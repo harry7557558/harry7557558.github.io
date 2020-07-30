@@ -1,4 +1,98 @@
 <html>
-<head></head>
-<body>Hello, World!</body>
+<head>
+    <title>Harry Chen</title>
+    <meta charset="utf-8" />
+
+    <link rel="icon" href="./logo.png" />
+
+    <style>
+        body {
+            background-color: seashell;
+        }
+
+        #titles {
+            margin: 5% 5% 3% 5%;
+            font-family: 'Courier New', Consolas;
+            border-bottom: 1px solid gray;
+            padding: 10px 0px;
+            width: 60%;
+        }
+
+            #titles #title {
+                font-size: 60px;
+                font-weight: 400;
+                color: black;
+            }
+
+            #titles #bar {
+                margin: 15px 5px;
+                font-size: 16px;
+            }
+
+        #info {
+            margin: 0% 5% 5% 5%;
+            font-family: Helvetica, Arial;
+        }
+
+            #info .stitle {
+                font-size: 20px;
+                margin: 24px 0px 12px 0px;
+            }
+
+            #info p {
+                font-size: 16px;
+                font-family: Calibri;
+                margin: 10px 0px;
+            }
+
+            #info a {
+                color: blue;
+                text-decoration: none;
+            }
+
+                #info a:hover {
+                    color: brown;
+                    text-decoration: underline;
+                }
+
+        ::selection {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="titles">
+        <div id="title" title="somewhere on the internet">Coming soon...</div>
+        <div id="bar">Notes - Tools - Blogs - Math - Physics - Graphics</div>
+
+    </div>
+
+    <div id="info">
+        <div class="stitle">You can still check some of my tools:</div>
+        <p><a href="./tools/matrixv.html">Matrix visualizer</a>: interactive visualization of 2d/3d/4d matrices used for computer graphics, geometry transform, data processing, and others. (doesn't work in Firefox)</p>
+        <p><a href="./tools/complex.html">Complex grapher</a>: graphing complex-variabled math functions using Javascript.</p>
+        <p><a href="./tools/chemequ.html">Chemical equation balancer</a>: made for my science homework.</p>
+        <p><a href="./tools/mathjaxt.html">MathJax tester</a>: Latex math tester with real-time preview. (defined some macros)</p>
+        <p><a href="./tools/svgpath.html">SVG path tester</a>: visualizing svg path data. A quite sketchy tool.</p>
+        <div class="stitle">...and notes:</div>
+        <p><a href="./notes/trigonometric.png">Trigonometric formulas</a>: a list of trigonometric function identities in elementry algebra. (172kb png, HTML/PDF coming soon)</p>
+        <p><a href="./notes/substitution.html">Integral substitutions</a>: list of common substitutions in multidimensional integration. (please <a href="https://github.com/Harry7557558/Notes/issues" target="_blank">check my math</a>)</p>
+        <div class="stitle">Most of my tools are single HTML. Feel free to download them and add something of your own ;)</div>
+    </div>
+
+    <script>
+        var typeTitleDots = {
+            timer: 1,
+            typeDot: function () {
+                var that = this;
+                var s = "Coming soon" + ([".&nbsp;&nbsp;", "..&nbsp;", "...", "..."][(++this.timer) % 4]);
+                document.getElementById("title").innerHTML = s;
+                setTimeout(function () { that.typeDot(); }, 1000);
+            }
+        };
+        typeTitleDots.typeDot();
+    </script>
+
+    <a style="width:16px;height:16px;position:absolute;top:0;right:0;opacity:0" href="https://dmoj.ca/user/Moana"></a>
+</body>
 </html>

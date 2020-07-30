@@ -1,0 +1,563 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>Chemical Equation Balancer</title>
+    <meta charset="utf-8" />
+    <style>
+        #debug {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+        }
+
+        #main {
+            margin: 40px 20% 0px 20%;
+            min-height: 200px;
+            border: 1px solid gray;
+            border-radius: 10px;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+            font-family: sans-serif;
+        }
+
+        #title {
+            width: 100%;
+            margin: 20px 0px 0px 0px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+            #title > #subtitle {
+                margin: 6px 0px;
+                font-size: 0.6em;
+                color: gray;
+            }
+
+        #content {
+            margin: 10px 10% 0px 10%;
+        }
+
+            #content > p {
+                margin: 5px 0px;
+                font-style: italic;
+            }
+
+        #border {
+            width: 100%;
+            display: flex;
+            border: 1px solid gray;
+            border-radius: 4px;
+            padding: 0px;
+            white-space: nowrap;
+            align-items: center;
+        }
+
+            #border #input {
+                margin: 0px 6px;
+                width: 100%;
+                flex-grow: 1;
+                height: 30px;
+                border: 0;
+                background-color: transparent;
+                outline: none;
+                font-family: Consolas;
+            }
+
+            #border #button {
+                margin-right: 6px;
+                height: 25px;
+            }
+
+        #result {
+            margin: 20px 0px;
+            text-align: center;
+        }
+
+        @media only screen and (max-width: 700px) {
+            #debug {
+                background-color: blue;
+            }
+
+            #main {
+                margin: 30px 15% 0px 15%;
+            }
+
+            #title {
+                margin: 15px 0px;
+                font-size: 1.2em;
+            }
+
+            #border #input {
+                margin-left: 4px;
+                height: 25px;
+            }
+
+            #border #button {
+                margin-right: 4px;
+                height: 22px;
+            }
+        }
+    </style>
+</head>
+<body onload="balance_main();">
+    <div id="debug" title="The color of this square helps developer diagnose layout problems"></div>
+    <div id="main">
+        <div id="title">
+            Chemical Equation Balancer
+            <p id="subtitle">By Harry Chen</p>
+            <!--<hr />-->
+        </div>
+        <div id="content">
+            <div id="border">
+                <input id="input" type="text" placeholder="Enter or paste chemical equation there"
+                       spellcheck="false" autocomplete="off" autocorrect="off"
+                       value="H2+O2==H2O"
+                       onkeydown="if (event.keyCode==13) balance_main();" />
+                <button id="button" type="button" onclick="balance_main();">Balance</button>
+            </div>
+            <div id="result">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Note that the reading of ionic equations and complex compound notations is still debugging
+
+        String.prototype.splice = function (idx, rem, str) {
+            return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+        };
+
+        function gcd(a, b) {
+            while (b != 0) {
+                var t = b;
+                b = a - b * Math.floor(a / b);
+                a = t;
+            }
+            return a;
+        }
+
+        function Fraction(n, m) {
+            if (n == 0) this.n = 0, this.m = 1;
+            else {
+                var d = gcd(m > 0 ? m : -m, n > 0 ? n : -n);
+                if (m < 0) d = -d;
+                this.n = n / d, this.m = m / d;
+            }
+        }
+        function Add(a, b) {
+            return new Fraction(a.m * b.n + a.n * b.m, a.m * b.m);
+        }
+        function Min(a, b) {
+            return new Fraction(a.m * b.n - a.n * b.m, a.m * b.m);
+        }
+        function Mul(a, b) {
+            return new Fraction(a.n * b.n, a.m * b.m);
+        }
+        function Div(a, b) {
+            return new Fraction(a.n * b.m, a.m * b.n);
+        }
+        function Neg(f) {
+            return new Fraction(-f.n, f.m);
+        }
+        function Inv(f) {
+            return new Fraction(f.m, f.n);
+        }
+        function frac2str(f) {
+            if (f.m == 1) return "" + f.n;
+            else return f.n + "/" + f.m;
+        }
+
+        function isDigit(str) {
+            var d = str.charCodeAt(0);
+            return d >= 48 && d <= 57;
+        }
+        function getInput() {
+            return document.getElementById("input").value;
+        }
+
+        const ele = [
+            "Periodic Table of Elements (placeholder)",
+            "H*", "He",
+            "Li", "Be", "B*", "C*", "N*", "O*", "F*", "Ne",
+            "Na", "Mg", "Al", "Si", "P*", "S*", "Cl", "Ar",
+            "K*", "Ca", "Sc", "Ti", "V*", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
+            "Rb", "Sr", "Y*", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I*", "Xe",
+            "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W*", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
+            "Fr", "Ra", "Ac", "Th", "Pa", "U*", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"
+        ];
+        const n = ele.length;   // 119, with a placeholder
+
+        // saperate string of lists of molecular formulas
+        function sliceChem(equ) {
+            equ = equ + "+";
+            var res = [];
+            while (equ.length != 0) {
+                var brackets = [];
+                var chm = "";
+                var n = 0;
+                while (1) {
+                    if (equ.length == 0) throw "unbalanced brackets";
+                    var c = equ[0];
+                    equ = equ.substring(1, equ.length);
+                    if (c == '(' || c == '[' || c == '{') brackets.push(c);
+                    if (c == ')' || c == ']' || c == '}') {
+                        var l = brackets.length;
+                        if (l == 0) throw "unbalanced brackets";
+                        if (c == ')' && brackets.pop() != '(') throw ("unexpected bracket ')'");
+                        if (c == ']' && brackets.pop() != '[') throw ("unexpected bracket ']'");
+                        if (c == '}' && brackets.pop() != '{') throw ("unexpected bracket '}'");
+                    }
+                    if (c == '+') {
+                        if (brackets.length == 0) break;
+                        c = '⁺';
+                    }
+                    if (c == '-') c = '⁻';  // avoid confusion
+                    chm += c;
+                    if (++n > 100) break;
+                }
+                res.push(chm);
+            }
+            var removenum = function (equ) {
+                var equ_bk = equ;
+                while (isDigit(equ[0])) {
+                    equ = equ.substring(1, equ.length);
+                    if (equ.length == 0) throw ("unexpected number " + equ_bk);
+                }
+                return equ;
+            };
+            try {
+                for (var i = 0; i < res.length; i++) res[i] = removenum(res[i]);
+            } catch (e) { throw (e); }
+            return res;
+        }
+
+        // read the number at the beginning of a string
+        function readnum(str) {
+            var m = "";
+            while (str.length != 0) {
+                if (!isDigit(str[0])) break;
+                m += str[0], str = str.substring(1, str.length);
+            }
+            if (m.length == 0) return 1;
+            var r = 0;
+            while (m.length != 0) {
+                r = 10 * r + m.charCodeAt(0) - 48;
+                m = m.substring(1, m.length);
+            }
+            return r;
+        }
+
+        // read a molecular formula into return a vector
+        function mol2vec(equ) {
+            // replace some tokens
+            const equ_bk = equ;
+            equ = equ.replace(/⁺/g, "").replace(/⁻/g, "");
+            equ = equ.replace(/\[/g, "(").replace(/\{/g, "(");
+            equ = equ.replace(/\]/g, ")").replace(/\}/g, ")");
+            equ = equ.replace(/\./g, "");
+
+            // add a "*" symbol after element symbols with only one letter
+            for (var i = 0; i < equ.length; i++) {
+                var c = equ.substr(i, 1), cc = c.charCodeAt(0);
+                if (cc >= 65 && cc <= 90) {     // capital letter
+                    if (i == equ.length - 1 || ((c = equ.substr(i + 1, 1)) == '(' || c == ')') ||
+                        (((cc = equ.charCodeAt(i + 1)) >= 65 && cc <= 90)) || (cc >= 48 && cc <= 57)) {
+                        equ = equ.splice(i + 1, 0, "*");
+                    }
+                }
+            }
+
+            // recursion part
+            var mol2vec_c = function (equ) {
+                var res = [];
+                for (var i = 0; i < n; i++) res.push(0);
+                while (equ.length != 0) {
+                    var c = equ[0], cc = equ.charCodeAt(0);
+                    equ = equ.substring(1, equ.length);
+                    if (cc >= 65 && cc <= 90) {     // capital letter, beginning of an element symbol
+                        c += equ[0];
+                        equ = equ.substring(1, equ.length);
+                        var dir; for (dir = 1; dir < n; dir++) {
+                            if (c == ele[dir]) break;
+                        }
+                        if (dir == n) throw ("unknown element symbol \"" + c.replace("\*", "") + "\"");
+                        // now c is the element symbol and dir is its atomic number
+                        var m = readnum(equ);
+                        while (equ.length != 0 && isDigit(equ[0])) equ = equ.substring(1, equ.length);
+                        res[dir] += m;
+                    }
+                    else if (c == '(') {    // bracket
+                        var brackets = 1;
+                        var i; for (i = 0; i < equ.length; i++) {
+                            if (equ[i] == '(') brackets++;
+                            if (equ[i] == ')') brackets--;
+                            if (brackets == 0) break;   // find the matched bracket
+                        }
+                        var r;
+                        try {
+                            r = mol2vec_c(equ.substring(0, i));     // recursive reading contents inside the bracket
+                        } catch (e) {
+                            throw (e);
+                        }
+                        equ = equ.substring(i + 1, equ.length);
+                        // add things inside the bracket into the result vector
+                        var m = readnum(equ);
+                        while (equ.length != 0 && isDigit(equ[0])) equ = equ.substring(1, equ.length);
+                        for (var i = 1; i < n; i++) res[i] += m * r[i];
+                    }
+                    else throw false;
+                }
+                return res;
+            };
+
+            var res;
+            try {
+                res = mol2vec_c(equ);
+            } catch (e) {
+                if (e == false) throw ("unrecogonized molecular formula " + equ_bk);
+                throw e;
+            }
+
+            return res;
+        }
+
+        // read and balance chemical equation in a string
+        function balance(equ) {
+            document.getElementById("log").innerHTML = "";
+            equ = equ.replace(/ /g, "");
+            equ = equ.replace(/\*/g, ".");
+            for (var i = 0; i < equ.length; i++) {
+                if (equ.charCodeAt(i) < 0x20 || equ.charCodeAt(i) > 0x7E)
+                    throw ("unexpexted character \'" + equ.substr(i, 1) + "\'");
+            }
+
+            // convert arrow or equal sign to a single "="
+            if (/=/.test(equ)) {
+                while (equ.match("==")) equ = equ.replace("==", "=");
+                while (equ.match("=>")) equ = equ.replace("=>", "=");
+            }
+            else if (equ.match("->")) {
+                while (equ.match("-->")) equ = equ.replace("-->", "->");
+                while (equ.match("->>")) equ = equ.replace("->>", "->");
+                equ = equ.replace("->", "=");
+            }
+            else throw "missing arrow or equal sign";
+
+            // get lists of molecular formulas before and after reaction
+            var dir = equ.search("=", 0);
+            try {
+                var chml = sliceChem(equ.substring(0, dir));
+                var chmr = sliceChem(equ.substring(dir + 1, equ.length));
+                console.log(chml, chmr);
+            } catch (e) {
+                throw e;
+            }
+            if (chml.length * chmr.length == 0) throw "empty side";
+
+
+
+            // construct matrix
+            var c = chml.length + chmr.length;
+            var M = [];
+            for (var i = 0; i < chml.length; i++) M.push(mol2vec(chml[i]));
+            for (var i = 0; i < chmr.length; i++) M.push(mol2vec(chmr[i]));
+            for (var i = chml.length; i < c - 1; i++)
+                for (var j = 0; j < n; j++) if (M[i][j] != 0) M[i][j] = -M[i][j];
+
+            // transpose the matrix
+            var _M = M;
+            M = [];
+            for (var i = 1; i < n; i++) {
+                M.push([]);
+                for (var j = 0; j < c; j++) M[i - 1].push(new Fraction(_M[j][i], 1));
+            }
+
+            // remove empty rows
+            for (var i = 0; i < M.length; i++) {
+                for (var j = 0; j <= c; j++) {
+                    if (j == c) M.splice(i, 1), i--;
+                    else if (M[i][j].n != 0) break;
+                }
+            }
+            var s = M.length;
+            if (s < c - 1) throw "This chemical equation has more than one ways to balance, or it doesn't exist.";
+
+            // Gaussian elimination
+            var log = function (msg) {
+                document.getElementById("log").innerHTML += "<p>" + msg + "</p>";
+            };
+            var logMat = function () {
+                var b = "";
+                b += "<table style='margin:20px;'>";
+                for (var i = 0; i < M.length; i++) {
+                    b += "<tr>";
+                    for (var j = 0; j < M[i].length; j++) {
+                        b += "<td>" + frac2str(M[i][j]) + "&emsp;</td>";
+                    }
+                    b += "</tr>";
+                }
+                b += "</table>";
+                document.getElementById("log").innerHTML += b;
+            };
+            logMat(M);
+            var swaprow = function (r1, r2) {
+                //log("Swap row " + (r1 + 1) + " and row " + (r2 + 1));
+                var r = M[r1];
+                M[r1] = M[r2], M[r2] = r;
+            };
+            var multrow = function (r, k) {
+                //log("Multiply row " + (r + 1) + " by " + frac2str(k));
+                for (var i = 0; i < c; i++) M[r][i] = Mul(M[r][i], k);
+            };
+            var multadd = function (r1, k, r2) {
+                //log("Add row " + (r1 + 1) + " times " + frac2str(k) + " to row " + (r2 + 1));
+                for (var i = 0; i < c; i++) M[r2][i] = Add(Mul(M[r1][i], k), M[r2][i]);
+            };
+            var di = 0, i, j, k;
+            for (i = 0; i < c; i++ , di++) {
+                // find the first non-zero number
+                for (k = di; k < s; k++) {
+                    if (M[k][i].n != 0) break;
+                }
+                if (k == s) di--;   // if this happens, problem may occur
+                else {
+                    // add all other values in the same column to zero
+                    if (k != di) swaprow(k, di), k = di/*, logMat()*/;
+                    for (j = 0; j < s; j++) {
+                        if (j != k && M[j][i].n != 0) {
+                            var mt = Neg(Div(M[j][i], M[k][i]));
+                            multadd(k, mt, j);
+                            //logMat();
+                        }
+                    }
+                    multrow(k, Inv(M[k][i]));
+                    //logMat();
+                }
+            }
+            logMat(M);
+
+            // check the result
+            for (var i = 0; i < c - 1; i++) {
+                for (var j = 0; j < s; j++) {
+                    if (j != i && M[j][i].n != 0) throw "This chemical equation has more than one ways to balance, or it doesn't exist.";
+                }
+            }
+
+            // output balanced equation
+            _M = [];
+            var mt = 1;  // gcd
+            for (var i = 0; i < c - 1; i++) {
+                var f = M[i][c - 1];
+                if (f.n <= 0) throw "Balancing failed! This error may occur due to an inexistent chemical equation, or the chemical equation you entered have more than one ways to balance.";
+                _M.push(f);
+                mt = mt * f.m / gcd(mt, f.m);
+            }
+            for (var i = 0; i < c - 1; i++) _M[i] = mt * _M[i].n / _M[i].m;
+            _M.push(mt);
+            // convert to html
+            var form2html = function (form) {
+                var r = "";
+                while (form.length != 0) {
+                    var c = form[0];
+                    form = form.substring(1, form.length);
+                    if (isDigit(c)) r += "<sub>" + c + "</sub>";
+                    else r += c;
+                }
+                return r;
+            };
+            var str = "";
+            for (var i = 0; i < chml.length; i++)
+                str += (i == 0 ? "" : " + ") + (_M[i] == 1 ? "" : _M[i]) + " " + form2html(chml[i]);
+            str += "&emsp;⟹&emsp;";
+            for (var i = chml.length; i < c; i++)
+                str += (i == chml.length ? "" : " + ") + (_M[i] == 1 ? "" : _M[i]) + " " + form2html(chmr[i - chml.length]);
+            document.getElementById("result").innerHTML = str;
+            console.log(_M);
+        }
+
+        function balance_main() {
+            try {
+                balance(getInput());
+            } catch (e) {
+                document.getElementById("result").innerHTML = "<b style='color:red'>Error: " + e + "</b>";
+            }
+        }
+
+    </script>
+
+
+    <div style="display: none">
+
+        // test equations
+
+        // These chemical equations can be balanced
+        H2+O2==H2O
+        CO+O2==CO2
+        Fe+O2==Fe2O3
+        Fe+O2==Fe3O4
+        Fe+O2==FeO
+        CoO+CO==Co+CO2
+        Na2CO3+HCl==NaCl+CO2+H2O
+        Al+H2SO4==Al2(SO4)3+H2
+        CuSO4+HCl==H2[CuCl4]+H2SO4
+        Ca(OH)2+Na2CO3====CaCO3+NaOH
+        KMnO4+C6H5CH3===C6H5COOK+MnO2+H2O+K2MnO4
+        Pt+HNO3+HCl===H2PtCl6+NO+H2O
+        P4+CuSO4+H2O===Cu3P+H3PO4+H2SO4
+        S8+Ca(OH)2===CaS5+CaS2O3+H2O
+        CuSO4+Na2CO3+H2O==Cu2(OH)2CO3+Na2SO4+CO2
+        KMnO4+H2SO4==Mn2O7+K2SO4+H2O
+        P2I4+P4+H2O===PH4I+H3PO4
+        Fe3C+HNO3===Fe(NO3)3+CO2+NO2+H2O
+        PbN6+Cr(MnO4)2===Cr2O3+MnO2+Pb3O4+NO
+        KHC2O4.H2C2O4+KMnO4+H2SO4=MnSO4+K2SO4+CO2+H2O
+        Ag3AsO4+Zn+H2SO4===Ag+AsH3+ZnSO4+H2O
+        NaCr(OH)4+NaClO+NaOH===Na2CrO4+NaCl+H2O
+        Na2S5+NaClO+NaOH===Na2SO4+NaCl+H2O
+        KOCN+NaOH+Cl2===CO2+N2+KCl+NaCl+H2O
+        NaBiO3+MnSO4+H2SO4===Na2SO4+Bi2(SO4)3+NaMnO4+H2O
+        B10H12CNH3+NiCl2+NaOH=Na4(B10H10CNH2)2Ni+NaCl+H2O
+        K2NaCo(NO2)6+KMnO4+H2SO4=K2SO4+Na2SO4+CoSO4+MnSO4+HNO3+H2O
+        K4Fe(CN)6+KMnO4+H2SO4=KHSO4+Fe2(SO4)3+MnSO4+HNO3+CO2+H2O
+        H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2===PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O
+        *CH3(CH2)5COOH+(Ca(PO3))2(Ca(OH)2)3====(Ca(CH3(CH2)5COO)2)+H2O+Ca(PO3)2
+
+        // These chemical equations do not exist
+        H2+Cl2==H2O
+        H2SO4+O2==H2O+SO2
+        Ne2+HF==HNeF
+
+        // These are not chemical equations
+        y^2=x^3-x+1
+        [H+CH3(CH2)5COO-]+2Ca(PO3)2.3Ca(OH)2
+        3C+4O=5N
+
+        // These chemical equations have more than one ways to balance
+        C6H12O6+H2O+O2==CO2+H2O
+        CH3CH2OH+O2==CO+CO2+H2O
+        Fe36Si5+H3PO3+K2Cr2O7+H2O===FePO4+Fe(OH)3+Cr(OH)3+CrPO4+K3PO4+SiO2
+        H2S+K2Cr2O7+H2SO4===Cr2(SO4)3+K2SO4+S+H2O
+
+        // Challenge
+        H1000C800O500N300S100Cl50P20F10Br5I3+O2==H2O+CO2+NO2+SO2+HCl+P4O10+HF+HBr+HI
+        H1000C800O500N300S100Cl50P20F10Br5I3+O2==H2O+CO2+HNO3+H2SO4+HCl+H3PO4+HF+HBr+HI
+        H1000C800O500N300S100Cl50P20F10Br5I3+F2==HF+CF4+O2+N2+SF6+Cl2+PF5+Br2+I2
+        C990H1529N263O299S7+O2==CO2+H2O+NO+SO2
+        C990H1529N263O299S7+O2==CO2+H2O+NO2+SO3
+        C990H1529N263O299S7+O2==CO2+H2O+HNO3+H2SO4
+        C990H1529N263O299S7+H2SO4==C+H2O+NO+SO2+H2SO4
+        C990H1529N263O299S7+H2SO4==C+H2O+NO+SO2
+        C990H1529N263O299S7+H2SO4==H2O+NO+SO2
+        C990H1529N263O299S7+NaOH===NH2CH2COONa+CH3CHNH2COONa+CH3CHCH3CHNH2COONa+CH3CHCH3CH2CHNH2COONa+CH3CH2CHCH3CHNH2COONa+C6H5CH2CHNH2COONa+C8H6NCH2CHNH2COONa+C6H4OHCH2CHNH2COONa+NaOOCCH2CHNH2COONa+C2H3N2CH2CHNH2COONa+NH2COCH2CHNH2COONa+NaOOC(CH2)2CHNH2COONa+H2N(CH2)4CHNH2COONa+H2NCO(CH2)2CHNH2COONa+H3CS(CH2)2CHNH2COONa+H2NCNNH2N(CH2)3CHNH2COONa+NH2CH(CH2OH)COONa+NH2CH(CH(CH3)OH)COONa+NH2CHCH2SHCOONa+C4H8NCOONa+NH4OH+(NH4)2S+H2O
+
+    </div>
+    <div style="display:none">
+        <br /><br /><br /><hr />
+        Please ignore the numbers below.
+        <div id="log"></div>
+    </div>
+</body>
+</html>

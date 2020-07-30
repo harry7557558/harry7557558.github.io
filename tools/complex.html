@@ -1,0 +1,838 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>The Complex Grapher</title>
+    <meta charset="utf-8" />
+
+    <script id="mathjax-config-script" type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
+    </script>
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <style>
+        #MathJax_MenuFrame {
+            opacity: 0.0;
+            visibility: hidden;
+            display: none;
+        }
+
+        .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
+            outline-width: 0px;
+            outline-style: none;
+            outline-color: rgba(255,255,255,0.0);
+        }
+    </style>
+
+    <script src="https://unpkg.com/mathjs@5.7.0/dist/math.min.js"></script>
+    <script>
+        // https://unpkg.com/mathjs@5.9.0/dist/math.js  line 34520-35609
+
+        // IE doesn't support hyperbolic functions
+        function sinh(e) {
+            return 0.5 * (Math.exp(e) - Math.exp(-e));
+        }
+        function cosh(e) {
+            return 0.5 * (Math.exp(e) + Math.exp(-e));
+        }
+        function tanh(e) {
+            if (e > 1000) return 1;
+            if (e < -1000) return -1;
+            return (Math.exp(e) - Math.exp(-e)) / (Math.exp(e) + Math.exp(-e));
+        }
+        function hypot(a, b) {
+            return Math.sqrt(a * a + b * b);
+        }
+        function logHypot(a, b) {
+            var _a = Math.abs(a);
+            var _b = Math.abs(b);
+            if (a === 0) return Math.log(_b);
+            if (b === 0) return Math.log(_a);
+            if (_a < 3000 && _b < 3000) return Math.log(a * a + b * b) * 0.5;
+            return Math.log(a / Math.cos(Math.atan2(b, a)));
+        }
+
+        function Complex(e, t) {
+            this.re = e,
+                this.im = t,
+                this.argCalc = !1,
+                this.magCalc = !1,
+                this.Re = function () {
+                    return this.re
+                }
+                ,
+                this.Im = function () {
+                    return this.im
+                }
+                ,
+                this.Mag = function () {
+                    return this.magCalc || (this.mag = Math.sqrt(Math.pow(this.re, 2) + Math.pow(this.im, 2)),
+                        this.magCalc = !0),
+                        this.mag
+                }
+                ,
+                this.Arg = function () {
+                    return this.argCalc || (this.arg = Math.atan2(this.im, this.re),
+                        this.argCalc = !0),
+                        this.arg
+                }
+                ,
+                this.ToString = function () {
+                    return ((this.re >= 0) ? "" : " −") + Math.abs(this.re.toFixed(2)) + ((this.im >= 0) ? " + " : " − ")
+                        + ((Math.abs(this.im.toFixed(2)) == 1) ? "" : Math.abs(this.im.toFixed(2))) + "i";
+                }
+        }
+        const compE = new Complex(Math.E, 0)
+            , compI = new Complex(0, 1)
+            , comp2I = new Complex(0, 2)
+            , comp1 = new Complex(1, 0)
+            , comp2 = new Complex(2, 0)
+            , compPi = new Complex(Math.PI, 0);
+
+        function Add(e, t) {
+            return new Complex(e.Re() + t.Re(), e.Im() + t.Im());
+        }
+        function Min(e, t) {
+            return new Complex(e.Re() - t.Re(), e.Im() - t.Im());
+        }
+        function Mul(e, t) {
+            return new Complex(e.Re() * t.Re() - e.Im() * t.Im(), e.Re() * t.Im() + e.Im() * t.Re())
+        }
+        function Div(e, t) {
+            var a = t.Re() * t.Re() + t.Im() * t.Im();
+            return new Complex((e.Re() * t.Re() + e.Im() * t.Im()) / a, (e.Im() * t.Re() - e.Re() * t.Im()) / a);
+        }
+        function Pow(e, t) {
+            var a = e.Arg()
+                , r = Math.log(e.Mag())
+                , c = Math.exp(t.Re() * r - t.Im() * a)
+                , s = t.Re() * a + t.Im() * r;
+            return new Complex(c * Math.cos(s), c * Math.sin(s));
+        }
+        function Sqrt(e) {
+            var m = e.Mag();
+            return e.Im() > 0 ? (new Complex(Math.sqrt(0.5 * (m + e.Re())), Math.sqrt(0.5 * (m - e.Re()))))
+                : (new Complex(Math.sqrt(0.5 * (m + e.Re())), -Math.sqrt(0.5 * (m - e.Re()))));
+        }
+        function Inv(e) {
+            var a = e.Re() * e.Re() + e.Im() * e.Im();
+            return new Complex(e.Re() / a, -e.Im() / a);
+        }
+
+        function Exp(e) {
+            var c = Math.exp(e.Re());
+            return new Complex(c * Math.cos(e.Im()), c * Math.sin(e.Im()));
+        }
+        function Sin(e) {
+            return new Complex(Math.sin(e.Re()) * cosh(e.Im()), Math.cos(e.Re()) * sinh(e.Im()));
+        }
+        function Cos(e) {
+            return new Complex(Math.cos(e.Re()) * cosh(e.Im()), - Math.sin(e.Re()) * sinh(e.Im()));
+        }
+        function Tan(e) {
+            var a = 2 * e.Re(), b = 2 * e.Im(), d = Math.cos(a) + cosh(b);
+            return new Complex(Math.sin(a) / d, sinh(b) / d);
+        }
+        function Cot(e) {
+            var a = 2 * e.Re(), b = 2 * e.Im(), d = Math.cos(a) - cosh(b);
+            return new Complex(-Math.sin(a) / d, sinh(b) / d);
+        }
+        function Sec(e) {
+            var a = e.Re(), b = e.Im(), d = 0.5 * cosh(2 * b) + 0.5 * Math.cos(2 * a);
+            return new Complex(Math.cos(a) * cosh(b) / d, Math.sin(a) * sinh(b) / d);
+        }
+        function Csc(e) {
+            var a = e.Re(), b = e.Im(), d = 0.5 * cosh(2 * b) - 0.5 * Math.cos(2 * a);
+            return new Complex(Math.sin(a) * cosh(b) / d, -Math.cos(a) * sinh(b) / d);
+        }
+        function Sinh(e) {
+            return new Complex(sinh(e.Re()) * Math.cos(e.Im()), cosh(e.Re()) * Math.sin(e.Im()));
+        }
+        function Cosh(e) {
+            return new Complex(cosh(e.Re()) * Math.cos(e.Im()), sinh(e.Re()) * Math.sin(e.Im()));
+        }
+        function Tanh(e) {
+            var a = 2 * e.Re();
+            var b = 2 * e.Im();
+            var d = cosh(a) + Math.cos(b);
+            return new Complex(sinh(a) / d, Math.sin(b) / d);
+        }
+        function Coth(e) {
+            var a = 2 * e.Re();
+            var b = 2 * e.Im();
+            var d = cosh(a) - Math.cos(b);
+            return new Complex(sinh(a) / d, -Math.sin(b) / d);
+        }
+        function Csch(e) {
+            var d = Math.cos(2 * e.Im()) - cosh(2 * e.Re());
+            return new Complex(-2 * sinh(e.Re()) * Math.cos(e.Im()) / d, 2 * cosh(e.Re()) * Math.sin(e.Im()) / d);
+        }
+        function Sech(e) {
+            var d = Math.cos(2 * e.Im()) + cosh(2 * e.Re());
+            return new Complex(2 * cosh(e.Re()) * Math.cos(e.Im()) / d, -2 * sinh(e.Re()) * Math.sin(e.Im()) / d);
+        }
+
+        function Log(e) {
+            return new Complex(Math.log(e.Mag()), e.Arg())
+        }
+        function Asin(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var t1 = Sqrt(new Complex(
+                b * b - a * a + 1,
+                -2 * a * b));
+            var t2 = Log(new Complex(
+                t1.Re() - b,
+                t1.Im() + a));
+            return new Complex(t2.Im(), -t2.Re());
+        }
+        function Acos(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var t1 = Sqrt(new Complex(
+                b * b - a * a + 1,
+                -2 * a * b));
+            var t2 = Log(new Complex(
+                t1.Re() - b,
+                t1.Im() + a));
+            return new Complex(Math.PI / 2 - t2.Im(), t2.Re());
+        }
+        function Atan(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + (1.0 - b) * (1.0 - b);
+            var t1 = Log(new Complex(
+                (1 - b * b - a * a) / d,
+                -2 * a / d));
+            return new Complex(-0.5 * t1.Im(), 0.5 * t1.Re());
+        }
+        function Acot(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Atan(new Complex(
+                    a / d,
+                    -b / d))
+                : Atan(new Complex(
+                    (a !== 0) ? a / 0 : 0,
+                    (b !== 0) ? -b / 0 : 0));
+        }
+        function Asec(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Acos(new Complex(
+                    a / d,
+                    -b / d))
+                : Acos(new Complex(
+                    (a !== 0) ? a / 0 : 0,
+                    (b !== 0) ? -b / 0 : 0));
+        }
+        function Acsc(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Asin(new Complex(
+                    a / d,
+                    -b / d))
+                : Asin(new Complex(
+                    (a !== 0) ? a / 0 : 0,
+                    (b !== 0) ? -b / 0 : 0));
+        }
+        function Asinh(e) {
+            var res = Asin(new Complex(e.Im(), -e.Re()));
+            return new Complex(-res.Im(), res.Re());
+        }
+        function Acosh(e) {
+            var res = Acos(e);
+            if (res.Im() <= 0) {
+                return new Complex(-res.Im(), res.Re());
+            } else {
+                return new Complex(res.Im(), -res.Re());
+            }
+        }
+        function Atanh(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var noIM = a > 1 && b === 0;
+            var oneMinus = 1 - a;
+            var onePlus = 1 + a;
+            var d = oneMinus * oneMinus + b * b;
+            var x = (d !== 0)
+                ? new Complex((onePlus * oneMinus - b * b) / d, (b * oneMinus + onePlus * b) / d)
+                : new Complex((a !== -1) ? (a / 0) : 0, (b !== 0) ? (b / 0) : 0);
+            return noIM ? (new Complex(0.5 * logHypot(x.Re(), x.Im()), -0.5 * Math.atan2(x.Im(), x.Re())))
+                : (new Complex(0.5 * logHypot(x.Re(), x.Im()), 0.5 * Math.atan2(x.Im(), x.Re())));
+        }
+        function Acoth(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Atanh(new Complex(a / d, -b / d))
+                : Atanh(new Complex((a !== 0) ? a / 0 : 0, (b !== 0) ? -b / 0 : 0));
+        }
+        function Acsch(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Asinh(new Complex(a / d, -b / d))
+                : Asinh(new Complex((a !== 0) ? a / 0 : 0, (b !== 0) ? -b / 0 : 0));
+        }
+        function Asech(e) {
+            var a = e.Re();
+            var b = e.Im();
+            var d = a * a + b * b;
+            return (d !== 0)
+                ? Acosh(new Complex(a / d, -b / d))
+                : Acosh(new Complex((a !== 0) ? a / 0 : 0, (b !== 0) ? -b / 0 : 0));
+        }
+
+        function Gamma(e) {
+            var c = math.gamma(math.complex(e.Re(), e.Im()));
+            return new Complex(math.re(c), math.im(c));
+        }
+
+    </script>
+
+    <style>
+        .main {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 40px;
+            text-align: center;
+            width: max-content;
+            max-width: 840px;
+            border: 1px solid gray;
+            border-radius: 10px;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+            padding: 12px 28px 16px 28px;
+        }
+
+        #title {
+            font-family: sans-serif;
+            font-size: 28px;
+            margin: 20px;
+        }
+
+        #canvas {
+            display: table-cell;
+            border: 1px solid gray;
+            width: 600px;
+            height: 400px;
+            position: relative;
+        }
+
+        #graph {
+            position: absolute;
+            left: 0;
+            top: 0;
+            cursor: crosshair;
+        }
+
+        #cmt {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            margin: 2px;
+            padding: 2px 8px;
+            height: 20px;
+            width: auto;
+            min-width: 100px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            text-align: center;
+            font-family: MathJax_Math-italic;
+            font-size: 16px;
+            display: none;
+        }
+
+        #canvaswrap {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0,0,0,0.5);
+            height: 400px;
+            width: 600px;
+            display: none;
+            cursor: unset;
+        }
+
+            #canvaswrap > p {
+                margin: 40px;
+                font-family: sans-serif;
+                font-size: 20px;
+                color: white;
+                text-align: center;
+            }
+
+        #control {
+            width: 200px;
+            max-height: 400px;
+            display: table-cell;
+            border: 1px solid gray;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        #ifunction {
+            width: 192px;
+            height: 18px;
+            border: 1px solid gray;
+            border-radius: 2px;
+            padding: 0.2em 0.4em;
+            font-size: 16px;
+            font-family: sans-serif;
+            font-weight: normal;
+            box-shadow: none;
+            color: black;
+        }
+
+        #ctrx, #ctry, #radx, #rady, #cprea {
+            width: 60px;
+            text-align: center;
+            border: 1px solid gray;
+            border-radius: 2px;
+        }
+
+        #start {
+            margin: 10px;
+            border: 2px solid gray;
+            border-radius: 2px;
+            background-color: rgb(221,221,221);
+            padding: 0.5em 0.8em;
+            font-size: 15px;
+        }
+    </style>
+    <script>
+        function $(id) {
+            return document.getElementById(id);
+        }
+        function $$(className) {
+            return document.getElementsByClassName(className);
+        }
+    </script>
+</head>
+<body onload="graph()">
+    <div class="main">
+        <p id="title">The Complex Grapher</p>
+        <div id="canvas" onmouseover="showscale(event)" onmousemove="showscale(event)" onmouseout="$('cmt').style.display = 'none';">
+            <canvas id="graph" width="600" height="400"></canvas>
+            <div id="canvaswrap">
+                <p>Graphing, please wait...</p>
+            </div>
+            <div id="cmt"></div>
+            <script>
+                var mat, cmd;
+                function showscale(e) {
+                    $("cmt").style.display = "block";
+                    var x = e.clientX - $("graph").getBoundingClientRect().left, y = e.clientY - $("graph").getBoundingClientRect().top;
+                    var C = new Complex(mat[0][0] * x + mat[0][1] * y + mat[0][2], mat[1][0] * x + mat[1][1] * y + mat[1][2]);
+                    var s = "#Error!";
+                    try { s = funcVal(C, cmd.slice(0)).ToString(); } catch (e) { }
+                    $("cmt").innerHTML = "f ( " + C.ToString() + " ) = " + s;
+                }
+            </script>
+        </div>
+        <div id="control">
+            <div>
+                Function to graph: <br />
+                <input id="ifunction" type="text" value="z" spellcheck="false"
+                       onkeydown="if (event.keyCode == 13) { graph(); };" />
+                <br /><br />
+            </div>
+            <div>
+                Center of graph: <br />
+                <input id="ctrx" type="text" value="0" oninput="ctrxchange()" /> $+$ <input id="ctry" type="text" value="0" oninput="ctrychange()" /> $i$
+                <br /><br />
+                <script>
+                    function ctrxchange() {
+                        if (isNaN(new Number($("ctrx").value))) highlight($("ctrx"));
+                        else dishighlight($("ctrx"));
+                    }
+                    function ctrychange() {
+                        if (isNaN(new Number($("ctry").value))) highlight($("ctry"));
+                        else dishighlight($("ctry"));
+                    }
+                </script>
+            </div>
+            <div>
+                <div style="display:inline-block;float:right;margin:8px;" onclick="clicklock()">
+                    <img style="display:none;" id="unlocked" alt="unlocked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTEyIDE3YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMi0yIC45LTIgMiAuOSAyIDIgMnptNi05aC0xVjZjMC0yLjc2LTIuMjQtNS01LTVTNyAzLjI0IDcgNmgxLjljMC0xLjcxIDEuMzktMy4xIDMuMS0zLjEgMS43MSAwIDMuMSAxLjM5IDMuMSAzLjF2Mkg2Yy0xLjEgMC0yIC45LTIgMnYxMGMwIDEuMS45IDIgMiAyaDEyYzEuMSAwIDItLjkgMi0yVjEwYzAtMS4xLS45LTItMi0yem0wIDEySDZWMTBoMTJ2MTB6Ii8+PC9zdmc+" />
+                    <img style="display:block;" id="locked" alt="locked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGRlZnM+PHBhdGggaWQ9ImEiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjwvZGVmcz48Y2xpcFBhdGggaWQ9ImIiPjx1c2Ugb3ZlcmZsb3c9InZpc2libGUiIHhsaW5rOmhyZWY9IiNhIi8+PC9jbGlwUGF0aD48cGF0aCBkPSJNMTIgMTdjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yLTIgLjktMiAyIC45IDIgMiAyem02LTloLTFWNmMwLTIuNzYtMi4yNC01LTUtNVM3IDMuMjQgNyA2djJINmMtMS4xIDAtMiAuOS0yIDJ2MTBjMCAxLjEuOSAyIDIgMmgxMmMxLjEgMCAyLS45IDItMlYxMGMwLTEuMS0uOS0yLTItMnpNOC45IDZjMC0xLjcxIDEuMzktMy4xIDMuMS0zLjFzMy4xIDEuMzkgMy4xIDMuMXYySDguOVY2ek0xOCAyMEg2VjEwaDEydjEweiIgY2xpcC1wYXRoPSJ1cmwoI2IpIi8+PC9zdmc+" />
+                    <script>
+                        var lockxy = 1;
+                        function clicklock() {
+                            if (lockxy != 0) {
+                                lockxy = 0;
+                                $("unlocked").style.display = "block";
+                                $("locked").style.display = "none";
+                            }
+                            else {
+                                lockxy = 1;
+                                $("unlocked").style.display = "none";
+                                $("locked").style.display = "block";
+                            }
+                        }
+                    </script>
+                </div>
+                Re axis radius:
+                <input id="radx" type="text" value="6" oninput="radxchange()" />
+                <br />
+                Im axis radius:
+                <input id="rady" type="text" value="4" oninput="radychange()" />
+                <br />
+                <!--<table><tr><td><input id="showaxis" type="checkbox" style="width:16px;height:16px;" checked /></td><td>Show axis</td></tr></table>--><br />
+                <br />
+                <script>
+                    var prevrx = 6, prevry = 4;
+                    function radxchange() {
+                        var x = new Number($("radx").value);
+                        if (isNaN(x) || x <= 0) highlight($("radx"));
+                        else {
+                            dishighlight($("radx"));
+                            if (lockxy != 0) {
+                                $("rady").value = new String(Math.round(prevry / prevrx * x * 100) / 100);
+                                dishighlight($("rady"));
+                            }
+                            prevrx = x; prevry = $("rady").value;
+                        }
+                    }
+                    function radychange() {
+                        var y = new Number($("rady").value);
+                        if (isNaN(y) || y <= 0) highlight($("rady"));
+                        else {
+                            dishighlight($("rady"));
+                            if (lockxy != 0) {
+                                $("radx").value = new String(Math.round(prevrx / prevry * y * 100) / 100);
+                                dishighlight($("radx"));
+                            }
+                            prevrx = $("radx").value; prevry = y;
+                        }
+                    }
+                </script>
+            </div>
+            <div>
+                Coloring parameter <i>a</i>:
+                <input id="cprea" type="text" value="0.5" oninput="cpreachange()" />
+                <br />
+                <script>
+                    function cpreachange() {
+                        var a = new Number($("cprea").value);
+                        if (isNaN(a)) highlight($("cprea"));
+                        else if (a >= 1 || a <= 0) highlight($("cprea"));
+                        else dishighlight($("cprea"));
+                    }
+                </script>
+                <p style="font-size:16px;">
+                    $\begin{cases}
+                    H &= \arg z \\
+                    L &= 1-a^{\ln(\ln(|z|+1)+1.05)} \\
+                    S &= 1 \\
+                    \end{cases}$
+                </p>
+            </div>
+            <div style="text-align:center;">
+                <button id="start" onclick="graph()">Draw Graph</button>
+            </div>
+        </div>
+        <br style="clear:both;" />
+    </div>
+    <script>
+
+        var Input = document.getElementsByTagName("input");
+        for (var i = 0; i < Input.length; i++) {
+            Input[i].spellcheck = false;
+            Input[i].autocomplete = Input[i].autocorrect = Input[i].autocapitalize = "off";
+        }
+        function highlight(i) {
+            i.style.boxShadow = "0px 0px 3px rgb(255,0,0)";
+            i.style.color = "red";
+            i.style.fontWeight = "600";
+        }
+        function dishighlight(i) {
+            i.style.boxShadow = "none";
+            i.style.color = "black";
+            i.style.fontWeight = "normal";
+        }
+        function hslToRgb(h, s, l) {
+            if (isNaN(l)) return "rgb(255,255,255)";
+            var r, g, b;
+            if (s == 0) {
+                r = g = b = l;
+            } else {
+                var hue2rgb = function hue2rgb(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                }
+
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return "rgb(" + Math.round(r * 255) + "," + Math.round(g * 255) + "," + Math.round(b * 255) + ")";
+        }
+
+
+        const FC = ["éҳρ", "log", "sin", "cos", "tan", "snh", "csh", "asn", "acs", "atn", "tnh", "ash", "ach", "ath", "sqr", "csc", "sec", "cot", "acc", "asc", "act", "cch", "sch", "cth", "aҳh", "agh", "akh", "gma",
+            "rél", "ɪma", "abs", "arg"];
+
+        function readstr() {
+            str = $("ifunction").value;
+
+            // Shunting-Yard algorithm, saved from https://www.complexgrapher.com/scripts.min.js
+            str = str.replace(/ /g, "");
+            var replaceFuncName = function replaceFuncName() {
+                for (var i = 0; i < src.length; i++) {
+                    while (str.match(src[i])) str = str.replace(src[i], rep[i]);
+                }
+            }
+            var src = ["arsinh", "arcosh", "artanh", "arcsch", "arsech", "arcoth", "arcsinh", "arccosh", "arctanh", "arccsch", "arcsech", "arccoth"];
+            var rep = ["ash", "ach", "ath", "aҳh", "agh", "akh", "ash", "ach", "ath", "aҳh", "agh", "akh"];
+            replaceFuncName();
+            src = ["arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot"];
+            rep = ["asn", "acs", "atn", "acc", "asc", "act", "asn", "acs", "atn", "acc", "asc", "act"];
+            replaceFuncName();
+            src = ["asinh", "acosh", "atanh", "acsch", "asech", "acoth", "sinh", "cosh", "tanh", "csch", "sech", "coth"];
+            rep = ["ash", "ach", "ath", "aҳh", "agh", "akh", "snh", "csh", "tnh", "cch", "sch", "cth"];
+            replaceFuncName();
+            src = ["ln", "exp", "sqrt", "asin", "acos", "atan", "acsc", "asec", "acot", "gamma", "pi", "PI"];
+            rep = ["log", "éҳρ", "sqr", "asn", "acs", "atn", "acc", "asc", "act", "gma", "π", "π"];  // must be 3 lowercase characters, [zepix] => [żéρɪҳ]
+            replaceFuncName();
+            src = ["re", "Re", "real", "Real", "im", "Im"];
+            rep = ["rél", "rél", "rél", "rél", "ɪma", "ɪma"];
+            replaceFuncName();
+
+            if (!(/z/.test(str)) && (/x/.test(str))) str = str.replace(/x/g, "z");
+
+            for (var t = 0; t < str.length; t++)
+                t < str.length - 1 && /[zeπi\)]/.test(str[t]) && (/[zeπi\(0-9.]/.test(str[t + 1]) || FC.indexOf(str.slice(t + 1, t + 4)) >= 0) && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length)),
+                    t < str.length - 1 && /\d/.test(str[t]) && FC.indexOf(str.slice(t + 1, t + 4)) >= 0 && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length)),
+                    t > 0 && /[zeπi\(]/.test(str[t]) && /[zeπi\)0-9.]/.test(str[t - 1]) && (str = str.slice(0, t) + "*" + str.slice(t, str.length));
+
+            for (var t = 0; t < str.length; t++)
+                "-" == str[t] && (0 == t || "(" == str[t - 1]) && (str = str.slice(0, t) + "0" + str.slice(t, str.length));
+
+            for (var n = [], t = 0; t < str.length; t++)
+                if (token = str[t],
+                    /[zeπi+*-\/\^\(\)]/.test(token))
+                    n.push(token);
+                else if (/[0-9.]/.test(token)) {
+                    for (t++; /[0-9.]/.test(str[t]);)
+                        token += str[t],
+                            t++;
+                    if (t-- ,
+                        (token.match(/[.]/g) || []).length > 1)
+                        throw "Invalid Expression";
+                    n.push(token)
+                } else {
+                    if (!(FC.indexOf(str.slice(t, t + 3)) >= 0))
+                        throw "Invalid Expression";
+                    if (n.push(str.slice(t, t + 3)),
+                        t += 2,
+                        "(" != str[t + 1])
+                        throw "Invalid Expression"
+                }
+
+            var prec = function prec(e) {
+                switch (e) {
+                    case "+": return 1;
+                    case "-": return 1;
+                    case "*": return 2;
+                    case "/": return 2;
+                    case "^": return 3;
+                    case "sin": return 4;
+                    case "cos": return 4;
+                    case "tan": return 4;
+                    case "éҳρ": return 4;
+                    case "log": return 4;
+                    case "sqr": return 4;
+                    case "asn": return 4;
+                    case "acs": return 4;
+                    case "atn": return 4;
+                    case "snh": return 4;
+                    case "csh": return 4;
+                    case "tnh": return 4;
+                    case "ash": return 4;
+                    case "ach": return 4;
+                    case "ath": return 4;
+                    case "cot": return 4;
+                    case "csc": return 4;
+                    case "sec": return 4;
+                    case "acc": return 4;
+                    case "asc": return 4;
+                    case "act": return 4;
+                    case "cch": return 4;
+                    case "sch": return 4;
+                    case "cth": return 4;
+                    case "aҳh": return 4;
+                    case "agh": return 4;
+                    case "akh": return 4;
+                    case "gma": return 4;
+                    case "rél": return 4;
+                    case "ɪma": return 4;
+                    case "abs": return 4;
+                    case "arg": return 4;
+                    default: return -1;
+                }
+            }
+            for (var a = [], i = [], t = 0; t < n.length; t++)
+                if (token = n[t],
+                    /[0-9.]/.test(token[0]) || /^[zeπi]/.test(token))
+                    i.push(token);
+                else if (/[+*-\/\^]/.test(token) || FC.indexOf(token) >= 0) {
+                    if (a.length > 0)
+                        for (; (prec(a[a.length - 1]) > prec(token) || prec(a[a.length - 1]) == prec(token) && "^" != a[a.length - 1]) && (i.push(a.pop()),
+                            0 != a.length);)
+                            ;
+                    a.push(token)
+                } else if ("(" == token)
+                    a.push(token);
+                else if (")" == token) {
+                    if (!(a.length > 0)) break;
+                    for (; "(" != a[a.length - 1];)
+                        if (i.push(a.pop()),
+                            0 == a.length) break;
+                    a.pop()
+                }
+
+            for (; a.length > 0;) {
+                if ("(" == a[a.length - 1]) a.pop();
+                i.push(a.pop())
+            }
+
+            for (var t = 0; t < i.length; t++)
+                "i" == i[t] ? i[t] = compI : "e" == i[t] ? i[t] = compE : "π" == i[t] ? i[t] = compPi : /[0-9.]/.test(i[t][0]) && (i[t] = new Complex(Number(i[t]), 0));
+
+            return i;
+
+        }
+
+        function funcVal(e, t) {
+            for (var n = 0; n < t.length; n++)
+                "z" == t[n] && (t[n] = e);
+            stack = [];
+            for (var n = 0; n < t.length; n++)
+                if (token = t[n],
+                    "string" == typeof token) {
+                    if (!(FC.indexOf(token) >= 0)) {
+                        if (stack.length < 2) throw "Invalid Expression";
+                        var i = stack.pop()
+                            , o = stack.pop()
+                            , r = new Complex(0, 0);
+                        switch (token) {
+                            case "+": r = Add(o, i); break;
+                            case "-": r = Min(o, i); break;
+                            case "*": r = Mul(o, i); break;
+                            case "/": r = Div(o, i); break;
+                            case "^": r = Pow(o, i); break;
+                        }
+                    } else {
+                        var a = stack.pop();
+                        switch (token) {
+                            case "sin": r = Sin(a); break;
+                            case "cos": r = Cos(a); break;
+                            case "tan": r = Tan(a); break;
+                            case "snh": r = Sinh(a); break;
+                            case "csh": r = Cosh(a); break;
+                            case "tnh": r = Tanh(a); break;
+                            case "éҳρ": r = Exp(a); break;
+                            case "log": r = Log(a); break;
+                            case "asn": r = Asin(a); break;
+                            case "acs": r = Acos(a); break;
+                            case "atn": r = Atan(a); break;
+                            case "ash": r = Asinh(a); break;
+                            case "ach": r = Acosh(a); break;
+                            case "ath": r = Atanh(a); break;
+                            case "sqr": r = Sqrt(a); break;
+                            case "cot": r = Cot(a); break;
+                            case "csc": r = Csc(a); break;
+                            case "sec": r = Sec(a); break;
+                            case "cch": r = Csch(a); break;
+                            case "sch": r = Sech(a); break;
+                            case "cth": r = Coth(a); break;
+                            case "acc": r = Acsc(a); break;
+                            case "asc": r = Asec(a); break;
+                            case "act": r = Acot(a); break;
+                            case "aҳh": r = Acsch(a); break;
+                            case "agh": r = Asech(a); break;
+                            case "akh": r = Acoth(a); break;
+                            case "gma": r = Gamma(a); break;
+                            case "żta": r = Riemann_Zeta(a); break;
+                            case "rél": r = new Complex(a.re, 0); break;
+                            case "ɪma": r = new Complex(a.im, 0); break;
+                            case "abs": r = new Complex(a.Mag(), 0); break;
+                            case "arg": r = new Complex(a.Arg(), 0); break;
+                        }
+                    }
+                    stack.push(r)
+                } else
+                    stack.push(token);
+            if (1 != stack.length)
+                throw "Invalid Expression";
+            return stack.pop()
+        }
+
+
+        function graph() {
+            dishighlight($("ifunction"));
+
+            var cx = new Number($("ctrx").value);
+            var cy = new Number($("ctry").value);
+            var rx = new Number($("radx").value);
+            var ry = new Number($("rady").value);
+            if (isNaN(cx) || isNaN(cy) || isNaN(rx) || rx <= 0 || isNaN(ry) || ry <= 0) return;
+            mat = [[rx / 300, 0, cx - rx], [0, -ry / 200, cy + ry]];
+            var a = new Number($("cprea").value);
+            if (isNaN(a) || a >= 1 || a <= 0) return;
+
+            try {
+                cmd = readstr();
+            } catch (d) {
+                highlight($("ifunction"));
+                $("canvaswrap").style.display = "none";
+                console.log(d);
+                return;
+            }
+
+
+            setTimeout(function () {
+                try {
+                    var canvas = $("graph");
+                    var cmdc, c, sc;
+                    var ctx = canvas.getContext('2d');
+                    for (var i = 0; i < 400; i++) {
+                        for (var j = 0; j < 600; j++) {
+                            sc = new Complex(mat[0][0] * j + mat[0][1] * i + mat[0][2], mat[1][0] * j + mat[1][1] * i + mat[1][2])
+                            c = funcVal(sc, cmd.slice(0));
+                            //ctx.fillStyle = hslToRgb(c.Arg() / (2 * Math.PI), 1, 1 - Math.pow(a, c.Mag()));
+                            ctx.fillStyle = hslToRgb(c.Arg() / (2 * Math.PI), 1, 1 - Math.pow(a, Math.log(Math.log(c.Mag() + 1) + 1.05)));
+                            ctx.fillRect(j, i, 1, 1);
+                        }
+                    }
+                    $("canvaswrap").style.display = "none";
+
+                } catch (d) {
+                    highlight($("ifunction"));
+                    $("canvaswrap").style.display = "none";
+                    console.log(d);
+                }
+            }, 200);
+            $("canvaswrap").style.display = "block";
+        }
+
+    </script>
+
+</body>
+</html>
