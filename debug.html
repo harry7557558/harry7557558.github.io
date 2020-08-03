@@ -1,0 +1,51 @@
+<html>
+<head>
+    <title>Harry Chen - DEBUG</title>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./logo.png" />
+    <style>
+        pre {
+            font-size: 18px;
+            margin-left: 50px;
+        }
+    </style>
+</head>
+<body contenteditable="true">
+    <h1>This is a list of my tools/notes that are currently under debugging.</h1>
+
+<pre>
+<a href="notes/inertia.html">List of moments of inertia</a>
+</pre>
+
+    <h1>To-do list:</h1>
+
+<pre>
+Inertia notes: ellipsoid and torus grapher; check the connecting-with-origin inertia formula;
+MathJax compressor: compress styles more; remove nested/empty span; safe whitespace removal;
+</pre>
+
+    <script>
+        var s = document.getElementsByTagName("a");
+        for (var i = 0; i < s.length; i++) {
+            s[i].contentEditable = "false";
+            //s[i].target = "_blank";
+        }
+    </script>
+
+
+    <!--<script>
+        // https://stackoverflow.com/a/18197341
+        function download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+    </script>
+    <h1 contenteditable="false"><a href="javascript:download('test.html', document.body.parentElement.innerHTML)">Save</a></h1>-->
+</body>
+</html>
