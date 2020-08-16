@@ -1,0 +1,829 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>The Contour Plotter</title>
+    <meta charset="utf-8" />
+
+    <script id="mathjax-config-script" type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
+    </script>
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <style>
+        #MathJax_MenuFrame {
+            opacity: 0.0;
+            visibility: hidden;
+            display: none;
+        }
+
+        .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
+            outline-width: 0px;
+            outline-style: none;
+            outline-color: rgba(255,255,255,0.0);
+        }
+    </style>
+
+    <script src="https://unpkg.com/mathjs@5.7.0/dist/math.min.js"></script>
+    <script>
+
+    </script>
+
+    <style>
+        .main {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 40px;
+            text-align: center;
+            width: max-content;
+            max-width: 840px;
+            border: 1px solid gray;
+            border-radius: 10px;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+            padding: 12px 28px 16px 28px;
+        }
+
+        #title {
+            font-family: sans-serif;
+            font-size: 28px;
+            margin: 20px;
+        }
+
+        #canvas {
+            display: table-cell;
+            border: 1px solid gray;
+            width: 600px;
+            height: 400px;
+            position: relative;
+        }
+
+        #graph {
+            position: absolute;
+            left: 0;
+            top: 0;
+            cursor: crosshair;
+        }
+
+        #cmt {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            margin: 2px;
+            padding: 2px 8px;
+            height: 20px;
+            width: auto;
+            min-width: 100px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            text-align: center;
+            font-family: MathJax_Math-italic;
+            font-size: 16px;
+            display: none;
+        }
+
+        #canvaswrap {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0,0,0,0.5);
+            height: 400px;
+            width: 600px;
+            display: none;
+            cursor: unset;
+        }
+
+            #canvaswrap > p {
+                margin: 40px;
+                font-family: sans-serif;
+                font-size: 20px;
+                color: white;
+                text-align: center;
+            }
+
+        #control {
+            width: 200px;
+            max-height: 400px;
+            display: table-cell;
+            border: 1px solid gray;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        #ifunction {
+            width: 192px;
+            height: 18px;
+            border: 1px solid gray;
+            border-radius: 2px;
+            padding: 0.2em 0.4em;
+            font-size: 16px;
+            font-family: sans-serif;
+            font-weight: normal;
+            box-shadow: none;
+            color: black;
+        }
+
+        #ctrx, #ctry, #radx, #rady {
+            width: 60px;
+            text-align: center;
+            border: 1px solid gray;
+            border-radius: 2px;
+        }
+
+        #start {
+            margin: 10px;
+            border: 2px solid gray;
+            border-radius: 2px;
+            background-color: rgb(221,221,221);
+            padding: 0.5em 0.8em;
+            font-size: 15px;
+        }
+
+        #ColorFunctionBtn {
+            width: 180px;
+            height: 20px;
+            font-size: 12px;
+            font-family: Arial;
+        }
+
+        #ColorFunctionBtn_text {
+            width: 180px;
+            height: 16px;
+            line-height: 16px;
+            border: 1px solid gray;
+            padding: 2px 6px;
+        }
+
+        #ColorFunction_Dropdown {
+            display: none;
+            position: absolute;
+            margin-top: -2px;
+            background-color: white;
+        }
+
+        #ColorFunctionBtn:hover #ColorFunction_Dropdown {
+            display: block;
+        }
+
+        .colorfunction {
+            width: 180px;
+            height: 14px;
+            display: block;
+            margin: 0px 0px -1px 0px;
+            padding: 2px 6px;
+            color: black;
+            background-color: white;
+        }
+
+            .colorfunction:hover {
+                color: white;
+                background-color: steelblue;
+            }
+    </style>
+    <script>
+        function $(id) {
+            return document.getElementById(id);
+        }
+        function $$(className) {
+            return document.getElementsByClassName(className);
+        }
+
+        function sine_integral(x) {
+            var r = x > 0 ? 1 : -1;
+            if (Math.abs(x) < 4) {
+                x = Math.abs(x);
+                r *= x * (1 - 4.54393409816329991e-2 * Math.pow(x, 2) + 1.15457225751016682e-3 * Math.pow(x, 4) - 1.41018536821330254e-5 * Math.pow(x, 6) + 9.43280809438713025e-8 * Math.pow(x, 8) - 3.53201978997168357e-10 * Math.pow(x, 10) + 7.08240282274875911e-13 * Math.pow(x, 12) - 6.05338212010422477e-16 * Math.pow(x, 14)) / (1 + 1.01162145739225565e-2 * Math.pow(x, 2) + 4.99175116169755106e-5 * Math.pow(x, 4) + 1.55654986308745614e-7 * Math.pow(x, 6) + 3.28067571055789734e-10 * Math.pow(x, 8) + 4.5049097575386581e-13 * Math.pow(x, 10) + 3.21107051193712168e-16 * Math.pow(x, 12));
+                return r;
+            }
+            else {
+                x = Math.abs(x);
+                var fx, gx;
+                fx = (1 + 7.44437068161936700618e+2 * Math.pow(x, -2) + 1.96396372895146869801e+5 * Math.pow(x, -4) + 2.37750310125431834034e+7 * Math.pow(x, -6) + 1.43073403821274636888e+9 * Math.pow(x, -8) + 4.33736238870432522765e+10 * Math.pow(x, -10) + 6.40533830574022022911e+11 * Math.pow(x, -12) + 4.20968180571076940208e+12 * Math.pow(x, -14) + 1.00795182980368574617e+13 * Math.pow(x, -16) + 4.94816688199951963482e+12 * Math.pow(x, -18) - 4.94701168645415959931e+11 * Math.pow(x, -20)) / (1 + 7.46437068161927678031e+2 * Math.pow(x, -2) + 1.97865247031583951450e+5 * Math.pow(x, -4) + 2.41535670165126845144e+7 * Math.pow(x, -6) + 1.47478952192985464958e+9 * Math.pow(x, -8) + 4.58595115847765779830e+10 * Math.pow(x, -10) + 7.08501308149515401563e+11 * Math.pow(x, -12) + 5.06084464593475076774e+12 * Math.pow(x, -14) + 1.43468549171581016479e+13 * Math.pow(x, -16) + 1.11535493509914254097e+13 * Math.pow(x, -18)) / x;
+                gx = (1 + 8.1359520115168615e+2 * Math.pow(x, -2) + 2.35239181626478200e+5 * Math.pow(x, -4) + 3.12557570795778731e+7 * Math.pow(x, -6) + 2.06297595146763354e+9 * Math.pow(x, -8) + 6.83052205423625007e+10 * Math.pow(x, -10) + 1.09049528450362786e+12 * Math.pow(x, -12) + 7.57664583257834349e+12 * Math.pow(x, -14) + 1.81004487464664575e+13 * Math.pow(x, -16) + 6.43291613143049485e+12 * Math.pow(x, -18) - 1.36517137670871689e+12 * Math.pow(x, -20)) / (1 + 8.19595201151451564e+2 * Math.pow(x, -2) + 2.40036752835578777e+5 * Math.pow(x, -4) + 3.26026661647090822e+7 * Math.pow(x, -6) + 2.23355543278099360e+9 * Math.pow(x, -8) + 7.87465017341829930e+10 * Math.pow(x, -10) + 1.39866710696414565e+12 * Math.pow(x, -12) + 1.17164723371736605e+13 * Math.pow(x, -14) + 4.01839087307656620e+13 * Math.pow(x, -16) + 3.99653257887490811e+13 * Math.pow(x, -18)) / Math.pow(x, 2);
+                r *= Math.PI / 2 - fx * Math.cos(x) - gx * Math.sin(x);
+                return r;
+            }
+        }
+        function cosine_integral(x) {
+            if (x < 0) return NaN;
+            else if (x < 4) {
+                return 0.577215664901532860606512 + Math.log(x) + (-0.25 + 7.51851524438898291e-3 * Math.pow(x, 2) - 1.27528342240267686e-4 * Math.pow(x, 4) + 1.05297363846239184e-6 * Math.pow(x, 6) - 4.68889508144848019e-9 * Math.pow(x, 8) + 1.06480802891189243e-11 * Math.pow(x, 10) - 9.93728488857585407e-15 * Math.pow(x, 12)) / (1 + 1.1592605689110735e-2 * Math.pow(x, 2) + 6.72126800814254432e-5 * Math.pow(x, 4) + 2.55533277086129636e-7 * Math.pow(x, 6) + 6.97071295760958946e-10 * Math.pow(x, 8) + 1.38536352772778619e-12 * Math.pow(x, 10) + 1.89106054713059759e-15 * Math.pow(x, 12) + 1.39759616731376855e-18 * Math.pow(x, 14)) * Math.pow(x, 2);
+            }
+            else {
+                x = Math.abs(x);
+                var fx, gx;
+                fx = (1 + 7.44437068161936700618e+2 * Math.pow(x, -2) + 1.96396372895146869801e+5 * Math.pow(x, -4) + 2.37750310125431834034e+7 * Math.pow(x, -6) + 1.43073403821274636888e+9 * Math.pow(x, -8) + 4.33736238870432522765e+10 * Math.pow(x, -10) + 6.40533830574022022911e+11 * Math.pow(x, -12) + 4.20968180571076940208e+12 * Math.pow(x, -14) + 1.00795182980368574617e+13 * Math.pow(x, -16) + 4.94816688199951963482e+12 * Math.pow(x, -18) - 4.94701168645415959931e+11 * Math.pow(x, -20)) / (1 + 7.46437068161927678031e+2 * Math.pow(x, -2) + 1.97865247031583951450e+5 * Math.pow(x, -4) + 2.41535670165126845144e+7 * Math.pow(x, -6) + 1.47478952192985464958e+9 * Math.pow(x, -8) + 4.58595115847765779830e+10 * Math.pow(x, -10) + 7.08501308149515401563e+11 * Math.pow(x, -12) + 5.06084464593475076774e+12 * Math.pow(x, -14) + 1.43468549171581016479e+13 * Math.pow(x, -16) + 1.11535493509914254097e+13 * Math.pow(x, -18)) / x;
+                gx = (1 + 8.1359520115168615e+2 * Math.pow(x, -2) + 2.35239181626478200e+5 * Math.pow(x, -4) + 3.12557570795778731e+7 * Math.pow(x, -6) + 2.06297595146763354e+9 * Math.pow(x, -8) + 6.83052205423625007e+10 * Math.pow(x, -10) + 1.09049528450362786e+12 * Math.pow(x, -12) + 7.57664583257834349e+12 * Math.pow(x, -14) + 1.81004487464664575e+13 * Math.pow(x, -16) + 6.43291613143049485e+12 * Math.pow(x, -18) - 1.36517137670871689e+12 * Math.pow(x, -20)) / (1 + 8.19595201151451564e+2 * Math.pow(x, -2) + 2.40036752835578777e+5 * Math.pow(x, -4) + 3.26026661647090822e+7 * Math.pow(x, -6) + 2.23355543278099360e+9 * Math.pow(x, -8) + 7.87465017341829930e+10 * Math.pow(x, -10) + 1.39866710696414565e+12 * Math.pow(x, -12) + 1.17164723371736605e+13 * Math.pow(x, -14) + 4.01839087307656620e+13 * Math.pow(x, -16) + 3.99653257887490811e+13 * Math.pow(x, -18)) / Math.pow(x, 2);
+                return fx * Math.sin(x) - gx * Math.cos(x);
+            }
+        }
+        function exp_integral(x) {
+
+        }
+
+
+        function Elliptic_Complete_1(m) {
+            var agm = function agm(a0, g0) {
+                var maxIter = 50;
+                var an = (a0 + g0) / 2;
+                var gn = Math.sqrt(a0 * g0);
+                for (var iter = 0; (iter < maxIter) && (Math.abs(an - gn) > 1e-15); iter++) {
+                    a0 = 0.5 * (an + gn);
+                    g0 = Math.sqrt(an * gn);
+                    an = a0;
+                    gn = g0;
+                };
+                return an;
+            };
+            var kprime = Math.sqrt(1 - m);
+            return 0.5 * Math.PI / agm(1, kprime);
+        }
+
+        function Elliptic_Complete_2(m) {
+            var iter = 0, maxIter = 50;
+            var kprime = Math.sqrt(1. - m);
+            var a0 = 1., g0 = kprime;
+            var an = a0, gn = g0;
+            var twoPow = 0.25;
+            var partialSum = 1. - 0.5 * m;
+            do {
+                partialSum -= twoPow * (an - gn) * (an - gn);
+                twoPow *= 2.;
+                a0 = 0.5 * (an + gn);
+                g0 = Math.sqrt(an * gn);
+                an = a0;
+                gn = g0;
+                iter++;
+            } while ((Math.abs(an - gn) > 1e-15) && (iter < maxIter));
+            return 0.5 * Math.PI * partialSum / an;
+        }
+
+
+    </script>
+</head>
+<body onload="init()">
+    <div class="main">
+        <p id="title">The Contour Plotter</p>
+        <div id="canvas" onmouseover="showscale(event)" onmousemove="showscale(event)" onmouseout="$('cmt').style.display = 'none';">
+            <canvas id="graph" width="600" height="400"></canvas>
+            <div id="canvaswrap">
+                <p>Graphing, please wait...</p>
+            </div>
+            <div id="cmt"></div>
+            <script>
+                var mat, cmd;
+                function showscale(e) {
+                    var sx, sy, C;
+                    try {
+                        var x = e.clientX - $("graph").getBoundingClientRect().left, y = e.clientY - $("graph").getBoundingClientRect().top;
+                        sx = mat[0][0] * x + mat[0][1] * y + mat[0][2], sy = mat[1][0] * x + mat[1][1] * y + mat[1][2];
+                        C = funcVal(sx, sy, cmd.slice(0));
+                    } catch (d) {
+                        $("cmt").style.display = "none";
+                        return;
+                    }
+                    $("cmt").style.display = "block";
+                    $("cmt").innerHTML = ("f ( " + sx.toFixed(2) + ", " + sy.toFixed(2) + " ) = " + C.toFixed(2)).replace(/-/g, "−");
+                }
+            </script>
+        </div>
+        <div id="control">
+            <div>
+                Function to graph: <br />
+                <input id="ifunction" type="text" value="Beta(x,y)" spellcheck="false"
+                       onkeydown="if (event.keyCode == 13) { graph(); };" />
+                <br /><br />
+            </div>
+            <div>
+                Center of graph: <br />
+                $($ <input id="ctrx" type="text" value="0" oninput="ctrxchange()" /> $, $ <input id="ctry" type="text" value="0" oninput="ctrychange()" /> $)$
+                <br /><br />
+                <script>
+                    function ctrxchange() {
+                        if (isNaN(new Number($("ctrx").value))) highlight($("ctrx"));
+                        else dishighlight($("ctrx"));
+                    }
+                    function ctrychange() {
+                        if (isNaN(new Number($("ctry").value))) highlight($("ctry"));
+                        else dishighlight($("ctry"));
+                    }
+                </script>
+            </div>
+            <div>
+                <div style="display:inline-block;float:right;margin:8px;" onclick="clicklock()">
+                    <img style="display:none;" id="unlocked" alt="unlocked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTEyIDE3YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMi0yIC45LTIgMiAuOSAyIDIgMnptNi05aC0xVjZjMC0yLjc2LTIuMjQtNS01LTVTNyAzLjI0IDcgNmgxLjljMC0xLjcxIDEuMzktMy4xIDMuMS0zLjEgMS43MSAwIDMuMSAxLjM5IDMuMSAzLjF2Mkg2Yy0xLjEgMC0yIC45LTIgMnYxMGMwIDEuMS45IDIgMiAyaDEyYzEuMSAwIDItLjkgMi0yVjEwYzAtMS4xLS45LTItMi0yem0wIDEySDZWMTBoMTJ2MTB6Ii8+PC9zdmc+" />
+                    <img style="display:block;" id="locked" alt="locked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGRlZnM+PHBhdGggaWQ9ImEiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjwvZGVmcz48Y2xpcFBhdGggaWQ9ImIiPjx1c2Ugb3ZlcmZsb3c9InZpc2libGUiIHhsaW5rOmhyZWY9IiNhIi8+PC9jbGlwUGF0aD48cGF0aCBkPSJNMTIgMTdjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yLTIgLjktMiAyIC45IDIgMiAyem02LTloLTFWNmMwLTIuNzYtMi4yNC01LTUtNVM3IDMuMjQgNyA2djJINmMtMS4xIDAtMiAuOS0yIDJ2MTBjMCAxLjEuOSAyIDIgMmgxMmMxLjEgMCAyLS45IDItMlYxMGMwLTEuMS0uOS0yLTItMnpNOC45IDZjMC0xLjcxIDEuMzktMy4xIDMuMS0zLjFzMy4xIDEuMzkgMy4xIDMuMXYySDguOVY2ek0xOCAyMEg2VjEwaDEydjEweiIgY2xpcC1wYXRoPSJ1cmwoI2IpIi8+PC9zdmc+" />
+                    <script>
+                        var lockxy = 1;
+                        function clicklock() {
+                            if (lockxy != 0) {
+                                lockxy = 0;
+                                $("unlocked").style.display = "block";
+                                $("locked").style.display = "none";
+                            }
+                            else {
+                                lockxy = 1;
+                                $("unlocked").style.display = "none";
+                                $("locked").style.display = "block";
+                            }
+                        }
+                    </script>
+                </div>
+                <i>x</i>-axis radius:&ensp;
+                <input id="radx" type="text" value="6" oninput="radxchange()" />
+                <br />
+                <i>y</i>-axis radius:&ensp;
+                <input id="rady" type="text" value="4" oninput="radychange()" />
+                <br />
+                <!--<table><tr><td><input id="showaxis" type="checkbox" style="width:16px;height:16px;" unchecked /></td><td>Show axis</td></tr></table>--><br />
+                <br />
+                <script>
+                    var prevrx = 6, prevry = 4;
+                    function radxchange() {
+                        var x = new Number($("radx").value);
+                        if (isNaN(x) || x <= 0) highlight($("radx"));
+                        else {
+                            dishighlight($("radx"));
+                            if (lockxy != 0) {
+                                $("rady").value = new String(Math.round(prevry / prevrx * x * 100) / 100);
+                                dishighlight($("rady"));
+                            }
+                            prevrx = x; prevry = $("rady").value;
+                        }
+                    }
+                    function radychange() {
+                        var y = new Number($("rady").value);
+                        if (isNaN(y) || y <= 0) highlight($("rady"));
+                        else {
+                            dishighlight($("rady"));
+                            if (lockxy != 0) {
+                                $("radx").value = new String(Math.round(prevrx / prevry * y * 100) / 100);
+                                dishighlight($("radx"));
+                            }
+                            prevrx = $("radx").value; prevry = y;
+                        }
+                    }
+                </script>
+            </div>
+            <div>
+                Color Function: <br />
+                <select id="ColorFunction" onchange="graph(); refreshColorfv();">
+                    <option value="Default">Default</option>
+                    <option value="SolarDeepSea" selected>Solar − DeepSea</option>
+                    <option value="" disabled>——————————</option>
+                    <option value="BlueGreenYellow">BlueGreenYellow</option>
+                    <option value="Rainbow">Rainbow</option>
+                    <option value="Thermometer">Thermometer</option>
+                    <option value="Sunset">Sunset</option>
+                    <option value="GreenPinkTones">GreenPinkTones</option>
+                    <option value="Avocado">Avocado</option>
+                    <option value="" disabled>——————————</option>
+                </select>
+                <!--<br /><br />
+                <div id="ColorFunctionBtn">
+                    <div style="display:inline;float:right;margin:4px -4px;font-size:12px;">▼</div>
+                    <div id="ColorFunctionBtn_text">Select Color Function</div>
+                    <div id="ColorFunction_Dropdown">
+                        <div class="colorfunction">Default</div>
+                        <div class="colorfunction">Solar − DeepSea</div>
+                    </div>
+                </div>-->
+
+                <script src="ColorFunctions.js"></script>
+
+                <script>
+                    var colorfv = "Default";
+                    function refreshColorfv() {
+                        colorfv = document.getElementById("ColorFunction").value;
+                        //console.log(colorfv);
+                    }
+                    function tanh(e) {
+                        if (e > 1000) return 1;
+                        if (e < -1000) return -1;
+                        return (Math.exp(e) - Math.exp(-e)) / (Math.exp(e) + Math.exp(-e));
+                    }
+
+                    // Color functions: https://reference.wolfram.com/language/guide/ColorSchemes.html
+                    // Analysis RGB components of color gradients and fit using least square method
+                    // Some color functions don't work well, even they look beautiful in example images
+                    function DefaultColor(c) {
+                        if (isNaN(c)) return "DarkGreen";
+                        return hslToRgb(c >= 0 ? 0 : 0.5, 1, 1 - Math.pow(0.5, Math.log(Math.log(Math.abs(c) + 1) + 1.05)));
+                    }
+                    function SolarDeepSea(c) {
+                        if (isNaN(c)) return "rgb(64, 0, 0)";
+                        var t = 0.5 * c; t = (Math.exp(t) - Math.exp(-t)) / (Math.exp(t) + Math.exp(-t));
+                        if (c > 1000) t = 1; if (c < -1000) t = -1;
+                        var r, g, b;
+                        if (t >= 0) //r = -0.960828 * t * t + 1.42687 * t + 0.485457, g = 0.138228 * t * t + 0.774229 * t - 0.0442216, b = 0.158179 * t * t - 0.0298145 * t + 0.00779989;
+                            r = 0.880183 * t * t * t - 2.27602 * t * t + 1.94992 * t + 0.442456, g = -1.15153 * t * t * t + 1.85887 * t * t + 0.0899384 * t + 0.0120354, b = -0.204874 * t * t * t + 0.464309 * t * t - 0.151561 * t + 0.0178089;
+                        else t = -t, //r = 0.948458 * t * t - 0.574079 * t + 0.294471, g = 0.545408 * t * t + 0.492658 * t - 0.0490484, b = -0.741011 * t * t + 1.45874 * t + 0.280493;
+                            r = -7.31545 * Math.pow(t, 6) + 13.31 * Math.pow(t, 5) - 3.75123 * Math.pow(t, 4) - 1.83143 * t * t * t - 0.560149 * t * t + 0.779769 * t + 0.156216,
+                            g = -3.53306 * Math.pow(t, 6) + 14.265 * Math.pow(t, 5) - 21.3179 * Math.pow(t, 4) + 13.3875 * t * t * t - 2.16183 * t * t + 0.286874 * t - 9.48835e-05,
+                            b = 5.62199 * Math.pow(t, 6) - 16.1938 * Math.pow(t, 5) + 17.7046 * Math.pow(t, 4) - 9.38477 * t * t * t + 1.85801 * t * t + 1.08822 * t + 0.29789;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function BlueGreenYellow(c) {
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        //var r = 0.464854 * t * t + 0.346517 * t + 0.234843, g = -2.71038 * t * t + 2.93713 * t - 0.058516, b = -0.369806 * t * t - 0.382005 * t + 0.776378;
+                        var r = 0.437406 * t * t * t + 0.742519 * t * t - 0.367212 * t + 0.124687,
+                            g = 0.401903 * t * t * t - 1.41674 * t * t + 1.91798 * t - 0.00777944,
+                            b = 0.778786 * t * t * t - 1.79423 * t * t + 0.978048 * t + 0.385333;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function Rainbow(c) {
+                        //return hslToRgb(1 / (Math.exp(c) + 1), 1, 0.5);
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        //var r = 0.32 * Math.sin(5 * t - 2.6) + 0.56 + Math.pow((t - 0.45), 4), g = 1.3 * Math.pow(Math.sin(Math.sin(2.1 * t + 0.45)), 4) + 0.1, b = 0.36 * Math.pow((9.12 * t + 1.61), 3.3) * Math.exp(-(9.12 * t + 1.61)) + 0.14;
+                        var r = 33.2244 * Math.pow(t, 6) - 100.59 * Math.pow(t, 5) + 115.781 * Math.pow(t, 4) - 67.2886 * t * t * t + 23.2038 * t * t - 3.95569 * t + 0.495532,
+                            g = 40.0115 * Math.pow(t, 6) - 129.052 * Math.pow(t, 5) + 160.522 * Math.pow(t, 4) - 97.563 * t * t * t + 27.4201 * t * t - 1.35831 * t + 0.120199,
+                            b = 32.1251 * Math.pow(t, 6) - 102.898 * Math.pow(t, 5) + 117.668 * Math.pow(t, 4) - 52.4257 * t * t * t + 2.94278 * t * t + 2.19122 * t + 0.517757;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function Thermometer(c) {
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        var r = -2.21141 * t * t + 2.73313 * t + 0.029785, g = -3.43758 * t * t + 3.317 * t + 0.0664359, b = -1.41439 * t * t + 0.625223 * t + 0.850185;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function GreenPinkTones(c) {
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        //var r = -3.37461 * t * t + 4.17821 * t - 0.40699, g = -3.04987 * t * t + 2.35646 * t + 0.413827, b = -3.26774 * t * t + 4.01309 * t - 0.34825;
+                        var r = 11.101 * Math.pow(t, 4) - 28.9063 * t * t * t + 20.9159 * t * t - 2.9738 * t + 0.0772872,
+                            g = 6.51295 * Math.pow(t, 4) - 6.72748 * t * t * t - 4.08742 * t * t + 4.24063 * t + 0.198082,
+                            b = 9.29231 * Math.pow(t, 4) - 25.1058 * t * t * t + 18.4236 * t * t - 2.51392 * t + 0.101541;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function Avocado(c) {
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        var r = 0.857176 * t * t + 0.289262 * t - 0.0600045, g = -0.781326 * t * t + 1.69503 * t + 0.0241685, b = 0.0262179 * t * t + 0.173811 * t + 0.0139945;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                    function Sunset(c) {
+                        var t = 1 / (Math.exp(-0.5 * Math.floor(c * 4)) + 1);
+                        var r = -10.2457 * Math.pow(t, 6) + 20.5472 * Math.pow(t, 5) - 4.52495 * Math.pow(t, 4) - 12.5935 * t * t * t + 6.2716 * t * t + 1.53734 * t + 0.0070273,
+                            g = 6.28519 * Math.pow(t, 6) - 15.3752 * Math.pow(t, 5) + 10.6425 * Math.pow(t, 4) - 0.620113 * t * t * t - 0.868161 * t * t + 0.940185 * t - 0.00599704,
+                            b = 38.9567 * Math.pow(t, 6) - 113.737 * Math.pow(t, 5) + 110.123 * Math.pow(t, 4) - 27.4458 * t * t * t - 12.0644 * t * t + 5.27785 * t - 0.0610802;
+                        if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;
+                        if (r < 0) r = 0; if (g < 0) g = 0; if (b < 0) b = 0;
+                        r = Math.floor(r * 255), g = Math.floor(g * 255), b = Math.floor(b * 255);
+                        return "rgb(" + r + "," + g + "," + b + ")";
+                    }
+                </script>
+            </div>
+            <br /><br />
+            <div style="text-align:center;">
+                <button id="start" onclick="graph()">Draw Graph</button>
+            </div>
+        </div>
+        <br style="clear:both;" />
+    </div>
+    <script>
+
+        function init() {
+            try {
+                var c = math.gamma(0);
+            } catch (d) {
+                $("ifunction").value = "tan(x)*tan(y)";
+            }
+            LoadColorFunction();
+            graph();
+        }
+
+        var Input = document.getElementsByTagName("input");
+        for (var i = 0; i < Input.length; i++) {
+            Input[i].spellcheck = false;
+            Input[i].autocomplete = Input[i].autocorrect = Input[i].autocapitalize = "off";
+        }
+        function highlight(i) {
+            i.style.boxShadow = "0px 0px 3px rgb(255,0,0)";
+            i.style.color = "red";
+            i.style.fontWeight = "600";
+        }
+        function dishighlight(i) {
+            i.style.boxShadow = "none";
+            i.style.color = "black";
+            i.style.fontWeight = "normal";
+        }
+
+
+        function hslToRgb(h, s, l) {
+            var r, g, b;
+            if (s == 0) {
+                r = g = b = l;
+            } else {
+                var hue2rgb = function hue2rgb(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                }
+
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return "rgb(" + Math.round(r * 255) + "," + Math.round(g * 255) + "," + Math.round(b * 255) + ")";
+        }
+
+
+        var FC = ["é×ρ", "log", "sin", "cos", "tan", "snh", "csh", "asn", "acs", "atn", "tnh", "ash", "ach", "ath", "sqr", "cbr", "csc", "sec", "cot", "acc", "asc", "act", "cch", "sch", "cth", "a×h", "agh", "akh",
+            "gma", "érf", "abs", "sgn", "flr", "cél", "rnd", "trc", "lŋg", "lŋb", "sn∫", "cs∫", "é∫ⅰ", "é∫ⅱ"];
+        var FC2 = ["lgg", "rot", "mod", "att", "hpt", "bta"];
+        FC = FC.concat(FC2);
+
+        function readstr() {
+            str = $("ifunction").value;
+            str = str.replace(/ /g, "");
+            while (str.match("pi")) str = str.replace("pi", "π");
+            while (str.match("atan2")) str = str.replace("atan2", "att");
+            while (str.match("log10")) str = str.replace("log10", "lŋg");
+            while (str.match("log2")) str = str.replace("log2", "lŋb");
+            while (str.match("root3")) str = str.replace("root3", "cbr");
+            var src = ["arsinh", "arcosh", "artanh", "arcsch", "arsech", "arcoth", "arcsinh", "arccosh", "arctanh", "arccsch", "arcsech", "arccoth",
+                "arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot",
+                "asinh", "acosh", "atanh", "acsch", "asech", "acoth", "sinh", "cosh", "tanh", "csch", "sech", "coth",
+                "exp", "sqrt", "cbrt", "root", "asin", "acos", "atan", "acsc", "asec", "acot", "Gamma", "gamma", "erf",
+                "floor", "ceil", "round", "trunc", "sign", "fmod", "hypot", "Beta", "beta", "ln", "lg", "lb", "ld", "Si", "Ci", "K", "E"];
+            var rep = ["ash", "ach", "ath", "a×h", "agh", "akh", "ash", "ach", "ath", "a×h", "agh", "akh",
+                "asn", "acs", "atn", "acc", "asc", "act", "asn", "acs", "atn", "acc", "asc", "act",
+                "ash", "ach", "ath", "a×h", "agh", "akh", "snh", "csh", "tnh", "cch", "sch", "cth",
+                "é×ρ", "sqr", "cbr", "rot", "asn", "acs", "atn", "acc", "asc", "act", "gma", "gma", "érf",
+                "flr", "cél", "rnd", "trc", "sgn", "mod", "hpt", "bta", "bta", "log", "lŋg", "lŋb", "lŋb", "sn∫", "cs∫", "é∫ⅰ", "é∫ⅱ"];  // must be 3 lowercase characters, [xye] => [×ƴé]
+            src = src.concat(FC), rep = rep.concat(FC);
+            for (var i = 0; i < rep.length; i++) {
+                rep[i] = rep[i].replace(/a/g, "ā");
+                rep[i] = rep[i].replace(/b/g, "ƀ");
+            }
+            for (var i = 0; i < src.length; i++) {
+                if (rep[i] != src[i]) while (str.match(src[i])) str = str.replace(src[i], rep[i]);
+            }
+            if (!(/x/.test(str) || /y/.test(str)) && (/a/.test(str) || /b/.test(str)))
+                str = str.replace(/a/g, "x"), str = str.replace(/b/g, "y");
+            for (var i = 0; i < rep.length; i++) {
+                src[i] = rep[i];
+                rep[i] = rep[i].replace(/ā/g, "a");
+                rep[i] = rep[i].replace(/ƀ/g, "b");
+                if (rep[i] != src[i]) while (str.match(src[i])) str = str.replace(src[i], rep[i]);
+            }
+
+            //console.log(str);
+
+
+            // Formally, we type "log(2,sin(2*x)+1)". But when using our cellphone, most of us just type "log2(sin2x+1".
+            for (var t = 0; t < str.length; t++) {
+                t < str.length - 1 && /[xyeπ\)]/.test(str[t]) && (/[xyeπ\(\d.]/.test(str[t + 1]) || FC.indexOf(str.slice(t + 1, t + 4)) >= 0)
+                    && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length));
+                t < str.length - 1 && /\d/.test(str[t]) && FC.indexOf(str.slice(t + 1, t + 4)) >= 0
+                    && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length));
+                t > 0 && /[xyeπ\(]/.test(str[t]) && /[xyeπ\)\d.]/.test(str[t - 1])
+                    && (str = str.slice(0, t) + "*" + str.slice(t, str.length));
+            }
+            for (var t = 0; t < str.length; t++) {
+                "-" == str[t] && (0 == t || "(" == str[t - 1] || "," == str[t - 1])
+                    && (str = str.slice(0, t) + "0" + str.slice(t, str.length));
+            }
+
+
+            for (var n = [], t = 0; t < str.length; t++) {
+                if (token = str[t], /[xyeπ+*-\/\^,\(\)]/.test(token))
+                    n.push(token);
+                else if (/[0-9.]/.test(token)) {
+                    for (t++; /[0-9.]/.test(str[t]);)
+                        token += str[t], t++;
+                    if (t-- , (token.match(/[.]/g) || []).length > 1)
+                        throw "Invalid Expression: Decimal Error";
+                    n.push(token);
+                } else {
+                    if (!(FC.indexOf(str.slice(t, t + 3)) >= 0))
+                        throw "Invalid Expression: Unknown Function Name " + str.slice(t, t + 3);
+                    if (n.push(str.slice(t, t + 3)), t += 2, "(" != str[t + 1])
+                        throw "Invalid Expression: Bracket Missing after a Function";
+                }
+            }
+
+
+            var prec = function prec(e) {
+                switch (e) {
+                    case "+": return 1;
+                    case "-": return 1;
+                    case "*": return 2;
+                    case "/": return 2;
+                    case "^": return 3;
+                    default: return -1;
+                }
+            }
+
+
+            for (var a = [], i = [], t = 0; t < n.length; t++) {
+                if (token = n[t],
+                    /[0-9.]/.test(token[0]) || /^[xyeπ]/.test(token))
+                    i.push(token);
+                else if (FC.indexOf(token) >= 0) a.push(token);
+                else if ("," == token) {
+                    while (a.length > 0 && "(" != a[a.length - 1])
+                        i.push(a.pop());
+                    if (!(a.length > 0)) throw "Invalid Expression: Unexpected \",\"";
+                    if ("log" == a[a.length - 2]) a[a.length - 2] = "lgg";
+                }
+                else if (/[+*-\/\^]/.test(token)) {
+                    if (a.length > 0)
+                        for (; (prec(a[a.length - 1]) > prec(token) || prec(a[a.length - 1]) == prec(token) && "^" != a[a.length - 1]) && (i.push(a.pop()),
+                            0 != a.length););
+                    a.push(token);
+                }
+                else if ("(" == token) a.push(token);
+                else if (")" == token) {
+                    if (!(a.length > 0)) break;   // unbalanced bracket
+                    for (; "(" != a[a.length - 1];)
+                        if (i.push(a.pop()), 0 == a.length) break;  // unbalanced bracket
+                    a.pop();
+                    if (FC.indexOf(a[a.length - 1]) >= 0) i.push(a.pop());
+                }
+            }
+
+            for (; a.length > 0;) {
+                if ("(" == a[a.length - 1])
+                    a.pop();  // unbalanced bracket
+                i.push(a.pop());
+            }
+
+            for (var t = 0; t < i.length; t++)
+                "e" == i[t] ? i[t] = Math.E : "π" == i[t] ? i[t] = Math.PI : /[0-9.]/.test(i[t][0]) && (i[t] = new Number(i[t]));
+
+            //console.log(i);
+            return i;
+
+        }
+
+        function funcVal(x, y, t) {
+            for (var n = 0; n < t.length; n++)
+                "x" == t[n] && (t[n] = x), "y" == t[n] && (t[n] = y);
+            stack = [];
+            for (var n = 0; n < t.length; n++) {
+                if (token = t[n], "string" == typeof token) {
+                    if (FC.indexOf(token) >= 0) {
+                        var a = stack.pop();
+                        switch (token) {
+                            case "sin": r = Math.sin(a); break;
+                            case "cos": r = Math.cos(a); break;
+                            case "tan": r = Math.tan(a); break;
+                            case "snh": r = 0.5 * (Math.exp(a) - Math.exp(-a)); break;
+                            case "csh": r = 0.5 * (Math.exp(a) + Math.exp(-a)); break;
+                            case "tnh": r = (Math.exp(a) - Math.exp(-a)) / (Math.exp(a) + Math.exp(-a)); break;
+                            case "é×ρ": r = Math.exp(a); break;
+                            case "log": r = Math.log(a); break;
+                            case "asn": r = Math.asin(a); break;
+                            case "acs": r = Math.acos(a); break;
+                            case "atn": r = Math.atan(a); break;
+                            case "ash": r = Math.log(a + Math.sqrt(a * a + 1)); break;
+                            case "ach": r = Math.log(a + Math.sqrt(a * a - 1)); break;
+                            case "ath": r = 0.5 * Math.log((1 + a) / (1 - a)); break;
+                            case "sqr": r = Math.sqrt(a); break;
+                            case "cbr": r = (a >= 0) ? (Math.pow(a, 1 / 3)) : (-Math.pow(-a, 1 / 3)); break;
+                            case "cot": r = 1 / Math.tan(a); break;
+                            case "csc": r = 1 / Math.sin(a); break;
+                            case "sec": r = 1 / Math.cos(a); break;
+                            case "cch": r = 2 / (Math.exp(a) - Math.exp(-a)); break;
+                            case "sch": r = 2 / (Math.exp(a) + Math.exp(-a)); break;
+                            case "cth": r = (Math.exp(a) + Math.exp(-a)) / (Math.exp(a) - Math.exp(-a)); break;
+                            case "acc": r = Math.asin(1 / a); break;
+                            case "asc": r = Math.acos(1 / a); break;
+                            case "act": r = Math.PI / 2 - Math.atan(a); break;
+                            case "a×h": r = Math.log(1 / a + Math.sqrt(1 / (a * a) + 1)); break;
+                            case "agh": r = Math.log(1 / a + Math.sqrt(1 / (a * a) - 1)); break;
+                            case "akh": r = 0.5 * Math.log((1 + 1 / a) / (1 - 1 / a)); break;
+                            case "abs": r = Math.abs(a); break;
+                            case "sgn": r = a > 0 ? 1 : (a < 0 ? -1 : 0); break;
+                            case "flr": r = Math.floor(a); break;
+                            case "cél": r = Math.ceil(a); break;
+                            case "rnd": r = Math.round(a); break;
+                            case "trc": r = a >= 0 ? Math.floor(a) : Math.ceil(a); break;
+                            case "lŋg": r = Math.log(a) / Math.LN10; break;
+                            case "lŋb": r = Math.log(a) / Math.LN2; break;
+                            case "érf": r = math.erf(a); break;
+                            case "gma": r = math.re(math.gamma(a)); break;
+                            case "sn∫": r = sine_integral(a); break;
+                            case "cs∫": r = cosine_integral(a); break;
+                            //case "é∫ⅰ": r = Elliptic_Complete_1(a); break;
+                            //case "é∫ⅱ": r = Elliptic_Complete_2(a); break;
+                            default: if (FC2.indexOf(token) >= 0) {
+                                if (stack.length == 0) throw "Error: Empty stack";
+                                var o = stack.pop(), r = 0;
+                                switch (token) {
+                                    case "lgg": r = Math.log(a) / Math.log(o); break;
+                                    case "rot": if (Math.abs(Math.round(a) - a) < 1e-6 && (Math.round(Math.abs(a)) & 1)) r = (o >= 0) ? (Math.pow(o, 1 / a)) : (-Math.pow(-o, 1 / a)); else r = Math.pow(o, 1 / a); break;
+                                    case "mod": r = o - Math.floor(o / a) * a; break;
+                                    case "att": r = Math.atan2(o, a); break;
+                                    case "hpt": r = Math.sqrt(o * o + a * a); break;
+                                    case "bta": r = math.gamma(o) * math.gamma(a) / math.gamma(o + a); break;
+                                    default: throw ("Invalid Expression: " + token);
+                                }
+                            } else throw ("Invalid Expression: " + token);
+                        }
+                    } else {
+                        if (stack.length < 2) throw "Error: Empty stack";
+                        var i = stack.pop()
+                            , o = stack.pop()
+                            , r = 0;
+                        switch (token) {
+                            case "+": r = o + i; break;
+                            case "-": r = o - i; break;
+                            case "*": r = o * i; break;
+                            case "/": r = o / i; break;
+                            case "^": r = Math.pow(o, i); break;
+                            default: throw ("Invalid Expression: " + token);
+                        }
+                    }
+                    stack.push(r)
+                }
+                else stack.push(token);
+            }
+            if (1 != stack.length)
+                throw "Error: Final stack not empty";
+            return stack.pop();
+        }
+
+
+        function graph() {
+            dishighlight($("ifunction"));
+
+            var cx = new Number($("ctrx").value);
+            var cy = new Number($("ctry").value);
+            var rx = new Number($("radx").value);
+            var ry = new Number($("rady").value);
+            if (isNaN(cx) || isNaN(cy) || isNaN(rx) || rx <= 0 || isNaN(ry) || ry <= 0) return;
+            mat = [[rx / 300, 0, cx - rx], [0, -ry / 200, cy + ry]];
+
+            try {
+                cmd = readstr();
+                //console.log(cmd);
+            } catch (d) {
+                console.log(d);
+                highlight($("ifunction"));
+                $("canvaswrap").style.display = "none";
+                return;
+            }
+
+
+            setTimeout(function () {
+                try {
+                    var canvas = $("graph");
+                    var c, r, g, b, sx, sy;
+                    var ctx = canvas.getContext('2d');
+                    var col = $("ColorFunction").value;
+                    for (var i = 0; i < 400; i++) {
+                        for (var j = 0; j < 600; j++) {
+                            sx = mat[0][0] * j + mat[0][1] * i + mat[0][2], sy = mat[1][0] * j + mat[1][1] * i + mat[1][2];
+                            c = funcVal(sx, sy, cmd.slice(0));
+                            switch (col) {
+                                case "Default": ctx.fillStyle = DefaultColor(c); break;
+                                case "SolarDeepSea": ctx.fillStyle = SolarDeepSea(c); break;
+                                case "BlueGreenYellow": ctx.fillStyle = BlueGreenYellow(c); break;
+                                case "Rainbow": ctx.fillStyle = Rainbow(c); break;
+                                case "Thermometer": ctx.fillStyle = Thermometer(c); break;
+                                case "GreenPinkTones": ctx.fillStyle = GreenPinkTones(c); break;
+                                case "Avocado": ctx.fillStyle = Avocado(c); break;
+                                case "Sunset": ctx.fillStyle = Sunset(c); break;
+                                default: ctx.fillStyle = MtColor(1 / (Math.exp(-2 * c) + 1)); break;
+                            }
+                            ctx.fillRect(j, i, 1, 1);
+                        }
+                    }
+                    $("canvaswrap").style.display = "none";
+
+                } catch (d) {
+                    console.log(d);
+                    highlight($("ifunction"));
+                    $("canvaswrap").style.display = "none";
+                }
+            }, 200);
+            $("canvaswrap").style.display = "block";
+        }
+
+    </script>
+
+
+</body>
+</html>

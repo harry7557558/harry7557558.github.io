@@ -48,7 +48,7 @@
         #TeX_Input_container {
         }
 
-        #title {
+        .title {
             padding: 0px 0px 10px 10px;
             font-size: 20px;
             text-align: left;
@@ -56,6 +56,7 @@
             font-style: italic;
             font-weight: 600;
             color: rgb(180,190,190);
+            text-decoration: none;
         }
 
         #TeX_Input {
@@ -102,66 +103,25 @@
         }
     </script>
 </head>
-<body onload="init();" onbeforeunload="return backup()">
+<body onload="init();">
 
+    <!-- Latex macros -->
     <div style="height:0px; visibility:hidden; display:none;">
+        $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\e}{\operatorname{e}}$
         $\newcommand{\csch}{\operatorname{csch}}$
         $\newcommand{\sech}{\operatorname{sech}}$
         $\newcommand{\erf}{\operatorname{erf}}$
         $\newcommand{\sgn}{\operatorname{sgn}}$
-        $\newcommand{\arccot}{\operatorname{arccot}}$
-        $\newcommand{\Rk}{\operatorname{R}}$
-        $\newcommand{\Prj}{\operatorname{Prj}}$
-        $\newcommand{\gcf}{\operatorname{gcf}}$
-        $\newcommand{\lcm}{\operatorname{lcm}}$
-        $\newcommand{\mod}{\operatorname{mod\>}}$
-        $\newcommand{\divisible}{ {\>\large\mid\>}}$
-
-        $\newcommand{\d} {\mathrm{d}}$
-        $\newcommand{\deri}{\displaystyle\dfrac{\mathrm{d}}{\mathrm{d}x}}$
-        $\newcommand{\idint}[2][x]{\displaystyle\int{#2}{\>\mathrm{d}{#1}}}$
-        $\newcommand{\dint}[4][x]{\displaystyle\int_{#3}^{#4}{#2}{\>\mathrm{d}{#1}}}$
-        $\newcommand{\Int}{\displaystyle\int}$
-        $\newcommand{\Iint}{\displaystyle\iint}$
-        $\newcommand{\Iiint}{\displaystyle\iiint}$
-        $\newcommand{\Oint}{\displaystyle\oint}$
-        $\newcommand{\Oiint}{\displaystyle{\LARGE\raise{-0.13em}{\unicode{0x2b2d}}\kern-1.56em}\iint}$
-        $\newcommand{\oiint}{ {\LARGE\unicode{0x222F}}}$
-
-        $\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}$
-        $\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}$
-        $\newcommand{\vmat}[1]{\begin{vmatrix}#1\end{vmatrix}}$
-        $\newcommand{\equd}[2]{\displaystyle\left\{ {\begin{array}{l} {#1} \\ {#2} \end{array}}\right.}$
-        $\newcommand{\Sum}[3]{\displaystyle\sum\limits_{#2}\limits^{#3}{#1}}$
-
-        $\newcommand{\Alpha}{\unicode{0x0391}}$
-        $\newcommand{\Beta}{\unicode{0x0392}}$
-        $\newcommand{\Epsilon}{\unicode{0x0395}}$
-        $\newcommand{\Zeta}{\unicode{0x0396}}$
-        $\newcommand{\Eta}{\unicode{0x0397}}$
-        $\newcommand{\Iota}{\unicode{0x0399}}$
-        $\newcommand{\Kappa}{\unicode{0x039A}}$
-        $\newcommand{\Mu}{\unicode{0x039C}}$
-        $\newcommand{\Nu}{\unicode{0x039D}}$
-        $\newcommand{\Omicron}{\unicode{0x039F}}$
-        $\newcommand{\Tau}{\unicode{0x03A4}}$
-        $\newcommand{\Chi}{\unicode{0x03A7}}$
-
-        $\newcommand{\N}{\unicode{0x2115}}$
-        $\newcommand{\Z}{\unicode{0x2124}}$
-        $\newcommand{\P}{\unicode{0x2119}}$
-        $\newcommand{\Q}{\unicode{0x211A}}$
-        $\newcommand{\R}{\unicode{0x211D}}$
-        $\newcommand{\C}{\unicode{0x2102}}$
-        $\newcommand{\H}{\unicode{0x210D}}$
-
-
+        $\newcommand{\mod}{\operatorname{mod}}$
     </div>
 
     <div id="LaTeX_Tester">
         <div id="TeX_Input_container">
-            <div id="title">type LaTeX there: </div>
+            <div id="title" class="title">
+                <span>type LaTeX there: </span>
+                <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title" style="float:right;display:none">⇒</a>
+            </div>
             <textarea id="TeX_Input" type="text" spellcheck="false"
                       oninput="Render()">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
         </div>
@@ -217,7 +177,7 @@
 
             var cookie_enabled = navigator.cookieEnabled;  // In most browsers, local HTML files are not allowed to set cookies
             function init() {
-                String.prototype.splice = function(start, delCount, newSubStr) {
+                String.prototype.splice = function (start, delCount, newSubStr) {
                     return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
                 };
                 tex.value = "% Example Formula \n\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z} \n";
@@ -233,11 +193,13 @@
                     };
                     var s = getCookie("FinInput");
                     if (s != "") tex.value = s;
-                    console.log(s);
+                }
+                if (document.URL.match("file")) {
+                    document.getElementsByTagName('a')[0].style.display = "";
                 }
                 fom.innerHTML = "$" + tex.value.replace(/</g, "&lt;") + "$";
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-                setTimeout(function() {
+                setTimeout(function () {
                     histht = fom.getBoundingClientRect().height;
                     fom.style.minHeight = histht + "px";
                 }, 1000)
@@ -251,6 +213,9 @@
             }
 
             function Render() {
+                if (cookie_enabled) backup();
+                else document.body.setAttribute("onbeforeunload", "return backup()");
+
                 var ht = fom.getBoundingClientRect().height;
                 if (ht > histht) {
                     histht = ht;

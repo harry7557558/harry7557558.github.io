@@ -1,5 +1,5 @@
 # Not sure if this works for Github Pages
-# My homepage sometimes have insane contents that make me regret soon
+# My homepage sometimes has insane contents that make me regret soon
 
 User-agent: ia_archiver
 Disallow: /index.html
