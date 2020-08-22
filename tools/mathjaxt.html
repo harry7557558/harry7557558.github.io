@@ -10,7 +10,6 @@
     </script>
     <script type="text/javascript" async="" id="MathJax_JS" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>
-        /* disable MathJax menuframe and blue border shown when click */
 
         #MathJax_MenuFrame {
             opacity: 0.0;
@@ -122,8 +121,7 @@
                 <span>type LaTeX there: </span>
                 <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title" style="float:right;display:none">⇒</a>
             </div>
-            <textarea id="TeX_Input" type="text" spellcheck="false"
-                      oninput="Render()">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
+            <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false" oninput="Render()">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
         </div>
         <div id="TeX_PreviewBox_Frame">
             <div id="TeX_PreviewBox">
