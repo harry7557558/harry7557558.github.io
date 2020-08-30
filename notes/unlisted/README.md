@@ -1,0 +1,1 @@
+Incomplete notes, source files, note creation tools, and contents for personal use.
