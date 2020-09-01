@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <title>The Contour Plotter</title>
@@ -591,7 +591,7 @@
             //console.log(str);
 
 
-            // Formally, we type "log(2,sin(2*x)+1)". But when using our cellphone, most of us just type "log2(sin2x+1".
+            // Formally, we type "log(2,sin(2*x)+1)". But when using our phone, most of us just type "log2(sin2x+1".
             for (var t = 0; t < str.length; t++) {
                 t < str.length - 1 && /[xyeπ\)]/.test(str[t]) && (/[xyeπ\(\d.]/.test(str[t + 1]) || FC.indexOf(str.slice(t + 1, t + 4)) >= 0)
                     && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length));
@@ -761,7 +761,7 @@
                 else stack.push(token);
             }
             if (1 != stack.length)
-                throw "Error: Final stack not empty";
+                throw "Error: Final stack is not empty";
             return stack.pop();
         }
 

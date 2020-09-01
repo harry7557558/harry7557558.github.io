@@ -1,11 +1,11 @@
-// compressing loaded html notes
+// compressing loaded HTML notes
 // intended to heavily compress Mathjax
 
-// run as Chrome snippet
+// run as a Chrome snippet
 // make sure MathJax are fully-loaded as HTML/CSS
 // right click - Math Settings - Math Renderer - HTML-CSS
 
-// agressive compression, sometimes hurts normal html
+// aggressive compression, sometimes hurts normal HTML
 // MathJax nobr paddings may be removed
 
 // TODO: compress style attributes more
@@ -69,7 +69,7 @@ function compressCSS(s) {
     s = s.replace(/: /g, ":").replace(/; /g, ";");
     s = s.replace(/ \./g, ".").replace(/\, /g, ",");
     s = s.replace(/ >/g, ">").replace(/> /g, ">");
-    // remove css that override classes
+    // remove CSS that override classes
     if (removeMathjaxCSS && s.indexOf("@font-face") != -1)
         s = s.substring(s.indexOf("@font-face"), s.length);
     // remove comments
@@ -98,7 +98,7 @@ function getClassAttribute(s) {
     return k;
 }
 
-// count the occurence of style attributes
+// count the occurrence of style attributes
 var Styles = {};
 var TopStyles = [];
 var TopStylesId = [];
@@ -127,7 +127,7 @@ function countStyle(e) {
         addStyle(compressAttribute(an.value));
     }
 }
-// find style attributes that occupies most html length
+// find style attributes that occupy most HTML length
 function sortStyle() {
     var k = Object.keys(Styles).map((key)=>[String(key), Styles[key]]);
     k.sort(function(a, b) {
@@ -137,7 +137,7 @@ function sortStyle() {
         return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
     });
     for (var i = 0; i < Math.min(k.length, 26 * 27); i++) {
-        // use class names with no more than 2 letters to avoid collision
+        // use class names with no more than 2 letters to avoid collisions
         // some style attributes are like to come together. maybe...
         if (Math.max(k[i][0].length - 3, 0) * (k[i][1] - 1) > 2 * k[i][0].length + 10) {
             var n = i;

@@ -1,6 +1,6 @@
 /*
- * This file is auto generated with C++ programming language. 
- * All color functions come from: https://reference.wolfram.com/language/guide/ColorSchemes.html
+ * This file is auto-generated with C++.
+ * All color functions come from https://reference.wolfram.com/language/guide/ColorSchemes.html
  * Analysis RGB components of color gradients and fit using least square method
  * Some color functions don't work well, even they may look beautiful in preview images
  */

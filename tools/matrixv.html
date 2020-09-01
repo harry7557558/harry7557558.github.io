@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <title>Simple 3D Matrix Visualizer</title>
@@ -207,7 +207,7 @@
             };
             document.onmousemove = function (event) {
                 Cursor = [event.clientX, canvas.height - event.clientY];
-                if (mouse_down && !_2d) {	// click and drag to rotate view
+                if (mouse_down && !_2d) {	// click and drag to rotate the view
                     var dx = Cursor[0] - OrigCursor[0], dy = OrigCursor[1] - Cursor[1];
                     dx /= 100, dy /= 120;
                     rx += dy, rz += dx;
@@ -314,7 +314,7 @@
         var EigenValues = [1, 1, 1], EigenVectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
         const C3 = 1; var C2 = -3, C1 = 3, C0 = -1;  // characteristic polynomial coefficients
 
-        // calulating determinants
+        // calculating determinants
         function calcDet() {
             Det2 = Mat[0][0] * Mat[1][1] - Mat[0][1] * Mat[1][0];
             $("det2").innerText = num2str(Det2, 7);
@@ -607,7 +607,7 @@
             const N = 2;  // radius of the cube
 
             function drawView(cx, cy, cz, cc, s) {
-                // Axis with arrow
+                // Axis with an arrow
                 ctx.strokeStyle = cx;
                 drawline([-s * N, 0, 0], [s * N, 0, 0]);
                 drawTriangle([s * N + 0.2, 0, 0], [s * N, 0.1, 0], [s * N, -0.1, 0]);
@@ -657,14 +657,14 @@
                 }
             }
 
-            // combine both matrixes
+            // combine both matrices
             M = affinemul(M, Mat);
 
             // transformed cube
             ctx.lineWidth = 1;
             drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)", "rgb(255,255,128)", 2.5);
 
-            // eigen vectors - note that now the matrix is already transformed
+            // eigenvectors - note that now the matrix is transformed
             if (drawEigen) {
                 for (var i = 0; i < 3; i++) {
                     ctx.lineWidth = 5;

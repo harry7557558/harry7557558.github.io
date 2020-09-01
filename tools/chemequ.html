@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <title>Chemical Equation Balancer</title>
@@ -111,7 +111,7 @@
         </div>
         <div id="content">
             <div id="border">
-                <input id="input" type="text" placeholder="Enter or paste chemical equation there"
+                <input id="input" type="text" placeholder="Enter a chemical equation..."
                        spellcheck="false" autocomplete="off" autocorrect="off"
                        value="H2+O2==H2O"
                        onkeydown="if (event.keyCode==13) balance_main();" />
@@ -190,7 +190,7 @@
         ];
         const n = ele.length;   // 119, with a placeholder
 
-        // saperate string of lists of molecular formulas
+        // separate string of lists of molecular formulas
         function sliceChem(equ) {
             equ = equ + "+";
             var res = [];
@@ -199,13 +199,13 @@
                 var chm = "";
                 var n = 0;
                 while (1) {
-                    if (equ.length == 0) throw "unbalanced brackets";
+                    if (equ.length == 0) throw "unbalanced bracket";
                     var c = equ[0];
                     equ = equ.substring(1, equ.length);
                     if (c == '(' || c == '[' || c == '{') brackets.push(c);
                     if (c == ')' || c == ']' || c == '}') {
                         var l = brackets.length;
-                        if (l == 0) throw "unbalanced brackets";
+                        if (l == 0) throw "unbalanced bracket";
                         if (c == ')' && brackets.pop() != '(') throw ("unexpected bracket ')'");
                         if (c == ']' && brackets.pop() != '[') throw ("unexpected bracket ']'");
                         if (c == '}' && brackets.pop() != '{') throw ("unexpected bracket '}'");
@@ -317,7 +317,7 @@
             try {
                 res = mol2vec_c(equ);
             } catch (e) {
-                if (e == false) throw ("unrecogonized molecular formula " + equ_bk);
+                if (e == false) throw ("unrecognized molecular formula " + equ_bk);
                 throw e;
             }
 
@@ -331,7 +331,7 @@
             equ = equ.replace(/\*/g, ".");
             for (var i = 0; i < equ.length; i++) {
                 if (equ.charCodeAt(i) < 0x20 || equ.charCodeAt(i) > 0x7E)
-                    throw ("unexpexted character \'" + equ.substr(i, 1) + "\'");
+                    throw ("unexpected character \'" + equ.substr(i, 1) + "\'");
             }
 
             // convert arrow or equal sign to a single "="
@@ -346,7 +346,7 @@
             }
             else throw "missing arrow or equal sign";
 
-            // get lists of molecular formulas before and after reaction
+            // get lists of molecular formulas before and after the reaction
             var dir = equ.search("=", 0);
             try {
                 var chml = sliceChem(equ.substring(0, dir));
@@ -383,7 +383,7 @@
                 }
             }
             var s = M.length;
-            if (s < c - 1) throw "This chemical equation has more than one ways to balance, or it doesn't exist.";
+            if (s < c - 1) throw "This chemical equation has more than one way to balance, or it doesn't exist.";
 
             // Gaussian elimination
             var log = function (msg) {
@@ -422,7 +422,7 @@
                 for (k = di; k < s; k++) {
                     if (M[k][i].n != 0) break;
                 }
-                if (k == s) di--;   // if this happens, problem may occur
+                if (k == s) di--;   // if this happens, problems may occur
                 else {
                     // add all other values in the same column to zero
                     if (k != di) swaprow(k, di), k = di/*, logMat()*/;
@@ -442,7 +442,7 @@
             // check the result
             for (var i = 0; i < c - 1; i++) {
                 for (var j = 0; j < s; j++) {
-                    if (j != i && M[j][i].n != 0) throw "This chemical equation has more than one ways to balance, or it doesn't exist.";
+                    if (j != i && M[j][i].n != 0) throw "This chemical equation has more than one way to balance, or it doesn't exist.";
                 }
             }
 
@@ -451,7 +451,7 @@
             var mt = 1;  // gcd
             for (var i = 0; i < c - 1; i++) {
                 var f = M[i][c - 1];
-                if (f.n <= 0) throw "Balancing failed! This error may occur due to an inexistent chemical equation, or the chemical equation you entered have more than one ways to balance.";
+                if (f.n <= 0) throw "Balancing failed! This error may occur due to an inexistent chemical equation, or the chemical equation you entered has more than one way to balance.";
                 _M.push(f);
                 mt = mt * f.m / gcd(mt, f.m);
             }
