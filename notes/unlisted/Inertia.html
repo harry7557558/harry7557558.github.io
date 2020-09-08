@@ -1,13 +1,12 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <title>List of Moments of Inertia</title>
     <meta charset="utf-8" />
-
     <!-- graph plotter -->
     <script>
         // math
-        var sin = Math.sin, cos = Math.cos, acos = Math.acos, atan = Math.atan, sqrt = Math.sqrt, PI = Math.PI;
+        var sin = Math.sin, cos = Math.cos, acos = Math.acos, atan = Math.atan, atan2 = Math.atan2, sqrt = Math.sqrt, PI = Math.PI;
         function addv(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
         function subv(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
         function negv(a) { return [-a[0], -a[1], -a[2]]; }
@@ -34,8 +33,8 @@
         function renderGraph(object, script, vp, allowChangeView = true) {
 
             var S = "<defs>"
-                + "<marker id='EndArrow' viewBox='0 0 10 10' refX='10' refY='5' markerUnits='strokeWidth' orient='auto' markerWidth='10' markerHeight='10'><polyline points='10,5 0,10 4,5 0,0 10,5' fill='black' /></marker>"
-                + "<marker id='StartArrow' viewBox='0 0 10 10' refX='0' refY='5' markerUnits='strokeWidth' orient='auto' markerWidth='10' markerHeight='10'><polyline points='0,5 10,0 6,5 10,10 0,5' fill='black' /></marker>"
+                + "<marker id='EA' viewBox='0 0 10 10' refX='10' refY='5' markerUnits='strokeWidth' orient='auto' markerWidth='10' markerHeight='10'><polyline points='10,5 0,10 4,5 0,0 10,5' fill='black' /></marker>"
+                + "<marker id='SA' viewBox='0 0 10 10' refX='0' refY='5' markerUnits='strokeWidth' orient='auto' markerWidth='10' markerHeight='10'><polyline points='0,5 10,0 6,5 10,10 0,5' fill='black' /></marker>"
                 + "</defs>";
             var G = "";  // graphics
             var T = "";  // text
@@ -72,41 +71,47 @@
                 return [addv(C, addv(mulv(u, cos(t[0])), mulv(v, sin(t[0])))), addv(C, addv(mulv(u, cos(t[1])), mulv(v, sin(t[1]))))];
             }
 
+            // optimized decimal to string
+            function _(x) {
+                return String(Number(Number(x).toFixed(1)));
+            }
+
             // graphing functions
             function line(p0, p1, endArrow = false, startArrow = false, attr = "") {
-                if (endArrow) attr += "marker-end='url(#EndArrow)'";
-                if (startArrow) attr += "marker-start='url(#StartArrow)'";
-                G += "<line x1='" + U(p0) + "' x2='" + U(p1) + "' y1='" + V(p0) + "' y2='" + V(p1) + "'" + attr + "/>";
+                if (endArrow) attr += "marker-end='url(#EA)'";
+                if (startArrow) attr += "marker-start='url(#SA)'";
+                G += "<line x1='" + _(U(p0)) + "' x2='" + _(U(p1)) + "' y1='" + _(V(p0)) + "' y2='" + _(V(p1)) + "'" + attr + "/>";
             }
             function polyline(ps, close = true, attr = "") {
                 s = "";
                 for (var i = 0; i < ps.length; i++) {
-                    s += (i == 0 ? 'M' : 'L') + U(ps[i]) + "," + V(ps[i]);
+                    s += (i == 0 ? 'M' : 'L') + _(U(ps[i])) + "," + _(V(ps[i]));
                 }
                 if (close) s += 'Z';
                 G += "<path d='" + s + "' " + attr + "/>";
             }
             function circle(p, u, v, attr = "") {
+                // this may be optimized using SVG's built-in <ellipse>
                 var A = addv(p, u), B = addv(p, v), C = subv(p, u), D = subv(p, v);
-                var a = A, s = "M" + U(a) + "," + V(a);
-                a = addv(a, mulv(v, magic)), s += "C" + U(a) + "," + V(a);
-                a = addv(B, mulv(u, magic)), s += " " + U(a) + "," + V(a);
-                a = B, s += " " + U(a) + "," + V(a);
-                a = subv(B, mulv(u, magic)), s += "C" + U(a) + "," + V(a);
-                a = addv(C, mulv(v, magic)), s += " " + U(a) + "," + V(a);
-                a = C, s += " " + U(a) + "," + V(a);
-                a = subv(C, mulv(v, magic)), s += "C" + U(a) + "," + V(a);
-                a = subv(D, mulv(u, magic)), s += " " + U(a) + "," + V(a);
-                a = D, s += " " + U(a) + "," + V(a);
-                a = addv(D, mulv(u, magic)), s += "C" + U(a) + "," + V(a);
-                a = subv(A, mulv(v, magic)), s += " " + U(a) + "," + V(a);
-                a = A, s += " " + U(a) + "," + V(a);
+                var a = A, s = "M" + _(U(a)) + "," + _(V(a));
+                a = addv(a, mulv(v, magic)), s += "C" + _(U(a)) + "," + _(V(a));
+                a = addv(B, mulv(u, magic)), s += " " + _(U(a)) + "," + _(V(a));
+                a = B, s += " " + _(U(a)) + "," + _(V(a));
+                a = subv(B, mulv(u, magic)), s += "C" + _(U(a)) + "," + _(V(a));
+                a = addv(C, mulv(v, magic)), s += " " + _(U(a)) + "," + _(V(a));
+                a = C, s += " " + _(U(a)) + "," + _(V(a));
+                a = subv(C, mulv(v, magic)), s += "C" + _(U(a)) + "," + _(V(a));
+                a = subv(D, mulv(u, magic)), s += " " + _(U(a)) + "," + _(V(a));
+                a = D, s += " " + _(U(a)) + "," + _(V(a));
+                a = addv(D, mulv(u, magic)), s += "C" + _(U(a)) + "," + _(V(a));
+                a = subv(A, mulv(v, magic)), s += " " + _(U(a)) + "," + _(V(a));
+                a = A, s += " " + _(U(a)) + "," + _(V(a));
                 G += "<path d='" + s + "'" + attr + "/>";
             }
             function arc(p, u, v, t0, t1, sector = false, close = false, attr = "") {
                 if (t0 > t1) { var t = t0; t0 = t1; t1 = t; }
                 var r = addv(p, addv(mulv(u, cos(t0)), mulv(v, sin(t0))));
-                var s = "M" + U(r) + "," + V(r);
+                var s = "M" + _(U(r)) + "," + _(V(r));
                 // recursively fit elliptic arc to piecewise Bezier splines
                 var fitarc = function (p, u, v, t0, t1) {
                     if (t0 != 0) {
@@ -122,27 +127,27 @@
                     var magic = arc2bezier(t1);
                     var r = addv(p, u);
                     r = addv(r, mulv(v, magic));
-                    s += "C" + U(r) + "," + V(r);
+                    s += "C" + _(U(r)) + "," + _(V(r));
                     var end = addv(mulv(u, cos(t1)), mulv(v, sin(t1)));
                     var enddir = addv(mulv(u, sin(t1)), mulv(v, -cos(t1)));
                     r = addv(p, addv(end, mulv(enddir, magic)));
-                    s += " " + U(r) + "," + V(r);
+                    s += " " + _(U(r)) + "," + _(V(r));
                     r = addv(p, end);
-                    s += " " + U(r) + "," + V(r);
+                    s += " " + _(U(r)) + "," + _(V(r));
                 }
                 fitarc(p, u, v, t0, t1);
-                if (sector) s += "L" + U(p) + "," + V(p) + 'Z';
+                if (sector) s += "L" + _(U(p)) + "," + _(V(p)) + 'Z';
                 else if (close) s += 'Z';
                 G += "<path d='" + s + "'" + attr + "/>";
             }
             function sphere(p, r, attr = "") {
-                G += "<circle cx='" + U(p) + "' cy='" + V(p) + "' r='" + (sc * r) + "' " + attr + "/>";
+                G += "<circle cx='" + _(U(p)) + "' cy='" + _(V(p)) + "' r='" + _(sc * r) + "' " + attr + "/>";
             }
             function lable(p, s, dx = 0, dy = 0, bkg = 0, attr = "") {
                 var x = U(p) + dx, y = V(p) + dy;
                 var t = "";
-                if (bkg != 0) t = "<text x='" + x + "' y='" + y + "' stroke-width='" + bkg + "px' stroke='white'>" + s + "</text>";
-                t += "<text x='" + x + "' y='" + y + "'" + attr + ">" + s + "</text>";
+                if (bkg != 0) t = "<text x='" + _(x) + "' y='" + _(y) + "' stroke-width='" + bkg + "px' stroke='white'>" + s + "</text>";
+                t += "<text x='" + _(x) + "' y='" + _(y) + "'" + attr + ">" + s + "</text>";
                 T += t;
             }
             function axis(x0, x1, y0, y1, z0, z1, showArrow = [true, true, true], showLable = [true, true, true]) {
@@ -152,6 +157,54 @@
                 if (showLable[0]) lable([x1, 0, 0], "x", 10, 10);
                 if (showLable[1]) lable([0, y1, 0], "y", 10, 10);
                 if (showLable[2]) lable([0, 0, z1], "z", 10, 10);
+            }
+
+            // two "troll" shapes
+            function ellipsoid(a, b, c, attr = "") {
+                // x²/a²+y²/b²+z²/c²=1
+                var A13 = 0, A23 = cos(rx);  // part of the transformation matrix
+                var K11 = -sin(rz), K12 = -cos(rz) / sin(rx), K21 = cos(rz), K22 = -sin(rz) / sin(rx);  // inverse of the top-left 2x2 block of the matrix
+                var G1 = (K11 * A13 + K12 * A23) / a;
+                var G2 = (K21 * A13 + K22 * A23) / b;
+                var R = G1 * G1 + G2 * G2 + 1 / (c * c);
+                // graph ax²+bxy+cy²=1, in 2d
+                function graphEllipse(a, b, c) {
+                    var O = [U([0, 0, 0]), V([0, 0, 0])];
+                    var delta = sqrt(a * a - 2 * a * c + c * c + b * b);
+                    var lambda1 = 0.5 * (-delta + a + c), lambda2 = 0.5 * (delta + a + c);
+                    var v1 = [-delta + a - c, b], v2 = [delta + a - c, b];
+                    G += "<ellipse cx='" + _(O[0]) + "' cy='" + _(O[1]) + "' rx='" + _(sc / sqrt(lambda1)) + "' ry='" + _(sc / sqrt(lambda2))
+                        + "' transform='rotate(" + _(-180 / PI * atan2(v1[1], v1[0])) + " " + _(O[0]) + " " + _(O[1]) + ")'" + attr + "/>";
+                };
+                var Ca = (R - G1 * G1) / (a * a), Cb = (R - G2 * G2) / (b * b), Cc = 2 * G1 * G2 / (a * b);
+                var C = mulv([Ca, Cb, -Cc], 1 / R);
+                graphEllipse(dotv(C, [K11 * K11, K21 * K21, K11 * K21]), dotv(C, [2 * K11 * K12, 2 * K21 * K22, K11 * K22 + K12 * K21]), dotv(C, [K12 * K12, K22 * K22, K12 * K22]));
+            }
+            function torus(R, r, attr = "", nomodify = false) {
+                var A11 = -sin(rz), A12 = cos(rz), A13 = 0, A21 = -cos(rz) * sin(rx), A22 = -sin(rz) * sin(rx), A23 = cos(rx);
+                // parametric equation of the outline, t in [0,2*PI]
+                // outer: d=0; inner: d=PI
+                function outline(t, d) {
+                    // https://www.desmos.com/calculator/ge42y91t4m
+                    var st = sin(t), ct = cos(t);
+                    var a11 = A11 * ct + A21 * st, a12 = A12 * ct + A22 * st, a13 = A13 * ct + A23 * st;
+                    var u = atan2(a12, a11);
+                    var ku = a11 * cos(u) + a12 * sin(u);
+                    var v = atan2(a13, ku * r) + d;
+                    var p = [cos(u) * (R + r * cos(v)), sin(u) * (R + r * cos(v)), r * sin(v)];
+                    return [U(p), V(p)];
+                }
+                // can be optimized by adaptively fitting to splines
+                var so = '', si = '';
+                for (var t = 0; t < 2 * PI; t += 0.1) {
+                    var p = outline(t, 0);
+                    so += (t == 0 ? 'M' : 'L') + _(p[0]) + "," + _(p[1]);
+                    p = outline(t, PI);
+                    si += (t == 0 ? 'M' : 'L') + _(p[0]) + "," + _(p[1]);
+                }
+                var s = so + 'Z' + si + 'Z';
+                if (!nomodify) G += "<path d='" + s + "' " + attr + "/>";
+                return s;
             }
 
             // graphing
@@ -182,6 +235,7 @@
             for (var i = 0; i < sv.length; i++) {
                 var s = sv[i].innerHTML;
                 while (s.indexOf("&lt;") != -1) s = s.replace("&lt;", "<");
+                while (s.indexOf("&gt;") != -1) s = s.replace("&gt;", ">");
                 svs.push(s);
                 vps.push(new viewPort(0, 0, 1, [0, 0, 0], 0));
             }
@@ -189,6 +243,10 @@
         }
         function renderGraphs() {
             if (sv.length == 0) getGraphs();
+            for (var D = 0; D < sv.length; D++) {
+                sv[D].removeAttribute('width');
+                sv[D].removeAttribute('height');
+            }
             for (var D = 0; D < sv.length; D++) {
                 var object = sv[D];
                 var w = object.width.baseVal.value;
@@ -200,6 +258,8 @@
                 }
                 vps[D].Tr = Tr;
                 renderGraph(object, svs[D], vps[D]);
+                object.setAttribute("width", String(Math.round(w)));
+                object.setAttribute("height", String(Math.round(h)));
             }
         }
 
@@ -207,7 +267,7 @@
 
         // debug mode: change MathJax script tag to something else
         function debugGraphPlotter() {
-            if (document.getElementById("MathJax_src").tagName.toLocaleLowerCase() != "script") {
+            if (false || document.getElementById("MathJax_src").tagName.toLocaleLowerCase() != "script") {
                 var s = document.getElementsByTagName("td");
                 for (var i = 0; i < s.length; i++) {
                     var t = s[i].innerHTML;
@@ -228,18 +288,12 @@
             setTimeout(renderGraphs, 0);
             /* graphs with issues:
              * Solid angle
-             * Torus
-             * Ellipsoid
              * Cylindrical shell with thickness
-             */
-            /* blank graphs:
-             * Toric shell
-             * Toric shell with thickness
              */
         }
     </script>
-
     <style>
+
         body {
             background-color: rgb(82,86,89);
             padding: 20px 0px 60px 0px;
@@ -291,13 +345,13 @@
                 content: " ";
             }
 
-            td .graph {
-                margin-left: 0 auto;
-                margin-right: 0 auto;
-                width: 100%;
-                height: 120px;
-                cursor: default;
-            }
+        /*td*/ .graph {
+            margin-left: 0 auto;
+            margin-right: 0 auto;
+            width: 100%;
+            height: 120px;
+            cursor: default;
+        }
 
         .hidden {
             visibility: hidden;
@@ -316,7 +370,6 @@
             background: rgb(153,193,218);
         }
     </style>
-
     <!-- Mathjax -->
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
@@ -325,9 +378,9 @@
     <script type="text/javascript" id="MathJax_src" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" onerror="alert('Failed to load MathJax')"></script>
 </head>
 <body contenteditable="false" onload="renderGraphs()">
-
     <!-- hacking MathJax-->
     <style>
+
         #MathJax_MenuFrame {
             visibility: hidden;
             display: none;
@@ -342,9 +395,9 @@
 
     <div class="article" id="main">
         <div class="page">
+            <div style="display:inline-block;float:right;border:5px solid purple;padding:10px;background-color:salmon;font-family:Arial">WARNING: the correctness of these equations are to be determined.</div>
 
             <h1>List of moments of inertia</h1>
-
 
             <table class="cat">
                 <tr>
@@ -354,7 +407,6 @@
                     <th>Inertia tensor</th>
                     <th>Additional notes</th>
                 </tr>
-
                 <!-- The correctness of this part is to be determined -->
                 <tr>
                     <td>
@@ -397,7 +449,7 @@
                 </tr>
                 <tr>
                     <td>
-                        Rotation about origin<br />
+                        Rotation about the origin<br />
                         Representing rotation using orthogonal matrix $\mathbf{R}$ where the columns of $\mathbf{R}$ are $\vec{i}, \vec{j}, \vec{k}$ after rotation.
                     </td>
                     <td>
@@ -426,7 +478,20 @@
                         $I_1=s^2I_0$
                     </td>
                     <td>
-                        Reference rule 0. for mass change.
+                        If the density of the shape remains unchanged, then $I_1=s^3/s^4/s^5 \cdot I_0$.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Stretching<br />
+                        Scaling on unit axis $\mathbf{n}$ with a factor $s$.
+                    </td>
+                    <td>
+                        For solids only:<br />
+                        $A_1=sA_0\\V_1=sV_0$
+                    </td>
+                    <td>
+                        $C_1=C_0+(s-1)(C_0\cdot\mathbf{n})\mathbf{n}$
                     </td>
                 </tr>
                 <tr>
@@ -473,10 +538,11 @@
                         $I_1=I_0+\dfrac{1}{3}mh^2\begin{bmatrix}1&0&0\\0&1&0\\0&0&0\end{bmatrix}$
                     </td>
                     <td>
-                        $m$ represents the mass of the body before and after transformation. Reference rule 0. for mass change.
+                        $I_0$ is a 3×3 matrix calculated in 3D. <br />
+                        Reference rule 0. for mass change.
                     </td>
                 </tr>
-                <tr>
+                <!--<tr>
                     <td>
                         Revolution from 2D<br />
                         Rotate a shape on <i>xOz</i> plane or other planes perpendicular to <i>xOy</i> plane about <span class="nowrap"><i>z</i>-axis</span> to form a ring-like body. The shape should not intersect the <i>z</i>-axis.
@@ -493,9 +559,91 @@
                         Surface to volume by connecting with the origin<br />
                         Connecting points on a surface/line to the origin to form a volume/surface. A ray from the origin should intersect the surface/line no more than once.
                     </td>
-                </tr>
+                </tr>-->
             </table>
 
+            <table class="cat">
+                <tr>
+                    <th>Description</th>
+                    <th>Length / Area / Volume</th>
+                    <th>Centroid / <br />Center of mass</th>
+                    <th>Inertia tensor</th>
+                </tr>
+                <!-- Segment ... Tetrahedron with one vertex at origin-->
+                <tr>
+                    <td>
+                        Segment defined by endpoints <span class="nowrap">$A$, $B$</span>
+                    </td>
+                    <td>
+                        $L=\left|B-A\right|$
+                    </td>
+                    <td>
+                        $\dfrac{1}{2}\left(A+B\right)$
+                    </td>
+                    <td>
+                        $\dfrac{1}{3}m\left[\left(A^TA+A^TB+B^TB\right)\mathbf{I}-\left(AA^T+BB^T+\dfrac{1}{2}\left(AB^T+BA^T\right)\right)\right]$
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Triangle defined by the origin and vectors $\vec{a}$, $\vec{b}$
+                    </td>
+                    <td>
+                        $A=\dfrac{1}{2}\left|a\times b\right|$
+                    </td>
+                    <td>
+                        $\dfrac{1}{3}\left(a+b\right)$
+                    </td>
+                    <td>
+                        $\dfrac{1}{6}m\left[\left(a^Ta+a^Tb+b^Tb\right)\mathbf{I}-\left(aa^T+bb^T+\dfrac{1}{2}\left(ab^T+ba^T\right)\right)\right]$
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Triangle defined by vertices <span class="nowrap">$A$, $B$, $C$</span>
+                    </td>
+                    <td>
+                        $A=\dfrac{1}{2}\left|\left(B-A\right)\times\left(C-A\right)\right|$
+                    </td>
+                    <td>
+                        $\dfrac{1}{3}\left(A+B+C\right)$
+                    </td>
+                    <td>
+                        $\dfrac{1}{6}m\left[\left(A^TA+B^TB+C^TC+A^TB+A^TC+B^TC\right)\mathbf{I}\\
+                        -\left(AA^T+BB^T+CC^T+\dfrac{1}{2}\left(AB^T+AC^T+BA^T+BC^T+CA^T+CB^T\right)\right)\right]$
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Parallelogram defined by point $p$ and vectors <span class="nowrap">$a$, $b$</span>
+                    </td>
+                    <td>
+                        $A=\left|a\times b\right|$
+                    </td>
+                    <td>
+                        $p+\dfrac{1}{2}a+\dfrac{1}{2}b$
+                    </td>
+                    <td>
+                        $m\left[\left(p^Tp+\dfrac{1}{3}\left(a^Ta+b^Tb\right)+a^Tp+b^Tp+\dfrac{1}{2}a^Tb\right)\mathbf{I}\\
+                        -\left(pp^T+\dfrac{1}{3}\left(aa^T+bb^T\right)+\dfrac{1}{2}\left(ap^T+pa^T+bp^T+pb^T\right)+\dfrac{1}{4}\left(ab^T+ba^T\right)\right)\right]$
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Tetrahedron defined by the origin and vectors <span class="nowrap">$a$, $b$, $c$</span>
+                    </td>
+                    <td>
+                        $V=\dfrac{1}{6}\det\left[a,b,c\right]$
+                    </td>
+                    <td>
+                        $\dfrac{1}{4}\left(a+b+c\right)$
+                    </td>
+                    <td>
+                        $\dfrac{1}{10}m\left[\left(a^Ta+b^Tb+c^Tc+a^Tb+a^Tc+b^Tc\right)\mathbf{I}\\
+                        -\left(aa^T+bb^T+cc^T+\dfrac{1}{2}\left(ab^T+ac^T+ba^T+bc^T+ca^T+cb^T\right)\right)\right]$
+                    </td>
+                </tr>
+            </table>
 
             <table class="cat">
                 <tr>
@@ -505,7 +653,6 @@
                     <th style="min-width:170px;">Graph</th>
                     <th>Additional notes</th>
                 </tr>
-
                 <!-- Rod ... Sector -->
                 <tr>
                     <td>
@@ -658,7 +805,6 @@
                         $C=\dfrac{1}{A}\left(\dfrac{2}{3}(r^2-a^2)^{\frac{3}{2}},0,0\right)$
                     </td>
                 </tr>
-
                 <!-- Cylinder ... Torus -->
                 <tr>
                     <td>
@@ -888,15 +1034,9 @@
                     </td>
                     <td>
                         <svg class="graph" overflow="visible">
-                            // http://www.centre-dalembert.universite-paris-saclay.fr/wp-content/uploads/2013/12/j.buzzi_.pdf#page=4
-                            // wait...
                             view(0.5, 0.6, 50);
                             var R = 1.0, r = 0.35;
-                            for (var i=0;i&lt;8;i++) {var t=2*PI*i/8;circle([R*cos(t),R*sin(t),0], [r*cos(t),r*sin(t),0], [0,0,r], shaded);}
-                            circle([0,0,0], [R+r,0,0], [0,R+r,0], shaded);
-                            circle([0,0,0], [R-r,0,0], [0,R-r,0], "fill='white'");
-                            circle([0,0,r], [R,0,0], [0,R,0]);
-                            circle([0,0,-r], [R,0,0], [0,R,0]);
+                            torus(R, r, shaded + "fill-rule='evenodd'");
                             axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
                             line([0,0,0], [0,R,0], true, true);
                             lable([0,0.5*R,0.1], "R", 0, 0, 2);
@@ -904,11 +1044,8 @@
                             lable([0,R+0.5*r,0.1], "r", 0, 0, 2);
                         </svg>
                     </td>
-                    <td>
-                        <i>Not implemented torus projection.</i>
-                    </td>
+                    <td></td>
                 </tr>
-
                 <!-- Ellipse ... Truncated elliptical cone -->
                 <tr>
                     <td>
@@ -984,18 +1121,14 @@
                         <svg class="graph" overflow="visible">
                             view(0.4, .25*PI, 50, [0, 0, -0.2]);
                             var a=1.2,b=1.0,c=0.7;
-                            circle([0,0,0],[a,0,0],[0,b,0],dashed);
-                            circle([0,0,0],[a,0,0],[0,0,c],dashed);
-                            circle([0,0,0],[0,b,0],[0,0,c],dashed);
+                            ellipsoid(a, b, c, shaded);
                             const l = 1.8; axis(-.8*l, l, -.8*l, l, -.2*l, .8*l);
-                            line([0,0,0],[a,0,0],true,true); lable([0.5*a,0,0],"a",-5,-3);
-                            line([0,0,0],[0,b,0],true,true); lable([0,0.5*b,0],"b",-2,-2);
+                            line([0,0,0],[a,0,0],true,true); lable([0.5*a,0,0],"a",-6,-3);
+                            line([0,0,0],[0,b,0],true,true); lable([0,0.5*b,0],"b",0,-2);
                             line([0,0,0],[0,0,c],true,true); lable([0,0,0.5*c],"c",2,4);
                         </svg>
                     </td>
-                    <td>
-                        <i>Not implemented ellipsoid projection.</i>
-                    </td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td>
@@ -1062,7 +1195,6 @@
                         $C=\left(0,0,\dfrac{3}{4}h_1\dfrac{1-k^4}{1-k^3}\right)$
                     </td>
                 </tr>
-
                 <!-- Cylindrical shell ... Toric shell -->
                 <tr>
                     <td>
@@ -1091,7 +1223,7 @@
                         </svg>
                     </td>
                     <td>
-                        Without base
+                        Without bases
                     </td>
                 </tr>
                 <tr>
@@ -1277,10 +1409,20 @@
                     <td>
                         $m\begin{bmatrix}\frac{1}{2}R^2+\frac{5}{4}r^2&0&0\\0&\frac{1}{2}R^2+\frac{5}{4}r^2&0\\0&0&R^2+\frac{3}{2}r^2\end{bmatrix}$
                     </td>
-                    <td></td>
+                    <td>
+                        <svg class="graph" overflow="visible">
+                            view(0.5, 0.6, 50);
+                            var R = 1.0, r = 0.35;
+                            torus(R, r);
+                            axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
+                            line([0,0,0], [0,R,0], true, true);
+                            lable([0,0.5*R,0.1], "R", 0, 0, 2);
+                            line([0,R,0], [0,R+r,0], true, true);
+                            lable([0,R+0.5*r,0.1], "r", 0, 0, 2);
+                        </svg>
+                    </td>
                     <td></td>
                 </tr>
-
                 <!-- Cylindrical shell with thickness ... Toric shell with thickness -->
                 <tr>
                     <td>
@@ -1334,7 +1476,7 @@
                         <svg class="graph" overflow="visible">
                             view(0.4, .25*PI, 50, [0, 0, -0.2]);
                             sphere([0,0,0], 0.9, shaded);
-                            sphere([0,0,0], 0.5);
+                            sphere([0,0,0], 0.5, "fill='white'");
                             const l = 1.8; axis(0, l, 0, l, -.2*l, .8*l);
                             var cs = circleEdges([0,0,0],[0.9,0,0],[0,0.9,0])[0];
                             line([0,0,0],cs,true,true);
@@ -1373,98 +1515,23 @@
                         $m\begin{bmatrix}\frac{1}{2}R^2+\frac{5}{8}\overline{r^2}&0&0\\0&\frac{1}{2}R^2+\frac{5}{8}\overline{r^2}&0\\0&0&R^2+\frac{3}{4}\overline{r^2}\end{bmatrix}$
                         <!--$m\begin{bmatrix}\frac{1}{2}R^2+\frac{5}{8}(r_1^2+r_0^2)&0&0\\0&\frac{1}{2}R^2+\frac{5}{8}(r_1^2+r_0^2)&0\\0&0&R^2+\frac{3}{4}(r_1^2+r_0^2)\end{bmatrix}$-->
                     </td>
-                    <td></td>
-                    <td></td>
+                    <td>
+                        <svg class="graph" overflow="visible">
+                            view(0.4, 0.6, 50);
+                            var R = 1.0, r1 = 0.3, r0 = 0.1;
+                            var s = torus(R, r1, '', true) + torus(R, r0, '', true);
+                            G += "&lt;path d='" + s + "' " + shaded + "fill-rule='evenodd' />";
+                            axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
+                            line([0,0,0], [0,R,0], true, true);
+                            lable([0,0.5*R,0.1], "R", -5, 0, 2);
+                            line([0,R,0], [0,R+r1,0], true, true);
+                        </svg>
+                    </td>
+                    <td>
+                        $r_0$ and $r_1$ are inner and outer minor radiuses.
+                    </td>
                 </tr>
-
             </table>
-
-
-            <table class="cat">
-                <tr>
-                    <th>Description</th>
-                    <th>Length / Area / Volume</th>
-                    <th>Centroid / <br />Center of mass</th>
-                    <th>Inertia tensor</th>
-                </tr>
-
-                <!-- Segment ... Tetrahedron with one vertex at origin-->
-                <tr>
-                    <td>
-                        Segment defined by endpoints <span class="nowrap">$A$, $B$</span>
-                    </td>
-                    <td>
-                        $L=\left|B-A\right|$
-                    </td>
-                    <td>
-                        $\dfrac{1}{2}\left(A+B\right)$
-                    </td>
-                    <td>
-                        $\dfrac{1}{3}m\left[\left(A^TA+A^TB+B^TB\right)\mathbf{I}-\left(AA^T+BB^T+\dfrac{1}{2}\left(AB^T+BA^T\right)\right)\right]$
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Triangle defined by the origin and vectors $\vec{a}$, $\vec{b}$
-                    </td>
-                    <td>
-                        $A=\dfrac{1}{2}\left|a\times b\right|$
-                    </td>
-                    <td>
-                        $\dfrac{1}{3}\left(a+b\right)$
-                    </td>
-                    <td>
-                        $\dfrac{1}{6}m\left[\left(a^Ta+a^Tb+b^Tb\right)\mathbf{I}-\left(aa^T+bb^T+\dfrac{1}{2}\left(ab^T+ba^T\right)\right)\right]$
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Triangle defined by vertices <span class="nowrap">$A$, $B$, $C$</span>
-                    </td>
-                    <td>
-                        $A=\dfrac{1}{2}\left|\left(B-A\right)\times\left(C-A\right)\right|$
-                    </td>
-                    <td>
-                        $\dfrac{1}{3}\left(A+B+C\right)$
-                    </td>
-                    <td>
-                        $\dfrac{1}{6}m\left[\left(A^TA+B^TB+C^TC+A^TB+A^TC+B^TC\right)\mathbf{I}\\
-                        -\left(AA^T+BB^T+CC^T+\dfrac{1}{2}\left(AB^T+AC^T+BA^T+BC^T+CA^T+CB^T\right)\right)\right]$
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Parallelogram defined by point $p$ and vectors <span class="nowrap">$a$, $b$</span>
-                    </td>
-                    <td>
-                        $A=\left|a\times b\right|$
-                    </td>
-                    <td>
-                        $p+\dfrac{1}{2}a+\dfrac{1}{2}b$
-                    </td>
-                    <td>
-                        $m\left[\left(p^Tp+\dfrac{1}{3}\left(a^Ta+b^Tb\right)+a^Tp+b^Tp+\dfrac{1}{2}a^Tb\right)\mathbf{I}\\
-                        -\left(pp^T+\dfrac{1}{3}\left(aa^T+bb^T\right)+\dfrac{1}{2}\left(ap^T+pa^T+bp^T+pb^T\right)+\dfrac{1}{4}\left(ab^T+ba^T\right)\right)\right]$
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Tetrahedron defined by the origin and vectors <span class="nowrap">$a$, $b$, $c$</span>
-                    </td>
-                    <td>
-                        $V=\dfrac{1}{6}\det\left[a,b,c\right]$
-                    </td>
-                    <td>
-                        $\dfrac{1}{4}\left(a+b+c\right)$
-                    </td>
-                    <td>
-                        $\dfrac{1}{10}m\left[\left(a^Ta+b^Tb+c^Tc+a^Tb+a^Tc+b^Tc\right)\mathbf{I}\\
-                        -\left(aa^T+bb^T+cc^T+\dfrac{1}{2}\left(ab^T+ac^T+ba^T+bc^T+ca^T+cb^T\right)\right)\right]$
-                    </td>
-                </tr>
-
-            </table>
-
 
             <table class="cat">
                 <tr>
@@ -1474,7 +1541,6 @@
                     <th style="min-width:170px;">Graph</th>
                     <th>Additional notes</th>
                 </tr>
-
                 <!-- Square ... Border of regular polygon -->
                 <tr>
                     <td>
@@ -1500,7 +1566,7 @@
                 </tr>
                 <tr>
                     <td>
-                        Border of a rectangle
+                        Rectangle border
                     </td>
                     <td>
                         $L=4a+4b$
@@ -1533,7 +1599,7 @@
                 </tr>
                 <tr>
                     <td>
-                        Border of a regular polygon
+                        Regular polygon border
                     </td>
                     <td>
                         $L=N\sqrt{r^2+1-2r\cos\left(\dfrac{2\pi}{N}\right)}$
@@ -1542,7 +1608,6 @@
                         $\dfrac{1}{6}mr^2\left(2+\cos\left(\dfrac{2\pi}{N}\right)\right)\begin{bmatrix}1&0&0\\0&1&0\\0&0&2\end{bmatrix}$
                     </td>
                 </tr>
-
                 <!-- Cube ... Cube shell with thickness-->
                 <tr>
                     <td>
@@ -1582,7 +1647,7 @@
                         Box shell
                     </td>
                     <td>
-                        $A=8(a^2+b^2+c^2)$
+                        $A=8(ab+ac+bc)$
                     </td>
                     <td>
                         $\dfrac{5}{9}m\begin{bmatrix}b^2+c^2&0&0\\0&a^2+c^2&0\\0&0&a^2+b^2\end{bmatrix}$
@@ -1599,8 +1664,8 @@
                         $\dfrac{2}{3}m\dfrac{a_1^5-a_0^5}{a_1^3-a_0^3}\begin{bmatrix}1&0&0\\0&1&0\\0&0&1\end{bmatrix}$
                     </td>
                 </tr>
-
-                <tr>
+                <!-- Regular polyhedrons and shells-->
+                <!--<tr>
                     <td>
                         Regular tetrahedron
                     </td>
@@ -1639,8 +1704,9 @@
                     <td>
                         Regular icosahedron shell
                     </td>
-                </tr>
-                <tr>
+                </tr>-->
+                <!-- Polygonal cylinders and pyramids -->
+                <!--<tr>
                     <td>
                         Regular polygonal cylinder
                     </td>
@@ -1659,8 +1725,9 @@
                     <td>
                         Regular polygonal pyramidal face
                     </td>
-                </tr>
-                <tr>
+                </tr>-->
+                <!-- Rounded shapes -->
+                <!--<tr>
                     <td>
                         Rounded rectangle
                     </td>
@@ -1739,8 +1806,9 @@
                     <td>
                         Link shell
                     </td>
-                </tr>
-                <tr>
+                </tr>-->
+                <!-- Splines -->
+                <!--<tr>
                     <td>
                         Area from origin to a quadratic parametric curve
                     </td>
@@ -1779,9 +1847,8 @@
                     <td colspan="9999">
                         More ideas: intersections, helix, bolt, spiral, snail...
                     </td>
-                </tr>
+                </tr>-->
             </table>
-
 
             <script>
                 // add index number
@@ -1797,12 +1864,12 @@
                 }
             </script>
 
-
             <div class="cat">
                 <h2>References</h2>
                 <p><a href="https://en.wikipedia.org/wiki/Moment_of_inertia">Moment of inertia - Wikipedia</a></p>
                 <p><a href="https://en.wikipedia.org/wiki/Parallel_axis_theorem">Parallel axis theorem - Wikipedia</a></p>
                 <p><a href="https://en.wikipedia.org/wiki/Perpendicular_axis_theorem">Perpendicular axis theorem - Wikipedia</a></p>
+                <p><a href="https://en.wikipedia.org/wiki/Stretch_rule">Stretch rule - Wikipedia</a></p>
                 <p><a href="https://en.wikipedia.org/wiki/List_of_moments_of_inertia">List of moments of inertia - Wikipedia</a></p>
             </div>
             <div class="cat">
@@ -1812,12 +1879,9 @@
                     Formulas are rendered with <a href="https://www.mathjax.org/" target="_blank">MathJax</a>. A script has been used to generate latex.
                     Graphs are generated with Javascript.
                 </p>
-                <p>Please <a href="https://github.com/Harry7557558/Notes/issues" target="_blank">check my math and English</a>.</p>
+                <p>Please <a href="https://github.com/Harry7557558/harry7557558.github.io/issues" target="_blank">check my math and English</a>.</p>
             </div>
-
         </div>
     </div>
-
 </body>
 </html>
-
