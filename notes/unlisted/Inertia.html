@@ -185,12 +185,12 @@
                 // parametric equation of the outline, t in [0,2*PI]
                 // outer: d=0; inner: d=PI
                 function outline(t, d) {
-                    // https://www.desmos.com/calculator/ge42y91t4m
+                    // https://www.desmos.com/calculator/vu4xm0n9ir
                     var st = sin(t), ct = cos(t);
                     var a11 = A11 * ct + A21 * st, a12 = A12 * ct + A22 * st, a13 = A13 * ct + A23 * st;
                     var u = atan2(a12, a11);
                     var ku = a11 * cos(u) + a12 * sin(u);
-                    var v = atan2(a13, ku * r) + d;
+                    var v = atan2(a13, ku) + d;
                     var p = [cos(u) * (R + r * cos(v)), sin(u) * (R + r * cos(v)), r * sin(v)];
                     return [U(p), V(p)];
                 }
@@ -1035,7 +1035,7 @@
                     <td>
                         <svg class="graph" overflow="visible">
                             view(0.5, 0.6, 50);
-                            var R = 1.0, r = 0.35;
+                            var R = 0.9, r = 0.28;
                             torus(R, r, shaded + "fill-rule='evenodd'");
                             axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
                             line([0,0,0], [0,R,0], true, true);
@@ -1412,7 +1412,7 @@
                     <td>
                         <svg class="graph" overflow="visible">
                             view(0.5, 0.6, 50);
-                            var R = 1.0, r = 0.35;
+                            var R = 0.9, r = 0.28;
                             torus(R, r);
                             axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
                             line([0,0,0], [0,R,0], true, true);
@@ -1517,8 +1517,8 @@
                     </td>
                     <td>
                         <svg class="graph" overflow="visible">
-                            view(0.4, 0.6, 50);
-                            var R = 1.0, r1 = 0.3, r0 = 0.1;
+                            view(0.5, 0.6, 50);
+                            var R = 0.9, r1 = 0.28, r0 = 0.1;
                             var s = torus(R, r1, '', true) + torus(R, r0, '', true);
                             G += "&lt;path d='" + s + "' " + shaded + "fill-rule='evenodd' />";
                             axis(-1.8, 1.8, -1.7, 1.7, -1.2, 1.2);
