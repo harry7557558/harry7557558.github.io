@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Javascript function plotter</title>
+
+    <style>
+        #canvas_container, #scripts, #errors {
+            display: inline-block;
+            padding-right: 20px;
+        }
+
+        #canvas_container {
+            padding: 0px;
+            border: 2px solid black;
+        }
+
+        #canvas_container, #canvas {
+            width: 640px;
+            height: 360px;
+        }
+
+        #editor {
+            width: 600px;
+            height: 200px;
+            outline: none;
+            font-family: Consolas;
+            font-size: 13.3px;
+        }
+
+        #errors {
+            font-family: Consolas;
+            color: darkred;
+        }
+    </style>
+</head>
+<body spellcheck="false">
+    <div id="canvas_container">
+        <canvas id="canvas" width="640" height="360"></canvas>
+
+        <style>
+            span {
+                display: inline-block;
+                outline: none;
+            }
+
+            .slider {
+                margin: 10px 0px;
+            }
+
+            .slider-info {
+                width: 110px;
+            }
+
+            .slider-name {
+                width: 18px;
+                white-space: nowrap;
+            }
+
+            .slider-body {
+                width: 440px;
+            }
+
+            .slider-range {
+                -webkit-appearance: none;
+                margin: 0px 10px;
+                outline: none;
+                border: 1px solid gray;
+                width: 300px;
+                height: 6px;
+            }
+
+            .min-value, .max-value, .slider-value, .slider-step {
+                border: 1px solid gray;
+                border-radius: 4px;
+                text-align: center;
+                width: 50px;
+            }
+        </style>
+        <div id="sliders"></div>
+    </div>
+
+    <script>
+        // handle sliders
+
+        var sliders = [];
+        function setSliders() {
+            var sh = "";
+            for (var i = 0; i < sliders.length; i++) {
+                sh += "<div class='slider'>";
+                sh += "<span class='slider-info'>"
+                    + "<span>i</span><span class='slider-name' contenteditable='true'>"
+                    + sliders[i].name + "</span>" + " = "
+                    + "<span class='slider-value' contenteditable='true'>"
+                    + sliders[i].defaultValue.toFixed(2) + "</span></span>";
+                sh += "<span class='slider-body'>"
+                    + "<span class='min-value' contenteditable='true'>"
+                    + sliders[i].minValue.toFixed(2) + "</span>"
+                sh += "<input type='range' class='slider-range"
+                    + "' min='" + sliders[i].minValue
+                    + "' max='" + sliders[i].maxValue
+                    + "' step='" + sliders[i].step
+                    + "' value='" + sliders[i].defaultValue + "'/>";
+                sh += "<span class='max-value' contenteditable='true'>"
+                    + sliders[i].maxValue.toFixed(2) + "</span></span>"
+                sh += "<span><span>step=</span>"
+                    + "<span class='slider-step' contenteditable='true'>"
+                    + sliders[i].step + "</span>";
+                sh += "</div>"
+            }
+            document.getElementById("sliders").innerHTML = sh;
+
+            var names = document.getElementsByClassName("slider-name");
+            var ranges = document.getElementsByClassName("slider-range");
+            for (var i = 0; i < sliders.length; i++) {
+                ranges[i].oninput = plot;
+            }
+        }
+        function getSliders() {
+            var r = [];
+            var sh = document.getElementsByClassName("slider-range");
+            for (var i = 0; i < sliders.length; i++) {
+                r.push(['i' + sliders[i]["name"], Number(sh[i].value)]);
+            }
+            return r;
+        }
+
+        function addSlider(name, value, minValue = -5, maxValue = 5, step = 0.01) {
+            // default slider
+            sliders.push({
+                name: name,
+                minValue: minValue,
+                maxValue: maxValue,
+                step: step,
+                defaultValue: value
+            });
+        }
+        function testSlider() {
+            addSlider('R', 2.0, 0);
+            addSlider('r', 1.0, 0);
+            addSlider('Rx', 0.65);
+            addSlider('Rz', 2.5);
+            addSlider('Ry', 0.5);
+            setSliders();
+            console.log(getSliders());
+        }
+
+    </script>
+
+
+    <!-- one may hack this tool with malicious scripts -->
+    <div id="scripts">
+        <p>Javascript code:</p>
+        <script src="./temp.js"></script>
+        <textarea id="editor" spellcheck="false" data-gramm="false"
+                  oninput="window.onbeforeunload = function (e) { return e; }">
+
+// put everything you need inside the following function
+// return a number for one function and array/list for multiple functions
+
+function (t) {
+    return fun(t);
+    const A = iA, w = iw;
+    return [A*sin(w*t), A*cos(w*t)];
+}
+
+</textarea>
+    </div>
+
+    <div id="errors"></div>
+
+    <script>
+        testSlider();
+
+        // math constants/functions
+        const E = Math.E, LN2 = Math.LN2, LN10 = Math.LN10, LOG2E = Math.LOG2E, LOG10E = Math.LOG10E, PI = Math.PI, SQRT1_2 = Math.SQRT1_2, SQRT2 = Math.SQRT2;
+        const abs = Math.abs, acos = Math.acos, acosh = Math.acosh, asin = Math.asin, asinh = Math.asinh, atan = Math.atan, atan2 = Math.atan2, atanh = Math.atanh, cbrt = Math.cbrt, ceil = Math.ceil, cos = Math.cos, cosh = Math.cosh, exp = Math.exp, floor = Math.floor, hypot = Math.hypot, log = Math.log, log2 = Math.log2, log10 = Math.log10, max = Math.max, min = Math.min, pow = Math.pow, random = Math.random, round = Math.round, sign = Math.sign, sin = Math.sin, sinh = Math.sinh, sqrt = Math.sqrt, tan = Math.tan, tanh = Math.tanh, trunc = Math.trunc;
+        const clamp = function (x, a, b) { return x < a ? a : x > b ? b : x; };
+
+        // function to plot
+        var __fun__;
+
+        // viewport configs
+        var iRes = [640, 360];  // image resolution
+        var iSc = [50, 50];  // coordinate scaling factors
+        var iTr = [0.5 * iRes[0] / iSc[0], 0.5 * iRes[1] / iSc[1]];  // translation from bottom-left
+        function fromScreen(p) {
+            return [
+                p[0] / iSc[0] - iTr[0],
+                (iRes[1] - p[1]) / iSc[1] - iTr[1]
+            ];
+        }
+        function fromCanvas(p) {
+            return [
+                (p[0] + iTr[0]) * iSc[0],
+                iRes[1] - (p[1] + iTr[1]) * iSc[1]
+            ];
+        }
+
+
+        // initialization
+        window.onload = function () {
+
+            // get code
+            try {
+                var code = document.getElementById("editor").textContent.split('\n');
+                eval("__fun__ = " + code.join('\n'));
+            } catch (e) {
+                document.getElementById('errors').innerHTML += e;
+                return;
+            }
+
+            // render
+            plot();
+
+            // graph interactions
+            var drag = false, Shift = false;
+            canvas.onmousedown = function () { drag = true; };
+            window.onmouseup = function () { drag = false; };
+            window.onkeydown = function (e) { if (e.keyCode == 16) Shift = true; }
+            window.onkeyup = function (e) { if (e.keyCode == 16) Shift = false; }
+            window.onmousemove = function (e) {
+                if (drag) {
+                    iTr[0] += e.movementX / iSc[0];
+                    iTr[1] -= e.movementY / iSc[1];
+                    plot();
+                }
+            };
+            canvas.onmousewheel = function (e) {
+                e.preventDefault();
+                var p = fromScreen([e.offsetX, e.offsetY]);
+                var scf = exp(0.001 * e.wheelDelta);
+                var sc = [scf, scf];
+                if (Shift) sc[abs(p[1]) < abs(p[0]) ? 1 : 0] = 1;
+                iTr[0] = (p[0] + iTr[0]) / sc[0] - p[0];
+                iTr[1] = (p[1] + iTr[1]) / sc[1] - p[1];
+                iSc[0] *= sc[0], iSc[1] *= sc[1];
+                plot();
+            };
+        }
+
+
+        // plot function
+        function plot() {
+            document.getElementById('errors').innerHTML = "";
+
+            // get slider values
+            var sliders = getSliders();
+            for (var i = 0; i < sliders.length; i++) {
+                window[sliders[i][0]] = sliders[i][1];
+            }
+
+            // sample function values
+            var coords = [];
+            var vals = [];
+            for (var i = 0; i < iRes[0]; i++) {
+                // use underscores to avoid variable name collision
+                var __p__ = fromScreen([i, 0]);
+                coords.push(__p__[0]);
+                __y__ = NaN;
+                try {
+                    __y__ = (__fun__(__p__[0]));
+                } catch (__error__) {
+                    document.getElementById("errors").innerHTML += __error__;
+                    return;
+                }
+                if (typeof (__y__) == 'number') vals.push([__y__]);
+                else if (__y__.length != undefined) vals.push(__y__);
+                else;
+            }
+
+            // detect discontinuity/undefined
+            {
+
+            }
+
+            // initialize canvas
+            const canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, iRes[0], iRes[1]);
+
+            // plot axis
+            ctx.beginPath();
+            var O = fromCanvas([0, 0]);
+            ctx.strokeStyle = 'black';
+            ctx.moveTo(0, O[1]); ctx.lineTo(iRes[0], O[1]);  // x-axis
+            ctx.moveTo(O[0], 0); ctx.lineTo(O[0], iRes[1]);  // y-axis
+            var p = fromCanvas([1, 0]);
+            ctx.moveTo(p[0], p[1] - 5); ctx.lineTo(p[0], p[1] + 5);
+            p = fromCanvas([0, 1]);
+            ctx.moveTo(p[0] - 5, p[1]); ctx.lineTo(p[0] + 5, p[1]);
+            ctx.stroke();
+
+            // plot function
+            var fn = Infinity;
+            for (var i = 0; i < vals.length; i++)
+                fn = min(fn, vals[i].length);
+            for (var id = 0; id < fn; id++) {
+                ctx.beginPath();
+                for (var i = 0; i < vals.length; i++) {
+                    var p = fromCanvas([coords[i], vals[i][id]]);
+                    if (i == 0) ctx.moveTo(p[0], p[1]);
+                    else ctx.lineTo(p[0], p[1]);
+                }
+                ctx.stroke();
+            }
+        }
+
+    </script>
+</body>
+</html>
