@@ -1,14 +1,14 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
     <title>The Complex Grapher</title>
     <meta charset="utf-8" />
-
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
     </script>
     <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>
+
         #MathJax_MenuFrame {
             opacity: 0.0;
             visibility: hidden;
@@ -21,7 +21,6 @@
             outline-color: rgba(255,255,255,0.0);
         }
     </style>
-
     <script src="https://unpkg.com/mathjs@5.7.0/dist/math.min.js"></script>
     <script>
         // https://unpkg.com/mathjs@5.9.0/dist/math.js  line 34520-35609
@@ -296,8 +295,8 @@
         }
 
     </script>
-
     <style>
+
         .main {
             margin-left: auto;
             margin-right: auto;
@@ -418,7 +417,7 @@
         }
     </script>
 </head>
-<body onload="graph()">
+<body>
     <div class="main">
         <p id="title">The Complex Grapher</p>
         <div id="canvas" onmouseover="showscale(event)" onmousemove="showscale(event)" onmouseout="$('cmt').style.display = 'none';">
@@ -428,7 +427,7 @@
             </div>
             <div id="cmt"></div>
             <script>
-                var mat, cmd;
+                var mat = [[0, 0, 0], [0, 0, 0]], cmd;
                 function showscale(e) {
                     $("cmt").style.display = "block";
                     var x = e.clientX - $("graph").getBoundingClientRect().left, y = e.clientY - $("graph").getBoundingClientRect().top;
@@ -448,7 +447,7 @@
             </div>
             <div>
                 Center of graph: <br />
-                <input id="ctrx" type="text" value="0" oninput="ctrxchange()" /> $+$ <input id="ctry" type="text" value="0" oninput="ctrychange()" /> $i$
+                <input id="ctrx" type="text" value="0" oninput="ctrxchange()" onkeydown="graph(event)" /> $+$ <input id="ctry" type="text" value="0" oninput="ctrychange()" onkeydown="graph(event)" /> $i$
                 <br /><br />
                 <script>
                     function ctrxchange() {
@@ -482,10 +481,10 @@
                     </script>
                 </div>
                 Re axis radius:
-                <input id="radx" type="text" value="6" oninput="radxchange()" />
+                <input id="radx" type="text" value="6" oninput="radxchange()" onkeydown="graph(event)" />
                 <br />
                 Im axis radius:
-                <input id="rady" type="text" value="4" oninput="radychange()" />
+                <input id="rady" type="text" value="4" oninput="radychange()" onkeydown="graph(event)" />
                 <br />
                 <!--<table><tr><td><input id="showaxis" type="checkbox" style="width:16px;height:16px;" checked /></td><td>Show axis</td></tr></table>--><br />
                 <br />
@@ -518,8 +517,8 @@
                 </script>
             </div>
             <div>
-                Coloring parameter <i>a</i>:
-                <input id="cprea" type="text" value="0.5" oninput="cpreachange()" />
+                Coloring parameter <i title="a smaller `a` value produces a lighter color">a</i>:
+                <input id="cprea" type="text" value="0.5" oninput="cpreachange()" onkeydown="graph(event)" />
                 <br />
                 <script>
                     function cpreachange() {
@@ -588,8 +587,11 @@
         const FC = ["éҳρ", "log", "sin", "cos", "tan", "snh", "csh", "asn", "acs", "atn", "tnh", "ash", "ach", "ath", "sqr", "csc", "sec", "cot", "acc", "asc", "act", "cch", "sch", "cth", "aҳh", "agh", "akh", "gma",
             "rél", "ɪma", "abs", "arg"];
 
-        function readstr() {
-            str = $("ifunction").value;
+        function readstr(str) {
+            if (str.match('&'))
+                throw ("Invalid character detected");
+            if (str.length < 1 || str.length > 1024)
+                throw ("Invalid string length");
 
             // Shunting-Yard algorithm, saved from https://www.complexgrapher.com/scripts.min.js
             str = str.replace(/ /g, "");
@@ -785,7 +787,9 @@
         }
 
 
-        function graph() {
+        function graph(e) {
+            if (e != null && e.keyCode != 13)
+                return;
             dishighlight($("ifunction"));
 
             var cx = new Number($("ctrx").value);
@@ -797,14 +801,22 @@
             var a = new Number($("cprea").value);
             if (isNaN(a) || a >= 1 || a <= 0) return;
 
+            var str = $("ifunction").value;
             try {
-                cmd = readstr();
+                cmd = readstr(str);
             } catch (d) {
                 highlight($("ifunction"));
                 $("canvaswrap").style.display = "none";
-                console.log(d);
+                console.error(d);
                 return;
             }
+
+            window.location.hash = 'f=' + encodeURIComponent(str)
+                + '&cx=' + encodeURIComponent($("ctrx").value)
+                + '&cy=' + encodeURIComponent($("ctry").value)
+                + '&rx=' + encodeURIComponent($("radx").value)
+                + '&ry=' + encodeURIComponent($("rady").value)
+                + '&a=' + encodeURIComponent($("cprea").value);
 
 
             setTimeout(function () {
@@ -832,7 +844,30 @@
             $("canvaswrap").style.display = "block";
         }
 
-    </script>
+        window.onload = function () {
+            var getParamsFromHash = function () {
+                try {
+                    var hash = document.location.hash.replace('#', '');
+                    if (hash != '') {
+                        hash = hash.split('&').reduce(function (res, s) {
+                            s = s.split('=');
+                            res[s[0]] = decodeURIComponent(s[1]);
+                            return res;
+                        }, {});
+                        if (hash['f'] != undefined) $('ifunction').value = hash['f'];
+                        if (hash['cx'] != undefined) $('ctrx').value = hash['cx'];
+                        if (hash['cy'] != undefined) $('ctry').value = hash['cy'];
+                        if (hash['rx'] != undefined) $('radx').value = hash['rx'];
+                        if (hash['ry'] != undefined) $('rady').value = hash['ry'];
+                        if (hash['a'] != undefined) $('cprea').value = hash['a'];
+                    }
+                } catch (e) { }
+                graph();
+            };
+            getParamsFromHash();
+            //window.addEventListener("hashchange", function (e) { getParamsFromHash(); });
+        };
 
+    </script>
 </body>
 </html>
