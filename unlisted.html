@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Harry Chen - unlisted</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./logo.png" />
+    <style>body{margin:10px 10px 40px 10px}div,table{margin-left:40px}td{padding-right:16px}span{padding-left:20px}a{color:#000}.htm,.html{color:blue}.js{color:#ff4500}.css{color:#006400}.png,.jpg,.svg,.ico,.webp{color:#8b008b}.md,.txt{text-decoration:none}</style>
+    <script>
+        window.onload = function () {
+            var root = String(document.URL);
+            root = root.substring(0, root.indexOf('unlisted.html')).replace(/\/$/, '');
+            var paths = document.getElementsByClassName('file');
+            for (let f of paths) {
+                if (f.innerHTML == '/unlisted.html') continue;
+                f.innerHTML = "<a href='" + root + f.innerHTML + "'>" + f.innerHTML + "</a>";
+                f.children[0].setAttribute('class', f.getAttribute('type'));
+            }
+            var f = document.getElementById('root');
+            f.innerHTML = "<a href='" + root + "/index.html'>" + root + "</a>";
+        }
+    </script>
+</head>
+<body>
+    <div id="root" style="margin-left:0;font-size:20px;margin-bottom:5px;"></div>
+    <div class='dirname'>/notes</div><div class='dir'><div class='dirname'>/notes/unlisted</div><div class='dir'><table><tr><td class='file' type='js'>/notes/unlisted/csh.js</td><td>8.3KB</td><td>js</td></tr><tr><td class='file' type='html'>/notes/unlisted/Equations.html</td><td>99.8KB</td><td>html</td></tr><tr><td class='file' type='html'>/notes/unlisted/Inertia.html</td><td>85.2KB</td><td>html</td></tr><tr><td class='file' type='js'>/notes/unlisted/latex_desmos.js</td><td>2.1KB</td><td>js</td></tr><tr><td class='file' type='md'>/notes/unlisted/README.md</td><td>83bytes</td><td>md</td></tr><tr><td class='file' type='html'>/notes/unlisted/Substitution.html</td><td>33.7KB</td><td>html</td></tr><tr><td class='file' type='txt'>/notes/unlisted/UnicodeTable.txt</td><td>302.7KB</td><td>txt</td></tr></table></div><table><tr><td class='file' type='html'>/notes/equations.html</td><td>1.4MB</td><td>html</td></tr><tr><td class='file' type='html'>/notes/inertia.html</td><td>391.9KB</td><td>html</td></tr><tr><td class='file' type='html'>/notes/substitution.html</td><td>235.9KB</td><td>html</td></tr></table></div><div class='dirname'>/tools</div><div class='dir'><div class='dirname'>/tools/unlisted</div><div class='dir'><div class='dirname'>/tools/unlisted/Contour Grapher (newer)</div><div class='dir'><table><tr><td class='file' type='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.js</td><td>26.9KB</td><td>js</td></tr><tr><td class='file' type='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.old.js</td><td>45KB</td><td>js</td></tr><tr><td class='file' type='html'>/tools/unlisted/Contour Grapher (newer)/Contour Grapher.html</td><td>44.6KB</td><td>html</td></tr></table></div><table><tr><td class='file' type='html'>/tools/unlisted/Contour Grapher.html</td><td>44.6KB</td><td>html</td></tr><tr><td class='file' type='html'>/tools/unlisted/funplot.html</td><td>10.6KB</td><td>html</td></tr><tr><td class='file' type='png'>/tools/unlisted/Matrix Visualizer.png</td><td>189.6KB</td><td>png</td></tr><tr><td class='file' type='js'>/tools/unlisted/temp.js</td><td>2.9KB</td><td>js</td></tr></table></div><table><tr><td class='file' type='html'>/tools/chemequ.html</td><td>21KB</td><td>html</td></tr><tr><td class='file' type='html'>/tools/complex.html</td><td>37.1KB</td><td>html</td></tr><tr><td class='file' type='html'>/tools/mathjaxt.html</td><td>9.3KB</td><td>html</td></tr><tr><td class='file' type='html'>/tools/matrixv.html</td><td>30.2KB</td><td>html</td></tr><tr><td class='file' type='html'>/tools/svgpath.html</td><td>2.1KB</td><td>html</td></tr></table></div><table><tr><td class='file' type='html'>/index.html</td><td>3.6KB</td><td>html</td></tr><tr><td class='file' type='py'>/index.py</td><td>2.5KB</td><td>py</td></tr><tr><td class='file' type='png'>/logo.png</td><td>8.3KB</td><td>png</td></tr><tr><td class='file' type='md'>/README.md</td><td>584bytes</td><td>md</td></tr><tr><td class='file' type='txt'>/robots.txt</td><td>217bytes</td><td>txt</td></tr><tr><td class='file' type='html'>/unlisted.html</td><td>4.3KB</td><td>html</td></tr></table>
+</body>
+</html>

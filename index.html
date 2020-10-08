@@ -16,7 +16,7 @@
         }
 
         #titles {
-            margin: 5% 5% 3% 5%;
+            margin: 4% 5% 3% 5%;
             font-family: 'Courier New', Consolas;
             border-bottom: 1px solid gray;
             padding: 10px 0px;
@@ -67,23 +67,24 @@
 </head>
 <body>
     <div id="titles">
-        <div id="title" title="somewhere on the internet">Coming soon...</div>
-        <div id="bar">Notes - Tools - Blogs - Math - Physics - Graphics</div>
+        <div id="title" title="site under construction"></div>
+        <div id="bar" title="Coming soon...">Notes - Tools - Blogs - Math - Physics - Graphics</div>
 
     </div>
 
     <div id="info">
-        <div class="stitle">You can still check some of my tools:</div>
+        <div class="stitle">Some single-HTML tools:</div>
         <p><a href="./tools/matrixv.html">Matrix visualizer</a>: interactive visualization of 2d/3d/4d matrices used for computer graphics, geometry transform, data processing, and others. (doesn't work in Firefox)</p>
         <p><a href="./tools/complex.html">Complex grapher</a>: graphing complex-variable math functions using Javascript.</p>
         <p><a href="./tools/chemequ.html">Chemical equation balancer</a>: created for my science homework.</p>
         <p><a href="./tools/mathjaxt.html">MathJax tester</a>: Latex math tester with real-time preview. (defined some macros)</p>
         <p><a href="./tools/svgpath.html">SVG path tester</a>: visualizing SVG path data. A quite sketchy tool.</p>
-        <div class="stitle">...and notes:</div>
+        <div class="stitle">and notes:</div>
         <p><a href="./notes/equations.html">Equations in Mathematics (incomplete)</a>: a general math note sheet, my favorite part is the trigonometric formulas. </p>
         <p><a href="./notes/substitution.html">Integral substitutions</a>: list of common substitutions in multidimensional integration. </p>
-        <div class="stitle">Most of my tools are single HTML. Feel free to download them and add something of your own ;)</div>
-        <p title="Report incorrect formula, typo, grammar, compatibility issues, etc."><a href="https://github.com/Harry7557558/harry7557558.github.io/issues" target="_blank">Github issues</a></p>
+        <div class="stitle" title='If you do, please let me know.'>Until now, you should not see this page in a search engine's search result.</div>
+        <p title="Report error/typo, compatibility issues, etc."><a href="https://github.com/Harry7557558/harry7557558.github.io/issues" target="_blank">Github issues</a></p>
+        <p><a title="magic link" href="./unlisted.html">Quicklink</a></p>
     </div>
 
     <script>
@@ -91,14 +92,12 @@
             timer: 1,
             typeDot: function () {
                 var that = this;
-                var s = "Coming soon" + ([".&nbsp;&nbsp;", "..&nbsp;", "...", "..."][(++this.timer) % 4]);
+                var s = "🏗 Hello" + ([".&nbsp;&nbsp;", "..&nbsp;", "...", "..."][(++this.timer) % 4]);
                 document.getElementById("title").innerHTML = s;
                 setTimeout(function () { that.typeDot(); }, 1000);
             }
         };
         typeTitleDots.typeDot();
     </script>
-
-    <a style="width:32px;height:32px;position:absolute;top:0;right:0;background-color:#FF000010" title="magic link" href="./debug.html"></a>
 </body>
 </html>
