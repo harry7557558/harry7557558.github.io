@@ -46,7 +46,7 @@ content = """<!doctype html>
     <script>
         window.onload = function () {
             var root = String(document.URL);
-            root = root.substring(0, root.indexOf('unlisted.html')).replace(/\/$/, '');
+            root = root.replace(/\/unlisted.html$/, '');
             var paths = document.getElementsByClassName('file');
             for (let f of paths) {
                 if (f.innerHTML == '/unlisted.html') continue;
