@@ -1,8 +1,8 @@
-# generate unlisted.html
+# a commentless Python source to generate unlisted.html
 
 import os
 
-root = os.path.dirname(__file__).replace('\\','/')
+root = os.path.dirname(__file__)
 
 def getFileSize(path):
     n = os.path.getsize(path)
@@ -14,26 +14,46 @@ def getExtension(path):
     ext = os.path.splitext(path)[1]
     return ext.lstrip('.').lower()
 
-def indexDirectory(_dir):
+def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
+    if trunc==-1:
+        _dir = _dir.replace('\\','/')
+        if _dir[-1]!='/': _dir += '/'
+        trunc = len(_dir)-1
     ls = [f for f in os.listdir(_dir) if f[0]!='.']
     files = [_dir+f for f in ls if os.path.isfile(_dir+f)]
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
+    dirs_content = [indexDirectory(path+'/',web_only=web_only,trunc=trunc,name=name) for path in dirs]
     html = ""
-    for path in dirs:
-        html += "<div class='dirname'>"+path[len(root):]+"</div>"
-        html += "<div class='dir'>"+indexDirectory(path+'/')+"</div>"
+    for i in range(len(dirs)):
+        if dirs_content[i]=='': continue
+        html += "<div class='dirname'>"+name+dirs[i][trunc:]+"</div>"
+        html += "<div class='dir'>"+dirs_content[i]+"</div>"
     if len(files):
         html += "<table>"
         for fn in files:
             ext = getExtension(fn)
+            if web_only and ['htm','html','js','css'].count(ext)==0:
+                continue
             html += "<tr>"
-            html += "<td class='file' type='"+ext+"'>"+fn[len(root):]+"</td>"
+            html += "<td class='file' type='"+ext+"'>"+name+fn[trunc:]+"</td>"
             html += "<td>"+getFileSize(fn)+"</td>"
             html += "<td>"+ext+"</td>"
             html += "</tr>"
         html += "</table>"
+    if html.find("class='file'")==-1:
+        return ''
     return html
 
+
+additional_repos = [
+    ['Graphics','D:\\Coding\\Github\\Graphics\\'],
+    ['miscellaneous','D:\\Coding\\Github\\miscellaneous']
+    ]
+
+site_content = indexDirectory(root)
+additional_contents = ["<div class='dirname'><i>"+s[0]+"</i></div>"
+                       + "<div class='dir'>"+indexDirectory(s[1],web_only=True,name='/<i>'+s[0]+'</i>')+"</div>"
+                       for s in additional_repos]
 
 content = """<!doctype html>
 <html>
@@ -60,7 +80,7 @@ content = """<!doctype html>
 </head>
 <body>
     <div id="root" style="margin-left:0;font-size:20px;margin-bottom:5px;"></div>
-    """ + indexDirectory(root+'/') + """
+    """ + site_content + ''.join(additional_contents) + """
 </body>
 </html>"""
 
