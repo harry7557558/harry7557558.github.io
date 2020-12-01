@@ -70,7 +70,7 @@ content = """<!doctype html>
             var paths = document.getElementsByClassName('file');
             for (let f of paths) {
                 if (f.innerHTML == '/unlisted.html') continue;
-                f.innerHTML = "<a href='" + root + f.innerHTML + "'>" + f.innerHTML + "</a>";
+                f.innerHTML = "<a href='" + root + f.innerHTML.replace('<i>','').replace('</i>','') + "'>" + f.innerHTML + "</a>";
                 f.children[0].setAttribute('class', f.getAttribute('type'));
             }
             var f = document.getElementById('root');
