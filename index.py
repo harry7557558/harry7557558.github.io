@@ -47,11 +47,12 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
 
 additional_repos = [
     ['Graphics','D:\\Coding\\Github\\Graphics\\'],
-    ['miscellaneous','D:\\Coding\\Github\\miscellaneous']
+    ['miscellaneous','D:\\Coding\\Github\\miscellaneous'],
+    ['DMOJ-Render_Main','D:\\Coding\\Github\\DMOJ-Render_Main']
     ]
 
 site_content = indexDirectory(root)
-additional_contents = ["<div class='dirname'><i>"+s[0]+"</i></div>"
+additional_contents = ["<div class='dirname'><i>/"+s[0]+"</i></div>"
                        + "<div class='dir'>"+indexDirectory(s[1],web_only=True,name='/<i>'+s[0]+'</i>')+"</div>"
                        for s in additional_repos]
 

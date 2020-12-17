@@ -1,9 +1,8 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <title>Equations in Mathematics</title>
     <meta charset="utf-8" />
-
     <!-- MathJax -->
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
@@ -14,8 +13,8 @@
             alert("Failed loading MathJax \nCannot display LaTeX formulas");
         }
     </script>
-
     <style>
+
         body {
             background-color: rgb(82,86,89);
             padding: 20px 0px 60px 0px;
@@ -85,7 +84,6 @@
         }
     </style>
 
-
 </head>
 <body>
     <script>
@@ -93,9 +91,7 @@
         // pages without keyword will not be loaded
         var enable = "";  // case sensitive
     </script>
-
     <div id="click2edit" style="position:fixed;top:0px;left:0px;width:10px;height:10px;background-color:red;display:none;" onclick="document.body.contentEditable = document.body.contentEditable!='true';"></div>
-
     <!-- LaTeX Macros -->
     <div style="height:0px; visibility:hidden; display:none;">
         $\newcommand{\e}{\operatorname{e}}$
@@ -151,13 +147,10 @@
 
 
     </div>
-
     <div class="article" id="main">
-
         <!-- Trigonometric Functions -->
         <div class="page">
             <h1>Trigonometric Functions</h1>
-
             <div class="cat">
                 <p>
                     $\sin{z}={\dfrac{\e^{iz}-\e^{-iz}}{2i}}, \quad
@@ -165,7 +158,6 @@
                     \tan{z}=-i\cdot{\dfrac {\e^{iz}-\e^{-iz}}{\e^{iz}+\e^{-iz}}};$
                 </p>
             </div>
-
             <!-- Graph -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
@@ -190,7 +182,6 @@
                     <span>$f(x)=\cot{x}$</span>
                 </div>&nbsp;
             </div>
-
             <!-- Special Values -->
             <div class="cat">
                 <p>
@@ -209,21 +200,24 @@
                     \sin{72^\circ}=\dfrac{\sqrt{10+2\sqrt{5}}}{4};$
                 </p>
             </div>
-
             <!-- Basic Identities -->
             <div class="cat">
                 <p>
-                    $\sin(-x)=-\sin{x}, \quad
-                    \cos(-x)=\cos{x}, \quad
-                    \tan(-x)=-\tan{x};$
+                    $\sin(-x)=-\sin{x}, \quad\cos(-x)=\cos{x}, \quad\tan(-x)=-\tan{x};$
                 </p>
                 <p>
-                    $\sin(x\pm\pi)=-\sin{x}, \quad\cos(x\pm\pi)=-\cos{x}, \quad\tan(x\pm\pi)=\tan{x}; $
-                </p>
-                <p>
-                    $\sin\left(x\pm\dfrac{\pi}{2}\right)=\pm\cos{x}, \quad
+                    $\sin(x\pm\pi)=-\sin{x}, \quad\cos(x\pm\pi)=-\cos{x}, \quad\tan(x\pm\pi)=\tan{x};
+                    \qquad
+                    \sin\left(x\pm\dfrac{\pi}{2}\right)=\pm\cos{x}, \quad
                     \cos\left(x\pm\dfrac{\pi}{2}\right)=\mp\sin{x}, \quad
                     \tan\left(x\pm\dfrac{\pi}{2}\right)=\cot{x};$
+                </p>
+                <p>
+                    $\sin(\pi-x)=\sin(x), \quad\cos(\pi-x)=-\cos(x), \quad\tan(\pi-x)=-\tan(x);
+                    \qquad
+                    \sin\left(\dfrac{\pi}{2}-x\right)=\cos(x), \quad
+                    \cos\left(\dfrac{\pi}{2}-x\right)=\sin(x), \quad
+                    \tan\left(\dfrac{\pi}{2}-x\right)=\cot(x);$
                 </p>
                 <p>
                     $\sin\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{1}{\sqrt{2}}(\sin{x}\pm\cos{x}), \quad
@@ -236,7 +230,6 @@
                     \csc^2{x}-\cot^2{x}=1;$
                 </p>
             </div>
-
             <!-- Sum, Double-angle, and Half-angle formulas -->
             <div class="cat">
                 <p>
@@ -267,7 +260,6 @@
                     \tan^2x=\dfrac{1-\cos2x}{1+\cos2x};$
                 </p>
             </div>
-
             <!-- Sum to Prod, Prod to Sum -->
             <div class="cat">
                 <p>
@@ -287,9 +279,7 @@
             </div>
             <br />
 
-
             <h2>Inverse Trigonometric Functions</h2>
-
             <div class="cat">
                 <p>
                     $\sin^{-1}(z)=-i\cdot\ln\left(iz+{\sqrt{1-z^{2}}}\right), \quad
@@ -298,7 +288,6 @@
                     \mathrm{atan2}(y,x)={\dfrac{1}{2i}}\ln\left({\dfrac{x+yi}{x-yi}}\right);$
                 </p>
             </div>
-
             <!-- Graph -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
@@ -321,7 +310,6 @@
                     <span>$f(x)=\csc^{-1}{x}$</span>
                 </div>
             </div>
-
             <div class="cat">
                 <p>
                     $\csc^{-1}{x}=\sin^{-1}\dfrac{1}{x}, \quad
@@ -331,7 +319,6 @@
                     \sec^{-1}{x}+\csc^{-1}{x}=\dfrac{\pi}{2};$
                 </p>
             </div>
-
             <!-- Combined trigonometric and inverse -->
             <div class="cat">
                 <p>
@@ -348,7 +335,6 @@
                     \tan^{-1}(x)\pm\tan^{-1}(y)=\mathrm{atan2}(x\pm y, 1\mp xy);$
                 </p>
             </div>
-
             <!-- Combined inverse and trigonometric -->
             <div class="cat">
                 <div class="graph" style="display:inline; float:right;">
@@ -386,7 +372,6 @@
                     \cot^{-1}(\tan(x))=-x+\pi\left(\dfrac{1}{2}+\operatorname{round}\left(\dfrac{x}{\pi}\right)\right);$
                 </p>
             </div>
-
             <!-- Combined trigonometric and multiple of inverse -->
             <!-- Consider to remove or keep in a separated file -->
             <div class="cat">
@@ -427,20 +412,16 @@
                     \cos\left(\dfrac{1}{2}\mathrm{atan2}(y,x)\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\dfrac{x}{\sqrt{x^2+y^2}}+1};$ <br />
                 </p>
             </div>
-
             <div class="cat">
                 Solutions of $a\cos(x)+b\sin(x)+c=0$:&ensp;
                 $x=2\tan^{-1}\left(\dfrac{b\pm\sqrt{a^2+b^2-c^2}}{a-c}\right)+2\pi n$;
                 &emsp;(non-degenerated case)
             </div>
-
         </div>
-
 
         <!-- Exponential and Logarithm -->
         <div class="page">
             <h1>Power, Exponential, and Logarithm</h1>
-
             <!-- Graph of exp and ln -->
             <div class="graph" style="display:inline; float:right;">
                 <div class="graphfun">
@@ -451,14 +432,12 @@
                     <span>$f(x)=\ln{x}$</span>
                 </div>
             </div>
-
             <!-- Complex square root -->
             <div class="cat">
                 <p>
                     $\sqrt{a+bi}=\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}+a}{2}}+i\cdot\sgn(b)\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}-a}{2}}$;
                 </p>
             </div>
-
             <!-- Exponent and Power basics -->
             <div class="cat">
                 <p>
@@ -474,7 +453,6 @@
                     a^0=1;$
                 </p>
             </div>
-
             <!-- Logarithm basics -->
             <div class="cat">
                 <p>
@@ -492,7 +470,6 @@
                     \log_ab\cdot\log_ba=1;$
                 </p>
             </div>
-
             <!-- Graphs of Power, Exponent and Logarithm -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
@@ -523,14 +500,10 @@
                     <span>$f(x)=\log_{1.8}{x}$</span>
                 </div>
             </div>
-
             <div class="cat"><br /><br /></div>
 
-
             <!-- Hyperbolic Functions -->
-
             <h1>Hyperbolic Functions</h1>
-
             <!-- Definitions -->
             <div class="cat">
                 <p>
@@ -550,7 +523,6 @@
                     \coth^{-1}(x)={\dfrac{1}{2}}\ln\left({\dfrac{x+1}{x-1}}\right);$
                 </p>
             </div>
-
             <!-- Graphs of hyperbolic functions -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
@@ -573,7 +545,6 @@
                     <span>$f(x)=\mathrm{coth}{x}$</span>
                 </div>
             </div>
-
             <!-- Trigonometric/hyperbolic for imaginary numbers -->
             <div class="cat">
                 <p>
@@ -591,7 +562,6 @@
                     \tanh^{-1}(iz)=i\cdot\tan^{-1}(z);$
                 </p>
             </div>
-
             <!-- Basic Identities -->
             <div class="cat">
                 <p>
@@ -602,7 +572,6 @@
                     \coth^2{x}-\mathrm{csch}^2{x}=1;$
                 </p>
             </div>
-
             <!-- Hyperbolic function identities -->
             <div class="cat">
                 <!-- Sum -->
@@ -640,7 +609,6 @@
                     \cosh{x}-\cosh{y}=2\sinh\left(\dfrac{x+y}{2}\right)\sinh\left(\dfrac{x-y}{2}\right);$
                 </p>
             </div>
-
             <!-- Combined hyperbolic and inverse -->
             <div class="cat">
                 <p>
@@ -653,16 +621,12 @@
                 </p>
             </div>
 
-
         </div>
-
 
         <!-- Limit, Derivative, and Differential equations -->
         <div class="page">
-
             <h1>Limit</h1>
             <div class="cat">
-
                 <!-- Basic Identity -->
                 <div class="cat">
                     <p>
@@ -673,7 +637,6 @@
                         \lim[f(x)]^{n}=[\lim{f(x)}]^{n},\> n\in{N};$
                     </p>
                 </div>
-
                 <!-- Calculation Strategies -->
                 <div class="cat">
                     <p>
@@ -683,7 +646,6 @@
                         If $ \>\lim\dfrac{f(x)}{g(x)}=1\> $, &ensp;then $\>\lim[{f(x)\cdot{h(x)}}]=\lim[{g(x)\cdot{h(x)}}]\>$, &ensp;$\>\lim\dfrac{h(x)}{f(x)}=\lim\dfrac{h(x)}{g(x)} \> $;
                     </p>
                 </div>
-
                 <!-- L'Hôpital's Rule -->
                 <div class="cat">
                     <p>
@@ -700,14 +662,10 @@
                         \lim{\log_{1}{1}}\Rightarrow \lim\dfrac{\ln1}{\ln1};$
                     </p>
                 </div>
-
             </div>
-
             <div class="cat"><br /></div>
 
-
             <h1>Derivative</h1>
-
             <!-- Basic Identities -->
             <div class="cat">
                 <p>
@@ -728,7 +686,6 @@
                     $\dfrac{\d^n}{\d^n{x}}[f(x)\cdot{g(x)}]=\displaystyle\sum\limits_{k=0}\limits^{n}\dbinom{n}{k}\cdot{f^{(n-k)}(x)}\cdot{g^{(k)}(x)}$;
                 </p>
             </div>
-
             <!-- Derivative Table -->
             <div class="cat">
                 <p>
@@ -777,13 +734,11 @@
                     $\ddx\mathrm{erf}(x)=\dfrac{2}{\sqrt{\pi}}\e^{-x^2};$
                 </p>
             </div>
-
             <div class="incomplete_mark">
                 Implicit differentiation
                 Jacobian / Multivariable
                 Curvature / Geometry
             </div>
-
             <!-- Taylor Series -->
             <div class="cat">
                 <p>
@@ -793,7 +748,6 @@
                     $ f(x)=\displaystyle\sum\limits_{k=0}\limits^{n}{\dfrac{x^k\cdot{f^{(k)}}(0)}{k!}}+R_n$; &emsp;
                 </p>
             </div>
-
             <!-- Curvature -->
             <div class="cat">
                 <p>
@@ -805,7 +759,6 @@
                     Frenet–Serret formulas: &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$
                 </p>
             </div>
-
             <!-- Kinematics -->
             <div class="cat">
                 <p>
@@ -828,12 +781,9 @@
                     &emsp;($\vec{a}$ can also be calculated by projecting acceleration vector in $\vec{e_t}$ and $\vec{e_n}$ directions)
                 </p>
             </div>
-
             <div class="cat"><br /></div>
 
-
             <h1>Differential equations</h1>
-
             <!-- First order differential equations -->
             <div class="cat">
                 <p>
@@ -858,7 +808,6 @@
                     $z=y^{1-n} \Longrightarrow \dfrac{\d{z}}{\d{x}}+(1-n)p(x)z=(1-n)q(x)$; (treat as above)
                 </p>
             </div>
-
             <!-- Second and higher order differential equations -->
             <div class="cat">
                 <p>
@@ -884,7 +833,6 @@
                     $u(x)=y^{(n-2)} \Longrightarrow u''=f(u',u)$,&ensp; solve using above and repeat;
                 </p>
             </div>
-
             <!-- Second order differential equations -->
             <div class="cat">
                 <p>
@@ -940,15 +888,12 @@
                     $x=\e^t \Longrightarrow \dfrac{\d^2y}{\d t^2}+(p-1)\dfrac{\d y}{\d t}+qy=f(\e^t)$;
                 </p>
             </div>
-
             <div class="incomplete_mark"></div>
         </div>
-
 
         <!-- Integral -->
         <div class="page">
             <h1>Integral</h1>
-
 
             <!-- Basic of Integral -->
             <div class="cat">
@@ -968,7 +913,6 @@
                 </p>
             </div>
             <br />
-
             <!-- Integral Table -->
             <div class="cat">
                 <p>
@@ -1034,16 +978,13 @@
                     \intd{x\cos(x)}=\cos(x)+x\sin(x)+C;$
                 </p>
             </div>
-
             <br />
-
             <div class="incomplete_mark">
                 More common indefinite/definite integrals;
                 Multivariable integration; Jacobian, common substitutions; Green/Gauss/Stokes;
                 Application;
                 Special integrals;
             </div>
-
             <!-- Basic of Definite Integral -->
             <div class="cat">
                 <p>
@@ -1091,7 +1032,6 @@
                 </p>
             </div>
             <br />
-
             <!-- Application of Definite Integral -->
             <div class="cat">
                 <p>
@@ -1109,12 +1049,9 @@
                     Spherical: $\d{V}=\rho^2\cos\varphi\;\d{\rho}\d{\theta}\d{\varphi}$; &ensp;
                 </p>
             </div>
-
             <div class="cat"><br /></div>
-
             <!-- Non-elementary Functions -->
             <h2>Special Integrals</h2>
-
             <div class="cat">
                 <p>
                     Elliptic integral of the first kind: &ensp;
@@ -1144,9 +1081,7 @@
                 </p>
             </div>
             <br />
-
             <div class="incomplete_mark"></div>
-
             <!-- Fourier Series -->
             <div class="cat">
                 <p>
@@ -1163,15 +1098,12 @@
 
                 </p>
             </div>
-
             <br /><br />
         </div>
-
 
         <!-- Matrix and Vector -->
         <div class="page">
             <h1>Matrix</h1>
-
             <!-- Basic Operations -->
             <div class="cat">
                 <p>
@@ -1191,10 +1123,8 @@
                     $\Longrightarrow$ $(A^{-1})^{-1}=A$, &ensp;$(\lambda{A})^{-1}=\lambda^{-1}A^{-1}$, &ensp;$(AB)^{-1}=B^{-1}A^{-1}$, &ensp;$(A^T)^{-1}=(A^{-1})^T$; &ensp;
                 </p>
                 <p>
-
                 </p>
             </div>
-
             <!-- Basic of Determinant -->
             <div class="cat">
                 <p>
@@ -1236,7 +1166,6 @@
                     which $A_i$ is the matrix formed by replacing the <i>i</i><sup>th</sup> column of $A$ by $Y$;
                 </p>
             </div>
-
             <!-- Basic of Rank -->
             <div class="cat">
                 <p>
@@ -1251,7 +1180,6 @@
                     $A_{m\times{n}} \cong \bmat{I_{R(A)}&O\\O&O}_{m\times{n}}$; &ensp;
                 </p>
             </div>
-
             <div class="cat">
                 <p>
                     <red>*</red>
@@ -1259,14 +1187,10 @@
                     \quad\left(\lambda=\frac{a+d}{2}\pm\sqrt{\frac{(a+d)^2}{4}-(ad-bc)}\right)$
                 </p>
             </div>
-
             <div class="incomplete_mark"></div>
             <div class="cat"><br /></div>
 
-
-
             <h1>Vector</h1>
-
             <!-- Basic Operations -->
             <div class="cat">
                 <!-- Linear Operations -->
@@ -1292,7 +1216,6 @@
                     $\cos^2\theta_x+\cos^2\theta_y+\cos^2\theta_z=1$; &ensp;
                 </p>
             </div>
-
             <!-- Dot Product -->
             <div class="cat">
                 <p>
@@ -1312,9 +1235,7 @@
                     $\vec{a}\cdot\vec{b} \quad \begin{cases}>0,&\left< \vec{a},\vec{b}\right><
                     \dfrac{\pi}{2}\\< 0,&\left< \vec{a},\vec{b}\right>>\dfrac{\pi}{2}\end{cases}$; &emsp;
                 </p>
-
             </div>
-
             <!-- Cross Product -->
             <div class="cat">
                 <p>
@@ -1332,9 +1253,7 @@
                     $(\vec{a}\pm\vec{b})\times\vec{c}=\vec{a}\times\vec{c}\pm\vec{b}\times\vec{c}$, &ensp;
                     $\vec{c}\times(\vec{a}\pm\vec{b})=\vec{c}\times\vec{a}\pm\vec{c}\times\vec{b}$; &ensp;
                 </p>
-
             </div>
-
             <!-- Triple Product -->
             <div class="cat">
                 <p>
@@ -1344,14 +1263,11 @@
                 </p>
             </div>
 
-
         </div>
-
 
         <!-- Analytic Geometry -->
         <div class="page">
             <h1>Analytic Geometry</h1>
-
             <!-- Basic Equations -->
             <div class="cat">
                 <h3>Basic Equations</h3>
@@ -1408,11 +1324,11 @@
                 </div>
             </div>
             <br />
-
             <!-- Equation of Planar Lines -->
             <div class="cat">
                 <h3>Equations of Planar Straight Line</h3>
                 <style>
+
                     .Table_2DLineEqu {
                         margin: -10px 0px 10px 2.4em;
                     }
@@ -1483,11 +1399,11 @@
                 </p>
                 <br />
             </div>
-
             <!-- Equation of Circle -->
             <div class="cat">
                 <h3>Equations of Circle</h3>
                 <style>
+
                     .Table_CircEqu {
                         margin: -10px 0px 10px 2.4em;
                     }
@@ -1536,7 +1452,6 @@
                 </p>-->
                 <br />
             </div>
-
             <!-- Quadratic Curves -->
             <div class="cat">
                 <table style="display:inline-block; float:right; font-size: 14px;">
@@ -1561,7 +1476,6 @@
                         <td>/,haɪpɚ'bɑlɪk/</td>
                     </tr>
                 </table>
-
                 <h3>Quadratic Curves</h3>
                 <p>
                     <u>Ellipse</u>: &ensp;$\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}=1 \quad (a>b>0)$; &emsp;
@@ -1584,11 +1498,11 @@
                 <br />
             </div>
 
-
             <!-- Equation of Plane -->
             <div class="cat">
                 <h3>Equations of Plane</h3>
                 <style>
+
                     .Table_PlaneEqu {
                         margin: -10px 0px 10px 2.4em;
                     }
@@ -1642,11 +1556,11 @@
                 </p>
                 <br />
             </div>
-
             <!-- Equation of Spatial Line -->
             <div class="cat">
                 <h3>Equations of Spatial Straight Line</h3>
                 <style>
+
                     .Table_3DLineEqu {
                         margin: -10px 0px 10px 2.4em;
                     }
@@ -1719,11 +1633,8 @@
                 </p>
                 <br />
             </div>
-
             <div class="incomplete_mark"></div>
-
         </div>
-
 
         <!-- Miscellaneous -->
         <div class="page">
@@ -1734,7 +1645,6 @@
                 <div class="incomplete_mark"></div>
                 <br />
             </div>
-
             <div class="cat">
                 <p>
                     Arithmetic Sequence: &ensp;
@@ -1754,10 +1664,8 @@
                 </p>
             </div>
 
-
             <br />
             <div class="incomplete_mark"></div>
-
 
             <!-- Permutation and Combination -->
             <div class="cat">
@@ -1797,14 +1705,11 @@
                 </p>
             </div>
 
-
             <div class="incomplete_mark"></div>
-
             <div class="cat">
                 Bayes' theorem: &ensp; $\displaystyle P(A\mid B)={\frac {P(B\mid A)\,P(A)}{P(B)}}$
             </div>
             <br />
-
             <div class="incomplete_mark"></div>
             <div class="cat">
                 <h3><red>*</red>Normal Distribution</h3>
@@ -1816,10 +1721,7 @@
             </div>
             <br />
 
-
-
             <h1><red>*</red>Statistics</h1>
-
             <div class="cat">
                 <p>
                     Variance: &ensp;$S=\dfrac{1}{n}\displaystyle\sum{(x_i-\overline{x})^2}$; &emsp;
@@ -1855,14 +1757,11 @@
             </div>
             <div class="incomplete_mark"></div>
 
-
             <div class="cat">
             </div>
         </div>
-
         <hr />
     </div>
-
 
     <!-- For Easier Editing -->
     <script>
@@ -1944,7 +1843,6 @@
             }
         }
     </script>
-
     <!-- Function Grapher -->
     <script>
         function initCanvas(c, cx, cy, ux, uy) {
@@ -2061,8 +1959,6 @@
         GraphFun();
 
     </script>
-
-
 
 </body>
 </html>
