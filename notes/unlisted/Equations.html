@@ -82,6 +82,10 @@
         ::selection {
             background: rgb(153,193,218);
         }
+
+        /*a {
+            color: rgb(0,0,238);
+        }*/
     </style>
 
 </head>
@@ -145,8 +149,9 @@
         $\newcommand{\C}{\unicode{0x2102}}$
         $\newcommand{\H}{\unicode{0x210D}}$
 
-
     </div>
+
+
     <div class="article" id="main">
         <!-- Trigonometric Functions -->
         <div class="page">
@@ -200,7 +205,7 @@
                     \sin{72^\circ}=\dfrac{\sqrt{10+2\sqrt{5}}}{4};$
                 </p>
             </div>
-            <!-- Basic Identities -->
+            <!-- Basic Properties -->
             <div class="cat">
                 <p>
                     $\sin(-x)=-\sin{x}, \quad\cos(-x)=\cos{x}, \quad\tan(-x)=-\tan{x};$
@@ -213,11 +218,11 @@
                     \tan\left(x\pm\dfrac{\pi}{2}\right)=\cot{x};$
                 </p>
                 <p>
-                    $\sin(\pi-x)=\sin(x), \quad\cos(\pi-x)=-\cos(x), \quad\tan(\pi-x)=-\tan(x);
+                    $\sin(\pi-x)=\sin{x}, \quad\cos(\pi-x)=-\cos{x}, \quad\tan(\pi-x)=-\tan{x};
                     \qquad
-                    \sin\left(\dfrac{\pi}{2}-x\right)=\cos(x), \quad
-                    \cos\left(\dfrac{\pi}{2}-x\right)=\sin(x), \quad
-                    \tan\left(\dfrac{\pi}{2}-x\right)=\cot(x);$
+                    \sin\left(\dfrac{\pi}{2}-x\right)=\cos{x}, \quad
+                    \cos\left(\dfrac{\pi}{2}-x\right)=\sin{x}, \quad
+                    \tan\left(\dfrac{\pi}{2}-x\right)=\cot{x};$
                 </p>
                 <p>
                     $\sin\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{1}{\sqrt{2}}(\sin{x}\pm\cos{x}), \quad
@@ -623,7 +628,7 @@
 
         </div>
 
-        <!-- Limit, Derivative, and Differential equations -->
+        <!-- Limit and Derivative -->
         <div class="page">
             <h1>Limit</h1>
             <div class="cat">
@@ -739,6 +744,7 @@
                 Jacobian / Multivariable
                 Curvature / Geometry
             </div>
+
             <!-- Taylor Series -->
             <div class="cat">
                 <p>
@@ -748,18 +754,40 @@
                     $ f(x)=\displaystyle\sum\limits_{k=0}\limits^{n}{\dfrac{x^k\cdot{f^{(k)}}(0)}{k!}}+R_n$; &emsp;
                 </p>
             </div>
-            <!-- Curvature -->
+            <!-- Arc Length and Curvature -->
+            <h3>Arc length and curvature</h3>
             <div class="cat">
                 <p>
-                    Curvature: &ensp;$\kappa=\lim\limits_{\Delta s\to 0}{\dfrac{\Delta\theta}{\Delta{s}}}$; &emsp;
-                    $y=f(x)$: &ensp;$\kappa(x)={\dfrac{y''}{\left(1+{y'}^{2}\right)^{\frac{3}{2}}}}$; &emsp;
-                    $r=r(\theta)$: &ensp;$\kappa (\theta )={\dfrac {r^{2}+2{r'}^{2}-r\,r''}{\left(r^{2}+{r'}^{2}\right)^{\frac {3}{2}}}}$; &emsp;
-                    $c(t)=\left(x(t),y(t)\right)$: &ensp;$\kappa(t)={\dfrac{x'y''-y'x''}{\left({x'}^{2}+{y'}^{2}\right)^{\frac {3}{2}}}}$; &emsp;<br />
-                    &emsp;&emsp;&emsp;&emsp;$c(t)=\left(x(t),y(t),z(t)\right)$: &ensp;$\kappa(t)=\dfrac{\sqrt {\left(z''y'-y''z'\right)^{2}+\left(x''z'-z''x'\right)^{2}+\left(y''x'-x''y'\right)^{2}}}{\left({x'}^{2}+{y'}^{2}+{z'}^{2}\right)^{\frac{3}{2}}}$; &emsp;
-                    Frenet–Serret formulas: &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$
+                    $(x(t),y(t))$: $\d{s}=\sqrt{x'^2+y'^2}\d{t}$; &ensp;
+                    $(x(t),y(t),z(t))$: $\d{s}=\sqrt{x'^2+y'^2+z'^2}\d{t}$; &emsp;
+                    $y=f(x)$: $\d{s}=\sqrt{y'^2+1}\d{x}$; &ensp;
+                    $r=r(\theta)$: $\d{s}=\sqrt{r^2+r'^2}\d{\theta}$; &ensp;
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    Curvature: &ensp;$\kappa=\lim\limits_{\Delta s\to 0}{\dfrac{\Delta\theta}{\Delta{s}}}=\left|\dfrac{\d\theta}{\d{s}}\right|$;
+                </p>
+                <p>
+                    $\vec{r}=\mathbf{r}(t)$:&ensp;
+                    $\kappa(t)=\dfrac{|\mathbf{r}'(t)\times\mathbf{r}''(t)|}{|\mathbf{r}'(t)|^{3}}$;
+                    &emsp;$y=f(x)$:&ensp;
+                    $\kappa(x)={\dfrac{y''}{\left(1+{y'}^{2}\right)^{\frac{3}{2}}}}$;
+                    &emsp;$r=r(\theta)$:&ensp;
+                    $\kappa(\theta)={\dfrac{r^{2}+2{r'}^{2}-r\,r''}{\left(r^{2}+{r'}^{2}\right)^{\frac{3}{2}}}}$;
+                </p>
+                <p>
+                    Unit tangent: $T=\dfrac{\mathbf{r}'(t)}{|\mathbf{r}'(t)|}$;&ensp;
+                    Normal unit vector: $N=\dfrac{T'(t)}{|T'(t)|}$;&ensp;
+                    Binormal unit vector: $B=T\times N$;&ensp;
+                </p>
+                <p>
+                    Frenet–Serret formulas: &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$,
+                    &ensp;where $\tau=-\dfrac{\d{B}}{\d{s}}\cdot N$ is the <i>torsion</i>;
                 </p>
             </div>
             <!-- Kinematics -->
+            <h3>Kinematics</h3>
             <div class="cat">
                 <p>
                     Velocity and acceleration in Cartesian coordinate:&ensp;
@@ -780,115 +808,12 @@
                     $R$ is the curvature radius;<br />
                     &emsp;($\vec{a}$ can also be calculated by projecting acceleration vector in $\vec{e_t}$ and $\vec{e_n}$ directions)
                 </p>
-            </div>
-            <div class="cat"><br /></div>
-
-            <h1>Differential equations</h1>
-            <!-- First order differential equations -->
-            <div class="cat">
                 <p>
-                    Solve $\dfrac{\d{y}}{\d{x}}=f(x)$:&ensp;
-                    $y=\Int{f(x)\d{x}}+C$;
-                </p>
-                <p title="separable differential equation">
-                    Solve $\dfrac{\d{y}}{\d{x}}=f(x)g(y)$:&ensp;
-                    $\dfrac{1}{g(y)}\d{y}=f(x)\d{x} \Longrightarrow\Int\dfrac{1}{g(y)}\d{y}=\Int f(x)\d{x}+C$;
-                </p>
-                <p title="homogeneous differential equation">
-                    Solve $\dfrac{\d{y}}{\d{x}}=\varphi\left(\dfrac{y}{x}\right)$:&ensp;
-                    $z=\dfrac{y}{x} \Longrightarrow x\dfrac{\d{z}}{\d{x}}+z=\varphi(z)\Longrightarrow\dfrac{\d{z}}{\d{x}}=\dfrac{\varphi(z)-z}{x}$;
-                    &emsp;$\varphi(z)-z\ne0: \Int\dfrac{\d{z}}{\varphi(z)-z}=\ln\left|\dfrac{x}{C}\right|; \quad \varphi(z)-z\equiv0: z=\dfrac{y}{x}=C$;
-                </p>
-                <p title="first order linear differential equation">
-                    Solve $\dfrac{\d{y}}{\d{x}}+p(x)y=q(x)$:&ensp;
-                    $y(x)=\e^{-\int p(x)\d{x}}\left[\Int q(x)\e^{\int p(x)\d{x}}\d{x}+C\right]$;
-                </p>
-                <p title="Bernoulli differential equation">
-                    Solve $\dfrac{\d{y}}{\d{x}}+p(x)y=q(x)y^n$:&ensp;
-                    $z=y^{1-n} \Longrightarrow \dfrac{\d{z}}{\d{x}}+(1-n)p(x)z=(1-n)q(x)$; (treat as above)
+                    Derivatives of unit vectors in polar coordinate:&ensp;
+                    $\dfrac{\d}{\d{t}}{\vec{e_r}}=\dot{\theta}\vec{e_\theta}$,&ensp;
+                    $\dfrac{\d}{\d{t}}{\vec{e_\theta}}=-\dot{\theta}\vec{e_r}$;
                 </p>
             </div>
-            <!-- Second and higher order differential equations -->
-            <div class="cat">
-                <p>
-                    Solve $y^{(n)}=f(x)$:&ensp;
-                    $\dfrac{\d^{n-1}y}{\d x^{n-1}}=\Int f(x)\d{x}+C_1$; (repeat)
-                </p>
-                <p>
-                    Solve $y''=f(x,y')$:&ensp;
-                    $p(x)=\dfrac{\d{y}}{\d{x}} \Longrightarrow \dfrac{\d{p}}{\d{x}}=f(x,p)$;
-                    &emsp;$p(x)=\varphi(x,C_1) \Longrightarrow y=\Int \varphi(x,C_1)\d{x} +C_2$;
-                </p>
-                <p>
-                    Solve $y''=f(y,y')$:&ensp;
-                    $p(y)=\dfrac{\d{y}}{\d{x}} \Longrightarrow \dfrac{\d^2y}{\d x^2}=p\dfrac{\d{p}}{\d{y}}=f(y,p)$;
-                    &emsp;$p(y)=\varphi(y,C_1) \Longrightarrow \Int\dfrac{\d{y}}{\varphi(y,C_1)}=x+C_2$;
-                </p>
-                <p>
-                    Solve $y^{(n)}=f\left(x,y^{(n-1)}\right)$:&ensp;
-                    $u(x)=y^{(n-2)} \Longrightarrow u''=f(x,u')$,&ensp; solve using above and repeat;
-                </p>
-                <p>
-                    Solve $y^{(n)}=f\left(y^{(n-1)},y^{(n-2)}\right)$:&ensp;
-                    $u(x)=y^{(n-2)} \Longrightarrow u''=f(u',u)$,&ensp; solve using above and repeat;
-                </p>
-            </div>
-            <!-- Second order differential equations -->
-            <div class="cat">
-                <p>
-                    Solve $y''+py'+qy=0$:&ensp;
-                    Let $r$ be the roots of $r^2+pr+q=0$;
-                    &emsp;$y=\begin{cases}
-                    C_1\e^{r_1x}+C_2\e^{r_2x}, &r\in[r_1,r_2],\ r_1\ne r_2\\
-                    \e^{rx}(C_1+C_2x), &r=r_1=r_2\\
-                    \e^{ax}\left(C_1\cos(bx)+C_2\sin(bx)\right), &r=a\pm bi,\ b\ne0
-                    \end{cases}$
-                </p>
-                <p>
-                    Solve $y''+py'+qy=\e^{\lambda x}P(x)$:&ensp;
-                    Find $Q(x)$ such that $Q''(x)+(2\lambda+p)Q'(x)+(\lambda^2+p\lambda+q)Q(x)=P(x)$,&ensp;
-                    $\Longrightarrow y=\e^{\lambda x}Q(x)+(\text{solution of }y''+py'+qy=0)$;
-                </p>
-                <div style="margin-left:2em">
-                    <p>
-                        $\lambda^2+p\lambda+q$ and $2\lambda+p$ are both zero when $\lambda$ is a multiple root of $\lambda^2+p\lambda+q=0$;
-                    </p>
-                    <p>
-                        $P(x)=P_m(x)$ is a degree-$m$ polynomial:&ensp;
-                        $Q(x)=\begin{cases}
-                        Q_m(x), &\lambda^2+p\lambda+q\ne0\\
-                        xQ_m(x), &\lambda^2+p\lambda+q=0,\ 2\lambda+p\ne0\\
-                        x^2Q_m(x), &\lambda^2+p\lambda+q=2\lambda+p=0\\
-                        \end{cases}$,&ensp; where $Q_m(x)$ is a polynomial of degree $m$;
-                    </p>
-                    <p>
-                        $\e^{\lambda x}P(x)=\e^{ax}\left[P_m(x)\cos(bx)+P_n(x)\sin(bx)\right]$:&ensp;
-                        $\e^{\lambda x}Q(x)=x^k\e^{ax}\left[R_1(x)\cos(bx)+R_2(x)\sin(bx)\right]$,&ensp;
-                        $k=\begin{cases}0, &(a+bi)^2+p(a+bi)+q\ne0\\1, &(a+bi)^2+p(a+bi)+q=0\\\end{cases}$,&ensp;
-                        $R_i(x)$ has degree $\max(m,n)$;
-                    </p>
-                </div>
-                <p title="second order linear homogeneous differential equation">
-                    Solve $y''+p(x)y'+q(x)y=0$:&ensp;
-                    Find any non-zero solution $y_1(x)$,&ensp; let $y_2(x)=y_1(x)\Int\dfrac{\e^{-\int p(x)\d{x}}}{y_1(x)^2}\d{x}$,&ensp;
-                    $\Longrightarrow y=C_1y_1(x)+C_2y_2(x)$;
-                </p>
-                <p title="second order linear nonhomogeneous differential equation">
-                    Solve $y''+p(x)y'+q(x)y=f(x)$:&ensp;
-                    Find any solution $y^*(x)$,&ensp; $\Longrightarrow y(x)=y^*(x)+(\text{solution of }y''+p(x)y'+q(x)y=0)$;
-                </p>
-                <div style="margin-left:2em">
-                    <p>
-                        If $y=y_1(x)$ satisfies $y''+p(x)y'+q(x)y=f_1(x)$ and $y=y_2(x)$ satisfies $y''+p(x)y'+q(x)y=f_2(x)$,<br />
-                        then $y=C_1y_1(x)+C_2y_2(x)$ satisfies $y''+p(x)y'+q(x)y=C_1f_1(x)+C_2f_2(x)$;
-                    </p>
-                </div>
-                <p title="Euler differential equation">
-                    Solve $x^2y''+pxy'+qy=f(x)$:&ensp;
-                    $x=\e^t \Longrightarrow \dfrac{\d^2y}{\d t^2}+(p-1)\dfrac{\d y}{\d t}+qy=f(\e^t)$;
-                </p>
-            </div>
-            <div class="incomplete_mark"></div>
         </div>
 
         <!-- Integral -->
@@ -1032,25 +957,8 @@
                 </p>
             </div>
             <br />
-            <!-- Application of Definite Integral -->
-            <div class="cat">
-                <p>
-                    $y=f(x)$: $\d{s}=\sqrt{f'(x)^2+1}\d{x}$; &ensp;
-                    $\rho=\rho(\theta)$: $\d{s}=\sqrt{\rho(\theta)^2+\rho'(\theta)^2}\d{\theta}$; &ensp;
-                    $p=(x(t),y(t))$: $\d{s}=\sqrt{x'(t)^2+y'(t)^2}\d{t}$; &ensp;
-                    $p=(x(t),y(t),z(t))$: $\d{s}=\sqrt{x'(t)^2+y'(t)^2+z'(t)^2}\d{t}$; &ensp;
-                </p>
-                <p>
-                    $z=f(x,y)$: $\d{A}=\sqrt{z_x'^2+z_y'^2+1}\>\d{x}\d{y}$; &ensp;
-                    $p=r(u,v)$: $\d{A}=|r_u'\times r_v'|\>\d{u}\d{v}$; &ensp;
-                </p>
-                <p>
-                    Polar: $\d{A}=\rho\;\d{\rho}\d{\theta}$; &ensp;
-                    Spherical: $\d{V}=\rho^2\cos\varphi\;\d{\rho}\d{\theta}\d{\varphi}$; &ensp;
-                </p>
-            </div>
-            <div class="cat"><br /></div>
-            <!-- Non-elementary Functions -->
+
+            <!-- Special Integrals -->
             <h2>Special Integrals</h2>
             <div class="cat">
                 <p>
@@ -1082,6 +990,7 @@
             </div>
             <br />
             <div class="incomplete_mark"></div>
+
             <!-- Fourier Series -->
             <div class="cat">
                 <p>
@@ -1099,6 +1008,219 @@
                 </p>
             </div>
             <br /><br />
+        </div>
+
+        <!-- Multivariable Calculus -->
+        <div class="page">
+            <h1>Multivariable Derivative</h1>
+            <!-- Jacobian -->
+            <div class="cat">
+                <p>
+                    $\dfrac{\partial\begin{bmatrix}f_1&f_2&\cdots\end{bmatrix}^T}{\partial\begin{bmatrix}x_1&x_2&\cdots\end{bmatrix}^T}=\begin{bmatrix}\frac{\partial{f_1}}{\partial{x_1}}&\frac{\partial{f_1}}{\partial{x_2}}&\cdots\\\frac{\partial{f_2}}{\partial{x_1}}&\frac{\partial{f_2}}{\partial{x_2}}&\cdots\\\vdots&\vdots&\ddots\end{bmatrix}$;&emsp;&emsp;
+                    $\dfrac{\partial(u,v)}{\partial(x,y)}=\begin{vmatrix}\frac{\partial u}{\partial x}&\frac{\partial u}{\partial y}\\\frac{\partial v}{\partial x}&\frac{\partial v}{\partial y}\end{vmatrix}$,&emsp;
+                    $\dfrac{\partial(u,v,w)}{\partial(x,y,z)}=\begin{vmatrix}\frac{\partial u}{\partial x}&\frac{\partial u}{\partial y}&\frac{\partial u}{\partial z}\\\frac{\partial v}{\partial x}&\frac{\partial v}{\partial y}&\frac{\partial v}{\partial z}\\\frac{\partial w}{\partial x}&\frac{\partial w}{\partial y}&\frac{\partial w}{\partial z}\end{vmatrix}$;
+                </p>
+                <p>
+                    $\dfrac{\partial(u,v)}{\partial(s,t)}=\dfrac{\partial(u,v)}{\partial(x,y)}\cdot\dfrac{\partial(x,y)}{\partial(s,t)}$,&emsp;
+                    $\dfrac{\partial(u,v)}{\partial(x,y)}\cdot\dfrac{\partial(x,y)}{\partial(u,v)}=1$,&emsp;
+                    $\dfrac{\partial(u,v)}{\partial(x,y)}=-\dfrac{\partial(v,u)}{\partial(x,y)}$,&emsp;
+                    $\dfrac{\partial(u,u)}{\partial(x,y)}=0$;
+                </p>
+                <!--<div class="incomplete_mark"></div>-->
+            </div>
+            <!-- Area and Volume elements -->
+            <div class="cat">
+                <h3>Area and volume elements<sup>&nbsp;<a href="substitution.html" title="list of multivariable integral substitutions">⭧</a></sup></h3>
+                <p>
+                    $\d{A}=\d{x}\d{y}=\dfrac{\partial(x,y)}{\partial(u,v)}\d{u}\d{v}$,&emsp;
+                    $\d{V}=\d{x}\d{y}\d{z}=\dfrac{\partial(x,y,z)}{\partial(u,v,w)}\d{u}\d{v}\d{w}$;
+                </p>
+                <p>
+                    Polar/cylindrical
+                    $\begin{aligned}x&=\rho\cos(\theta)\\y&=\rho\sin(\theta)\end{aligned}$:&ensp;
+                    $\dfrac{\partial(x,y)}{\partial(\rho,\theta)}=\rho$;
+                    &emsp;&emsp;
+                    Spherical
+                    $\begin{aligned}x&=\rho\sin(\varphi)\cos(\theta)\\y&=\rho\sin(\varphi)\sin(\theta)\\z&=\rho\cos(\varphi)\end{aligned}$:&ensp;
+                    $\dfrac{\partial(x,y,z)}{\partial(\rho,\theta,\varphi)}=\rho^2\sin(\varphi)$;
+                </p>
+                <p>
+                    Parametric surface $\mathbf{r}=\mathbf{r}(u,v)$:&emsp;
+                    $\d{A}=|\mathbf{r}_u'\times\mathbf{r}_v'|\d{u}\d{v}=\sqrt{\mathbf{r}_u'^2\mathbf{r}_v'^2-(\mathbf{r}_u'\cdot\mathbf{r}_v')^2}\ \d{u}\d{v}$;
+                </p>
+            </div>
+            <!-- Implicit Differentiation -->
+            <div class="cat">
+                <h3>Derivative of implicit functions</h3>
+                <p>
+                    $F(x,y(x))=0$: &ensp;
+                    $\displaystyle{\dfrac{\d{y}}{\d{x}}=-\frac{\frac{\partial{F}}{\partial{x}}}{\frac{\partial{F}}{\partial{y}}}}=-F_x'/F_y'$, &emsp;
+                    $\displaystyle{\frac{\d^2 y}{\d x^2}=-\frac{\frac{\partial^2 F}{\partial x^2}\left(\frac{\partial F}{\partial y}\right)^2-2\frac{\partial^{2}F}{\partial x\partial y}\frac{\partial F}{\partial x}\frac{\partial F}{\partial y}+\frac{\partial^2 F}{\partial y^2}\left(\frac{\partial F}{\partial x}\right)^2}{\left(\frac{\partial F}{\partial y}\right)^3}}$;
+                </p>
+                <p>
+                    $F(x,y,z(x,y))=0$: &ensp;
+                    $\dfrac{\d z}{\d x}=-F_x'/F_z'$,&ensp; $\dfrac{\d z}{\d y}=-F_y'/F_z'$;
+                </p>
+            </div>
+            <div><br /></div>
+
+            <h1>Vector Calculus</h1>
+            <!-- Gradient -->
+            <div class="cat">
+                <p>
+                    Gradient of a scalar field:&ensp;
+                    $\mathbf{grad}\ u=\nabla{u}=\dfrac{\partial{u}}{\partial{x}}\mathbf{i}+\dfrac{\partial{u}}{\partial{y}}\mathbf{j}+\dfrac{\partial{u}}{\partial{z}}\mathbf{k}$;
+                    &emsp;&emsp;&emsp;&emsp;Directional derivative:
+                    $\dfrac{\d}{\d{t}}u(\mathbf{x_0}+\mathbf{l}\cdot t)=\mathbf{grad}\ u(\mathbf{x_0})\cdot\mathbf{l}$;
+                </p>
+                <p>
+                    $\nabla(C_1u_1+C_2u_2) = C_1\nabla{u_1}+C_2\nabla{u_2}$,&emsp;
+                    $\nabla{u_1u_2}=u_1\nabla{u_2}+u_2\nabla{u_1}$,&emsp;
+                    $\nabla{f(u)}=f'(u)\nabla{u}$;
+                </p>
+            </div>
+            <!-- Divergence -->
+            <div class="cat">
+                <p>
+                    Divergence of a vector field:&ensp;
+                    $\mathbf{div}\ F=\nabla\cdot F=\dfrac{\partial F_x}{\partial x}+\dfrac{\partial F_y}{\partial y}+\dfrac{\partial F_z}{\partial z}$;
+                </p>
+                <p>
+                    $\mathrm{div}(C_1\mathbf{v}_1+C_2\mathbf{v}_2) = C_1\mathrm{div}(\mathbf{v}_1)+C_2\mathrm{div}(\mathbf{v}_2)$,&emsp;
+                    $\mathrm{div}(u\mathbf{v})=u\cdot\mathrm{div}(\mathbf{v})+\mathbf{v}\cdot\mathrm{grad}(u)$;
+                </p>
+            </div>
+            <!-- Curl -->
+            <div class="cat">
+                <p>
+                    Curl of a vector field:&ensp;
+                    $\mathbf{curl}\ F=\nabla\times{F}=\begin{vmatrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\frac{\partial}{\partial x}&\frac{\partial}{\partial y}&\frac{\partial}{\partial z}\\F_x&F_y&F_z\end{vmatrix}
+                    =\left(\dfrac{\partial F_{z}}{\partial y}-\dfrac{\partial F_{y}}{\partial z}\right)\mathbf{i} +\left(\dfrac{\partial F_{x}}{\partial z}-\dfrac{\partial F_{z}}{\partial x}\right)\mathbf{j} +\left(\dfrac{\partial F_{y}}{\partial x}-\dfrac{\partial F_{x}}{\partial y}\right)\mathbf{k}$;
+                </p>
+            </div>
+            <div class="incomplete_mark">
+                Textbook page 306;
+                https://en.wikipedia.org/wiki/Vector_calculus_identities
+            </div><a href="https://en.wikipedia.org/wiki/Vector_calculus_identities" target="_blank">⭧</a>
+            <!-- grad/div/curl of some functions -->
+            <div class="cat">
+                <p>
+                    <red>*</red>
+                    $\nabla|\mathbf{r}|=\dfrac{\mathbf{r}}{|\mathbf{r}|}$;&emsp;
+                    $\nabla\cdot\dfrac{\mathbf{r}}{|\mathbf{r}|}=\displaystyle\sum_i\dfrac{\mathbf{r}\cdot\mathbf{r}-r_i^2}{|\mathbf{r}|^3}=\dfrac{\mathrm{dim}(\mathbf{r})-1}{|r|}$,&emsp;
+                </p>
+                <div class="incomplete_mark"></div>
+            </div>
+        </div>
+
+        <!-- Differential Equations -->
+        <div class="page">
+            <h1>Differential equations</h1>
+            <!-- First order differential equations -->
+            <div class="cat">
+                <p>
+                    Solve $\dfrac{\d{y}}{\d{x}}=f(x)$:&ensp;
+                    $y=\Int{f(x)\d{x}}+C$;
+                </p>
+                <p title="separable differential equation">
+                    Solve $\dfrac{\d{y}}{\d{x}}=f(x)g(y)$:&ensp;
+                    $\dfrac{1}{g(y)}\d{y}=f(x)\d{x} \Longrightarrow\Int\dfrac{1}{g(y)}\d{y}=\Int f(x)\d{x}+C$;
+                </p>
+                <p title="homogeneous differential equation">
+                    Solve $\dfrac{\d{y}}{\d{x}}=\varphi\left(\dfrac{y}{x}\right)$:&ensp;
+                    $z=\dfrac{y}{x} \Longrightarrow x\dfrac{\d{z}}{\d{x}}+z=\varphi(z)\Longrightarrow\dfrac{\d{z}}{\d{x}}=\dfrac{\varphi(z)-z}{x}$;
+                    &emsp;$\varphi(z)-z\ne0: \Int\dfrac{\d{z}}{\varphi(z)-z}=\ln\left|\dfrac{x}{C}\right|; \quad \varphi(z)-z\equiv0: z=\dfrac{y}{x}=C$;
+                </p>
+                <p title="first order linear differential equation">
+                    Solve $\dfrac{\d{y}}{\d{x}}+p(x)y=q(x)$:&ensp;
+                    $y(x)=\e^{-\int p(x)\d{x}}\left[\Int q(x)\e^{\int p(x)\d{x}}\d{x}+C\right]$;
+                </p>
+                <p title="Bernoulli differential equation">
+                    Solve $\dfrac{\d{y}}{\d{x}}+p(x)y=q(x)y^n$:&ensp;
+                    $z=y^{1-n} \Longrightarrow \dfrac{\d{z}}{\d{x}}+(1-n)p(x)z=(1-n)q(x)$; (treat as above)
+                </p>
+            </div>
+            <!-- Second and higher order differential equations -->
+            <div class="cat">
+                <p>
+                    Solve $y^{(n)}=f(x)$:&ensp;
+                    $\dfrac{\d^{n-1}y}{\d x^{n-1}}=\Int f(x)\d{x}+C_1$; (repeat)
+                </p>
+                <p>
+                    Solve $y''=f(x,y')$:&ensp;
+                    $p(x)=\dfrac{\d{y}}{\d{x}} \Longrightarrow \dfrac{\d{p}}{\d{x}}=f(x,p)$;
+                    &emsp;$p(x)=\varphi(x,C_1) \Longrightarrow y=\Int \varphi(x,C_1)\d{x} +C_2$;
+                </p>
+                <p>
+                    Solve $y''=f(y,y')$:&ensp;
+                    $p(y)=\dfrac{\d{y}}{\d{x}} \Longrightarrow \dfrac{\d^2y}{\d x^2}=p\dfrac{\d{p}}{\d{y}}=f(y,p)$;
+                    &emsp;$p(y)=\varphi(y,C_1) \Longrightarrow \Int\dfrac{\d{y}}{\varphi(y,C_1)}=x+C_2$;
+                </p>
+                <p>
+                    Solve $y^{(n)}=f\left(x,y^{(n-1)}\right)$:&ensp;
+                    $u(x)=y^{(n-2)} \Longrightarrow u''=f(x,u')$,&ensp; solve using above and repeat;
+                </p>
+                <p>
+                    Solve $y^{(n)}=f\left(y^{(n-1)},y^{(n-2)}\right)$:&ensp;
+                    $u(x)=y^{(n-2)} \Longrightarrow u''=f(u',u)$,&ensp; solve using above and repeat;
+                </p>
+            </div>
+            <!-- Second order differential equations -->
+            <div class="cat">
+                <p>
+                    Solve $y''+py'+qy=0$:&ensp;
+                    Let $r$ be the roots of $r^2+pr+q=0$;
+                    &emsp;$y=\begin{cases}
+                    C_1\e^{r_1x}+C_2\e^{r_2x}, &r\in[r_1,r_2],\ r_1\ne r_2\\
+                    \e^{rx}(C_1+C_2x), &r=r_1=r_2\\
+                    \e^{ax}\left(C_1\cos(bx)+C_2\sin(bx)\right), &r=a\pm bi,\ b\ne0
+                    \end{cases}$
+                </p>
+                <p>
+                    Solve $y''+py'+qy=\e^{\lambda x}P(x)$:&ensp;
+                    Find $Q(x)$ such that $Q''(x)+(2\lambda+p)Q'(x)+(\lambda^2+p\lambda+q)Q(x)=P(x)$,&ensp;
+                    $\Longrightarrow y=\e^{\lambda x}Q(x)+(\text{solution of }y''+py'+qy=0)$;
+                </p>
+                <div style="margin-left:2em">
+                    <p>
+                        $\lambda^2+p\lambda+q$ and $2\lambda+p$ are both zero when $\lambda$ is a multiple root of $\lambda^2+p\lambda+q=0$;
+                    </p>
+                    <p>
+                        $P(x)=P_m(x)$ is a degree-$m$ polynomial:&ensp;
+                        $Q(x)=\begin{cases}
+                        Q_m(x), &\lambda^2+p\lambda+q\ne0\\
+                        xQ_m(x), &\lambda^2+p\lambda+q=0,\ 2\lambda+p\ne0\\
+                        x^2Q_m(x), &\lambda^2+p\lambda+q=2\lambda+p=0\\
+                        \end{cases}$,&ensp; where $Q_m(x)$ is a polynomial of degree $m$;
+                    </p>
+                    <p>
+                        $\e^{\lambda x}P(x)=\e^{ax}\left[P_m(x)\cos(bx)+P_n(x)\sin(bx)\right]$:&ensp;
+                        $\e^{\lambda x}Q(x)=x^k\e^{ax}\left[R_1(x)\cos(bx)+R_2(x)\sin(bx)\right]$,&ensp;
+                        $k=\begin{cases}0, &(a+bi)^2+p(a+bi)+q\ne0\\1, &(a+bi)^2+p(a+bi)+q=0\\\end{cases}$,&ensp;
+                        $R_i(x)$ has degree $\max(m,n)$;
+                    </p>
+                </div>
+                <p title="second order linear homogeneous differential equation">
+                    Solve $y''+p(x)y'+q(x)y=0$:&ensp;
+                    Find any non-zero solution $y_1(x)$,&ensp; let $y_2(x)=y_1(x)\Int\dfrac{\e^{-\int p(x)\d{x}}}{y_1(x)^2}\d{x}$,&ensp;
+                    $\Longrightarrow y=C_1y_1(x)+C_2y_2(x)$;
+                </p>
+                <p title="second order linear nonhomogeneous differential equation">
+                    Solve $y''+p(x)y'+q(x)y=f(x)$:&ensp;
+                    Find any solution $y^*(x)$,&ensp; $\Longrightarrow y(x)=y^*(x)+(\text{solution of }y''+p(x)y'+q(x)y=0)$;
+                </p>
+                <div style="margin-left:2em">
+                    <p>
+                        If $y=y_1(x)$ satisfies $y''+p(x)y'+q(x)y=f_1(x)$ and $y=y_2(x)$ satisfies $y''+p(x)y'+q(x)y=f_2(x)$,<br />
+                        then $y=C_1y_1(x)+C_2y_2(x)$ satisfies $y''+p(x)y'+q(x)y=C_1f_1(x)+C_2f_2(x)$;
+                    </p>
+                </div>
+                <p title="Euler differential equation">
+                    Solve $x^2y''+pxy'+qy=f(x)$:&ensp;
+                    $x=\e^t \Longrightarrow \dfrac{\d^2y}{\d t^2}+(p-1)\dfrac{\d y}{\d t}+qy=f(\e^t)$;
+                </p>
+            </div>
+            <div class="incomplete_mark"></div>
         </div>
 
         <!-- Matrix and Vector -->
@@ -1131,7 +1253,7 @@
                     $\det{AB}=\det{A}\cdot\det{B}$, &ensp;$\det{A^T}=\det{A}$, &ensp;$\det{A^{-1}}=\dfrac{1}{\det{A}}$; &ensp;
                 </p>
                 <p>
-                    Swap two rows/cols: &ensp;$\det{A'}=\det{A}$; &emsp;
+                    Swap two rows/cols: &ensp;$\det{A'}=-\det{A}$; &emsp;
                     Multiply a row/col by <i>k</i>: &ensp;$\det{A'}=k\det{A}$; &emsp;
                     Add the multiple of a row/col to another row/col: &ensp;$\det{A'}=\det{A}$; &emsp;
                 </p>
