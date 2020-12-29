@@ -1,16 +1,14 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
     <title>MathJax Tester</title>
     <meta charset="utf-8" />
-
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
         MathJax.Hub.Config({ "HTML-CSS": { styles: { ".MathJax nobr": { padding: "0.2em 0.2em" }, } } });
     </script>
     <script type="text/javascript" async="" id="MathJax_JS" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>
-
         #MathJax_MenuFrame {
             opacity: 0.0;
             visibility: hidden;
@@ -28,8 +26,8 @@
             display: none;
         }
     </style>
-
     <style>
+
         body {
             background-color: rgb(68,68,68);
         }
@@ -81,47 +79,36 @@
             background-color: white;
         }
     </style>
-
-    <script id="Math_JS" src="https://unpkg.com/mathjs@5.7.0/dist/math.min.js"></script>
     <script>
         function $(name) {
             return document.getElementById(name);
-        }
-        function $$(name) {
-            return document.getElementsByClassName(name);
-        }
-        function $$$(name) {
-            return document.getElementsByTagName(name);
         }
         $("MathJax_JS").onerror = function () {
             alert("Loading MathJax Failed!");
             $("TeX_Preview").style.color = "red";
         }
-        $("Math_JS").onerror = function () {
-            console.error("Loading \"math.js\" failed. Math commands are not available. ");
-        }
     </script>
 </head>
 <body onload="init();">
-
     <!-- Latex macros -->
     <div style="height:0px; visibility:hidden; display:none;">
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\e}{\operatorname{e}}$
-        $\newcommand{\csch}{\operatorname{csch}}$
-        $\newcommand{\sech}{\operatorname{sech}}$
         $\newcommand{\erf}{\operatorname{erf}}$
+        $\newcommand{\abs}{\operatorname{abs}}$
         $\newcommand{\sgn}{\operatorname{sgn}}$
         $\newcommand{\mod}{\operatorname{mod}}$
+        $\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}$
+        $\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}$
+        $\newcommand{\vmat}[1]{\begin{vmatrix}#1\end{vmatrix}}$
     </div>
-
     <div id="LaTeX_Tester">
         <div id="TeX_Input_container">
             <div id="title" class="title">
-                <span>type LaTeX there: </span>
+                <span>type LaTeX here: </span>
                 <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title" style="float:right;display:none">⇒</a>
             </div>
-            <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false" oninput="Render()">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
+            <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false" oninput="onInput(event)">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
         </div>
         <div id="TeX_PreviewBox_Frame">
             <div id="TeX_PreviewBox">
@@ -129,56 +116,53 @@
             </div>
         </div>
         <script>
-            function getCursortPos(obj) {
-                var cursorIndex = 0;
-                if (document.selection) {
-                    obj.focus();
-                    var range = document.selection.createRange();
-                    range.moveStart('character', -obj.value.length);
-                    cursorIndex = range.text.length;
-                } else if (obj.selectionStart || obj.selectionStart == 0) {
-                    cursorIndex = obj.selectionStart;
+
+            function escape(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+            function matchBracket(s, d) {
+                if (s[d] == '{') {
+                    var st = 1;
+                    for (var i = d + 1; i < s.length; i++) {
+                        if (s[i] == '{') st++;
+                        if (s[i] == '}') st--;
+                        if (st == 0) return i;
+                    }
+                    return -1;
                 }
-                return cursorIndex;
-            }
-            function moveCursortTo(obj, pos) {
-                obj.setSelectionRange(pos, pos);
-            }
-            function insert(str, dir, part) {
-                return str.substr(0, dir) + part + str.substring(dir, str.length);
-            }
-            function erase(str, dir, num) {
-                return str.substr(0, dir) + str.substring(dir + num, str.length);
-            }
-        </script>
-        <script>
-            function toLaTeX(s) {
-                s = s.replace(/\*/g, "{\\cdot}");
-                var fun = ['sin', 'cos', 'tan', 'csc', 'sec', 'cot', 'exp', 'log', 'ln', 'sinh', 'cosh', 'tanh'];
-                for (var i = 0; i < fun.length; i++) {
-                    var n = 0;
-                    while (s.match(fun[i])) s = s.splice(s.search(fun[i], 0), fun[i].length, fun[i].toLocaleUpperCase());
-                    while (s.match(fun[i].toLocaleUpperCase())) s = s.splice(s.search(fun[i].toLocaleUpperCase(), 0), fun[i].length, '{\\' + fun[i] + '}');
+                if (s[d] == '}') {
+                    var st = 1;
+                    for (var i = d - 1; i >= 0; i--) {
+                        if (s[i] == '}') st++;
+                        if (s[i] == '{') st--;
+                        if (st == 0) return i;
+                    }
+                    return -1;
                 }
-                s = s.replace(/\n\n/g, '\\\\[6pt]');
-                s = s.replace(/\n/g, '\\\\{\\qquad}');
-                return s;
+                return -1;
             }
-        </script>
-        <script>
+
+
             var tex = $("TeX_Input");
             var pref = $("TeX_PreviewBox_Frame");
             var pre = $("TeX_PreviewBox");
             var fom = $("TeX_Preview");
-            var prevpos = 0, maxheight = 0;
+            var maxheight = 0;
             var histht = 0;
+            var cookie_enabled = navigator.cookieEnabled;
+            var input_history = [];
 
-            var cookie_enabled = navigator.cookieEnabled;  // In most browsers, local HTML files are not allowed to set cookies
             function init() {
                 String.prototype.splice = function (start, delCount, newSubStr) {
                     return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
                 };
-                tex.value = "% Example Formula \n\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z} \n";
+                String.prototype.insert = function (dir, part) {
+                    return this.substr(0, dir) + part + this.substring(dir, this.length);
+                }
+                String.prototype.erase = function (dir, num) {
+                    return this.substr(0, dir) + this.substring(dir + num, this.length);
+                }
+
                 if (cookie_enabled) {
                     var getCookie = function getCookie(cname) {
                         var name = cname + "=";
@@ -192,11 +176,18 @@
                     var s = getCookie("FinInput");
                     if (s != "") tex.value = s;
                 }
+                else {
+                    tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z} \n";
+                }
+                input_history.push([tex.value, tex.value.length]);
+
                 if (document.URL.match("file")) {
                     document.getElementsByTagName('a')[0].style.display = "";
                 }
-                fom.innerHTML = "$" + tex.value.replace(/</g, "&lt;") + "$";
+                fom.innerHTML = "$" + escape(tex.value) + "$";
+
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
                 setTimeout(function () {
                     histht = fom.getBoundingClientRect().height;
                     fom.style.minHeight = histht + "px";
@@ -220,26 +211,75 @@
                     fom.style.minHeight = histht + "px";
                 }
 
-                var pos = getCursortPos(tex);
-                if (pos > prevpos) {
-                    if (tex.value.charAt(pos - 1) == "{") {
-                        tex.value = insert(tex.value, pos, "}");
-                        moveCursortTo(tex, pos);
-                    }
-                    else if (tex.value.charAt(pos - 1) == "}" && tex.value.charAt(pos) == "}") {
-                        tex.value = erase(tex.value, pos, 1);
-                        moveCursortTo(tex, pos);
-                    }
-                }
                 if (tex.value != "") {
-                    if (/\\/.test(tex.value)) fom.innerHTML = "$" + tex.value.replace(/</g, "&lt;") + "$";
-                    else fom.innerHTML = "$" + toLaTeX(tex.value).replace(/</g, "&lt;") + "$";
+                    fom.innerHTML = "$" + escape(tex.value) + "$";
                     backup();
                 }
                 else fom.innerText = "";
-                prevpos = pos;
 
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
+            }
+
+
+            var getCursortPos = function (obj) {
+                var cursorIndex = 0;
+                if (document.selection) {
+                    obj.focus();
+                    var range = document.selection.createRange();
+                    range.moveStart('character', -obj.value.length);
+                    cursorIndex = range.text.length;
+                } else if (obj.selectionStart || obj.selectionStart == 0) {
+                    cursorIndex = obj.selectionStart;
+                }
+                return cursorIndex;
+            };
+            var moveCursortTo = function (obj, pos) {
+                obj.setSelectionRange(pos, pos);
+            };
+
+            function onInput(event) {
+                // auto bracket {}, not 100% accurate
+                var pos = getCursortPos(tex);
+                var tex_old = input_history[input_history.length - 1][0];
+                if (event.inputType == 'insertText') {
+                    // type '{'
+                    if (event.data == '{' && tex.value[pos - 1] == "{") {
+                        if (tex.value[pos] == '{') {
+                            tex.value = tex.value.erase(pos, 1);
+                            moveCursortTo(tex, pos);
+                        }
+                        else {
+                            tex.value = tex.value.insert(pos, '}');
+                            if (tex.value.substring(pos - 5, pos - 1) == "frac")
+                                tex.value = tex.value.insert(pos + 1, "{}");
+                            moveCursortTo(tex, pos);
+                        }
+                    }
+                    // close '}'
+                    if (event.data == '}' && tex.value[pos] == '}') {
+                        tex.value = tex.value.erase(pos, 1);
+                        moveCursortTo(tex, pos);
+                    }
+                    // \left([|<
+                    var c = tex.value[pos - 1];
+                    if ((c == '(' || c == '[' || c == '|' || c == '<')
+                        && tex.value.substring(pos - 6, pos - 1) == "\\left") {
+                        tex.value = tex.value.insert(pos, "\\right" +
+                            (c == '(' ? ')' : c == '[' ? ']' : c == '|' ? '|' : c == '<' ? '>' : ''));
+                        moveCursortTo(tex, pos);
+                    }
+                }
+                else if (event.inputType == 'deleteContentBackward' && tex.value.length == tex_old.length - 1) {
+                    // erase '{'
+                    if (tex_old[pos] == '{' && tex.value[pos] == '}' && matchBracket(tex_old, pos) == pos + 1) {
+                        tex.value = tex.value.erase(pos, 1);
+                        moveCursortTo(tex, pos);
+                    }
+                }
+                else console.log(event);
+
+                Render();
+                input_history.push([tex.value, getCursortPos(tex)]);
             }
         </script>
     </div>
