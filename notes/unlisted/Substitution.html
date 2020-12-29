@@ -1,15 +1,14 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <title>Multidimensional Integral Substitutions</title>
     <meta charset="utf-8" />
-
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
     </script>
     <script type="text/javascript" id="MathJax_src" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" onerror="alert('Failed to load MathJax')"></script>
-
     <style>
+
         body {
             background-color: rgb(82,86,89);
             padding: 20px 0px 60px 0px;
@@ -64,29 +63,26 @@
             white-space: nowrap;
         }
     </style>
-
     <!-- hacking MathJax -->
     <style>
+
         #MathJax_MenuFrame {
             visibility: hidden;
             display: none;
         }
+
         .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
             outline-width: 0px;
             outline-style: none;
             outline-color: rgba(255,255,255,0.0);
         }
     </style>
-
 </head>
 <body contenteditable="false">
-
     <div class="article" id="main">
         <div class="page">
-
             <div class="cat">
                 <h1>2-dimensional integral substitutions</h1>
-
                 <table>
                     <tr>
                         <td>Description</td>
@@ -126,6 +122,25 @@
                     </tr>
                     <tr>
                         <td>
+                            <i>Polar</i><br />
+                            *Integrals of symmetrical functions in circular regions
+                        </td>
+                        <td></td>
+                        <td>
+                            $\mathbf{r}=(x,y)$<br />
+                            $r=|\mathbf{r}|=\sqrt{x^2+y^2}$
+                        </td>
+                        <td></td>
+                        <td>
+                            $\displaystyle\iint{f(|\mathbf{r}|)\ \mathrm{d}{\mathbf{r}}}=2\pi\int{r f(r)\mathrm{d}{r}}$
+                        </td>
+                        <td>
+                            Circular regions centered at the origin<br />
+                            Infinite 2D plane
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             Generalized polar<br />
                             $a,b$: scaling on <i>x</i> and <i>y</i>-axis
                         </td>
@@ -153,7 +168,7 @@
                             <span class="nowrap">Isosceles right triangle formed by axises</span><br />
                             <span>
                                 $u$: distance to origin (Manhattan)<br />
-                                $v$: linear interpolation coefficient from <i>x</i> to <i>y</i>-axis
+                                $v$: linear interpolation coefficient from <i>x</i>-axis to <i>y</i>-axis
                             </span>
                         </td>
                         <td>
@@ -194,7 +209,7 @@
                         </td>
                         <td>
                             Triangular integral regions<br />
-                            Green formula for regions inside polygons
+                            Green theorem for regions inside polygons
                         </td>
                     </tr>
                     <tr>
@@ -216,13 +231,10 @@
                         </td>
                     </tr>
                 </table>
-
             </div>
-
 
             <div class="cat">
                 <h1>3-dimensional integral substitutions</h1>
-
                 <table>
                     <tr>
                         <td>Description</td>
@@ -352,6 +364,25 @@
                     </tr>
                     <tr>
                         <td>
+                            <i>Spherical</i><br />
+                            *Integrals of symmetrical functions in spherical regions
+                        </td>
+                        <td></td>
+                        <td>
+                            $\mathbf{r}=(x,y,z)$<br />
+                            $r=|\mathbf{r}|=\sqrt{x^2+y^2+z^2}$
+                        </td>
+                        <td></td>
+                        <td>
+                            $\displaystyle\iiint{f(|\mathbf{r}|)\ \mathrm{d}{\mathbf{r}}}=4\pi\int{r^2f(r)\mathrm{d}{r}}$
+                        </td>
+                        <td>
+                            Spherical regions centered at the origin<br />
+                            Infinite three-dimensional space
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             Generalized spherical<br />
                             $a,b,c$: scaling on <i>x</i>, <i>y</i>, and <i>z</i>-axis
                         </td>
@@ -451,7 +482,6 @@
                         </td>
                         <td>
                             $x^2+y^2=(R+\rho\cos v)^2$<br />
-
                             $0\le u,v\le 2\pi$, $\rho\ge 0$
                         </td>
                         <td>
@@ -516,13 +546,10 @@
                         </td>
                     </tr>
                 </table>
-
             </div>
-
 
             <div class="cat">
                 <h1>3-dimensional area elements</h1>
-
                 $\newcommand{\d}{\mathrm{d}}$
 
                 <table>
@@ -763,7 +790,6 @@
                         </td>
                     </tr>
                 </table>
-
                 <br />
                 <!--<table>
                     <tr>
@@ -801,12 +827,8 @@
                         </td>
                     </tr>
                 </table>-->
-
             </div>
-
         </div>
     </div>
-
 </body>
 </html>
-
