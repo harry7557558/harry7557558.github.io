@@ -1,64 +1,90 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE HTML>
 <html>
 <head>
-    <title>Harry Chen</title>
     <meta charset="utf-8" />
-
-    <meta name="robots" content="noindex, follow" />
-    <meta name="ia_archiver" content="noindex" />
-
+    <title>Harry Chen</title>
     <link rel="icon" href="./logo.png" />
-
 
     <style>
         body {
-            background-color: seashell;
+            background-color: #f0f0f0;
         }
 
-        #titles {
-            margin: 4% 5% 3% 5%;
+        #container {
+            margin: 40px auto;
+            width: 85%;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.6);
+            padding: 5% 7%;
+            max-width: 800px;
+            background-color: #ffffe0;
+        }
+
+        @media only screen and (max-width: 900px) {
+            #container {
+                margin: 0;
+                box-shadow: none;
+                width: 90%;
+                padding: 5%;
+            }
+        }
+
+        #title-container {
+            margin: 0px 0px 24px 0px;
             font-family: 'Courier New', Consolas;
             border-bottom: 1px solid gray;
             padding: 10px 0px;
-            width: 60%;
+            width: 100%;
         }
 
-            #titles #title {
+            #title-container #title {
                 font-size: 60px;
                 font-weight: 400;
                 color: black;
             }
 
-            #titles #bar {
-                margin: 15px 5px;
-                font-size: 16px;
+            #title-container #bar {
+                margin: 16px 5px;
+                font-size: 18px;
             }
 
-        #info {
-            margin: 0% 5% 5% 5%;
+        #markdown {
+            margin: 0;
             font-family: Helvetica, Arial;
+            width: 100%;
         }
 
-            #info .stitle {
-                font-size: 20px;
-                margin: 24px 0px 12px 0px;
+            #markdown h4 {
+                font-size: 1.1em;
+                margin: 1em 0em;
+                font-family: Arial;
             }
 
-            #info p {
-                font-size: 16px;
+            #markdown p {
+                font-size: 1.1em;
+                margin: 0.6em 0em;
                 font-family: Calibri;
-                margin: 10px 0px;
             }
 
-            #info a {
+            #markdown a {
                 color: blue;
                 text-decoration: none;
             }
 
-                #info a:hover {
+                #markdown a:hover {
                     color: brown;
                     text-decoration: underline;
                 }
+
+            #markdown em, #markdown i {
+                font-style: italic;
+            }
+
+            #markdown blockquote {
+                margin: 0px;
+                border-left: 5px solid rgba(128,128,128,0.5);
+                padding: 1px 20px;
+                background-color: rgba(192,192,192,0.1);
+            }
 
         ::selection {
             background-color: lightblue;
@@ -66,25 +92,41 @@
     </style>
 </head>
 <body>
-    <div id="titles">
-        <div id="title" title="site under construction"></div>
-        <div id="bar" title="Coming soon...">Notes - Tools - Blogs - Math - Physics - Graphics</div>
 
-    </div>
+    <div id="container">
+        <div id="title-container">
+            <div id="title">
+                <div id="title-text" style="display:inline;"></div>
+                <img src="logo.svg" style="margin-right:20px;width:64px;height:64px;float:left;" />
+            </div>
+            <div id="bar">More contents coming soon.</div>
+        </div>
 
-    <div id="info">
-        <div class="stitle">Some single-HTML tools:</div>
-        <p><a href="./tools/matrixv.html">Matrix visualizer</a>: interactive visualization of 2d/3d/4d matrices used for computer graphics, geometry transform, data processing, and others. (doesn't work in Firefox)</p>
-        <p><a href="./tools/complex.html">Complex grapher</a>: graphing complex-variable math functions using Javascript.</p>
-        <p><a href="./tools/chemequ.html">Chemical equation balancer</a>: created for my science homework.</p>
-        <p><a href="./tools/mathjaxt.html">MathJax tester</a>: Latex math tester with real-time preview. (defined some macros)</p>
-        <p><a href="./tools/svgpath.html">SVG path tester</a>: visualizing SVG path data. A quite sketchy tool.</p>
-        <div class="stitle">and notes:</div>
-        <p><a href="./notes/equations.html">Equations in Mathematics (incomplete)</a>: a general math note sheet, my favorite part is the trigonometric formulas. </p>
-        <p><a href="./notes/substitution.html">Integral substitutions</a>: list of common substitutions in multidimensional integration. </p>
-        <div class="stitle" title='If you do, please let me know.'>Until now, you should not see this page in a search engine's search result.</div>
-        <p title="Report error/typo, compatibility issues, etc."><a href="https://github.com/Harry7557558/harry7557558.github.io/issues" target="_blank">Github issues</a></p>
-        <p><a title="magic link" href="./unlisted.html">Quicklink</a></p>
+        <div id="markdown">
+            <p>Hi - I am Harry, a high school student who likes math, physics, and coding. Recently, I'm interested in computer graphics.</p>
+            <p>This site was created initially for hosting pages I made for personal use. I made tools that I can't find anywhere else on the internet. You are free to use and share them, and I'm happy to see people get help from my works.</p>
+            <h4>Pages on this site that I find most useful:</h4>
+            <p><a href="https://harry7557558.github.io/notes/equations.html">Math notes</a>: a math formula sheet I keep for years that can never be completed. I don't memorize all the formulas, so I check them when I need to. I "discovered" some of the equations, but their correctness is not guaranteed.</p>
+            <p><a href="https://harry7557558.github.io/tools/complex.html">Complex grapher</a>: A tool for visualizing and sharing complex-variable math functions.</p>
+            <h4>My other tools/notes that you may find helpful:</h4>
+            <p><a href="https://harry7557558.github.io/tools/mathjaxt.html">MathJax tester</a>: a LaTeX equation editor I used in creating math formula sheets.</p>
+            <p><a href="https://harry7557558.github.io/tools/matrixv.html">Matrix visualizer</a>: interactive visualization of 2d/3d/4d transformation matrices.</p>
+            <p><a href="https://harry7557558.github.io/notes/substitution.html">Integral substitutions</a>: a list of commonly used area and volume elements in calculus as well as substitutions for calculating multidimensional integral.</p>
+            <p><a href="https://harry7557558.github.io/tools/svgpath.html">SVG path tester</a>: a sketchy tool for visualizing SVG path data, with moving and zooming feature.</p>
+            <p><a href="https://harry7557558.github.io/tools/chemequ.html">Chemical equation balancer</a>: as a programming exercise, getting tired of doing science homework.</p>
+            <p>A backup of all of my saved Desmos graphs: <a href="https://harry7557558.github.io/graph_backup/desmos/index.html">the index page</a></p>
+            <h4>Blogs, experiments, and explorations:</h4>
+            <p>Currently, there is nothing right here. Expected to come one day!</p>
+            <h4>Random stuff</h4>
+            <blockquote>
+                <p>Just stay away and you'll be safe from me!  - Queen Elsa from the movie <em>Frozen</em></p>
+            </blockquote>
+            <h4>Other stuffs</h4>
+            <p>Report bugs and errors in tools and notes: <a href="https://github.com/Harry7557558/harry7557558.github.io/issues">https://github.com/Harry7557558/harry7557558.github.io/issues</a></p>
+            <p><a href="https://docs.google.com/document/d/1xdJfVFV0bo8dZDvf2vMuDvsxw-24_l99ezHr-nSUhc8/mobilebasic">An insane to-do list</a></p>
+            <p><a href="https://harry7557558.github.io/unlisted.html">Quick link</a></p>
+            <p><a href="https://harry7557558.github.io/DMOJ-Render_Main/50pointer/%E2%80%8E/index.html">Magic link</a></p>
+        </div>
     </div>
 
     <script>
@@ -92,8 +134,8 @@
             timer: 1,
             typeDot: function () {
                 var that = this;
-                var s = "🏗 Hello" + ([".&nbsp;&nbsp;", "..&nbsp;", "...", "..."][(++this.timer) % 4]);
-                document.getElementById("title").innerHTML = s;
+                var s = "Hello" + ([".&nbsp;&nbsp;", "..&nbsp;", "...", "..."][(++this.timer) % 4]);
+                document.getElementById("title-text").innerHTML = s;
                 setTimeout(function () { that.typeDot(); }, 1000);
             }
         };

@@ -1,4 +1,4 @@
 ## My website
 
-Under construction: https://harry7557558.github.io/
+Check it: https://harry7557558.github.io/
 
