@@ -32,7 +32,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
         html += "<table>"
         for fn in files:
             ext = getExtension(fn)
-            if web_only and ['htm','html','js','css'].count(ext)==0:
+            if web_only and ['htm','html','js','css','svg'].count(ext)==0:
                 continue
             html += "<tr>"
             html += "<td class='file' type='"+ext+"'>"+name+fn[trunc:]+"</td>"
