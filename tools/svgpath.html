@@ -113,15 +113,19 @@
         window.onload = function () {
 
             var drag = false;
-            svgcontainer.onmousedown = function () { drag = true; };
+            var mousePos = [0, 0];
+            svgcontainer.onmousedown = function () {
+                drag = true;
+                mousePos = [e.clientX, e.clientY];
+            };
             window.onmouseup = function () { drag = false; };
             window.onmousemove = function (e) {
                 if (drag) {
-                    // seems like there is a bug
-                    iTr[0] += e.movementX / iSc[0];
-                    iTr[1] += e.movementY / iSc[1];
+                    iTr[0] += (e.clientX - mousePos[0]) / iSc[0];
+                    iTr[1] += (e.clientY - mousePos[1]) / iSc[1];
                     update_transform();
                 }
+                mousePos = [e.clientX, e.clientY];
             };
             svgcontainer.onmousemove = function (e) {
                 var x = e.offsetX / iSc[0] - iTr[0];

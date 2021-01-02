@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>2D scatter point plot</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: 0;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="input"></div>
+        <canvas id="canvas"></canvas>
+        <div id="toolbar"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+
+        // global configurations
+        const config = {
+            shiftScrollOffset: 20,  // radius of scrolling while holding Shift
+            dragScaleZoomLimitOffset: 20,  // prevents scale by dragging from going too deep
+        };
+
+        // graph information
+        var state = {
+            // expressions
+            expressions: [
+                {
+                    type: "points",
+                    data: "[(0,0),(1,1), (2,0),(3,-2),(4,-1),(2.5,-1.5)]",
+
+                }
+            ],
+            // viewport
+            xmin: NaN,
+            xmax: NaN,
+            ymin: NaN,
+            ymax: NaN,
+            xRes: canvas.clientWidth,
+            yRes: canvas.clientHeight,
+            // rendering parameters
+            showXAxis: true,
+            showYAxis: true,
+            showMajorGridX: true,
+            showMajorGridY: true,
+            showMinorGridX: true,
+            showMinorGridY: true
+        };
+
+        // point and coordinate transform
+        function vec2(x, y) { return { x: x, y: y }; }
+        function fromGraphX(x) { return (x - state.xmin) / (state.xmax - state.xmin) * state.xRes; }
+        function fromGraphY(y) { return state.yRes - (y - state.ymin) / (state.ymax - state.ymin) * state.yRes; }
+        function fromGraph(p) { return { x: fromGraphX(p.x), y: fromGraphY(p.y) }; }
+        function fromCanvasX(x) { return x / state.xRes * (state.xmax - state.xmin) + state.xmin; }
+        function fromCanvasY(y) { return (state.yRes - y) / state.yRes * (state.ymax - state.ymin) + state.ymin; }
+        function fromCanvas(p) { return { x: fromCanvasX(p.x), y: fromCanvasY(p.y) }; }
+
+        // round down/up to the nearest 1/2/5 whole number
+        // x: must be positive
+        var floor = Math.floor, ceil = Math.ceil, abs = Math.abs, round = Math.round;
+        var vfloor = function (x) {
+            var xm = Math.pow(10., floor(Math.log10(x)));
+            var xq = x / xm;
+            return xm * (xq < 2. ? 1. : xq < 5. ? 2. : 5.);
+        };
+        var vceil = function (x) {
+            var xm = Math.pow(10., floor(Math.log10(x)));
+            var xq = x / xm;
+            return xm * (xq <= 1. ? 1. : xq <= 2. ? 2. : xq <= 5. ? 5. : 10.);
+        };
+
+
+        function plotPoints(obj) {
+            if (obj.type != 'points') return;
+            var data = eval('[' + obj.data.replace(/[\[\]\{\} ]/g, '').replace(/\(/g, '[').replace(/\)/g, ']') + ']');
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'green';
+            for (var i = 0; i < data.length; i++) {
+                p = fromGraph(vec2(data[i][0], data[i][1]));
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI, false);
+                ctx.fill();
+            }
+        }
+
+        // user parameters
+        var mouseDown = false;
+        var mouseDownPos = vec2(NaN, NaN);
+        var mousePos = vec2(NaN, NaN);
+        var isDraggingXAxis = false;
+        var isDraggingYAxis = false;
+
+        function plot(event) {
+            canvas.width = state.xRes = canvas.clientWidth;
+            canvas.height = state.yRes = canvas.clientHeight;
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, state.xRes, state.yRes);
+
+            // axes and grid
+            {
+                // origin on canvas
+                var c = fromGraph(vec2(0, 0));
+                var dx = state.xmax - state.xmin;
+                var dy = state.ymax - state.ymin;
+
+                // grid
+                {
+                    var xd = vfloor(dx / state.xRes * 100.);
+                    var yd = vfloor(dy / state.yRes * 100.);
+                    // minor gridlines
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 0.5;
+                    if (state.showMinorGridX) {
+                        var x0 = floor(state.xmin / (.2 * xd)) * (.2 * xd);
+                        for (var x = x0; x <= state.xmax; x += .2 * xd) {
+                            var xc = fromGraphX(x);
+                            ctx.moveTo(xc, 0);
+                            ctx.lineTo(xc, state.yRes);
+                        }
+                    }
+                    if (state.showMinorGridY) {
+                        var y0 = floor(state.ymin / (.2 * yd)) * (.2 * yd);
+                        for (var y = y0; y <= state.ymax; y += .2 * yd) {
+                            var yc = fromGraphY(y);
+                            ctx.moveTo(0, yc);
+                            ctx.lineTo(state.xRes, yc);
+                        }
+                    }
+                    ctx.stroke();
+                    // major gridlines
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#aaa';
+                    ctx.lineWidth = 0.5;
+                    if (state.showMajorGridX) {
+                        var x0 = floor(state.xmin / xd) * xd;
+                        for (var x = x0; x <= state.xmax; x += xd) {
+                            var xc = fromGraphX(x);
+                            ctx.moveTo(xc, 0);
+                            ctx.lineTo(xc, state.yRes);
+                        }
+                    }
+                    if (state.showMajorGridY) {
+                        var y0 = floor(state.ymin / yd) * yd;
+                        for (var y = y0; y <= state.ymax; y += yd) {
+                            var yc = fromGraphY(y);
+                            ctx.moveTo(0, yc);
+                            ctx.lineTo(state.xRes, yc);
+                        }
+                    }
+                    ctx.stroke();
+                }
+
+                // axes
+                {
+                    // set cursor style
+                    var scalingXAxis = event.shiftKey && (!mouseDown &&
+                        abs(fromGraphY(0) - event.clientY) < config.shiftScrollOffset
+                        && !(abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset)
+                        || isDraggingXAxis);
+                    var scalingYAxis = event.shiftKey && (!mouseDown &&
+                        abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset
+                        || isDraggingYAxis);
+                    if (scalingXAxis) canvas.style.cursor = "e-resize";
+                    else if (scalingYAxis) canvas.style.cursor = "n-resize";
+                    else if (event.shiftKey) canvas.style.cursor = "ne-resize";
+                    else canvas.style.cursor = "default";
+                    // draw axes
+                    ctx.lineWidth = 1;
+                    if (state.showXAxis) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = scalingXAxis ? "cyan" : 'black';
+                        ctx.moveTo(0, c.y);
+                        ctx.lineTo(state.xRes, c.y);
+                        ctx.stroke();
+                    }
+                    if (state.showYAxis) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = scalingYAxis ? "cyan" : 'black';
+                        ctx.moveTo(c.x, 0);
+                        ctx.lineTo(c.x, state.yRes);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            plotPoints(state.expressions[0]);
+
+        }
+
+
+
+        // translate the viewport
+        function translateState(delta) {
+            state.xmin -= delta.x, state.xmax -= delta.x;
+            state.ymin -= delta.y, state.ymax -= delta.y;
+        }
+        // scale the viewport about a point on the graph
+        function scaleState(p, sc) {
+            state.xmin = p.x + (state.xmin - p.x) * sc.x;
+            state.xmax = p.x + (state.xmax - p.x) * sc.x;
+            state.ymin = p.y + (state.ymin - p.y) * sc.y;
+            state.ymax = p.y + (state.ymax - p.y) * sc.y;
+        }
+        // call this after window resizing
+        function resizeState() {
+            var xRes = canvas.clientWidth;
+            var yRes = canvas.clientHeight;
+            if (!((state.xmax - state.xmin) * (state.ymax - state.ymin) > 0)) {
+                var sc = Math.sqrt(xRes * yRes);
+                state.xmin = -(state.xmax = 10. * xRes / sc);
+                state.ymin = -(state.ymax = 10. * yRes / sc);
+            }
+            else if (xRes > 50 && yRes > 50 && state.xRes > 50 && state.yRes > 50) {
+                var sc = Math.sqrt(state.xRes * state.yRes) / Math.sqrt(xRes * yRes);
+                scaleState(
+                    vec2(0.5 * (state.xmin + state.xmax), 0.5 * (state.ymin + state.ymax)),
+                    vec2(sc * xRes / state.xRes, sc * yRes / state.yRes)
+                );
+            }
+            state.xRes = xRes, state.yRes = yRes;
+        }
+        // call this after mouse up/leave
+        function mouseUp() {
+            mouseDown = false;
+            isDraggingXAxis = isDraggingYAxis = false;
+        }
+
+        window.onload = function () {
+            resizeState();
+            console.log(state);
+            plot(event);
+        };
+        window.onresize = function () {
+            resizeState();
+            plot(event);
+        }
+
+        canvas.addEventListener("keydown", function (event) {
+            plot(event);
+        });
+        canvas.addEventListener("keyup", function (event) {
+            plot(event);
+        });
+        canvas.addEventListener("mousedown", function (event) {
+            mouseDown = true;
+            event.preventDefault();
+            event.stopPropagation();
+            mouseDownPos = mousePos = vec2(event.clientX, event.clientY);
+            if (event.shiftKey) {
+                isDraggingXAxis = abs(fromGraphY(0) - mouseDownPos.y) < config.dragScaleZoomLimitOffset;
+                isDraggingYAxis = abs(fromGraphX(0) - mouseDownPos.x) < config.dragScaleZoomLimitOffset;
+            }
+            plot(event);
+        });
+        canvas.addEventListener("mouseup", function (event) {
+            if (!mouseDown) return;
+            event.preventDefault();
+            event.stopPropagation();
+            mouseUp();
+            plot(event);
+        });
+        canvas.addEventListener("mouseleave", function (event) { mouseUp(); });
+        canvas.addEventListener("mouseout", function (event) { mouseUp(); });
+        canvas.addEventListener("mousemove", function (event) {
+            if (mouseDown) {
+                event.preventDefault();
+                event.stopPropagation();
+                // zoom
+                if (event.shiftKey) {
+                    var p0 = fromCanvas(mousePos);
+                    var p1 = fromCanvas(vec2(event.clientX, event.clientY));
+                    var sc = vec2(1, 1);
+                    if (isDraggingYAxis) {
+                        sc = vec2(1., p0.y / p1.y);
+                        if (abs(fromGraphY(0) - mousePos.y) < 50) sc.y = 1.;
+                    }
+                    else if (isDraggingXAxis) {
+                        sc = vec2(p0.x / p1.x, 1.);
+                        if (abs(fromGraphX(0) - mousePos.x) < 50) sc.x = 1.;
+                    }
+                    else {
+                        sc.x = sc.y = Math.hypot(p0.x, p0.y) / Math.hypot(p1.x, p1.y);
+                        if (Math.hypot(fromGraphX(0) - mousePos.x, fromGraphY(0) - mousePos.y) < config.dragScaleZoomLimitOffset) sc = vec2(1., 1.);
+                    }
+                    if (isNaN(sc.x)) sc.x = 1.; if (isNaN(sc.y)) sc.y = 1.;
+                    scaleState(vec2(0, 0), sc);
+                }
+                // drag
+                else {
+                    var delta = vec2(event.movementX, event.movementY);  // not accurate
+                    delta = vec2(event.clientX - mousePos.x, event.clientY - mousePos.y);
+                    var delta = vec2(
+                        delta.x * (state.xmax - state.xmin) / state.xRes,
+                        -delta.y * (state.ymax - state.ymin) / state.yRes
+                    );
+                    translateState(delta);
+                }
+            }
+            mousePos = vec2(event.clientX, event.clientY);
+            plot(event);
+        });
+        canvas.addEventListener("mousewheel", function (event) {
+            event.preventDefault();
+            // scroll
+            var p = fromCanvas(vec2(event.clientX, event.clientY));
+            var scf = Math.exp(-0.001 * event.wheelDelta);
+            var sc = vec2(scf, scf);
+            if (event.shiftKey) {
+                if (abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset)
+                    sc.x = 1., isDraggingYAxis = !mouseDown;
+                else if (abs(fromGraphY(0) - event.clientY) < config.shiftScrollOffset)
+                    sc.y = 1., isDraggingXAxis = !mouseDown;
+                else isDraggingXAxis = isDraggingYAxis = false;
+            }
+            scaleState(p, sc);
+            plot(event);
+        }, { passive: false });
+    </script>
+</body>
+</html>
