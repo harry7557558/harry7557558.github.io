@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -42,6 +42,7 @@
             font-size: 20px;
             text-align: center;
             background-color: white;
+            font-family: Calibri;
         }
 
             .button:hover {
@@ -55,6 +56,14 @@
         #button-fit:before {
             content: '⛶';
         }
+
+        #button-zoomin:before {
+            content: '⊕';
+        }
+
+        #button-zoomout:before {
+            content: '⊖';
+        }
     </style>
 </head>
 <body>
@@ -65,6 +74,8 @@
     <div id="toolbar">
         <div class="button" id="button-home" title="home"></div>
         <div class="button" id="button-fit" title="fit"></div>
+        <div class="button" id="button-zoomin" title="zoom in"></div>
+        <div class="button" id="button-zoomout" title="zoom out"></div>
     </div>
 
     <script>
@@ -130,6 +141,9 @@
         var mousePos = vec2(NaN, NaN);
         var isDraggingXAxis = false;
         var isDraggingYAxis = false;
+        var xAxisOnScreen = 0;  // y of x-axis on screen coordinate
+        var yAxisOnScreen = 0;  // x of y-axis on screen coordinate
+        var altZoomingStartPos = vec2(NaN);  // click Alt to zoom in
 
         // main plotting function
         function plot(event) {
@@ -145,6 +159,8 @@
                 var c = fromGraph(vec2(0, 0));
                 var dx = state.xmax - state.xmin;
                 var dy = state.ymax - state.ymin;
+                xAxisOnScreen = c.y < 0 ? 0 : c.y > state.yRes ? state.yRes : c.y;
+                yAxisOnScreen = c.x < 0 ? 0 : c.x > state.xRes ? state.xRes : c.x;
 
                 // grid
                 {
@@ -200,9 +216,9 @@
                     {
                         ctx.font = "10px sans-serif";
                         ctx.fillStyle = "black";
-                        ctx.textAlign = "center";
                         if (state.showXNumbers) {
-                            var y = fromGraphY(0.);
+                            ctx.textAlign = "center";
+                            var y = Math.min(xAxisOnScreen + 10, state.yRes - 2);
                             var x0 = floor(state.xmin / xd) * xd;
                             for (var x = x0; x <= state.xmax; x += xd) {
                                 if (abs(x) > 1e-12) {
@@ -210,13 +226,13 @@
                                     var xr = Number(x.toPrecision(12));
                                     ctx.fillText(abs(xr) >= 1e6 || abs(xr) <= 1e-6 ?
                                         xr.toExponential(6).replace(/0+e/, 'e').replace('.e', 'e') :
-                                        xr.toString(), xc, y + 10);
+                                        xr.toString(), xc, y);
                                 }
                             }
                         }
-                        ctx.textAlign = "right";
                         if (state.showYNumbers) {
-                            var x = fromGraphX(0.);
+                            var x = Math.max(yAxisOnScreen - 4, 2);
+                            ctx.textAlign = x <= 5 ? "left" : "right";
                             var y0 = floor(state.ymin / yd) * yd;
                             for (var y = y0; y <= state.ymax; y += yd) {
                                 if (abs(y) > 1e-12) {
@@ -224,7 +240,7 @@
                                     var yr = Number(y.toPrecision(12));
                                     ctx.fillText(abs(yr) >= 1e6 || abs(yr) <= 1e-6 ?
                                         yr.toExponential(6).replace(/0+e/, 'e').replace('.e', 'e') :
-                                        yr.toString(), x - 4, yc + 4);
+                                        yr.toString(), x, yc + 4);
                                 }
                             }
                         }
@@ -235,11 +251,11 @@
                 {
                     // set cursor style
                     var scalingXAxis = event.shiftKey && (!mouseDown &&
-                        abs(fromGraphY(0) - event.clientY) < config.shiftScrollOffset
-                        && !(abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset)
+                        abs(xAxisOnScreen - event.clientY) < config.shiftScrollOffset
+                        && !(abs(yAxisOnScreen - event.clientX) < config.shiftScrollOffset)
                         || isDraggingXAxis);
                     var scalingYAxis = event.shiftKey && (!mouseDown &&
-                        abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset
+                        abs(yAxisOnScreen - event.clientX) < config.shiftScrollOffset
                         || isDraggingYAxis);
                     if (scalingXAxis) canvas.style.cursor = "e-resize";
                     else if (scalingYAxis) canvas.style.cursor = "n-resize";
@@ -271,22 +287,56 @@
             }
             var data = state.data;
             var ctx = canvas.getContext('2d');
-            ctx.fillStyle = 'green';
             // has performance issue with large number of points
             // slower that Python matplotlib?!
             var t0 = performance.now();
-            ctx.beginPath();
-            for (var i = 0; i < data.length; i++) {
-                var p = fromGraph(vec2(data[i][0], data[i][1]));
-                ctx.moveTo(p.x, p.y);
-                ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-                //ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+            if (1) {
+                ctx.beginPath();
+                ctx.fillStyle = 'green';
+                const r = 3;
+                var pnts = [0, 1, 2, 3, 4, 5, 6].map(i => vec2(r * Math.cos(6.283185 * i / 6), r * Math.sin(6.283185 * i / 6)));
+                for (var i = 0; i < data.length; i++) {
+                    var p = fromGraph(vec2(data[i][0], data[i][1]));
+                    if (0) {
+                        // this one is slow
+                        ctx.moveTo(p.x, p.y);
+                        ctx.arc(p.x, p.y, r, 0, 2 * Math.PI);
+                    }
+                    else if (1) {
+                        // 1.3x as fast with Chrome and Edge
+                        ctx.moveTo(p.x + pnts[0].x, p.y + pnts[0].y);
+                        for (var j = 1; j <= 6; j++)
+                            ctx.lineTo(p.x + pnts[j].x, p.y + pnts[j].y);
+                    }
+                }
+                ctx.fill();
             }
-            ctx.fill();
+            if (1) {
+                // this one is fast
+                ctx.beginPath();
+                ctx.strokeStyle = "green";
+                ctx.lineWidth = 1;
+                for (var i = 0; i < data.length; i++) {
+                    var p = fromGraph(vec2(data[i][0], data[i][1]));
+                    if (i == 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                }
+                ctx.stroke();
+            }
             var t1 = performance.now();
-            if (data.length > 10000)
-                console.log(data.length, t1 - t0);
+            //if (data.length > 10000) console.log(data.length, 10. * (t1 - t0));
 
+            // alt zooming box
+            if (!isNaN(altZoomingStartPos.x) && event.altKey) {
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(
+                    Math.min(altZoomingStartPos.x, mousePos.x),
+                    Math.min(altZoomingStartPos.y, mousePos.y),
+                    Math.abs(altZoomingStartPos.x - mousePos.x),
+                    Math.abs(altZoomingStartPos.y - mousePos.y)
+                );
+            }
         }
 
 
@@ -297,6 +347,8 @@
         }
         // scale the viewport about a point on the graph
         function scaleState(p, sc) {
+            // sc must be positive
+            // zoom in when sc<1 and zoom out when sc>1
             state.xmin = p.x + (state.xmin - p.x) * sc.x;
             state.xmax = p.x + (state.xmax - p.x) * sc.x;
             state.ymin = p.y + (state.ymin - p.y) * sc.y;
@@ -324,6 +376,19 @@
         function mouseUp() {
             mouseDown = false;
             isDraggingXAxis = isDraggingYAxis = false;
+            altZoomingStartPos = vec2(NaN, NaN);
+        }
+
+        function updateAltZoom() {
+            if (!(abs(altZoomingStartPos.x - mousePos.x) > 10)) return;
+            if (!(abs(altZoomingStartPos.y - mousePos.y) > 10)) return;
+            var x0 = fromCanvasX(Math.min(altZoomingStartPos.x, mousePos.x));
+            var y0 = fromCanvasY(Math.max(altZoomingStartPos.y, mousePos.y));
+            var x1 = fromCanvasX(Math.max(altZoomingStartPos.x, mousePos.x));
+            var y1 = fromCanvasY(Math.min(altZoomingStartPos.y, mousePos.y));
+            state.xmin = x0, state.ymin = y0, state.xmax = x1, state.ymax = y1;
+            console.log(altZoomingStartPos, mousePos);
+            altZoomingStartPos = vec2(NaN, NaN);
         }
 
         // user functions
@@ -336,10 +401,13 @@
             resizeState();
             plot(event);
         });
-        canvas.addEventListener("keydown", function (event) {
-            plot(event);
+        window.addEventListener("keydown", function (event) {
+            if (event.keyCode >= 20) plot(event);
         });
-        canvas.addEventListener("keyup", function (event) {
+        window.addEventListener("keyup", function (event) {
+            if (event.keyCode == 18) {
+                updateAltZoom();
+            }
             plot(event);
         });
         canvas.addEventListener("mousedown", function (event) {
@@ -348,8 +416,11 @@
             event.stopPropagation();
             mouseDownPos = mousePos = vec2(event.clientX, event.clientY);
             if (event.shiftKey) {
-                isDraggingXAxis = abs(fromGraphY(0) - mouseDownPos.y) < config.dragScaleZoomLimitOffset;
-                isDraggingYAxis = abs(fromGraphX(0) - mouseDownPos.x) < config.dragScaleZoomLimitOffset;
+                isDraggingXAxis = abs(xAxisOnScreen - mouseDownPos.y) < config.dragScaleZoomLimitOffset;
+                isDraggingYAxis = abs(yAxisOnScreen - mouseDownPos.x) < config.dragScaleZoomLimitOffset;
+            }
+            if (event.altKey) {
+                altZoomingStartPos = mouseDownPos;
             }
             plot(event);
         });
@@ -357,6 +428,7 @@
             if (!mouseDown) return;
             event.preventDefault();
             event.stopPropagation();
+            if (event.altKey) updateAltZoom();
             mouseUp();
             plot(event);
         });
@@ -370,24 +442,26 @@
                 if (event.shiftKey) {
                     var p0 = fromCanvas(mousePos);
                     var p1 = fromCanvas(vec2(event.clientX, event.clientY));
+                    var q = fromCanvas(vec2(yAxisOnScreen, xAxisOnScreen));
+                    p0.x -= q.x, p0.y -= q.y; p1.x -= q.x, p1.y -= q.y;
                     var sc = vec2(1, 1);
                     if (isDraggingYAxis) {
                         sc = vec2(1., p0.y / p1.y);
-                        if (abs(fromGraphY(0) - mousePos.y) < 50) sc.y = 1.;
+                        if (abs(xAxisOnScreen - mousePos.y) < config.dragScaleZoomLimitOffset) sc.y = 1.;
                     }
                     else if (isDraggingXAxis) {
                         sc = vec2(p0.x / p1.x, 1.);
-                        if (abs(fromGraphX(0) - mousePos.x) < 50) sc.x = 1.;
+                        if (abs(yAxisOnScreen - mousePos.x) < config.dragScaleZoomLimitOffset) sc.x = 1.;
                     }
                     else {
                         sc.x = sc.y = Math.hypot(p0.x, p0.y) / Math.hypot(p1.x, p1.y);
-                        if (Math.hypot(fromGraphX(0) - mousePos.x, fromGraphY(0) - mousePos.y) < config.dragScaleZoomLimitOffset) sc = vec2(1., 1.);
+                        if (Math.hypot(yAxisOnScreen - mousePos.x, xAxisOnScreen - mousePos.y) < config.dragScaleZoomLimitOffset) sc = vec2(1., 1.);
                     }
                     if (isNaN(sc.x)) sc.x = 1.; if (isNaN(sc.y)) sc.y = 1.;
-                    scaleState(vec2(0, 0), sc);
+                    scaleState(q, sc);
                 }
                 // drag
-                else {
+                else if (!event.altKey) {
                     var delta = vec2(event.movementX, event.movementY);  // not accurate
                     delta = vec2(event.clientX - mousePos.x, event.clientY - mousePos.y);
                     var delta = vec2(
@@ -407,9 +481,9 @@
             var scf = Math.exp(0.001 * event.deltaY);
             var sc = vec2(scf, scf);
             if (event.shiftKey) {
-                if (abs(fromGraphX(0) - event.clientX) < config.shiftScrollOffset)
+                if (abs(yAxisOnScreen - event.clientX) < config.shiftScrollOffset)
                     sc.x = 1., isDraggingYAxis = !mouseDown;
-                else if (abs(fromGraphY(0) - event.clientY) < config.shiftScrollOffset)
+                else if (abs(xAxisOnScreen - event.clientY) < config.shiftScrollOffset)
                     sc.y = 1., isDraggingXAxis = !mouseDown;
                 else isDraggingXAxis = isDraggingYAxis = false;
             }
@@ -438,6 +512,15 @@
             scaleState(vec2(0.5 * (min_x + max_x), 0.5 * (min_y + max_y)), vec2(1.2, 1.2));
             plot(event);
         };
+        document.getElementById("button-zoomin").onclick = function (event) {
+            scaleState(vec2(0.5 * (state.xmin + state.xmax), 0.5 * (state.ymin + state.ymax)), vec2(0.5, 0.5));
+            plot(event);
+        }
+        document.getElementById("button-zoomout").onclick = function (event) {
+            scaleState(vec2(0.5 * (state.xmin + state.xmax), 0.5 * (state.ymin + state.ymax)), vec2(2.0, 2.0));
+            plot(event);
+        }
+
     </script>
 </body>
 </html>
