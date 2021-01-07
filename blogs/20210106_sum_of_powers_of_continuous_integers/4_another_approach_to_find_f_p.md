@@ -1,6 +1,6 @@
 ## Another approach to find $$f_p$$
 
-In the purpose of prooving these identities, I developed another approach to find the coefficients of $$f_p$$.
+In the purpose of prooving these identities, I discovered another approach to find the coefficients of $$f_p$$.
 
 From the induction formula:
 
@@ -38,6 +38,42 @@ Its first column of the matrix $$\mathbf{I}-\mathbf{A}$$ is zero, so it is not i
 
 $$\begin{bmatrix}1&-1&1&-1&\cdots\\0&2&-3&4&\cdots\\0&0&3&-6&\cdots\\0&0&0&4&\cdots\\\vdots&\vdots&\vdots&\vdots&\ddots\end{bmatrix} \begin{bmatrix}c_1\\c_2\\c_3\\c_4\\\vdots\end{bmatrix} = \begin{bmatrix}0\\\vdots\\0\\1\\0\\\vdots\end{bmatrix}$$
 
-The $$1$$ in the right side corresponds the term with degree $$p+1$$, and all terms after it are zero. The matrix in the equation is upper triangular, which means we can remove rows after the $$p+1$$-th row, which means the degree of the polynomial is exactly $$p+1$$. The bottom-right element of the remaining matrix is $$\dbinom{p+1}{p}=p+1$$, so $$c_{p+1}=\dfrac{1}{p+1}$$, and so's why $$f_p(n)$$ begins with $$\dfrac{1}{p+1}n^{p+1}$$.
+The $$1$$ in the right side corresponds the term with degree $$p+1$$, and all terms after it are zero. The matrix in the equation is upper triangular, which means we can remove rows after the $$p+1$$-th row, and the degree of the polynomial is exactly $$p+1$$. The bottom-right element of the remaining matrix is $$\dbinom{p+1}{p}=p+1$$, so $$c_{p+1}=\dfrac{1}{p+1}$$, and so's why $$f_p(n)$$ begins with $$\dfrac{1}{p+1}n^{p+1}$$.
 
 Look at the second-last row of the remaining matrix. The last element is $$-\dbinom{p+1}{p-1}=-\dfrac{1}{2}p(p+1)$$, the second last element is $$\dbinom{p}{p-1}=p$$. In the equation, $$p\cdot c_p-\dfrac{1}{2}p(p+1)\cdot c_{p+1}=0$$, and one can solve $$c_p=\dfrac{1}{2}$$. This is why the second highest term of $$f_p(n)$$ is always $$\dfrac{1}{2}n^p$$.
+
+An example of the linear system use to find the coefficients of $$f_4$$ is as follows:
+
+$$\begin{bmatrix}1&-1&1&-1&1\\0&2&-3&4&-5\\0&0&3&-6&10\\0&0&0&4&-10\\0&0&0&0&5\end{bmatrix}\begin{bmatrix}c_1\\c_2\\c_3\\c_4\\c_5\end{bmatrix}=\begin{bmatrix}0\\0\\0\\0\\1\end{bmatrix}$$
+
+and $$c_0=0$$.
+
+Below is a Python code that solves the coefficients of $$f_p$$ using the new method.
+
+    def find_fp_pascal(p):
+        d = p + 1
+        
+        # construct a Pascal matrix using the recursive relationship
+        A = [[0]*d for i in range(d)]
+        A[0][0] = 1
+        for i in range(1,d):
+            A[0][i] = (-1 if i&1 else 1)
+            for j in range(1,i):
+                A[j][i] = (abs(A[j-1][i-1])+abs(A[j][i-1])) * (-1 if (i+j)&1 else 1)
+            A[i][i] = i+1
+        
+        # initial vector
+        c = [(1 if i+1==d else 0) for i in range(d)]
+        
+        # solve the linear system in O(d²)
+        for i in range(d-1,-1,-1):
+            for j in range(i-1,-1,-1):
+                c[j] -= c[i]*A[j][i]/A[i][i]
+                A[j][i]=0
+            c[i] = c[i]/A[i][i]
+            A[i][i] = 1
+        
+        # return the coefficients of f_p in decimals
+        c.insert(0,0)
+        return c
+

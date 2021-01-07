@@ -44,3 +44,6 @@ Note that the matrix is a Vendermonde matrix. Its determinant is non-zero since 
         # as a list of fraction strings in increasing power
         c = [[c[i]//gcd(A[i][i],c[i]), A[i][i]//gcd(A[i][i],c[i])] for i in range(d+1)]
         return [str(f[0])+'/'+str(f[1]) for f in c]
+
+*&#42;Additional note: another approach to find a polynomial that goes through a list of points is [Lagrange interpolation](https://en.wikipedia.org/wiki/Lagrange_polynomial).*
+
