@@ -1,0 +1,7 @@
+{
+  "title": "Polynomial series - Sum of powers of consecutive integers",
+  "description": "Explore the pattern of polynomial $f_p(n)=\\sum_{k=1}^{n} k^p$",
+  "date_started": "2021/01/06",
+  "date_published": null
+  "date_updated": "2021/01/29"
+}

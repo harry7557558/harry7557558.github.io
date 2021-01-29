@@ -1,4 +1,4 @@
-## Sum of powers of continuous integers
+## Sum of powers of consecutive integers
 
 You may have heard this equation from math class:
 
@@ -14,9 +14,9 @@ And trivially:
 
 $$\displaystyle{\sum_{k=1}^{n}k^{0}=\underbrace{1+1+\cdots+1}_{n\ 1s}=n}$$
 
-These equations are all in the form of the sum of the power of continuous integers from $$1$$ to $$n$$ equals a polynomial with degree $$p+1$$, where the power $$p$$ is a non-negative integer.
+These equations are all in the form of the sum of the power of consecutive integers from $$1$$ to $$n$$ equals a polynomial with degree $$p+1$$, where the power $$p$$ is a non-negative integer.
 
-Prooving these identities are not hard using mathematical induction. For a polynomial $$f(n)$$, if you can show $$f(0)=0$$ or $$f(1)=1$$, as well as $$f(n)=f(n-1)+n^p$$, then you can proof $$\displaystyle{f(n)=\sum_{k=1}^{n}k^{p}}$$.
+Proving these identities are not hard using mathematical induction. For a polynomial $$f(n)$$, if you can show $$f(0)=0$$ or $$f(1)=1$$, as well as $$f(n)=f(n-1)+n^p$$, then you can proof $$\displaystyle{f(n)=\sum_{k=1}^{n}k^{p}}$$.
 
 But why the degree of the polynomials are always $$p+1$$? One may intuitively think that we are summing a $$p$$th-degree polynomial $$n$$ times that the terms are from $$1^p$$ to $$n^p$$, $$n$$ times $$n^p$$ should give $$n^{p+1}$$. Or replacing the sum by an integral, $$\displaystyle{\int_0^n{k^p\mathrm{d}k}=\frac{1}{p+1}n^{p+1}}$$, so the highest term of $$\displaystyle{\sum_{k=0}^n{k^p}}$$ is $$\dfrac{1}{p+1}n^{p+1}$$. However, these are not formal proofs.
 

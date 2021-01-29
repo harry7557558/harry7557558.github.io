@@ -1,6 +1,6 @@
 ## Another approach to find $$f_p$$
 
-In the purpose of prooving these identities, I discovered another approach to find the coefficients of $$f_p$$.
+In the purpose of proving these identities, I discovered another approach to find the coefficients of $$f_p$$.
 
 From the induction formula:
 

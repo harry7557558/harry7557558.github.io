@@ -8,7 +8,7 @@ for blog in blogs:
     md = ""
     for filename in files:
         md += open(filename).read()+'\n\n\n\n'
-    md = md.replace('\\','&#92;')
+    md = md.replace('\\','&#92;').replace('_','&#95;')
 
     markdown = __import__('markdown').Markdown(extensions=['mdx_math'])
     html = __import__('markdown').markdown(md)

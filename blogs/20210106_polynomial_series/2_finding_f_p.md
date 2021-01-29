@@ -16,7 +16,7 @@ Put all points together, I get the following systems of linear equations:
 
 $$\begin{bmatrix}y_0\\[3pt]y_1\\[3pt]\vdots\\[3pt]y_d\end{bmatrix}=\begin{bmatrix}x_0^0&x_0^1&\cdots&x_0^d\\[3pt]x_1^0&x_1^1&\cdots&x_1^d\\[3pt]\vdots&\vdots&\ddots&\vdots\\[3pt]x_d^0&x_d^1&\cdots&x_d^d\end{bmatrix}\begin{bmatrix}c_0\\[3pt]c_1\\[3pt]\vdots\\[3pt]c_d\end{bmatrix}$$
 
-Note that the matrix is a Vendermonde matrix. Its determinant is non-zero since all $$x$$ values are distinct, so the linear system always have an unique solution. I wrote a Python script that solves the linear system using elimination and determines the coefficients of the polynomial, and thus finds $$f_p$$.
+Note that the matrix is a Vandermonde matrix. Its determinant is non-zero since all $$x$$ values are distinct, so the linear system always have an unique solution. I wrote a Python script that solves the linear system using elimination and determines the coefficients of the polynomial, and thus finds $$f_p$$.
 
     def find_fp(p):
         from math import gcd
