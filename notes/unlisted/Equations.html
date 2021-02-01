@@ -163,27 +163,27 @@
                     \tan{z}=-i\cdot{\dfrac {\e^{iz}-\e^{-iz}}{\e^{iz}+\e^{-iz}}};$
                 </p>
             </div>
-            <!-- Graph -->
+            <!-- Graphs -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 8, 2, Math.sin(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, Math.sin(x)</canvas>
                     <span>$f(x)=\sin{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 8, 2, Math.cos(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, Math.cos(x)</canvas>
                     <span>$f(x)=\cos{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 6, 4, Math.tan(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, Math.tan(x)</canvas>
                     <span>$f(x)=\tan{x}$</span>
                 </div>&nbsp;
                 <br />
                 <div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 8, 4, 1./Math.sin(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, 1./Math.sin(x)</canvas>
                     <span>$f(x)=\csc{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 8, 4, 1./Math.cos(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, 1./Math.cos(x)</canvas>
                     <span>$f(x)=\sec{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 6, 4, 1./Math.tan(x)</canvas>
+                    <canvas class="graphfun-canvas" width="330" height="100">1.2, 0, 10, 3, 1./Math.tan(x)</canvas>
                     <span>$f(x)=\cot{x}$</span>
                 </div>&nbsp;
             </div>
@@ -2048,9 +2048,14 @@
                 Fix[i].style.color = 'brown';
             }
         }
+
     </script>
     <!-- Function Grapher -->
     <script>
+        "use strict";
+
+        var abs = Math.abs;
+
         function initCanvas(c, cx, cy, ux, uy) {
             var ctx = c.getContext("2d");
             var w = c.width, h = c.height;
@@ -2080,7 +2085,6 @@
                 ctx.stroke();
             }
 
-
             ul = -Math.floor(cy / uy);
             ur = Math.floor((h - cy) / uy);
             for (var i = ul; i <= ur; i++) {
@@ -2108,57 +2112,94 @@
         }
 
         function GraphFun() {
-            var c = document.getElementsByClassName("graphfun-canvas");
-            var ctx, w, h, fun, fp;
-            var ctrX, ctrY, radX, radY;
-            var Mat = [[1, 0], [0, 1]], dir = [0, 0];
-            for (var i = 0; i < c.length; i++) {
-                ctx = c[i].getContext("2d");
-                w = c[i].width, h = c[i].height;
-                fun = c[i].innerHTML;
+            var Graphs = document.getElementsByClassName("graphfun-canvas");
+            for (var G = 0; G < Graphs.length; G++) {
+                const ctx = Graphs[G].getContext("2d");
+                const w = Graphs[G].width, h = Graphs[G].height;
+
+                var time_start = performance.now();
 
                 try {
-                    fp = getPar(fun);
+                    var fp = getPar(Graphs[G].innerHTML);
+                    var ctrX = fp[0], ctrY = fp[1], radX = fp[2], radY = fp[3];
+                    var xmin = ctrX - radX, ymin = ctrY - radY, xmax = ctrX + radX, ymax = ctrY + radY;
 
-                    ctrX = fp[0], ctrY = fp[1], radX = fp[2], radY = fp[3];
-                    Mat = [[w / (2 * radX), 0], [0, -h / (2 * radY)]];
-                    dir = [w / 2 - Mat[0][0] * ctrX, h / 2 - Mat[1][1] * ctrY];
+                    var Mat = [[w / (2 * radX), 0], [0, -h / (2 * radY)]];
+                    var dir = [w / 2 - Mat[0][0] * ctrX, h / 2 - Mat[1][1] * ctrY];
                     ctx.clearRect(0, 0, w, h);
-                    initCanvas(c[i], dir[0], dir[1], Math.abs(Mat[0][0]), Math.abs(Mat[1][1]));
+                    initCanvas(Graphs[G], dir[0], dir[1], abs(w / (2 * radX)), abs(h / (2 * radY)));
 
-                    var x, y, dy, x_old = NaN, y_old = NaN, dy_old = NaN;
-                    var pos, old_pos = NaN;
-                    ctx.beginPath();
-                    for (var j = 0; j <= w; j++) {
-                        x = (j - dir[0]) / Mat[0][0];
-                        y = eval(fp[4]);
-                        dy = y - y_old;
-                        pos = Mat[1][1] * y + dir[1];
-                        if (!(isNaN(pos) || isNaN(old_pos))) {
-                            var d2y = dy - dy_old;
-                            if (Math.abs(d2y) < 2) {
-                                ctx.moveTo(j - 1, old_pos);
-                                ctx.lineTo(j, pos);
+                    // function to graph
+                    var fun = new Function('x', "return(" + fp[4] + ")");
+                    var fun_s = function (x) {
+                        var xf = x / w * (xmax - xmin) + xmin;
+                        var yf = fun(xf);
+                        var y = h - (yf - ymin) / (ymax - ymin) * h;
+                        return y < 0 ? NaN : y > h ? NaN : y;
+                    };
+
+                    // graphing
+                    function graphBetween(p0, p1, recurse_remain) {
+                        if (!(recurse_remain >= 0))
+                            return;
+                        if (Math.hypot(p1.x - p0.x, p1.y - p0.y) < 1) {
+                            if (!(isNaN(p0.y) || isNaN(p1.y))) {
+                                ctx.moveTo(p0.x, p0.y);
+                                ctx.lineTo(p1.x, p1.y);
                             }
+                            return;
                         }
-                        x_old = x, y_old = y, dy_old = dy;
-                        old_pos = pos;
+                        var xc = 0.5 * (p0.x + p1.x);
+                        var pc = { x: xc, y: fun_s(xc) };
+                        graphBetween(p0, pc, recurse_remain - 1);
+                        graphBetween(pc, p1, recurse_remain - 1);
+                    }
+                    var samples = [];
+                    for (var x = 0; x <= w; x++) {
+                        samples.push({ 'x': x, 'y': fun_s(x) });
+                    }
+                    ctx.beginPath();
+                    for (var i = 0; i + 1 < samples.length; i++) {
+                        graphBetween(samples[i], samples[i + 1], 8);
                     }
                     ctx.closePath();
                     ctx.stroke();
 
                     // encode canvas to bitmap
-                    var b64 = c[i].toDataURL();
+                    var b64 = Graphs[G].toDataURL();
                     var d = document.createElement("img");
                     d.className = "graphfun-canvas";
-                    d.width = c[i].width, d.height = c[i].height;
+                    d.width = w, d.height = h;
                     d.src = b64;
-                    c[i].parentNode.replaceChild(d, c[i]);
-                } catch (error) {
+                    Graphs[G].parentNode.replaceChild(d, Graphs[G]);
+                }
+
+                catch (error) {
                     console.error(error);
                     ctx.fillStyle = "red";
                     ctx.fillRect(0, 0, w, h);
                 }
+
+
+                var time_end = performance.now();
+                //console.log("Graph #" + G, (time_end - time_start).toFixed(2) + "ms");
+            }
+        }
+
+
+        if (0) {
+            // clear latex to debug function grapher
+            var cats = document.getElementsByClassName('cat');
+            for (var i = 0; i < cats.length; i++) {
+                var cat = cats[i];
+                if (cat.getElementsByClassName('graphfun-canvas').length == 0) {
+                    //cat.remove();
+                    //cat.style.display = 'none';
+                }
+            }
+            var ps = document.getElementsByTagName('p');
+            for (var i = 0; i < ps.length; i++) {
+                ps[i].style.display = 'none';
             }
         }
 
