@@ -437,44 +437,42 @@
                     <span>$f(x)=\ln{x}$</span>
                 </div>
             </div>
-            <!-- Complex square root -->
+
+            <!-- Real domain -->
             <div class="cat">
+                <p>In real domain:</p>
                 <p>
-                    $\sqrt{a+bi}=\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}+a}{2}}+i\cdot\sgn(b)\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}-a}{2}}$;
+                    $a^x=\e^{x\ln{a}}$; &emsp;
+                    $a^0=1$, &ensp;
+                    $a^{-x}=\dfrac{1}{a^x}$, &ensp;
+                    $a^\frac{x}{y}=\sqrt[y]{a^x}$;<br />
+                    $a^x a^y=a^{x+y}$, &ensp;
+                    $\dfrac{a^x}{a^y}=a^{x-y}$, &ensp;
+                    $(a^x)^y=a^{xy}$, &ensp;
+                    $(ab)^x=a^x b^x$, &ensp;
+                    $\left(\dfrac{a}{b}\right)^x=\dfrac{a^x}{b^x}$;
+                </p>
+                <p>
+                    $\sqrt{x}=x^{1/2}$; &emsp;
+                    $\sqrt{x}\sqrt{y}=\sqrt{xy}$, &ensp;
+                    $\sqrt{\dfrac{1}{x}}=\dfrac{1}{\sqrt{x}}$, &ensp;
+                    $\sqrt{x^2}=|x|$;
+                </p>
+                <p>
+                    $a^{\log_a{b}}=b$, &ensp;
+                    $\log_a{b}=\dfrac{\log_c{b}}{\log_c{a}}=\dfrac{\ln{b}}{\ln{a}}$; &emsp;
+                    $\log_a{1}=0$, &ensp;
+                    $\log_a{a}=1$; <br />
+                    $\log_a{b}+\log_a{c}=\log_a{bc}$, &ensp;
+                    $\log_a{b}-\log_a{c}=\log_a\left(\dfrac{b}{c}\right)$; &ensp;
+                    $\log_a{b^k}=k\cdot\log_a{b}$, &ensp;
+                    $\log_{a^k}{b}=\dfrac{1}{k}\log_a{b}$, &ensp;
+                    $\log_a{b}\cdot\log_b{c}=\log_a{c}$, &ensp;
+                    $\log_a{\sqrt{x}}=\dfrac{1}{2}\log_a{x}$;
                 </p>
             </div>
-            <!-- Exponent and Power basics -->
-            <div class="cat">
-                <p>
-                    $\exp(a+bi)=\e^a(\cos{b}+i\sin{b}), \quad
-                    \ln(a+bi)=\dfrac{1}{2}\ln(a^2+b^2)+\mathrm{atan2}(b,a)\,i;$
-                </p>
-                <p>
-                    $a^x=\e^{x\cdot\ln{a}}, a^{x+y}={a^x}\cdot{a^y}, a^{xy}=(a^x)^y, a^{-x}=\dfrac{1}{a^x}, a^{\frac{m}{n}}=\sqrt[n]{a^m}$;
-                </p>
-                <p>
-                    $(ab)^x={a^x}\cdot{b^x}, \quad
-                    \left(\dfrac{a}{b}\right)^x=\dfrac{a^x}{b^x}, \quad
-                    a^0=1;$
-                </p>
-            </div>
-            <!-- Logarithm basics -->
-            <div class="cat">
-                <p>
-                    $a^x=N \Rightarrow x=\log_a{N}, \quad
-                    \e^x=N \Rightarrow x=\ln{N}; \qquad
-                    \log_a{x}=\dfrac{\ln{x}}{\ln{a}}; \quad
-                    \log_a{1}=0;$
-                </p>
-                <p>
-                    $\log_a{xy}=\log_a{x}+\log_a{y}, \quad
-                    \log_a{\dfrac{x}{y}}=\log_a{x}-\log_a{y}, \quad
-                    \log_a{x^y}=y\cdot\log_a{x} \;(x>0), \quad
-                    \log_a{b}=\dfrac{1}{\log_b{a}}; \qquad
-                    \log_{1/a}(x)=-\log_a(x), \quad
-                    \log_ab\cdot\log_ba=1;$
-                </p>
-            </div>
+
+
             <!-- Graphs of Power, Exponent and Logarithm -->
             <div class="graph" style="display:block;">
                 <div class="graphfun">
@@ -505,6 +503,92 @@
                     <span>$f(x)=\log_{1.8}{x}$</span>
                 </div>
             </div>
+
+
+            <!-- Complex domain -->
+            <div class="cat">
+                <p>
+                    $\exp(a+bi)=\e^a(\cos{b}+i\sin{b}), \quad
+                    \ln(a+bi)=\ln\sqrt{a^2+b^2}+\mathrm{atan2}(b,a)\,i;$
+                    &emsp;&emsp;
+                    $\sqrt{a+bi}=\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}+a}{2}}+i\cdot\sgn(b)\sqrt{\dfrac{\sqrt{a^{2}+b^{2}}-a}{2}}$;
+                </p>
+            </div>
+            <h3>
+                For general complex numbers with $a,b\ne0$:
+            </h3>
+            <!-- Power and root -->
+            <div class="cat">
+                <p>
+                    $a^x=\e^{x\ln{a}}$, &ensp;
+                    $\dfrac{1}{a}=\e^{-\ln{a}}$; &ensp;
+                    $a^0=1$, &ensp;
+                    $a^{-x}=\dfrac{1}{a^x}$; &ensp;
+                    $a^x a^y=a^{x+y}$, &ensp;
+                    $\dfrac{a^x}{a^y}=a^{x-y}$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $(a^x)^y=a^{xy}\qquad (a\gt0, x\in\R)$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $(ab)^x=a^x b^x,\; \sqrt{ab}=\sqrt{a}\sqrt{b}
+                    \qquad (\Re(a),\Re(b)\ge 0,\ a,b\text{ not both negative imaginary};\quad a,b\in\R,\ a,b \text{ not both negative})$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $\left(\dfrac{a}{b}\right)^x=\dfrac{a^x}{b^x},\; \sqrt{\dfrac{a}{b}}=\dfrac{\sqrt{a}}{\sqrt{b}}
+                    \qquad (\Re(a),\Re(b)>0;\ a,b\in\R)$,
+                    &emsp;&emsp;&emsp;&emsp;
+                    <red>*</red>
+                    $\dfrac{1}{\sqrt{a}}=\sqrt{\dfrac{1}{a}}
+                    \qquad (a \text{ not negative real number})$;
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    $\sqrt{a^2}=\begin{cases}a,&\Re(a)>0;\ \Re(a)=0,\Im(a)>0\\-a,&\Re(a)\lt0;\ \Re(a)=0,\Im(a)\lt0\end{cases}$;
+                    &emsp;&emsp;
+                    $\left(\sqrt{a}\right)^2=a$;
+                </p>
+            </div>
+            <!-- Logarithm -->
+            <div class="cat">
+                <p>
+                    $\e^{\ln(x)}=x$; &emsp;
+                    $\ln(\e^x)=x \quad (\Im(x)\lt\pi)$;
+                    &emsp;&emsp;
+                    $a^{\ln(x)/\ln(a)}=x
+                    \quad (x\ne0, a\ne0,1)$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $\ln(xy)=\ln(x)+\ln(y)
+                    \qquad (\Re(x),\Re(y)\gt 0;\quad x,y\in\R,\ x,y \text{ not both negative})$,
+                    &emsp;&emsp;&emsp;&emsp;
+                    $\Re(\ln(xy))=\Re(\ln(x)+\ln(y))
+                    \qquad (x,y\ne0)$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $\ln\left(\dfrac{x}{y}\right)=\ln(x)-\ln(y)
+                    \qquad (\Re(x),\Re(y)\gt 0;\quad x,y\in\R)$,
+                    &emsp;&emsp;&emsp;&emsp;
+                    $\Re\left(\ln\left(\dfrac{x}{y}\right)\right)=\Re(\ln(x)-\ln(y))
+                    \qquad (x,y\ne0)$;
+                </p>
+                <p>
+                    <red>**</red>
+                    $\ln(x^a)=a\ln(x)
+                    \qquad (a,x\in\R, x>0)$;
+                    &emsp;&emsp;&emsp;&emsp;
+                    <red>*</red>
+                    $\ln\sqrt{x}=\dfrac{1}{2}\ln(x)
+                    \qquad (x \text{ not negative real number})$;
+                </p>
+            </div>
+
             <div class="cat"><br /><br /></div>
 
             <!-- Hyperbolic Functions -->
