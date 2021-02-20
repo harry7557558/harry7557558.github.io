@@ -1,24 +1,16 @@
 <!doctype html>
 <html>
-<head>
-    <title>Chemical Equation Balancer</title>
-    <meta charset="utf-8" />
-    <style>
-        #debug {
-            position: fixed;
-            right: 0;
-            top: 0;
-            width: 10px;
-            height: 10px;
-            background-color: red;
-        }
 
+<head>
+    <meta charset="utf-8" />
+    <title>Chemical Equation Balancer</title>
+    <style>
         #main {
             margin: 40px 20% 0px 20%;
             min-height: 200px;
             border: 1px solid gray;
             border-radius: 10px;
-            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.4);
             font-family: sans-serif;
         }
 
@@ -29,20 +21,20 @@
             font-size: 1.5em;
         }
 
-            #title > #subtitle {
-                margin: 6px 0px;
-                font-size: 0.6em;
-                color: gray;
-            }
+        #title>#subtitle {
+            margin: 6px 0px;
+            font-size: 0.6em;
+            color: gray;
+        }
 
         #content {
             margin: 10px 10% 0px 10%;
         }
 
-            #content > p {
-                margin: 5px 0px;
-                font-style: italic;
-            }
+        #content>p {
+            margin: 5px 0px;
+            font-style: italic;
+        }
 
         #border {
             width: 100%;
@@ -54,21 +46,21 @@
             align-items: center;
         }
 
-            #border #input {
-                margin: 0px 6px;
-                width: 100%;
-                flex-grow: 1;
-                height: 30px;
-                border: 0;
-                background-color: transparent;
-                outline: none;
-                font-family: Consolas;
-            }
+        #border #input {
+            margin: 0px 6px;
+            width: 100%;
+            flex-grow: 1;
+            height: 30px;
+            border: 0;
+            background-color: transparent;
+            outline: none;
+            font-family: Consolas;
+        }
 
-            #border #button {
-                margin-right: 6px;
-                height: 25px;
-            }
+        #border #button {
+            margin-right: 6px;
+            height: 25px;
+        }
 
         #result {
             margin: 20px 0px;
@@ -76,9 +68,6 @@
         }
 
         @media only screen and (max-width: 700px) {
-            #debug {
-                background-color: blue;
-            }
 
             #main {
                 margin: 30px 15% 0px 15%;
@@ -101,20 +90,18 @@
         }
     </style>
 </head>
-<body onload="balance_main();">
-    <div id="debug" title="The color of this square helps developer diagnose layout problems"></div>
+
+<body>
     <div id="main">
         <div id="title">
             Chemical Equation Balancer
             <p id="subtitle">By Harry Chen</p>
-            <!--<hr />-->
         </div>
         <div id="content">
             <div id="border">
-                <input id="input" type="text" placeholder="Enter a chemical equation..."
-                       spellcheck="false" autocomplete="off" autocorrect="off"
-                       value="H2+O2==H2O"
-                       onkeydown="if (event.keyCode==13) balance_main();" />
+                <input id="input" type="text" placeholder="Enter a chemical equation..." spellcheck="false"
+                    autocomplete="off" autocorrect="off" value="CO+O2==CO2"
+                    onkeydown="if (event.keyCode==13) balance_main();" />
                 <button id="button" type="button" onclick="balance_main();">Balance</button>
             </div>
             <div id="result">
@@ -124,7 +111,21 @@
     </div>
 
     <script>
+        // debug
+        function clear_log() {
+            document.getElementById('log').innerHTML = "";
+        }
+        function debug_log() {
+            msg = "";
+            for (var i = 0; i < arguments.length; i++)
+                msg += arguments[i] + ' ';
+            document.getElementById('log').innerHTML += "<p>" + msg + "</p>";
+        }
+    </script>
+
+    <script>
         // Note that the reading of ionic equations and complex compound notations is still debugging
+        "use strict";
 
         String.prototype.splice = function (idx, rem, str) {
             return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
@@ -140,7 +141,10 @@
         }
 
         function Fraction(n, m) {
-            if (n == 0) this.n = 0, this.m = 1;
+            if (n == 0) {
+                this.n = 0, this.m = 1;
+                if (m == 0) this.m = 0;
+            }
             else {
                 var d = gcd(m > 0 ? m : -m, n > 0 ? n : -n);
                 if (m < 0) d = -d;
@@ -190,7 +194,15 @@
         ];
         const n = ele.length;   // 119, with a placeholder
 
-        // separate string of lists of molecular formulas
+        const subscripts = "₀₁₂₃₄₅₆₇₈₉", subscript_replace = "0123456789";
+        function toSubscript(digit) {
+            return subscripts[subscript_replace.search(digit)];
+        }
+        function unSubscript(digit) {
+            return subscript_replace[subscripts.search(digit)];
+        }
+
+        // parse chemical expression into a list of molecular formulas
         function sliceChem(equ) {
             equ = equ + "+";
             var res = [];
@@ -199,13 +211,13 @@
                 var chm = "";
                 var n = 0;
                 while (1) {
-                    if (equ.length == 0) throw "unbalanced bracket";
+                    if (equ.length == 0) throw "unmatched bracket";
                     var c = equ[0];
                     equ = equ.substring(1, equ.length);
                     if (c == '(' || c == '[' || c == '{') brackets.push(c);
                     if (c == ')' || c == ']' || c == '}') {
                         var l = brackets.length;
-                        if (l == 0) throw "unbalanced bracket";
+                        if (l == 0) throw "unmatched bracket";
                         if (c == ')' && brackets.pop() != '(') throw ("unexpected bracket ')'");
                         if (c == ']' && brackets.pop() != '[') throw ("unexpected bracket ']'");
                         if (c == '}' && brackets.pop() != '{') throw ("unexpected bracket '}'");
@@ -220,17 +232,6 @@
                 }
                 res.push(chm);
             }
-            var removenum = function (equ) {
-                var equ_bk = equ;
-                while (isDigit(equ[0])) {
-                    equ = equ.substring(1, equ.length);
-                    if (equ.length == 0) throw ("unexpected number " + equ_bk);
-                }
-                return equ;
-            };
-            try {
-                for (var i = 0; i < res.length; i++) res[i] = removenum(res[i]);
-            } catch (e) { throw (e); }
             return res;
         }
 
@@ -252,14 +253,30 @@
 
         // read a molecular formula into return a vector
         function mol2vec(equ) {
-            // replace some tokens
+            // replace some characters
             const equ_bk = equ;
             equ = equ.replace(/⁺/g, "").replace(/⁻/g, "");
-            equ = equ.replace(/\[/g, "(").replace(/\{/g, "(");
-            equ = equ.replace(/\]/g, ")").replace(/\}/g, ")");
-            equ = equ.replace(/\./g, "");
+            equ = equ.replace(/[\[\{]/g, "(").replace(/[\]\}]/g, ")");
+            // in this situation: recursively split and add together
+            if (equ.search(/\./) != -1) {
+                var equs = equ.split('.');
+                var res = mol2vec(equs[0]);
+                for (var i = 1; i < equs.length; i++) {
+                    var res1 = mol2vec(equs[i]);
+                    for (var j = 0; j < res.length; j++) res[j] += res1[j];
+                }
+                return res;
+            }
+            // molecules starting with numbers
+            if (/[0-9]/.test(equ[0])) {
+                var equ_raw = equ.replace(/^[0-9]+/, '');
+                var number = readnum(equ);
+                var res = mol2vec(equ_raw);
+                for (var j = 0; j < res.length; j++) res[j] *= number;
+                return res;
+            }
 
-            // add a "*" symbol after element symbols with only one letter
+            // add a "*" character after element symbols with only one letter
             for (var i = 0; i < equ.length; i++) {
                 var c = equ.substr(i, 1), cc = c.charCodeAt(0);
                 if (cc >= 65 && cc <= 90) {     // capital letter
@@ -270,7 +287,7 @@
                 }
             }
 
-            // recursion part
+            // recursive part
             var mol2vec_c = function (equ) {
                 var res = [];
                 for (var i = 0; i < n; i++) res.push(0);
@@ -296,17 +313,12 @@
                             if (equ[i] == ')') brackets--;
                             if (brackets == 0) break;   // find the matched bracket
                         }
-                        var r;
-                        try {
-                            r = mol2vec_c(equ.substring(0, i));     // recursive reading contents inside the bracket
-                        } catch (e) {
-                            throw (e);
-                        }
+                        var res_t = mol2vec_c(equ.substring(0, i));     // recursive reading contents inside the bracket
                         equ = equ.substring(i + 1, equ.length);
                         // add things inside the bracket into the result vector
                         var m = readnum(equ);
                         while (equ.length != 0 && isDigit(equ[0])) equ = equ.substring(1, equ.length);
-                        for (var i = 1; i < n; i++) res[i] += m * r[i];
+                        for (var i = 1; i < n; i++) res[i] += m * res_t[i];
                     }
                     else throw false;
                 }
@@ -317,49 +329,89 @@
             try {
                 res = mol2vec_c(equ);
             } catch (e) {
-                if (e == false) throw ("unrecognized molecular formula " + equ_bk);
+                if (e == false) throw ("unrecognized chemical formula " + equ_bk);
                 throw e;
             }
 
             return res;
         }
 
-        // read and balance chemical equation in a string
-        function balance(equ) {
-            document.getElementById("log").innerHTML = "";
-            equ = equ.replace(/ /g, "");
-            equ = equ.replace(/\*/g, ".");
-            for (var i = 0; i < equ.length; i++) {
-                if (equ.charCodeAt(i) < 0x20 || equ.charCodeAt(i) > 0x7E)
-                    throw ("unexpected character \'" + equ.substr(i, 1) + "\'");
+
+        // convert balancing result to HTML
+        function result2HTML(chml, chmr, coes) {
+            var form2html = function (coe, form) {
+                var hasNumber = false;
+                var res = "";
+                for (var i = 0; i < form.length; i++) {
+                    if (isDigit(form[i])) {
+                        if (i == 0 || isDigit(res[i - 1]) || form[i - 1] == '.') res += form[i], hasNumber = true;
+                        else res += toSubscript(form[i]);
+                    }
+                    else res += form[i];
+                }
+                res = res.replace(/\./g, '·');
+                if (coe == 1) return res;
+                //if (hasNumber) res = '(' + res + ')';
+                if (isDigit(res[0])) res = '(' + res + ')';
+                return coe + " " + res;
+            };
+            var str = "";
+            for (var i = 0; i < chml.length; i++)
+                str += (i == 0 ? "" : " + ") + form2html(coes[i], chml[i]);
+            str += "&emsp;⟹&emsp;";
+            for (var i = chml.length; i < coes.length; i++)
+                str += (i == chml.length ? "" : " + ") + form2html(coes[i], chmr[i - chml.length]);
+            if (true) {
+                // use HTML <sub> tag instead of Unicode subscript because it looks better
+                for (var i = 0; i < subscripts.length; i++) {
+                    while (str.search(subscripts[i]) != -1) {
+                        str = str.replace(subscripts[i], "<sub>" + subscript_replace[i] + "</sub>");
+                    }
+                }
             }
+            return str;
+        }
+
+        // read and balance chemical equation
+        function balance(equ) {
+            clear_log();
+
+            // replace some characters
+            equ = equ.replace(/[\u0001-\u0020\u00a0\u2000-\u200a\u202d-\u202f\u3000]/g, "");  // space
+            equ = equ.replace(/[\*·•]/g, ".");  // dots
+            for (var i = 0; i < subscripts.length; i++) {
+                while (equ.search(subscripts[i]) != -1)
+                    equ = equ.replace(subscripts[i], subscript_replace[i]);
+            }
+            equ = equ.replace(/\^\+/g, '⁺').replace(/\^\-/g, '⁻');
 
             // convert arrow or equal sign to a single "="
             if (/=/.test(equ)) {
-                while (equ.match("==")) equ = equ.replace("==", "=");
-                while (equ.match("=>")) equ = equ.replace("=>", "=");
+                equ = equ.replace(/\=+\>*/, '=');
             }
             else if (equ.match("->")) {
-                while (equ.match("-->")) equ = equ.replace("-->", "->");
-                while (equ.match("->>")) equ = equ.replace("->>", "->");
-                equ = equ.replace("->", "=");
+                equ = equ.replace(/\-+\>*/, '=');
             }
-            else throw "missing arrow or equal sign";
+            else {
+                // this happens if your equation is copy-pasted
+                // maybe I should ignore them
+                console.log(equ);
+                equ = equ.replace(/[→⟶⇨⮕⬄⬌⇀⇁⥊⥋⥛⥤⇋⇌⥨⥬⇒⇔⟹⟺]/g, '=');
+                if (!(/=/.test(equ))) throw "missing arrow or equal sign";
+            }
+
 
             // get lists of molecular formulas before and after the reaction
-            var dir = equ.search("=", 0);
-            try {
-                var chml = sliceChem(equ.substring(0, dir));
-                var chmr = sliceChem(equ.substring(dir + 1, equ.length));
-                console.log(chml, chmr);
-            } catch (e) {
-                throw e;
-            }
-            if (chml.length * chmr.length == 0) throw "empty side";
-
+            equ = equ.split('=')
+            if (equ.length != 2) throw "incorrect number of arrows/equal signs";
+            var chml = sliceChem(equ[0]);
+            var chmr = sliceChem(equ[1]);
+            debug_log(chml, chmr);
+            if (chml.length * chmr.length == 0) throw "empty equation at one side";
 
 
             // construct matrix
+            // all to the left, one remain in the right
             var c = chml.length + chmr.length;
             var M = [];
             for (var i = 0; i < chml.length; i++) M.push(mol2vec(chml[i]));
@@ -383,12 +435,8 @@
                 }
             }
             var s = M.length;
-            if (s < c - 1) throw "This chemical equation has more than one way to balance, or it doesn't exist.";
 
-            // Gaussian elimination
-            var log = function (msg) {
-                document.getElementById("log").innerHTML += "<p>" + msg + "</p>";
-            };
+            // debug
             var logMat = function () {
                 var b = "";
                 b += "<table style='margin:20px;'>";
@@ -400,24 +448,28 @@
                     b += "</tr>";
                 }
                 b += "</table>";
-                document.getElementById("log").innerHTML += b;
+                debug_log(b);
             };
             logMat(M);
+
+            // Gaussian elimination
             var swaprow = function (r1, r2) {
-                //log("Swap row " + (r1 + 1) + " and row " + (r2 + 1));
                 var r = M[r1];
                 M[r1] = M[r2], M[r2] = r;
             };
             var multrow = function (r, k) {
-                //log("Multiply row " + (r + 1) + " by " + frac2str(k));
                 for (var i = 0; i < c; i++) M[r][i] = Mul(M[r][i], k);
             };
             var multadd = function (r1, k, r2) {
-                //log("Add row " + (r1 + 1) + " times " + frac2str(k) + " to row " + (r2 + 1));
                 for (var i = 0; i < c; i++) M[r2][i] = Add(Mul(M[r1][i], k), M[r2][i]);
             };
+            // @c: number of columns;
+            // @s: number of rows;
+            // the tracked element of the matrix is M[di][i];
+            // @k: non-zero element at row @i;
+            // @j: row to be zeroed out;
             var di = 0, i, j, k;
-            for (i = 0; i < c; i++ , di++) {
+            for (i = 0; i < c; i++, di++) {
                 // find the first non-zero number
                 for (k = di; k < s; k++) {
                     if (M[k][i].n != 0) break;
@@ -425,57 +477,150 @@
                 if (k == s) di--;   // if this happens, problems may occur
                 else {
                     // add all other values in the same column to zero
-                    if (k != di) swaprow(k, di), k = di/*, logMat()*/;
+                    if (k != di) swaprow(k, di), k = di;
                     for (j = 0; j < s; j++) {
                         if (j != k && M[j][i].n != 0) {
                             var mt = Neg(Div(M[j][i], M[k][i]));
                             multadd(k, mt, j);
-                            //logMat();
                         }
                     }
                     multrow(k, Inv(M[k][i]));
-                    //logMat();
                 }
+            }
+            //logMat(M);
+
+            // remove empty rows
+            for (; s > 0; s--) {
+                var allZero = true;
+                for (var i = 0; i < c; i++) if (M[s - 1][i].n != 0) allZero = false;
+                if (!allZero) break;
+                else M.pop();
             }
             logMat(M);
 
-            // check the result
-            for (var i = 0; i < c - 1; i++) {
-                for (var j = 0; j < s; j++) {
-                    if (j != i && M[j][i].n != 0) throw "This chemical equation has more than one way to balance, or it doesn't exist.";
-                }
+
+            // check if the chemical equation cannot be balanced
+            for (var j = 0; j < s; j++) {
+                var allZero = true;
+                for (var i = 0; i < c - 1; i++) if (M[j][i].n != 0) allZero = false;
+                if (allZero && M[j][c - 1].n != 0)
+                    throw "This chemical equation cannot be balanced. Please check your input.";
             }
 
-            // output balanced equation
-            _M = [];
-            var mt = 1;  // gcd
+
+            // check if the chemical equation has an unique way to balance
+            var hasUniqueSolution = c == s + 1;
             for (var i = 0; i < c - 1; i++) {
-                var f = M[i][c - 1];
-                if (f.n <= 0) throw "Balancing failed! This error may occur due to an inexistent chemical equation, or the chemical equation you entered has more than one way to balance.";
-                _M.push(f);
-                mt = mt * f.m / gcd(mt, f.m);
-            }
-            for (var i = 0; i < c - 1; i++) _M[i] = mt * _M[i].n / _M[i].m;
-            _M.push(mt);
-            // convert to html
-            var form2html = function (form) {
-                var r = "";
-                while (form.length != 0) {
-                    var c = form[0];
-                    form = form.substring(1, form.length);
-                    if (isDigit(c)) r += "<sub>" + c + "</sub>";
-                    else r += c;
+                for (var j = 0; j < s; j++) {
+                    if (j != i && M[j][i].n != 0) hasUniqueSolution = false;
                 }
-                return r;
+            }
+            if (hasUniqueSolution) {
+                // coefficients must be positive
+                for (var i = 0; i < s; i++) {
+                    if (M[i][c - 1].n <= 0)
+                        throw "This chemical equation cannot be balanced properly. Please check your input.";
+                }
+                // output balanced equation
+                var coes = [];
+                var mt = 1;  // gcd
+                for (var i = 0; i < c - 1; i++) {
+                    var f = M[i][c - 1];
+                    coes.push(f);
+                    mt = mt * f.m / gcd(mt, f.m);
+                }
+                for (var i = 0; i < c - 1; i++) coes[i] = mt * coes[i].n / coes[i].m;
+                coes.push(mt);
+                // convert to html
+                document.getElementById("result").innerHTML = result2HTML(chml, chmr, coes);
+                console.log(coes);
+                return;
+            }
+
+
+            // no unique solution: ?? (I'm not good at this)
+            var balanceFailed = function () {
+                throw "This chemical equation has multiple ways to balance that is not supported.";
             };
-            var str = "";
-            for (var i = 0; i < chml.length; i++)
-                str += (i == 0 ? "" : " + ") + (_M[i] == 1 ? "" : _M[i]) + " " + form2html(chml[i]);
-            str += "&emsp;⟹&emsp;";
-            for (var i = chml.length; i < c; i++)
-                str += (i == chml.length ? "" : " + ") + (_M[i] == 1 ? "" : _M[i]) + " " + form2html(chmr[i - chml.length]);
-            document.getElementById("result").innerHTML = str;
-            console.log(_M);
+            var cannotBalance = function () {
+                throw "This chemical equation cannot be balanced. Please check your input.";
+                // I should add a report bug button here
+            }
+            const N_SOL = 8;  // max number of solutions to give
+            var dim = c - (s + 1);  // dimension of solution space
+
+            if (dim == 1) {
+
+                // assume the last element is zero, find one solution
+                for (var i = 0; i < s; i++) {
+                    if (M[i][i].m != M[i][i].n) balanceFailed();
+                }
+                var base_solution = [];
+                for (var i = 0; i < s; i++) base_solution.push(M[i][c - 1]);
+                base_solution.push(new Fraction(0, 1));
+                console.log(base_solution);
+                // find the direction vector of the solution space
+                var dir_vec = [];
+                for (var i = 0; i < s; i++) dir_vec.push(Neg(M[i][c - 2]));
+                dir_vec.push(new Fraction(1, 1));
+                console.log(dir_vec);
+
+                // determine the range of valid coefficients
+                var min_t = new Fraction(0, 0), max_t = new Fraction(0, 0), min_t_f = -Infinity, max_t_f = Infinity;
+                for (var i = 0; i < base_solution.length; i++) {
+                    if (dir_vec[i].n > 0) {
+                        var t = Neg(Div(base_solution[i], dir_vec[i])), tf = t.n / t.m;
+                        if (tf > min_t_f) min_t = t, min_t_f = tf;
+                    }
+                    else if (dir_vec[i].n < 0) {
+                        var t = Neg(Div(base_solution[i], dir_vec[i])), tf = t.n / t.m;
+                        if (tf < max_t_f) max_t = t, max_t_f = tf;
+                    }
+                    else {
+                        if (base_solution[i].n <= 0) cannotBalance();
+                    }
+                }
+                if (min_t_f >= max_t_f) cannotBalance();
+                console.log(min_t_f, max_t_f);
+
+                // go though the range and add solutions
+                var solution_coes = [];
+                var addCoe = function (t) {
+                    //console.log(t);
+                    var add = base_solution.slice();
+                    for (var i = 0; i < add.length; i++) add[i] = Add(add[i], Mul(dir_vec[i], t));
+                    solution_coes.push(add);
+                };
+                for (var den = 1;
+                    (den <= Math.max(2 * Math.max(min_t.m, max_t.m), 3) && solution_coes.length <= N_SOL)
+                    || solution_coes.length == 0; den++) {
+                    var start = Math.ceil(min_t_f * den + 1e-8), end = Math.floor(max_t_f * den - 1e-8);
+                    for (var num = start; num <= end; num++) {
+                        if (gcd(num, den) == 1) {
+                            addCoe(new Fraction(num, den));
+                        }
+                        if (solution_coes.length > N_SOL) break;
+                    }
+                }
+                console.log(solution_coes);
+
+                // add HTML
+                document.getElementById("result").innerHTML = "";
+                for (var d = 0; d < solution_coes.length; d++) {
+                    var coes = [];
+                    var mt = 1;  // gcd
+                    for (var i = 0; i < c - 1; i++) {
+                        coes.push(solution_coes[d][i]);
+                        mt = mt * solution_coes[d][i].m / gcd(mt, solution_coes[d][i].m);
+                    }
+                    for (var i = 0; i < c - 1; i++) coes[i] = mt * coes[i].n / coes[i].m;
+                    coes.push(mt);
+                    document.getElementById("result").innerHTML += result2HTML(chml, chmr, coes) + "<br/>";
+                    console.log(coes);
+                }
+            }
+            else throw balanceFailed();
+
         }
 
         function balance_main() {
@@ -486,78 +631,16 @@
             }
         }
 
+        document.body.onload = balance_main;
     </script>
 
 
-    <div style="display: none">
-
-        // test equations
-
-        // These chemical equations can be balanced
-        H2+O2==H2O
-        CO+O2==CO2
-        Fe+O2==Fe2O3
-        Fe+O2==Fe3O4
-        Fe+O2==FeO
-        CoO+CO==Co+CO2
-        Na2CO3+HCl==NaCl+CO2+H2O
-        Al+H2SO4==Al2(SO4)3+H2
-        CuSO4+HCl==H2[CuCl4]+H2SO4
-        Ca(OH)2+Na2CO3====CaCO3+NaOH
-        KMnO4+C6H5CH3===C6H5COOK+MnO2+H2O+K2MnO4
-        Pt+HNO3+HCl===H2PtCl6+NO+H2O
-        P4+CuSO4+H2O===Cu3P+H3PO4+H2SO4
-        S8+Ca(OH)2===CaS5+CaS2O3+H2O
-        CuSO4+Na2CO3+H2O==Cu2(OH)2CO3+Na2SO4+CO2
-        KMnO4+H2SO4==Mn2O7+K2SO4+H2O
-        P2I4+P4+H2O===PH4I+H3PO4
-        Fe3C+HNO3===Fe(NO3)3+CO2+NO2+H2O
-        PbN6+Cr(MnO4)2===Cr2O3+MnO2+Pb3O4+NO
-        KHC2O4.H2C2O4+KMnO4+H2SO4=MnSO4+K2SO4+CO2+H2O
-        Ag3AsO4+Zn+H2SO4===Ag+AsH3+ZnSO4+H2O
-        NaCr(OH)4+NaClO+NaOH===Na2CrO4+NaCl+H2O
-        Na2S5+NaClO+NaOH===Na2SO4+NaCl+H2O
-        KOCN+NaOH+Cl2===CO2+N2+KCl+NaCl+H2O
-        NaBiO3+MnSO4+H2SO4===Na2SO4+Bi2(SO4)3+NaMnO4+H2O
-        B10H12CNH3+NiCl2+NaOH=Na4(B10H10CNH2)2Ni+NaCl+H2O
-        K2NaCo(NO2)6+KMnO4+H2SO4=K2SO4+Na2SO4+CoSO4+MnSO4+HNO3+H2O
-        K4Fe(CN)6+KMnO4+H2SO4=KHSO4+Fe2(SO4)3+MnSO4+HNO3+CO2+H2O
-        H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2===PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O
-        *CH3(CH2)5COOH+(Ca(PO3))2(Ca(OH)2)3====(Ca(CH3(CH2)5COO)2)+H2O+Ca(PO3)2
-
-        // These chemical equations do not exist
-        H2+Cl2==H2O
-        H2SO4+O2==H2O+SO2
-        Ne2+HF==HNeF
-
-        // These are not chemical equations
-        y^2=x^3-x+1
-        [H+CH3(CH2)5COO-]+2Ca(PO3)2.3Ca(OH)2
-        3C+4O=5N
-
-        // These chemical equations have more than one ways to balance
-        C6H12O6+H2O+O2==CO2+H2O
-        CH3CH2OH+O2==CO+CO2+H2O
-        Fe36Si5+H3PO3+K2Cr2O7+H2O===FePO4+Fe(OH)3+Cr(OH)3+CrPO4+K3PO4+SiO2
-        H2S+K2Cr2O7+H2SO4===Cr2(SO4)3+K2SO4+S+H2O
-
-        // Challenge
-        H1000C800O500N300S100Cl50P20F10Br5I3+O2==H2O+CO2+NO2+SO2+HCl+P4O10+HF+HBr+HI
-        H1000C800O500N300S100Cl50P20F10Br5I3+O2==H2O+CO2+HNO3+H2SO4+HCl+H3PO4+HF+HBr+HI
-        H1000C800O500N300S100Cl50P20F10Br5I3+F2==HF+CF4+O2+N2+SF6+Cl2+PF5+Br2+I2
-        C990H1529N263O299S7+O2==CO2+H2O+NO+SO2
-        C990H1529N263O299S7+O2==CO2+H2O+NO2+SO3
-        C990H1529N263O299S7+O2==CO2+H2O+HNO3+H2SO4
-        C990H1529N263O299S7+H2SO4==C+H2O+NO+SO2+H2SO4
-        C990H1529N263O299S7+H2SO4==C+H2O+NO+SO2
-        C990H1529N263O299S7+H2SO4==H2O+NO+SO2
-        C990H1529N263O299S7+NaOH===NH2CH2COONa+CH3CHNH2COONa+CH3CHCH3CHNH2COONa+CH3CHCH3CH2CHNH2COONa+CH3CH2CHCH3CHNH2COONa+C6H5CH2CHNH2COONa+C8H6NCH2CHNH2COONa+C6H4OHCH2CHNH2COONa+NaOOCCH2CHNH2COONa+C2H3N2CH2CHNH2COONa+NH2COCH2CHNH2COONa+NaOOC(CH2)2CHNH2COONa+H2N(CH2)4CHNH2COONa+H2NCO(CH2)2CHNH2COONa+H3CS(CH2)2CHNH2COONa+H2NCNNH2N(CH2)3CHNH2COONa+NH2CH(CH2OH)COONa+NH2CH(CH(CH3)OH)COONa+NH2CHCH2SHCOONa+C4H8NCOONa+NH4OH+(NH4)2S+H2O
-
-    </div>
     <div style="display:none">
-        <br /><br /><br /><hr />
-        Please ignore the numbers below.
+        <br /><br /><br />
+        <hr />
+        The followings are logs used in debugging.
         <div id="log"></div>
     </div>
 </body>
+
 </html>
