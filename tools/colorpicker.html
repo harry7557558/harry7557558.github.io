@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Color Picker</title>
+
+    <style>
+        body {
+            white-space: nowrap;
+        }
+
+        #container,
+        #info-container {
+            margin: 10px;
+            width: max-content;
+        }
+
+        #container {
+            float: left;
+        }
+
+        #info-container {
+            margin-left: 56px;
+            display: inline-block;
+        }
+
+        #preview {
+            width: 120px;
+            height: 40px;
+            margin: 10px 0px;
+            border: 1px solid gray;
+            padding: 0;
+            display: inline-block;
+        }
+
+        .scale_linear {
+            width: 360px;
+            height: 36px;
+            margin: 10px 0px;
+            border: 0;
+            padding: 0;
+            background-color: gray;
+            display: block;
+            position: relative;
+        }
+
+        .cell {
+            position: absolute;
+            display: table-cell;
+            margin: 0;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        td {
+            font-family: Calibri;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id='container'>
+        <div id='input-container'>
+            Enter color name/code:
+            <input type='text' id='input' spellcheck="false" />
+        </div>
+        <div id='preview-container'>
+            <div id='preview'></div>
+        </div>
+
+        <div id='rgb_picker'>
+            RGB scales<br />
+            <div id='scale_r' class='scale_linear'></div>
+            <div id='scale_g' class='scale_linear'></div>
+            <div id='scale_b' class='scale_linear'></div>
+        </div>
+
+        <div id='hsl_picker'></div>
+        <div id='cmyk_picker'></div>
+    </div>
+
+    <div id='info-container'>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Color Name&emsp;&emsp;</td>
+                    <td id='info-name'></td>
+                </tr>
+                <tr>
+                    <td>HEX</td>
+                    <td id='info-hex'></td>
+                </tr>
+                <tr>
+                    <td>RGB</td>
+                    <td id='info-rgb'></td>
+                </tr>
+                <tr>
+                    <td>RGB (float)</td>
+                    <td id='info-vec3'></td>
+                </tr>
+                <tr>
+                    <td>HSL</td>
+                    <td id='info-hsl'></td>
+                </tr>
+                <tr>
+                    <td>HSV/HSB</td>
+                    <td id='info-hsv'></td>
+                </tr>
+                <tr>
+                    <td>HWB</td>
+                    <td id='info-hwb'></td>
+                </tr>
+                <tr>
+                    <td>CMYK</td>
+                    <td id='info-cmyk'></td>
+                </tr>
+                <tr>
+                    <td>YUV (approx)</td>
+                    <td id='info-yuv'></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- color conversion -->
+    <script>
+        "use strict";
+
+        // list of CSS color names
+        const CSS_COLORS = {
+            "black": "#000000", "navy": "#000080", "darkblue": "#00008b", "mediumblue": "#0000cd", "blue": "#0000ff", "darkgreen": "#006400", "green": "#008000", "teal": "#008080", "darkcyan": "#008b8b",
+            "deepskyblue": "#00bfff", "darkturquoise": "#00ced1", "mediumspringgreen": "#00fa9a", "lime": "#00ff00", "springgreen": "#00ff7f", "cyan": "#00ffff", "aqua": "#00ffff",
+            "midnightblue": "#191970", "dodgerblue": "#1e90ff", "lightseagreen": "#20b2aa", "forestgreen": "#228b22", "seagreen": "#2e8b57", "darkslategray": "#2f4f4f", "darkslategrey": "#2f4f4f",
+            "limegreen": "#32cd32", "mediumseagreen": "#3cb371", "turquoise": "#40e0d0", "royalblue": "#4169e1", "steelblue": "#4682b4", "darkslateblue": "#483d8b", "mediumturquoise": "#48d1cc", "indigo": "#4b0082",
+            "darkolivegreen": "#556b2f", "cadetblue": "#5f9ea0", "cornflowerblue": "#6495ed", "rebeccapurple": "#663399", "mediumaquamarine": "#66cdaa", "dimgrey": "#696969", "dimgray": "#696969", "slateblue": "#6a5acd", "olivedrab": "#6b8e23",
+            "slategrey": "#708090", "slategray": "#708090", "lightslategrey": "#778899", "lightslategray": "#778899", "mediumslateblue": "#7b68ee", "lawngreen": "#7cfc00", "chartreuse": "#7fff00", "aquamarine": "#7fffd4",
+            "maroon": "#800000", "purple": "#800080", "olive": "#808000", "gray": "#808080", "grey": "#808080", "skyblue": "#87ceeb", "lightskyblue": "#87cefa", "blueviolet": "#8a2be2", "darkred": "#8b0000",
+            "darkmagenta": "#8b008b", "saddlebrown": "#8b4513", "darkseagreen": "#8fbc8f", "lightgreen": "#90ee90", "mediumpurple": "#9370db", "darkviolet": "#9400d3", "palegreen": "#98fb98", "darkorchid": "#9932cc", "yellowgreen": "#9acd32",
+            "sienna": "#a0522d", "brown": "#a52a2a", "darkgray": "#a9a9a9", "darkgrey": "#a9a9a9", "lightblue": "#add8e6", "greenyellow": "#adff2f", "paleturquoise": "#afeeee",
+            "lightsteelblue": "#b0c4de", "powderblue": "#b0e0e6", "firebrick": "#b22222", "darkgoldenrod": "#b8860b", "mediumorchid": "#ba55d3", "rosybrown": "#bc8f8f", "darkkhaki": "#bdb76b",
+            "silver": "#c0c0c0", "mediumvioletred": "#c71585", "indianred": "#cd5c5c", "peru": "#cd853f", "chocolate": "#d2691e", "tan": "#d2b48c", "lightgray": "#d3d3d3", "lightgrey": "#d3d3d3",
+            "thistle": "#d8bfd8", "orchid": "#da70d6", "goldenrod": "#daa520", "palevioletred": "#db7093", "crimson": "#dc143c", "gainsboro": "#dcdcdc", "plum": "#dda0dd", "burlywood": "#deb887",
+            "lightcyan": "#e0ffff", "lavender": "#e6e6fa", "darksalmon": "#e9967a", "violet": "#ee82ee", "palegoldenrod": "#eee8aa", "lightcoral": "#f08080", "khaki": "#f0e68c", "aliceblue": "#f0f8ff", "honeydew": "#f0fff0", "azure": "#f0ffff",
+            "sandybrown": "#f4a460", "wheat": "#f5deb3", "beige": "#f5f5dc", "whitesmoke": "#f5f5f5", "mintcream": "#f5fffa", "ghostwhite": "#f8f8ff", "salmon": "#fa8072", "antiquewhite": "#faebd7", "linen": "#faf0e6", "lightgoldenrodyellow": "#fafad2",
+            "oldlace": "#fdf5e6", "red": "#ff0000", "magenta": "#ff00ff", "fuchsia": "#ff00ff", "deeppink": "#ff1493", "orangered": "#ff4500", "tomato": "#ff6347", "hotpink": "#ff69b4", "coral": "#ff7f50",
+            "darkorange": "#ff8c00", "lightsalmon": "#ffa07a", "orange": "#ffa500", "lightpink": "#ffb6c1", "pink": "#ffc0cb", "gold": "#ffd700", "peachpuff": "#ffdab9", "navajowhite": "#ffdead",
+            "moccasin": "#ffe4b5", "bisque": "#ffe4c4", "mistyrose": "#ffe4e1", "blanchedalmond": "#ffebcd", "papayawhip": "#ffefd5", "lavenderblush": "#fff0f5", "seashell": "#fff5ee", "cornsilk": "#fff8dc",
+            "lemonchiffon": "#fffacd", "floralwhite": "#fffaf0", "snow": "#fffafa", "yellow": "#ffff00", "lightyellow": "#ffffe0", "ivory": "#fffff0", "white": "#ffffff"
+        };
+
+
+        // rgb, 0-1
+        var color = [0.5, 0.5, 0.5];
+
+        // calculate the difference between two colors
+        function rgb2yuv(col) {
+            var r = col[0], g = col[1], b = col[2];
+            var y = 0.299 * r + 0.587 * g + 0.114 * b;
+            var u = -0.14713 * r - 0.28886 * g + 0.436 * b;
+            var v = 0.615 * r - 0.51499 * g - 0.10001 * b;
+            return [y, u, v];
+        }
+        function colorDiff(col1, col2) {
+            // https://stackoverflow.com/a/5392276
+            var yuv1 = rgb2yuv(col1), yuv2 = rgb2yuv(col2);
+            // return the Euclidean distance
+            var d = [yuv1[0] - yuv2[0], yuv1[1] - yuv2[1], yuv1[2] - yuv2[2]];
+            return Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+        }
+        // [0,1] rgb array to a floating point decimal number
+        function rgb2gray(col) {
+            return rgb2yuv(col)[0];
+        }
+
+
+        function clamp(x, a = 0, b = 1) {
+            return x < a ? a : x > b ? b : x;
+        }
+
+
+        // [0,1] rgb array to string
+
+        // [0,1] rgb array to Javascript array string
+        function color2str(col) {
+            var r = String(clamp(col[0]));
+            var g = String(clamp(col[1]));
+            var b = String(clamp(col[2]));
+            return '[' + [r, g, b].join(',') + ']';
+        }
+        // [0,1] rgb array to GLSL color vector string
+        function color2vec3(col) {
+            var r = col[0].toFixed(2).replace(/0*$/, '');
+            var g = col[1].toFixed(2).replace(/0*$/, '');
+            var b = col[2].toFixed(2).replace(/0*$/, '');
+            return 'vec3(' + [r, g, b].join(', ') + ')';
+        }
+        // [0,1] rgb array to CSS rgb color string
+        function color2rgb(col) {
+            var r = Math.round(255 * clamp(col[0]));
+            var g = Math.round(255 * clamp(col[1]));
+            var b = Math.round(255 * clamp(col[2]));
+            return "rgb(" + [r, g, b].join(', ') + ")";
+        }
+        function color2rgb_hd(col) {
+            var r = String(255 * col[0]);
+            var g = String(255 * col[1]);
+            var b = String(255 * col[2]);
+            return "rgb(" + [r, g, b].join(', ') + ")";
+        }
+        // [0,1] rgb array to hex color string
+        function color2hex(col) {
+            var r = Math.round(255 * clamp(col[0]));
+            var g = Math.round(255 * clamp(col[1]));
+            var b = Math.round(255 * clamp(col[2]));
+            var col = (r << 16) | (g << 8) | b;
+            var str = col.toString(16);
+            while (str.length < 6) str = '0' + str;
+            return '#' + str;
+        }
+        // [0,1] rgb array to CMYK color string
+        function color2cmyk(col) {
+            var r = col[0], g = col[1], b = col[2];
+            var c = 1 - r, m = 1 - g, y = 1 - b;
+            // set k to as large as possible
+            var k = Math.min(c, m, y);
+            if (k == 1) return "cmyk(0, 0, 0, 1)";
+            c = (c - k) / (1 - k);
+            m = (m - k) / (1 - k);
+            y = (y - k) / (1 - k);
+            return "cmyk(" + [c, m, y, k].map(x => x.toFixed(2).replace(/0$/, '')).join(', ') + ")";
+        }
+
+
+        // color conversions involving hue
+        // hue: 0-360, in degrees
+
+        // a periodic function in the form /¯¯\__, in a period of 6
+        // r(h) = ¯\__/¯, g(h) = /¯¯\__, b(h) = __/¯¯\
+        // r=hue2rgb(h+2), g=hue2rgb(h), b=hue2rgb(h-2)
+        function hue2rgb(t) {
+            while (t < 0) t += 6;
+            while (t > 6) t -= 6;
+            if (t < 1) return t;
+            if (t < 3) return 1;
+            if (t < 4) return 4 - t;
+            return 0;
+        }
+
+        // high-dynamic color conversions
+        function rgb2hsl(rgb) {
+            var r = rgb[0], g = rgb[1], b = rgb[2];
+            var max = Math.max(r, g, b), min = Math.min(r, g, b);
+            var h, s, l = (max + min) / 2;  // lightness: mid of max and min
+            if (max == min)
+                h = s = 0;  // grayscale: only brightness matters
+            else {
+                // calculate hue
+                var range = max - min;  // called "chroma"
+                if (max == r) h = (g - b) / range + (g < b ? 6 : 0);  // must be positive
+                else if (max == g) h = (b - r) / range + 2;
+                else if (max == b) h = (r - g) / range + 4;
+                h *= 60;
+                // calculate saturation
+                // let x,y=max,min, function s(x,y) is symmetric about x+y=1,
+                // equals to zero at min==max and one at min==0 and max==1
+                s = l > 0.5 ?  // max+min>1. ?
+                    range / (2 - max - min) :  // (x-y)/(2-(x+y))
+                    range / (max + min);  // (x-y)/(x+y)
+            }
+            return [h, s, l];
+        }
+        function hsl2rgb(hsl) {
+            var h = hsl[0] / 60, s = hsl[1], l = hsl[2];
+            var max = l <= 0.5 ? l * (s + 1) : l + s - l * s;
+            var min = 2 * l - max;
+            var r = min + (max - min) * hue2rgb(h + 2);
+            var g = min + (max - min) * hue2rgb(h);
+            var b = min + (max - min) * hue2rgb(h - 2);
+            return [clamp(r), clamp(g), clamp(b)];
+        }
+        function rgb2hsv(rgb) {
+            var r = rgb[0], g = rgb[1], b = rgb[2];
+            var max = Math.max(r, g, b), min = Math.min(r, g, b);
+            var h, s, v = max;  // value: max of r/g/b
+            var range = max - min;
+            // saturation: range/max
+            s = max == 0 ? 0 : range / max;
+            // hue calculation: same as HSL
+            if (max == min) h = 0;
+            else if (max == r) h = (g - b) / range + (g < b ? 6 : 0);
+            else if (max == g) h = (b - r) / range + 2;
+            else if (max == b) h = (r - g) / range + 4;
+            return [h * 60, s, v];
+        }
+        function hsv2rgb(hsv) {
+            var h = hsv[0] / 60, s = hsv[1], v = hsv[2];
+            if (v == 0) return [0, 0, 0];
+            var max = v, min = max - s * max;
+            var r = min + (max - min) * hue2rgb(h + 2);
+            var g = min + (max - min) * hue2rgb(h);
+            var b = min + (max - min) * hue2rgb(h - 2);
+            return [clamp(r), clamp(g), clamp(b)];
+        }
+        function rgb2hwb(rgb) {
+            var r = rgb[0], g = rgb[1], b = rgb[2];
+            var max = Math.max(r, g, b), min = Math.min(r, g, b);
+            var range = max - min;
+            // hue calculation: same as HSL and HSB
+            var hue = 60 * (
+                max == min ? 0 :
+                    max == r ? (g - b) / range + (g < b ? 6 : 0) :
+                        max == g ? (b - r) / range + 2 :
+                            max == b ? (r - g) / range + 4 : 0);
+            // white and black calculation
+            var white = min;
+            var black = 1 - max;
+            return [hue, white, black];
+        }
+        function hwb2rgb(hwb) {
+            var h = hwb[0] / 60, white = hwb[1], black = hwb[2];
+            var min = white, max = 1 - black;
+            var r = min + (max - min) * hue2rgb(h + 2);
+            var g = min + (max - min) * hue2rgb(h);
+            var b = min + (max - min) * hue2rgb(h - 2);
+            return [clamp(r), clamp(g), clamp(b)];
+        }
+
+        // string-related color conversions
+
+        // [0,1] rgb array to CSS hsl color string
+        function color2hsl(col) {
+            var hsl = rgb2hsl(col);
+            return "hsl(" + Math.round(hsl[0]) + ', ' + Math.round(hsl[1] * 100) + '%, ' + Math.round(hsl[2] * 100) + "%)";
+        }
+        // [0,1] rgb array to hsv color string
+        function color2hsv(col) {
+            var hsv = rgb2hsv(col);
+            return "hsv(" + Math.round(hsv[0]) + ', ' + Math.round(hsv[1] * 100) + '%, ' + Math.round(hsv[2] * 100) + "%)";
+        }
+        // [0,1] rgb array to CSS hwb color string
+        function color2hwb(col) {
+            var hwb = rgb2hwb(col);
+            return "hwb(" + Math.round(hwb[0]) + ', ' + Math.round(hwb[1] * 100) + '%, ' + Math.round(hwb[2] * 100) + "%)";
+        }
+
+
+
+        // string to [0,1] rgb array
+
+        // hex color string to color array
+        function hex2color(hex) {
+            if (hex[0] != '#' && hex.substr(0, 2) != '0x') throw hex;
+            hex = hex.replace('#', '').replace('0x', '');
+            if (hex.length == 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            if (hex.length == 8) {
+                hex = hex.substr(0, 6);
+            }
+            if (hex.length == 6) {
+                var col = Number('0x' + hex);
+                if (isNaN(col)) throw col;
+                var b = col & 255, g = (col >> 8) & 255, r = (col >> 16) & 255;
+                return [r / 255, g / 255, b / 255];
+            }
+            else throw hex;
+        }
+        // Javascript color string to color array
+        function arr2color(arr, div) {
+            if (arr.length == 1) arr = [arr[0], arr[0], arr[0]];
+            if (arr.length < 3 || arr.length > 4) throw arr;
+            var r = Number(arr[0]) / div; if (isNaN(r)) throw (r);
+            var g = Number(arr[1]) / div; if (isNaN(g)) throw (g);
+            var b = Number(arr[2]) / div; if (isNaN(b)) throw (b);
+            return [clamp(r), clamp(g), clamp(b)];
+        }
+        // CSS color name to color array
+        function name2color(name) {
+            return hex2color(CSS_COLORS[name.toLowerCase()]);
+        }
+        // CSS RGB color to color array
+        function rgb2color(str) {
+            if (str.substr(0, 3) != 'rgb' && str.substr(0, 4) != 'rgba') throw str;
+            var arr = str.replace('rgba', '').replace('rgb', '').replace(/[\(\)]/g, '').split(',');
+            return arr2color(arr, 255);
+        }
+        // GLSL color vector to color array
+        function vec2color(str) {
+            if (str.search(/vec[234]/) != 0) throw (str);
+            var arr = str.replace(/vec[234]/, '').replace(/[\(\)]/g, '').split(',');
+            return arr2color(arr, 1);
+        }
+        // handle percent sign in HSL/HSV/HWB
+        function percent2float(str) {
+            var mult = str[str.length - 1] == '%' ? 0.01 : 1;
+            var num = Number(str.replace('%', ''));
+            if (isNaN(num)) throw (str);
+            return mult * num;
+        }
+        // CSS HSL color to color array
+        function hsl2color(str) {
+            if (str.substr(0, 3) != 'hsl') throw str;
+            var arr = str.replace('hsl', '').replace(/[\(\)]/g, '').split(',');
+            return hsl2rgb([percent2float(arr[0]), percent2float(arr[1]), percent2float(arr[2])]);
+        }
+        // HSV color to color array
+        function hsv2color(str) {
+            if (str.substr(0, 3) != 'hsv') throw str;
+            var arr = str.replace('hsv', '').replace(/[\(\)]/g, '').split(',');
+            return hsv2rgb([percent2float(arr[0]), percent2float(arr[1]), percent2float(arr[2])]);
+        }
+        // HWB color to color array
+        function hwb2color(str) {
+            if (str.substr(0, 3) != 'hwb') throw str;
+            var arr = str.replace('hwb', '').replace(/[\(\)]/g, '').split(',');
+            return hwb2rgb([percent2float(arr[0]), percent2float(arr[1]), percent2float(arr[2])]);
+        }
+        // CMYK color to color array
+        function cmyk2color(str) {
+            if (str.substr(0, 4) != 'cmyk') throw str;
+            var arr = str.replace('cmyk', '').replace(/[\(\)]/g, '').split(',');
+            var c = percent2float(arr[0]), m = percent2float(arr[1]), y = percent2float(arr[2]), k = percent2float(arr[3]);
+            return [(1 - c) * (1 - k), (1 - m) * (1 - k), (1 - y) * (1 - k)];
+        }
+        // arbitrary string to color array
+        function str2color(str) {
+            str = str.replace(/\s/g, '').toLowerCase();
+            try { return hex2color(str); } catch (e) { }
+            try { return name2color(str); } catch (e) { }
+            try { return rgb2color(str); } catch (e) { }
+            try { return vec2color(str); } catch (e) { }
+            try { return hsl2color(str); } catch (e) { }
+            try { return hsv2color(str); } catch (e) { }
+            try { return hwb2color(str); } catch (e) { }
+            try { return cmyk2color(str); } catch (e) { }
+            // tuple used in certain place
+            var arr = str.replace(/[\(\[\{\)\]\}]/g, '').replace(/[\;]/g, ',').split(',');
+            return arr2color(arr, 255);
+        }
+
+    </script>
+
+
+    <!-- user interaction -->
+    <script>
+
+        function $(s) { return document.querySelector(s); }
+        const preview = $("#preview");
+        const input = $("input");
+        const scale_r = $("#scale_r"), scale_g = $("#scale_g"), scale_b = $("#scale_b");
+        const LINEAR_W = scale_r.clientWidth, LINEAR_H = scale_r.clientHeight;
+        const LINEAR_N = 100, ANGULAR_N = 360;
+
+        var mousePos = { x: 0, y: 0 };
+
+
+        // update color information as text
+        function updateColorInfo(color) {
+            function colorBlock(col) {
+                return ` <div style="width:16px;height:16px;display:inline-block;background-color:${col};"></div> `;
+            };
+
+            // color name: closest
+            var closestColor = "", minDiff = Infinity;
+            for (var colorName in CSS_COLORS) {
+                var col = hex2color(CSS_COLORS[colorName]);
+                var diff = colorDiff(col, color);
+                if (diff < minDiff) closestColor = colorName, minDiff = diff;
+            }
+            $("#info-name").innerHTML = colorBlock(closestColor) + closestColor;
+
+            // RGB
+            var hex = color2hex(color);
+            $("#info-hex").innerHTML = colorBlock(hex) + hex;
+            var rgb = color2rgb(color);
+            $("#info-rgb").innerHTML = colorBlock(rgb) + rgb;
+            var rgbf = color2vec3(color), rgbf_str = color2rgb_hd(vec2color(rgbf));
+            $("#info-vec3").innerHTML = colorBlock(rgbf_str) + rgbf;
+
+            // HSL, HSV, HWB
+            var hsl = color2hsl(color);
+            $("#info-hsl").innerHTML = colorBlock(hsl) + hsl;
+            var hsv = color2hsv(color);
+            $("#info-hsv").innerHTML = colorBlock(hsv) + hsv;  // should not work
+            var hwb = color2hwb(color);
+            $("#info-hwb").innerHTML = colorBlock(hwb) + hwb;  // waiting for CSS4
+
+            // CMYK
+            var cmyk = color2cmyk(color);
+            $("#info-cmyk").innerHTML = colorBlock(cmyk) + cmyk;  // waiting for CSS4
+
+            // YUV
+            var yuv = rgb2yuv(color);
+            var yuv_str = 'y=' + yuv[0].toFixed(3) + ', u=' + yuv[1].toFixed(3) + ", v=" + yuv[2].toFixed(3);
+            $("#info-yuv").innerHTML = colorBlock(yuv) + yuv_str;  // should not work
+        }
+
+        // update color and apply change
+        function updateColor(col) {
+            color = col;
+
+            // update preview
+            preview.style.backgroundColor = color2hex(color);
+            updateColorInfo(col);
+
+            // update rgb scales
+            function setLinearScale(ele, colfun) {
+                var html = "";
+                var w = LINEAR_W / LINEAR_N, h = LINEAR_H;
+                var mindiff = Infinity, min_i = -1;  // record the index of color that is closest to the current color
+                for (var i = 0; i < LINEAR_N; i++) {
+                    var col = colfun((i + 0.5) / LINEAR_N);
+                    // add HTML
+                    var hex = color2hex(col);
+                    var str = color2str(col);
+                    html += `<div class="cell" style="top:0;left:${i * w - 0.01}px;width:${w + 0.02}px;height:${h}px;background-color:${hex}" `
+                        + `onclick="clickColor(${str});"></div>`;
+                    // update closest color
+                    var diff = colorDiff(col, color);
+                    if (diff < mindiff) mindiff = diff, min_i = i;
+                }
+                html += `<div class="cell" style="top:0;left:${(min_i + 0.5) * w - 1}px;width:2px;height:${h}px;background-color:${rgb2gray(color) > 0.5 ? 'black' : 'white'};opacity:0.4;"></div>`;
+                ele.innerHTML = html;
+            }
+            setLinearScale(scale_r, function (i) { return [i, color[1], color[2]]; });
+            setLinearScale(scale_g, function (i) { return [color[0], i, color[2]]; });
+            setLinearScale(scale_b, function (i) { return [color[0], color[1], i]; });
+        }
+
+        function clickColor(col) {
+            input.style.color = "#aaa";
+            updateColor(col);
+        }
+
+        // init
+        document.body.onload = function () {
+            document.addEventListener("mousemove", function (event) {
+                mousePos = { x: event.clientX, y: event.clientY };
+            });
+            input.addEventListener("input", function (e) {
+                input.style.color = "black";
+                var str = input.value;
+                try {
+                    var col = str2color(str);
+                    updateColor(col);
+                    input.style.backgroundColor = 'white';
+                }
+                catch (e) {
+                    console.log('error');
+                    input.style.backgroundColor = 'pink';
+                }
+            })
+            updateColor([0.5, 0.5, 0.5]);
+        }
+    </script>
+</body>
+
+</html>
