@@ -14,17 +14,19 @@ This site was created initially for hosting pages I made for personal use. I mad
 
 [Matrix visualizer](https://harry7557558.github.io/tools/matrixv.html): interactive visualization of 2d/3d/4d transformation matrices.
 
-[Integral substitutions](https://harry7557558.github.io/notes/substitution.html): a list of commonly used area and volume elements in calculus as well as substitutions for calculating multidimensional integral.
-
 [SVG path tester](https://harry7557558.github.io/tools/svgpath.html): a sketchy tool for visualizing SVG path data, with moving and zooming feature.
 
+[Color picker](https://harry7557558.github.io/tools/colorpicker.html): A color picker and converter that outputs color strings in many formats.
+
 [Chemical equation balancer](https://harry7557558.github.io/tools/chemequ.html): as a programming exercise, getting tired of doing science homework.
+
+[Integral substitutions](https://harry7557558.github.io/notes/substitution.html): a list of commonly used area and volume elements in calculus as well as substitutions for calculating multidimensional integral.
 
 A backup of all of my saved Desmos graphs: [the index page](https://harry7557558.github.io/graph_backup/desmos/index.html)
 
 #### Blogs, experiments, and explorations:
 
-Currently, there is nothing right here. Expected to come one day!
+I wrote few blogs to record my ideas and experiments. Currently, all blogs I posted on this site are math/technology based. Since most of them are incomplete, and many of my writings made me feel insane when I read them, I decided not to post the link to my blogs on this page. If you are really curious about what they are, you can click [this link](https://harry7557558.github.io/unlisted.html) to see a list of pages on this site.
 
 #### Random stuff
 

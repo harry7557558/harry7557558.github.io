@@ -10,18 +10,18 @@
             white-space: nowrap;
         }
 
-        #container,
-        #info-container {
+        #container-left,
+        #container-right {
             margin: 10px;
             width: max-content;
         }
 
-        #container {
+        #container-left {
             float: left;
         }
 
-        #info-container {
-            margin-left: 56px;
+        #container-right {
+            margin-left: 30px;
             display: inline-block;
         }
 
@@ -34,7 +34,7 @@
             display: inline-block;
         }
 
-        .scale_linear {
+        .scale-linear {
             width: 360px;
             height: 36px;
             margin: 10px 0px;
@@ -62,67 +62,82 @@
 
 <body>
 
-    <div id='container'>
+    <div id='container-left'>
+
+        <div id='rgb_picker'>
+            RGB color picker<br />
+            <div id='scale_r' class='scale-linear'></div>
+            <div id='scale_g' class='scale-linear'></div>
+            <div id='scale_b' class='scale-linear'></div>
+        </div>
+
+        <div><br /></div>
+
+        <div id='hsl_picker'>
+            HSL color picker<br />
+            <div id='scale_h' class='scale-linear'></div>
+            <div id='scale_s' class='scale-linear'></div>
+            <div id='scale_l' class='scale-linear'></div>
+        </div>
+
+    </div>
+
+    <div id='container-right'>
         <div id='input-container'>
             Enter color name/code:
-            <input type='text' id='input' spellcheck="false" />
+            <input type='text' id='input' spellcheck="false" autocapitalize="false" />
         </div>
         <div id='preview-container'>
             <div id='preview'></div>
         </div>
 
-        <div id='rgb_picker'>
-            RGB scales<br />
-            <div id='scale_r' class='scale_linear'></div>
-            <div id='scale_g' class='scale_linear'></div>
-            <div id='scale_b' class='scale_linear'></div>
+        <div id='info-container'>
+            <!-- <div><br/><br/></div> -->
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Color Name&emsp;&emsp;</td>
+                        <td id='info-name'></td>
+                    </tr>
+                    <tr>
+                        <td>HEX</td>
+                        <td id='info-hex'></td>
+                    </tr>
+                    <tr>
+                        <td>RGB</td>
+                        <td id='info-rgb'></td>
+                    </tr>
+                    <tr>
+                        <td>RGB (float)</td>
+                        <td id='info-vec3'></td>
+                    </tr>
+                    <tr>
+                        <td>HSL</td>
+                        <td id='info-hsl'></td>
+                    </tr>
+                    <tr>
+                        <td>HSV/HSB</td>
+                        <td id='info-hsv'></td>
+                    </tr>
+                    <tr>
+                        <td>HWB</td>
+                        <td id='info-hwb'></td>
+                    </tr>
+                    <tr>
+                        <td>CMYK</td>
+                        <td id='info-cmyk'></td>
+                    </tr>
+                    <tr>
+                        <td>YUV (approx)</td>
+                        <td id='info-yuv'></td>
+                    </tr>
+                    <tr>
+                        <td>Grayscale</td>
+                        <td id='info-gray'></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-
-        <div id='hsl_picker'></div>
-        <div id='cmyk_picker'></div>
-    </div>
-
-    <div id='info-container'>
-        <table>
-            <tbody>
-                <tr>
-                    <td>Color Name&emsp;&emsp;</td>
-                    <td id='info-name'></td>
-                </tr>
-                <tr>
-                    <td>HEX</td>
-                    <td id='info-hex'></td>
-                </tr>
-                <tr>
-                    <td>RGB</td>
-                    <td id='info-rgb'></td>
-                </tr>
-                <tr>
-                    <td>RGB (float)</td>
-                    <td id='info-vec3'></td>
-                </tr>
-                <tr>
-                    <td>HSL</td>
-                    <td id='info-hsl'></td>
-                </tr>
-                <tr>
-                    <td>HSV/HSB</td>
-                    <td id='info-hsv'></td>
-                </tr>
-                <tr>
-                    <td>HWB</td>
-                    <td id='info-hwb'></td>
-                </tr>
-                <tr>
-                    <td>CMYK</td>
-                    <td id='info-cmyk'></td>
-                </tr>
-                <tr>
-                    <td>YUV (approx)</td>
-                    <td id='info-yuv'></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
     <!-- color conversion -->
@@ -130,9 +145,10 @@
         "use strict";
 
         // list of CSS color names
+        // duplicates: magenta/fuchsia, cyan/aqua, gray/grey
         const CSS_COLORS = {
             "black": "#000000", "navy": "#000080", "darkblue": "#00008b", "mediumblue": "#0000cd", "blue": "#0000ff", "darkgreen": "#006400", "green": "#008000", "teal": "#008080", "darkcyan": "#008b8b",
-            "deepskyblue": "#00bfff", "darkturquoise": "#00ced1", "mediumspringgreen": "#00fa9a", "lime": "#00ff00", "springgreen": "#00ff7f", "cyan": "#00ffff", "aqua": "#00ffff",
+            "deepskyblue": "#00bfff", "darkturquoise": "#00ced1", "mediumspringgreen": "#00fa9a", "lime": "#00ff00", "springgreen": "#00ff7f", "aqua": "#00ffff", "cyan": "#00ffff",
             "midnightblue": "#191970", "dodgerblue": "#1e90ff", "lightseagreen": "#20b2aa", "forestgreen": "#228b22", "seagreen": "#2e8b57", "darkslategray": "#2f4f4f", "darkslategrey": "#2f4f4f",
             "limegreen": "#32cd32", "mediumseagreen": "#3cb371", "turquoise": "#40e0d0", "royalblue": "#4169e1", "steelblue": "#4682b4", "darkslateblue": "#483d8b", "mediumturquoise": "#48d1cc", "indigo": "#4b0082",
             "darkolivegreen": "#556b2f", "cadetblue": "#5f9ea0", "cornflowerblue": "#6495ed", "rebeccapurple": "#663399", "mediumaquamarine": "#66cdaa", "dimgrey": "#696969", "dimgray": "#696969", "slateblue": "#6a5acd", "olivedrab": "#6b8e23",
@@ -218,6 +234,15 @@
             var col = (r << 16) | (g << 8) | b;
             var str = col.toString(16);
             while (str.length < 6) str = '0' + str;
+            return '#' + str;
+        }
+        function color2hex_3(col) {
+            var r = Math.round(15.49 * clamp(col[0]));
+            var g = Math.round(15.49 * clamp(col[1]));
+            var b = Math.round(15.49 * clamp(col[2]));
+            var col = (r << 8) | (g << 4) | b;
+            var str = col.toString(16);
+            while (str.length < 3) str = '0' + str;
             return '#' + str;
         }
         // [0,1] rgb array to CMYK color string
@@ -451,30 +476,40 @@
         const preview = $("#preview");
         const input = $("input");
         const scale_r = $("#scale_r"), scale_g = $("#scale_g"), scale_b = $("#scale_b");
-        const LINEAR_W = scale_r.clientWidth, LINEAR_H = scale_r.clientHeight;
-        const LINEAR_N = 100, ANGULAR_N = 360;
-
-        var mousePos = { x: 0, y: 0 };
+        const scale_h = $("#scale_h"), scale_s = $("#scale_s"), scale_l = $("#scale_l"), scale_sl = $("#scale_sl");
 
 
         // update color information as text
         function updateColorInfo(color) {
             function colorBlock(col) {
-                return ` <div style="width:16px;height:16px;display:inline-block;background-color:${col};"></div> `;
+                return `<div style="width:14px;height:14px;display:inline-block;background-color:${col};border:1px solid #ccc;"></div>&nbsp;`;
             };
 
             // color name: closest
-            var closestColor = "", minDiff = Infinity;
+            var closestColor = "", closestColor2 = "", minDiff = Infinity, minDiff2 = Infinity;
             for (var colorName in CSS_COLORS) {
+                if (/grey/.test(colorName) || colorName == 'fuchsia' || colorName == 'aqua') continue;
                 var col = hex2color(CSS_COLORS[colorName]);
                 var diff = colorDiff(col, color);
-                if (diff < minDiff) closestColor = colorName, minDiff = diff;
+                if (diff < minDiff) {
+                    closestColor2 = closestColor, minDiff2 = minDiff;
+                    closestColor = colorName, minDiff = diff;
+                }
+                else if (diff <= minDiff2) {
+                    closestColor2 = colorName, minDiff2 = minDiff;
+                }
             }
             $("#info-name").innerHTML = colorBlock(closestColor) + closestColor;
+            //if (minDiff2 < 2. * minDiff)
+            $("#info-name").innerHTML += "<br/>" + colorBlock(closestColor2) + closestColor2;
 
-            // RGB
+            // hex
             var hex = color2hex(color);
             $("#info-hex").innerHTML = colorBlock(hex) + hex;
+            hex = color2hex_3(color);
+            $("#info-hex").innerHTML += "<br/>" + colorBlock(hex) + hex;
+
+            // RGB
             var rgb = color2rgb(color);
             $("#info-rgb").innerHTML = colorBlock(rgb) + rgb;
             var rgbf = color2vec3(color), rgbf_str = color2rgb_hd(vec2color(rgbf));
@@ -489,21 +524,29 @@
             $("#info-hwb").innerHTML = colorBlock(hwb) + hwb;  // waiting for CSS4
 
             // CMYK
-            var cmyk = color2cmyk(color);
-            $("#info-cmyk").innerHTML = colorBlock(cmyk) + cmyk;  // waiting for CSS4
+            var cmyk = color2cmyk(color); rgbf_str = color2rgb_hd(cmyk2color(cmyk));
+            $("#info-cmyk").innerHTML = colorBlock(rgbf_str) + cmyk;  // waiting for CSS4
 
-            // YUV
+            // YUV and grayscale
             var yuv = rgb2yuv(color);
-            var yuv_str = 'y=' + yuv[0].toFixed(3) + ', u=' + yuv[1].toFixed(3) + ", v=" + yuv[2].toFixed(3);
-            $("#info-yuv").innerHTML = colorBlock(yuv) + yuv_str;  // should not work
+            var yuv_str = 'y=' + yuv[0].toFixed(3) + ', u=' + yuv[1].toFixed(3) + ", v=" + yuv[2].toFixed(3);  // maybe I should use "≈"
+            yuv_str = yuv_str.replace(/\-/g, '−');  // a better minus sign
+            $("#info-yuv").innerHTML = colorBlock("#00000000") + yuv_str;  // transparent block
+            var gray = Math.round(yuv[0] * 255);
+            var gray_str = gray.toString(16); gray_str = '#' + gray_str + gray_str + gray_str;
+            $("#info-gray").innerHTML = colorBlock(gray_str) + gray + ", " + gray_str;
         }
 
         // update color and apply change
         function updateColor(col) {
             color = col;
 
+            // constants
+            const LINEAR_W = scale_r.clientWidth, LINEAR_H = scale_r.clientHeight;
+            const LINEAR_N = 180, ANGULAR_N = 360;
+
             // update preview
-            preview.style.backgroundColor = color2hex(color);
+            preview.style.backgroundColor = color2rgb_hd(color);
             updateColorInfo(col);
 
             // update rgb scales
@@ -514,9 +557,9 @@
                 for (var i = 0; i < LINEAR_N; i++) {
                     var col = colfun((i + 0.5) / LINEAR_N);
                     // add HTML
-                    var hex = color2hex(col);
+                    var rgb = color2rgb_hd(col);
                     var str = color2str(col);
-                    html += `<div class="cell" style="top:0;left:${i * w - 0.01}px;width:${w + 0.02}px;height:${h}px;background-color:${hex}" `
+                    html += `<div class="cell" style="top:0;left:${i * w - 0.01}px;width:${w + 0.02}px;height:${h}px;background-color:${rgb}" `
                         + `onclick="clickColor(${str});"></div>`;
                     // update closest color
                     var diff = colorDiff(col, color);
@@ -528,6 +571,12 @@
             setLinearScale(scale_r, function (i) { return [i, color[1], color[2]]; });
             setLinearScale(scale_g, function (i) { return [color[0], i, color[2]]; });
             setLinearScale(scale_b, function (i) { return [color[0], color[1], i]; });
+
+            // update hsl scales
+            var hsl = rgb2hsl(color);
+            setLinearScale(scale_h, function (i) { return hsl2rgb([i * 360, hsl[1], hsl[2]]) });
+            setLinearScale(scale_s, function (i) { return hsl2rgb([hsl[0], i, hsl[2]]) });
+            setLinearScale(scale_l, function (i) { return hsl2rgb([hsl[0], hsl[1], i]) });
         }
 
         function clickColor(col) {
@@ -537,10 +586,8 @@
 
         // init
         document.body.onload = function () {
-            document.addEventListener("mousemove", function (event) {
-                mousePos = { x: event.clientX, y: event.clientY };
-            });
-            input.addEventListener("input", function (e) {
+            // add input event listeners
+            var updateInput = function (e) {
                 input.style.color = "black";
                 var str = input.value;
                 try {
@@ -552,8 +599,20 @@
                     console.log('error');
                     input.style.backgroundColor = 'pink';
                 }
-            })
-            updateColor([0.5, 0.5, 0.5]);
+            };
+            input.addEventListener("input", updateInput);
+            input.addEventListener("keydown", function (e) {
+                if (e.keyCode == 13 || e.keyCode == 9) {
+                    e.preventDefault();
+                    updateInput(e);
+                }
+            });
+
+            // choose a random color
+            var colors = Object.keys(CSS_COLORS).filter(function (e) { return !(/grey/.test(e)) && e != "fuchsia" && e != "aqua"; });
+            var randcolor = colors[Math.floor(colors.length * Math.random())];
+            input.value = randcolor;
+            updateColor(hex2color(CSS_COLORS[randcolor]));
         }
     </script>
 </body>
