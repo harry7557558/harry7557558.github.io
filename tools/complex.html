@@ -1,26 +1,38 @@
 ﻿<!doctype html>
 <html>
+
 <head>
     <title>The Complex Grapher</title>
     <meta charset="utf-8" />
-    <script id="mathjax-config-script" type="text/x-mathjax-config">
+
+    <!-- MathJax -->
+    <!-- <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
     </script>
-    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" async=""
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
     <style>
-
         #MathJax_MenuFrame {
             opacity: 0.0;
             visibility: hidden;
             display: none;
         }
 
-        .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
+        .MathJax:focus,
+        .mjx-chtml:focus,
+        .MathJax_SVG:focus {
             outline-width: 0px;
             outline-style: none;
-            outline-color: rgba(255,255,255,0.0);
+            outline-color: rgba(255, 255, 255, 0.0);
+        }
+
+        @font-face {
+            font-family: MathJax_Math-italic;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/fonts/HTML-CSS/TeX/woff/MathJax_Math-Italic.woff?V=2.7.1') format('woff'), url('https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/fonts/HTML-CSS/TeX/otf/MathJax_Math-Italic.otf?V=2.7.1') format('opentype')
         }
     </style>
+
+    <!-- Complex Arithmetic -->
     <script src="https://unpkg.com/mathjs@5.7.0/dist/math.min.js"></script>
     <script>
         // https://unpkg.com/mathjs@5.9.0/dist/math.js  line 34520-35609
@@ -295,8 +307,9 @@
         }
 
     </script>
-    <style>
 
+    <!-- Main Stylesheet -->
+    <style>
         .main {
             margin-left: auto;
             margin-right: auto;
@@ -306,7 +319,7 @@
             max-width: 840px;
             border: 1px solid gray;
             border-radius: 10px;
-            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.4);
             padding: 12px 28px 16px 28px;
         }
 
@@ -316,7 +329,8 @@
             margin: 20px;
         }
 
-        #canvas {
+        /* canvas and position (cmt) */
+        #graph-container {
             display: table-cell;
             border: 1px solid gray;
             width: 600px;
@@ -324,7 +338,7 @@
             position: relative;
         }
 
-        #graph {
+        #canvas {
             position: absolute;
             left: 0;
             top: 0;
@@ -340,7 +354,7 @@
             height: 20px;
             width: auto;
             min-width: 100px;
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(0, 0, 0, 0.6);
             color: white;
             text-align: center;
             font-family: MathJax_Math-italic;
@@ -348,27 +362,30 @@
             display: none;
         }
 
+        /* Graphing, please wait... */
         #canvaswrap {
             position: absolute;
             left: 0;
             top: 0;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             height: 400px;
             width: 600px;
             display: none;
             cursor: unset;
         }
 
-            #canvaswrap > p {
-                margin: 40px;
-                font-family: sans-serif;
-                font-size: 20px;
-                color: white;
-                text-align: center;
-            }
+        #canvaswrap>p {
+            margin: 40px;
+            font-family: sans-serif;
+            font-size: 20px;
+            color: white;
+            text-align: center;
+        }
 
+        /* right pad */
         #control {
             width: 200px;
+            max-width: 200px;
             max-height: 400px;
             display: table-cell;
             border: 1px solid gray;
@@ -379,6 +396,7 @@
             white-space: nowrap;
         }
 
+        /* function input */
         #ifunction {
             width: 192px;
             height: 18px;
@@ -392,149 +410,85 @@
             color: black;
         }
 
-        #ctrx, #ctry, #radx, #rady, #cprea {
+        /* graphing parameter input */
+        #ctrx,
+        #ctry,
+        #radx,
+        #rady,
+        #cprea {
             width: 60px;
             text-align: center;
             border: 1px solid gray;
             border-radius: 2px;
         }
 
+        /* start button */
         #start {
             margin: 10px;
             border: 2px solid gray;
             border-radius: 2px;
-            background-color: rgb(221,221,221);
+            background-color: rgb(221, 221, 221);
             padding: 0.5em 0.8em;
             font-size: 15px;
         }
     </style>
+
     <script>
         function $(id) {
-            return document.getElementById(id);
-        }
-        function $$(className) {
-            return document.getElementsByClassName(className);
+            return document.querySelector(id);
         }
     </script>
 </head>
+
 <body>
     <div class="main">
         <p id="title">The Complex Grapher</p>
-        <div id="canvas" onmouseover="showscale(event)" onmousemove="showscale(event)" onmouseout="$('cmt').style.display = 'none';">
-            <canvas id="graph" width="600" height="400"></canvas>
+        <div id="graph-container">
+            <canvas id="canvas" width="600" height="400"></canvas>
             <div id="canvaswrap">
                 <p>Graphing, please wait...</p>
             </div>
             <div id="cmt"></div>
-            <script>
-                var mat = [[0, 0, 0], [0, 0, 0]], cmd;
-                function showscale(e) {
-                    $("cmt").style.display = "block";
-                    var x = e.clientX - $("graph").getBoundingClientRect().left, y = e.clientY - $("graph").getBoundingClientRect().top;
-                    var C = new Complex(mat[0][0] * x + mat[0][1] * y + mat[0][2], mat[1][0] * x + mat[1][1] * y + mat[1][2]);
-                    var s = "#Error!";
-                    try { s = funcVal(C, cmd.slice(0)).ToString(); } catch (e) { }
-                    $("cmt").innerHTML = "f ( " + C.ToString() + " ) = " + s;
-                }
-            </script>
         </div>
         <div id="control">
+            <!-- function input -->
             <div>
                 Function to graph: <br />
                 <input id="ifunction" type="text" value="z" spellcheck="false"
-                       onkeydown="if (event.keyCode == 13) { graph(); };" />
+                    onkeydown="if (event.keyCode == 13) { graph(); };" />
                 <br /><br />
             </div>
+            <!-- graph center input -->
             <div>
                 Center of graph: <br />
-                <input id="ctrx" type="text" value="0" oninput="ctrxchange()" onkeydown="graph(event)" /> $+$ <input id="ctry" type="text" value="0" oninput="ctrychange()" onkeydown="graph(event)" /> $i$
+                <input id="ctrx" type="text" value="0" onkeydown="graph(event)" />&nbsp;<span
+                    style='font-family: MathJax_Math-italic'>+</span>&nbsp;<input id="ctry" type="text" value="0"
+                    onkeydown="graph(event)" />&nbsp;<span style='font-family: MathJax_Math-italic'>i</span>
                 <br /><br />
-                <script>
-                    function ctrxchange() {
-                        if (isNaN(new Number($("ctrx").value))) highlight($("ctrx"));
-                        else dishighlight($("ctrx"));
-                    }
-                    function ctrychange() {
-                        if (isNaN(new Number($("ctry").value))) highlight($("ctry"));
-                        else dishighlight($("ctry"));
-                    }
-                </script>
             </div>
+            <!-- axes ratio input -->
             <div>
-                <div style="display:inline-block;float:right;margin:8px;" onclick="clicklock()">
-                    <img style="display:none;" id="unlocked" alt="unlocked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTEyIDE3YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMi0yIC45LTIgMiAuOSAyIDIgMnptNi05aC0xVjZjMC0yLjc2LTIuMjQtNS01LTVTNyAzLjI0IDcgNmgxLjljMC0xLjcxIDEuMzktMy4xIDMuMS0zLjEgMS43MSAwIDMuMSAxLjM5IDMuMSAzLjF2Mkg2Yy0xLjEgMC0yIC45LTIgMnYxMGMwIDEuMS45IDIgMiAyaDEyYzEuMSAwIDItLjkgMi0yVjEwYzAtMS4xLS45LTItMi0yem0wIDEySDZWMTBoMTJ2MTB6Ii8+PC9zdmc+" />
-                    <img style="display:block;" id="locked" alt="locked" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGRlZnM+PHBhdGggaWQ9ImEiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjwvZGVmcz48Y2xpcFBhdGggaWQ9ImIiPjx1c2Ugb3ZlcmZsb3c9InZpc2libGUiIHhsaW5rOmhyZWY9IiNhIi8+PC9jbGlwUGF0aD48cGF0aCBkPSJNMTIgMTdjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yLTIgLjktMiAyIC45IDIgMiAyem02LTloLTFWNmMwLTIuNzYtMi4yNC01LTUtNVM3IDMuMjQgNyA2djJINmMtMS4xIDAtMiAuOS0yIDJ2MTBjMCAxLjEuOSAyIDIgMmgxMmMxLjEgMCAyLS45IDItMlYxMGMwLTEuMS0uOS0yLTItMnpNOC45IDZjMC0xLjcxIDEuMzktMy4xIDMuMS0zLjFzMy4xIDEuMzkgMy4xIDMuMXYySDguOVY2ek0xOCAyMEg2VjEwaDEydjEweiIgY2xpcC1wYXRoPSJ1cmwoI2IpIi8+PC9zdmc+" />
-                    <script>
-                        var lockxy = 1;
-                        function clicklock() {
-                            if (lockxy != 0) {
-                                lockxy = 0;
-                                $("unlocked").style.display = "block";
-                                $("locked").style.display = "none";
-                            }
-                            else {
-                                lockxy = 1;
-                                $("unlocked").style.display = "none";
-                                $("locked").style.display = "block";
-                            }
-                        }
-                    </script>
+                <div style="float:right;margin:8px" onclick="clicklock()">
+                    <img style="display:none;" id="unlocked" alt="unlocked"
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTEyIDE3YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMi0yIC45LTIgMiAuOSAyIDIgMnptNi05aC0xVjZjMC0yLjc2LTIuMjQtNS01LTVTNyAzLjI0IDcgNmgxLjljMC0xLjcxIDEuMzktMy4xIDMuMS0zLjEgMS43MSAwIDMuMSAxLjM5IDMuMSAzLjF2Mkg2Yy0xLjEgMC0yIC45LTIgMnYxMGMwIDEuMS45IDIgMiAyaDEyYzEuMSAwIDItLjkgMi0yVjEwYzAtMS4xLS45LTItMi0yem0wIDEySDZWMTBoMTJ2MTB6Ii8+PC9zdmc+" />
+                    <img style="display:block;" id="locked" alt="locked"
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGRlZnM+PHBhdGggaWQ9ImEiIGQ9Ik0wIDBoMjR2MjRIMFYweiIvPjwvZGVmcz48Y2xpcFBhdGggaWQ9ImIiPjx1c2Ugb3ZlcmZsb3c9InZpc2libGUiIHhsaW5rOmhyZWY9IiNhIi8+PC9jbGlwUGF0aD48cGF0aCBkPSJNMTIgMTdjMS4xIDAgMi0uOSAyLTJzLS45LTItMi0yLTIgLjktMiAyIC45IDIgMiAyem02LTloLTFWNmMwLTIuNzYtMi4yNC01LTUtNVM3IDMuMjQgNyA2djJINmMtMS4xIDAtMiAuOS0yIDJ2MTBjMCAxLjEuOSAyIDIgMmgxMmMxLjEgMCAyLS45IDItMlYxMGMwLTEuMS0uOS0yLTItMnpNOC45IDZjMC0xLjcxIDEuMzktMy4xIDMuMS0zLjFzMy4xIDEuMzkgMy4xIDMuMXYySDguOVY2ek0xOCAyMEg2VjEwaDEydjEweiIgY2xpcC1wYXRoPSJ1cmwoI2IpIi8+PC9zdmc+" />
                 </div>
-                Re axis radius:
-                <input id="radx" type="text" value="6" oninput="radxchange()" onkeydown="graph(event)" />
+                Re-axis rad:
+                <input id="radx" type="text" value="6" onkeydown="graph(event)" />
                 <br />
-                Im axis radius:
-                <input id="rady" type="text" value="4" oninput="radychange()" onkeydown="graph(event)" />
-                <br />
-                <!--<table><tr><td><input id="showaxis" type="checkbox" style="width:16px;height:16px;" checked /></td><td>Show axis</td></tr></table>--><br />
-                <br />
-                <script>
-                    var prevrx = 6, prevry = 4;
-                    function radxchange() {
-                        var x = new Number($("radx").value);
-                        if (isNaN(x) || x <= 0) highlight($("radx"));
-                        else {
-                            dishighlight($("radx"));
-                            if (lockxy != 0) {
-                                $("rady").value = new String(Math.round(prevry / prevrx * x * 100) / 100);
-                                dishighlight($("rady"));
-                            }
-                            prevrx = x; prevry = $("rady").value;
-                        }
-                    }
-                    function radychange() {
-                        var y = new Number($("rady").value);
-                        if (isNaN(y) || y <= 0) highlight($("rady"));
-                        else {
-                            dishighlight($("rady"));
-                            if (lockxy != 0) {
-                                $("radx").value = new String(Math.round(prevrx / prevry * y * 100) / 100);
-                                dishighlight($("radx"));
-                            }
-                            prevrx = $("radx").value; prevry = y;
-                        }
-                    }
-                </script>
+                Im-axis rad:
+                <input id="rady" type="text" value="4" onkeydown="graph(event)" />
+                <br /><br /><br />
+            </div>
+            <!-- brightness parameter input -->
+            <div>
+                Brightness (0-1):
+                <input id="cprea" type="text" value="0.5" onkeydown="graph(event)" />
+                <br /><br />
             </div>
             <div>
-                Coloring parameter <i title="a smaller `a` value produces a lighter color">a</i>:
-                <input id="cprea" type="text" value="0.5" oninput="cpreachange()" onkeydown="graph(event)" />
-                <br />
-                <script>
-                    function cpreachange() {
-                        var a = new Number($("cprea").value);
-                        if (isNaN(a)) highlight($("cprea"));
-                        else if (a >= 1 || a <= 0) highlight($("cprea"));
-                        else dishighlight($("cprea"));
-                    }
-                </script>
-                <p style="font-size:16px;">
-                    $\begin{cases}
-                    H &= \arg z \\
-                    L &= 1-a^{\ln(\ln(|z|+1)+1.05)} \\
-                    S &= 1 \\
-                    \end{cases}$
-                </p>
+                $x^2$
             </div>
             <div style="text-align:center;">
                 <button id="start" onclick="graph()">Draw Graph</button>
@@ -542,22 +496,120 @@
         </div>
         <br style="clear:both;" />
     </div>
+
+    <!-- Input Parameters -->
+    <script>
+
+        const canvas = $("#canvas"), cmt = $("#cmt");
+        const ctrx_input = $("#ctrx"), ctry_input = $("#ctry"), radx_input = $("#radx"), rady_input = $("#rady");
+        const cprea_input = $("#cprea");
+
+        // show mouse position when mose move over canvas
+        var mat = [[0, 0, 0], [0, 0, 0]], cmd;
+        {
+            var showMousePos = function (event) {
+                cmt.style.display = "block";
+                var x = event.clientX - canvas.getBoundingClientRect().left,
+                    y = event.clientY - canvas.getBoundingClientRect().top;
+                var C = new Complex(mat[0][0] * x + mat[0][1] * y + mat[0][2], mat[1][0] * x + mat[1][1] * y + mat[1][2]);
+                var s = "#Error!";
+                try { s = funcVal(C, cmd.slice(0)).ToString(); } catch (e) { }
+                cmt.innerHTML = "f ( " + C.ToString() + " ) = " + s;
+            };
+            const graph_container = $("#graph-container");
+            graph_container.addEventListener("mouseover", showMousePos);
+            graph_container.addEventListener("mousemove", showMousePos);
+            graph_container.addEventListener("mouseout", function (e) {
+                $('#cmt').style.display = 'none';
+            });
+        }
+
+        // graph center input
+        {
+            function highlightError(i) {
+                i.style.boxShadow = "0px 0px 3px rgb(255,0,0)";
+                i.style.color = "red";
+                i.style.fontWeight = "600";
+            }
+            function dehighlightError(i) {
+                i.style.boxShadow = "none";
+                i.style.color = "black";
+                i.style.fontWeight = "normal";
+            }
+            ctrx.addEventListener("input", function () {
+                if (isNaN(new Number(ctrx_input.value))) highlightError(ctrx_input);
+                else dehighlightError(ctrx_input);
+            });
+            ctry.addEventListener("input", function () {
+                if (isNaN(new Number(ctry_input.value))) highlightError(ctry_input);
+                else dehighlightError(ctry_input);
+            });
+        }
+
+        // axes ratio input
+        var lockAxesRatio = true;
+        {
+            function clicklock() {
+                if (lockAxesRatio) {
+                    lockAxesRatio = false;
+                    $("#unlocked").style.display = "block";
+                    $("#locked").style.display = "none";
+                }
+                else {
+                    lockAxesRatio = true;
+                    $("#unlocked").style.display = "none";
+                    $("#locked").style.display = "block";
+                }
+            }
+            var axesRatio = 1.0 / 1.5;
+            radx_input.addEventListener("input", function () {
+                var x = new Number(radx_input.value);
+                if (isNaN(x) || x <= 0) highlightError(radx_input);
+                else {
+                    dehighlightError(radx_input);
+                    if (lockAxesRatio) {
+                        rady_input.value = new String(Math.round(x * 100 * axesRatio) / 100);
+                        dehighlightError(rady_input);
+                    }
+                    else {
+                        var ratio = Number(rady_input.value) / Number(radx_input.value);
+                        if (!isNaN(ratio)) axesRatio = ratio;
+                    }
+                }
+            });
+            rady_input.addEventListener("input", function () {
+                var y = new Number(rady_input.value);
+                if (isNaN(y) || y <= 0) highlightError(rady_input);
+                else {
+                    dehighlightError(rady_input);
+                    if (lockAxesRatio != 0) {
+                        radx_input.value = new String(Math.round(y * 100 / axesRatio) / 100);
+                        dehighlightError(radx_input);
+                    }
+                    else {
+                        var ratio = Number(rady_input.value) / Number(radx_input.value);
+                        if (!isNaN(ratio)) axesRatio = ratio;
+                    }
+                }
+            });
+        }
+
+        // coloring parameter input
+        cprea_input.addEventListener("input", function () {
+            const cprea = $("#cprea");
+            var a = new Number(cprea.value);
+            if (!(a > 0 && a < 1)) highlightError(cprea);
+            else dehighlightError(cprea);
+        });
+
+    </script>
+
     <script>
 
         var Input = document.getElementsByTagName("input");
         for (var i = 0; i < Input.length; i++) {
             Input[i].spellcheck = false;
             Input[i].autocomplete = Input[i].autocorrect = Input[i].autocapitalize = "off";
-        }
-        function highlight(i) {
-            i.style.boxShadow = "0px 0px 3px rgb(255,0,0)";
-            i.style.color = "red";
-            i.style.fontWeight = "600";
-        }
-        function dishighlight(i) {
-            i.style.boxShadow = "none";
-            i.style.color = "black";
-            i.style.fontWeight = "normal";
         }
         function hslToRgb(h, s, l) {
             if (isNaN(l)) return "rgb(255,255,255)";
@@ -573,7 +625,6 @@
                     if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
                     return p;
                 }
-
                 var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
                 var p = 2 * l - q;
                 r = hue2rgb(p, q, h + 1 / 3);
@@ -593,7 +644,7 @@
             if (str.length < 1 || str.length > 1024)
                 throw ("Invalid string length");
 
-            // Shunting-Yard algorithm, saved from https://www.complexgrapher.com/scripts.min.js
+            // Shunting-Yard algorithm, copied from https://www.complexgrapher.com/scripts.min.js
             str = str.replace(/ /g, "");
             var replaceFuncName = function replaceFuncName() {
                 for (var i = 0; i < src.length; i++) {
@@ -634,7 +685,7 @@
                     for (t++; /[0-9.]/.test(str[t]);)
                         token += str[t],
                             t++;
-                    if (t-- ,
+                    if (t--,
                         (token.match(/[.]/g) || []).length > 1)
                         throw "Invalid Expression";
                     n.push(token)
@@ -648,46 +699,13 @@
                 }
 
             var prec = function prec(e) {
-                switch (e) {
-                    case "+": return 1;
-                    case "-": return 1;
-                    case "*": return 2;
-                    case "/": return 2;
-                    case "^": return 3;
-                    case "sin": return 4;
-                    case "cos": return 4;
-                    case "tan": return 4;
-                    case "éҳρ": return 4;
-                    case "log": return 4;
-                    case "sqr": return 4;
-                    case "asn": return 4;
-                    case "acs": return 4;
-                    case "atn": return 4;
-                    case "snh": return 4;
-                    case "csh": return 4;
-                    case "tnh": return 4;
-                    case "ash": return 4;
-                    case "ach": return 4;
-                    case "ath": return 4;
-                    case "cot": return 4;
-                    case "csc": return 4;
-                    case "sec": return 4;
-                    case "acc": return 4;
-                    case "asc": return 4;
-                    case "act": return 4;
-                    case "cch": return 4;
-                    case "sch": return 4;
-                    case "cth": return 4;
-                    case "aҳh": return 4;
-                    case "agh": return 4;
-                    case "akh": return 4;
-                    case "gma": return 4;
-                    case "rél": return 4;
-                    case "ɪma": return 4;
-                    case "abs": return 4;
-                    case "arg": return 4;
-                    default: return -1;
-                }
+                const dict = {
+                    "+": 1, "-": 1, "*": 2, "/": 2, "^": 3,
+                    "sin": 4, "cos": 4, "tan": 4, "éҳρ": 4, "log": 4, "sqr": 4, "asn": 4, "acs": 4, "atn": 4, "snh": 4, "csh": 4, "tnh": 4, "ash": 4, "ach": 4, "ath": 4, "cot": 4, "csc": 4, "sec": 4, "acc": 4, "asc": 4, "act": 4, "cch": 4, "sch": 4, "cth": 4, "aҳh": 4, "agh": 4, "akh": 4, "gma": 4, "rél": 4, "ɪma": 4, "abs": 4, "arg": 4,
+                };
+                var res = dict[e];
+                if (res === undefined) return -1;
+                return res;
             }
             for (var a = [], i = [], t = 0; t < n.length; t++)
                 if (token = n[t],
@@ -771,7 +789,6 @@
                             case "agh": r = Asech(a); break;
                             case "akh": r = Acoth(a); break;
                             case "gma": r = Gamma(a); break;
-                            case "żta": r = Riemann_Zeta(a); break;
                             case "rél": r = new Complex(a.re, 0); break;
                             case "ɪma": r = new Complex(a.im, 0); break;
                             case "abs": r = new Complex(a.Mag(), 0); break;
@@ -790,58 +807,61 @@
         function graph(e) {
             if (e != null && e.keyCode != 13)
                 return;
-            dishighlight($("ifunction"));
+            dehighlightError($("#ifunction"));
 
-            var cx = new Number($("ctrx").value);
-            var cy = new Number($("ctry").value);
-            var rx = new Number($("radx").value);
-            var ry = new Number($("rady").value);
+            var cx = new Number($("#ctrx").value);
+            var cy = new Number($("#ctry").value);
+            var rx = new Number(radx_input.value);
+            var ry = new Number(rady_input.value);
             if (isNaN(cx) || isNaN(cy) || isNaN(rx) || rx <= 0 || isNaN(ry) || ry <= 0) return;
             mat = [[rx / 300, 0, cx - rx], [0, -ry / 200, cy + ry]];
-            var a = new Number($("cprea").value);
+            var a = new Number($("#cprea").value);
             if (isNaN(a) || a >= 1 || a <= 0) return;
 
-            var str = $("ifunction").value;
+            var str = $("#ifunction").value;
             try {
                 cmd = readstr(str);
             } catch (d) {
-                highlight($("ifunction"));
-                $("canvaswrap").style.display = "none";
+                highlightError($("#ifunction"));
+                $("#canvaswrap").style.display = "none";
                 console.error(d);
                 return;
             }
 
             window.location.hash = 'f=' + encodeURIComponent(str)
-                + '&cx=' + encodeURIComponent($("ctrx").value)
-                + '&cy=' + encodeURIComponent($("ctry").value)
-                + '&rx=' + encodeURIComponent($("radx").value)
-                + '&ry=' + encodeURIComponent($("rady").value)
-                + '&a=' + encodeURIComponent($("cprea").value);
+                + '&cx=' + encodeURIComponent($("#ctrx").value)
+                + '&cy=' + encodeURIComponent($("#ctry").value)
+                + '&rx=' + encodeURIComponent(radx_input.value)
+                + '&ry=' + encodeURIComponent(rady_input.value)
+                + '&a=' + encodeURIComponent($("#cprea").value);
 
 
             setTimeout(function () {
                 try {
-                    var canvas = $("graph");
+                    const canvas = $("#canvas");
                     var cmdc, c, sc;
                     var ctx = canvas.getContext('2d');
                     for (var i = 0; i < 400; i++) {
                         for (var j = 0; j < 600; j++) {
                             sc = new Complex(mat[0][0] * j + mat[0][1] * i + mat[0][2], mat[1][0] * j + mat[1][1] * i + mat[1][2])
                             c = funcVal(sc, cmd.slice(0));
-                            //ctx.fillStyle = hslToRgb(c.Arg() / (2 * Math.PI), 1, 1 - Math.pow(a, c.Mag()));
-                            ctx.fillStyle = hslToRgb(c.Arg() / (2 * Math.PI), 1, 1 - Math.pow(a, Math.log(Math.log(c.Mag() + 1) + 1.05)));
+                            ctx.fillStyle = hslToRgb(
+                                c.Arg() / (2 * Math.PI),
+                                0.5 + 0.5 * Math.pow(Math.abs(Math.sin(Math.PI * Math.log(c.Mag()) / Math.LN10)), 0.5),
+                                1 - Math.pow(1 - a, Math.log(Math.log(c.Mag() + 1) + 1.05))
+                            );
                             ctx.fillRect(j, i, 1, 1);
                         }
                     }
-                    $("canvaswrap").style.display = "none";
+                    $("#canvaswrap").style.display = "none";
 
                 } catch (d) {
-                    highlight($("ifunction"));
-                    $("canvaswrap").style.display = "none";
+                    highlight($("#ifunction"));
+                    $("#canvaswrap").style.display = "none";
                     console.log(d);
                 }
             }, 200);
-            $("canvaswrap").style.display = "block";
+            $("#canvaswrap").style.display = "block";
         }
 
         window.onload = function () {
@@ -854,12 +874,12 @@
                             res[s[0]] = decodeURIComponent(s[1]);
                             return res;
                         }, {});
-                        if (hash['f'] != undefined) $('ifunction').value = hash['f'];
-                        if (hash['cx'] != undefined) $('ctrx').value = hash['cx'];
-                        if (hash['cy'] != undefined) $('ctry').value = hash['cy'];
-                        if (hash['rx'] != undefined) $('radx').value = hash['rx'];
-                        if (hash['ry'] != undefined) $('rady').value = hash['ry'];
-                        if (hash['a'] != undefined) $('cprea').value = hash['a'];
+                        if (hash['f'] != undefined) $('#ifunction').value = hash['f'];
+                        if (hash['cx'] != undefined) $('#ctrx').value = hash['cx'];
+                        if (hash['cy'] != undefined) $('#ctry').value = hash['cy'];
+                        if (hash['rx'] != undefined) $('#radx').value = hash['rx'];
+                        if (hash['ry'] != undefined) $('#rady').value = hash['ry'];
+                        if (hash['a'] != undefined) $('#cprea').value = hash['a'];
                     }
                 } catch (e) { }
                 graph();
@@ -870,4 +890,5 @@
 
     </script>
 </body>
+
 </html>
