@@ -6,7 +6,7 @@
     <title>Chemical Equation Balancer</title>
     <style>
         #main {
-            margin: 40px 20% 0px 20%;
+            margin: 40px 15% 0px 15%;
             min-height: 200px;
             border: 1px solid gray;
             border-radius: 10px;
@@ -67,15 +67,14 @@
             text-align: center;
         }
 
-        @media only screen and (max-width: 700px) {
+        @media only screen and (max-width: 900px) {
 
             #main {
-                margin: 30px 15% 0px 15%;
+                margin: 30px 10% 0px 10%;
             }
 
             #title {
-                margin: 15px 0px;
-                font-size: 1.2em;
+                font-size: 1.3em;
             }
 
             #border #input {
@@ -88,6 +87,26 @@
                 height: 22px;
             }
         }
+
+        @media only screen and (max-width: 600px) {
+
+            #main {
+                margin: 30px 5% 0px 5%;
+            }
+
+        }
+
+        @media only screen and (min-width: 1200px) {
+
+            #main {
+                margin-top: 30px;
+                margin-bottom: 0px;
+                margin-left: auto;
+                margin-right: auto;
+                width: 800px;
+                max-width: 800px;
+            }
+        }
     </style>
 </head>
 
@@ -95,13 +114,12 @@
     <div id="main">
         <div id="title">
             Chemical Equation Balancer
-            <p id="subtitle">By Harry Chen</p>
+            <p id="subtitle" style='color:white'>By Harry Chen</p>
         </div>
         <div id="content">
             <div id="border">
                 <input id="input" type="text" placeholder="Enter a chemical equation..." spellcheck="false"
-                    autocomplete="off" autocorrect="off" value="CO+O2==CO2"
-                    onkeydown="if (event.keyCode==13) balance_main();" />
+                    autocomplete="off" autocorrect="off" onkeydown="if (event.keyCode==13) balance_main();" />
                 <button id="button" type="button" onclick="balance_main();">Balance</button>
             </div>
             <div id="result">
@@ -358,17 +376,9 @@
             var str = "";
             for (var i = 0; i < chml.length; i++)
                 str += (i == 0 ? "" : " + ") + form2html(coes[i], chml[i]);
-            str += "&emsp;⟹&emsp;";
+            str += "&emsp;⟶&emsp;";
             for (var i = chml.length; i < coes.length; i++)
                 str += (i == chml.length ? "" : " + ") + form2html(coes[i], chmr[i - chml.length]);
-            if (true) {
-                // use HTML <sub> tag instead of Unicode subscript because it looks better
-                for (var i = 0; i < subscripts.length; i++) {
-                    while (str.search(subscripts[i]) != -1) {
-                        str = str.replace(subscripts[i], "<sub>" + subscript_replace[i] + "</sub>");
-                    }
-                }
-            }
             return str;
         }
 
@@ -395,7 +405,6 @@
             else {
                 // this happens if your equation is copy-pasted
                 // maybe I should ignore them
-                console.log(equ);
                 equ = equ.replace(/[→⟶⇨⮕⬄⬌⇀⇁⥊⥋⥛⥤⇋⇌⥨⥬⇒⇔⟹⟺]/g, '=');
                 if (!(/=/.test(equ))) throw "missing arrow or equal sign";
             }
@@ -437,7 +446,7 @@
             var s = M.length;
 
             // debug
-            var logMat = function () {
+            var logMat = function (M) {
                 var b = "";
                 b += "<table style='margin:20px;'>";
                 for (var i = 0; i < M.length; i++) {
@@ -448,6 +457,15 @@
                     b += "</tr>";
                 }
                 b += "</table>";
+                debug_log(b);
+            };
+            var logVec = function (V) {
+                var b = "";
+                b += "<table style='margin:20px;'><tr>";
+                for (var i = 0; i < V.length; i++) {
+                    b += "<td>" + frac2str(V[i]) + "&emsp;</td>";
+                }
+                b += "<tr></table>";
                 debug_log(b);
             };
             logMat(M);
@@ -533,12 +551,11 @@
                 coes.push(mt);
                 // convert to html
                 document.getElementById("result").innerHTML = result2HTML(chml, chmr, coes);
-                console.log(coes);
                 return;
             }
 
 
-            // no unique solution: ?? (I'm not good at this)
+            // no unique solution: ??
             var balanceFailed = function () {
                 throw "This chemical equation has multiple ways to balance that is not supported.";
             };
@@ -551,19 +568,30 @@
 
             if (dim == 1) {
 
-                // assume the last element is zero, find one solution
+                // assume the `slip_col`th element is zero, find one solution
+                var slip_col = c - 2;
                 for (var i = 0; i < s; i++) {
-                    if (M[i][i].m != M[i][i].n) balanceFailed();
+                    if (M[i][i].n == 0) {
+                        if (slip_col == c - 2) slip_col = i;
+                        else balanceFailed();
+                        break;
+                    }
+                    if (M[i][i].n != M[i][i].m) balanceFailed();
                 }
+
+                // find one solution of the linear system
                 var base_solution = [];
-                for (var i = 0; i < s; i++) base_solution.push(M[i][c - 1]);
+                for (var i = 0; i < slip_col; i++) base_solution.push(M[i][c - 1]);
                 base_solution.push(new Fraction(0, 1));
-                console.log(base_solution);
+                for (var i = slip_col; i < s; i++) base_solution.push(M[i][c - 1]);
+
                 // find the direction vector of the solution space
                 var dir_vec = [];
-                for (var i = 0; i < s; i++) dir_vec.push(Neg(M[i][c - 2]));
+                for (var i = 0; i < slip_col; i++) dir_vec.push(Neg(M[i][slip_col]));
                 dir_vec.push(new Fraction(1, 1));
-                console.log(dir_vec);
+                for (var i = slip_col; i < s; i++) dir_vec.push(Neg(M[i][slip_col]));
+
+                logMat([base_solution, dir_vec]);
 
                 // determine the range of valid coefficients
                 var min_t = new Fraction(0, 0), max_t = new Fraction(0, 0), min_t_f = -Infinity, max_t_f = Infinity;
@@ -581,31 +609,42 @@
                     }
                 }
                 if (min_t_f >= max_t_f) cannotBalance();
-                console.log(min_t_f, max_t_f);
+                logVec([min_t, max_t]);
 
                 // go though the range and add solutions
                 var solution_coes = [];
                 var addCoe = function (t) {
-                    //console.log(t);
                     var add = base_solution.slice();
                     for (var i = 0; i < add.length; i++) add[i] = Add(add[i], Mul(dir_vec[i], t));
                     solution_coes.push(add);
                 };
-                for (var den = 1;
-                    (den <= Math.max(2 * Math.max(min_t.m, max_t.m), 3) && solution_coes.length <= N_SOL)
-                    || solution_coes.length == 0; den++) {
+                var den_list = [];
+                var addDenominator = function (den) {
                     var start = Math.ceil(min_t_f * den + 1e-8), end = Math.floor(max_t_f * den - 1e-8);
                     for (var num = start; num <= end; num++) {
+                        if (solution_coes.length >= N_SOL) break;
                         if (gcd(num, den) == 1) {
                             addCoe(new Fraction(num, den));
                         }
-                        if (solution_coes.length > N_SOL) break;
                     }
+                    if (den < den_list.length) den_list[den] = true;
                 }
-                console.log(solution_coes);
+                var lcm = min_t.m * max_t.m / gcd(min_t.m, max_t.m);
+                for (var den = 0; den <= Math.max(2 * lcm, 3); den++)
+                    den_list.push(false);
+                // some denominators are to be added first
+                addDenominator(lcm);
+                addDenominator(2 * lcm);
+                for (var den = 2; den < lcm; den++)
+                    if (lcm % den == 0) addDenominator(den);
+                // add remaining denominators
+                for (var den = 1; den < den_list.length && solution_coes.length <= N_SOL; den++)
+                    if (!den_list[den]) addDenominator(den);
+                for (var den = den_list.length - 1;
+                    solution_coes.length == 0; den++) addDenominator(den);
 
-                // add HTML
-                document.getElementById("result").innerHTML = "";
+                // fraction to integer
+                var final_solution_coes = [];
                 for (var d = 0; d < solution_coes.length; d++) {
                     var coes = [];
                     var mt = 1;  // gcd
@@ -615,8 +654,20 @@
                     }
                     for (var i = 0; i < c - 1; i++) coes[i] = mt * coes[i].n / coes[i].m;
                     coes.push(mt);
-                    document.getElementById("result").innerHTML += result2HTML(chml, chmr, coes) + "<br/>";
-                    console.log(coes);
+                    final_solution_coes.push(coes);
+                }
+                // sort the list in order of increasing sum
+                final_solution_coes.sort(function (a, b) {
+                    var sa = 0, sb = 0;
+                    for (var i = 0; i < a.length; i++) sa += a[i];
+                    for (var i = 0; i < b.length; i++) sb += b[i];
+                    return sa - sb;
+                });
+                // add HTML
+                document.getElementById("result").innerHTML = "";
+                for (var d = 0; d < solution_coes.length; d++) {
+                    document.getElementById("result").innerHTML +=
+                        result2HTML(chml, chmr, final_solution_coes[d]) + "<br/>";
                 }
             }
             else throw balanceFailed();
@@ -624,14 +675,38 @@
         }
 
         function balance_main() {
+            const result_container = document.getElementById("result");
+
             try {
-                balance(getInput());
+                var str = getInput();
+                balance(str.replace(/\\/g, ''));
+
+                // use HTML <sub> tag instead of Unicode subscript because it looks better
+                // still need an option that I can copy it as plain text
+                if (!/\\/.test(str)) {
+                    var result = result_container.innerHTML;
+                    for (var i = 0; i < subscripts.length; i++) {
+                        while (result.search(subscripts[i]) != -1) {
+                            result = result.replace(subscripts[i], "<sub>" + subscript_replace[i] + "</sub>");
+                        }
+                    }
+                    result_container.innerHTML = result;
+                    result_container.style.fontFamily =
+                        /\<br/.test(result_container.innerHTML) ? "Calibri" : "Arial";
+                }
+                else {
+                    result_container.style.fontFamily = "Calibri";  // better for subscripts
+                }
             } catch (e) {
-                document.getElementById("result").innerHTML = "<b style='color:red'>Error: " + e + "</b>";
+                result_container.style.fontFamily = "Arial";
+                result_container.innerHTML = "<b style='color:red'>Error: " + e + "</b>";
             }
         }
 
-        document.body.onload = balance_main;
+        document.body.onload = function () {
+            document.querySelector("#input").value = "H2+O2==H2O";
+            balance_main();
+        }
     </script>
 
 

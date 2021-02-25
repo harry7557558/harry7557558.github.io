@@ -1,4 +1,4 @@
-# Chemical equation balancer test cases
+﻿# Chemical equation balancer test cases
 
 # basic tests from chemistry textbook
 P+O2==P2O5
@@ -59,6 +59,7 @@ CH3(CH2)5COOH+(Ca(PO3))2(Ca(OH)2)3====Ca(CH3(CH2)5COO)2+H2O+Ca(PO3)2+H2
 H2+Cl2==H2O
 H2SO4+O2==H2O+SO2
 H2O+S2==H2SO4
+CO+O2==CO+CO2+H2O
 
 # These chemical equations have multiple ways to balance
 C6H12O6+H2O+O2==CO2+H2O
@@ -68,6 +69,11 @@ C2H2+O2==H2O+CO2+CO+C
 Fe36Si5+H3PO3+K2Cr2O7+H2O===FePO4+Fe(OH)3+Cr(OH)3+CrPO4+K3PO4+SiO2
 H2S+K2Cr2O7+H2SO4===Cr2(SO4)3+K2SO4+S+H2O
 C6H12O6+C6H12O6==C12H22O11+H2O
+C7H16+O2==CO2+CO+C+H2O
+C6H14+O2==CO2+CO+H2O   (intended solution: C₆H₁₄ + 8 O₂ ⟶ 3 CO₂ + 3 CO + 7 H₂O)
+[CH2O]10+O2==CO2+CO+H2O
+[CH2O]10+O2==H2O+CO2+CO
+[CH2O]9999+O2==CO2+CO+H2O
 
 # Large numbers
 H1000C800O500N300S100Cl50P20F10Br5I3+O2==H2O+CO2+NO2+SO2+HCl+P4O10+HF+HBr+HI
