@@ -1,0 +1,561 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>The Complex Grapher</title>
+
+    <style>
+        #canvas {
+            position: fixed;
+            margin: 0;
+            border: 0;
+            padding: 0;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #control {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(92, 92, 92, 0.6);
+            width: 200px;
+            padding: 20px;
+        }
+
+        #control>#title {
+            margin: -5px 10px 0px 0px;
+            padding: 0px 3px;
+            font-family: Consolas;
+            font-style: italic;
+            font-weight: 800;
+            font-size: 20px;
+            color: orange;
+            text-shadow: 1.5px 1.5px 1px maroon;
+        }
+    </style>
+
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+
+    <script>
+        "use strict";
+        const canvas = document.querySelector("#canvas");
+
+
+        // graph information
+        var state = {
+            // viewport
+            xmin: NaN,
+            xmax: NaN,
+            ymin: NaN,
+            ymax: NaN,
+            xRes: window.innerWidth,
+            yRes: window.innerHeight,
+            // rendering parameters
+            showXAxis: true,
+            showYAxis: true,
+            showMajorGridX: true,
+            showMajorGridY: true,
+            showMinorGridX: true,
+            showMinorGridY: true,
+            showXNumbers: true,
+            showYNumbers: true
+        };
+
+        // point and coordinate transform
+        function vec2(x, y) { return { x: x, y: y }; }
+        function fromGraphX(x) { return (x - state.xmin) / (state.xmax - state.xmin) * state.xRes; }
+        function fromGraphY(y) { return state.yRes - (y - state.ymin) / (state.ymax - state.ymin) * state.yRes; }
+        function fromGraph(p) { return { x: fromGraphX(p.x), y: fromGraphY(p.y) }; }
+        function fromCanvasX(x) { return x / state.xRes * (state.xmax - state.xmin) + state.xmin; }
+        function fromCanvasY(y) { return (state.yRes - y) / state.yRes * (state.ymax - state.ymin) + state.ymin; }
+        function fromCanvas(p) { return { x: fromCanvasX(p.x), y: fromCanvasY(p.y) }; }
+
+
+        // user parameters
+        var mouseDown = false;
+        var mouseDownPos = vec2(NaN, NaN);
+        var mousePos = vec2(NaN, NaN);
+        var isDraggingXAxis = false;
+        var isDraggingYAxis = false;
+        var xAxisOnScreen = 0;  // y of x-axis on screen coordinate
+        var yAxisOnScreen = 0;  // x of y-axis on screen coordinate
+        var altZoomingStartPos = vec2(NaN);  // click Alt to zoom in
+
+
+        function plotAxesAndGrid(event) {
+            canvas.width = canvas.width = state.xRes = canvas.clientWidth;
+            canvas.height = canvas.height = state.yRes = canvas.clientHeight;
+
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, state.xRes, state.yRes);
+
+            var vfloor = function (x) {
+                var xm = Math.pow(10., Math.floor(Math.log(x) / Math.log(10)));
+                var xq = x / xm;
+                return xm * (xq < 2. ? 1. : xq < 5. ? 2. : 5.);
+            };
+
+            // origin on canvas
+            var c = fromGraph(vec2(0, 0));
+            var dx = state.xmax - state.xmin;
+            var dy = state.ymax - state.ymin;
+            xAxisOnScreen = c.y < 0 ? 0 : c.y > state.yRes ? state.yRes : c.y;
+            yAxisOnScreen = c.x < 0 ? 0 : c.x > state.xRes ? state.xRes : c.x;
+
+            // grid
+            {
+                var xd = vfloor(dx / state.xRes * 120.);
+                var yd = vfloor(dy / state.yRes * 120.);
+                // minor gridlines
+                {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 0.5;
+                    if (state.showMinorGridX) {
+                        var x0 = Math.floor(state.xmin / (.2 * xd)) * (.2 * xd);
+                        for (var x = x0; x <= state.xmax; x += .2 * xd) {
+                            var xc = fromGraphX(x);
+                            ctx.moveTo(xc, 0);
+                            ctx.lineTo(xc, state.yRes);
+                        }
+                    }
+                    if (state.showMinorGridY) {
+                        var y0 = Math.floor(state.ymin / (.2 * yd)) * (.2 * yd);
+                        for (var y = y0; y <= state.ymax; y += .2 * yd) {
+                            var yc = fromGraphY(y);
+                            ctx.moveTo(0, yc);
+                            ctx.lineTo(state.xRes, yc);
+                        }
+                    }
+                    ctx.stroke();
+                }
+                // major gridlines
+                {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#aaa';
+                    ctx.lineWidth = 0.5;
+                    if (state.showMajorGridX) {
+                        var x0 = Math.floor(state.xmin / xd) * xd;
+                        for (var x = x0; x <= state.xmax; x += xd) {
+                            var xc = fromGraphX(x);
+                            ctx.moveTo(xc, 0);
+                            ctx.lineTo(xc, state.yRes);
+                        }
+                    }
+                    if (state.showMajorGridY) {
+                        var y0 = Math.floor(state.ymin / yd) * yd;
+                        for (var y = y0; y <= state.ymax; y += yd) {
+                            var yc = fromGraphY(y);
+                            ctx.moveTo(0, yc);
+                            ctx.lineTo(state.xRes, yc);
+                        }
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            // axes
+            {
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'black';
+                if (state.showXAxis) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, c.y);
+                    ctx.lineTo(state.xRes, c.y);
+                    ctx.stroke();
+                }
+                if (state.showYAxis) {
+                    ctx.beginPath();
+                    ctx.moveTo(c.x, 0);
+                    ctx.lineTo(c.x, state.yRes);
+                    ctx.stroke();
+                }
+            }
+        }
+
+
+        var WebGL = {
+            // getContext("webgl")
+            context: undefined,
+            programInfo: {
+                // shader program
+                program: undefined,
+                // attribute and uniform variable locations
+                aVertexPosition: undefined,
+                uPmin: undefined,
+                uPmax: undefined,
+            },
+            positionBuffer: undefined,
+        };
+
+        function init_WebGL() {
+
+            // initialize shader program
+            function initShaderProgram(gl, vsSource, fsSource) {
+
+                // function: create a shader of the given type, upload and compile source
+                function loadShader(gl, type, source) {
+                    const shader = gl.createShader(type);
+                    gl.shaderSource(shader, source);
+                    gl.compileShader(shader);
+                    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                        var error_message = "Shader compile error: " + gl.getShaderInfoLog(shader);
+                        gl.deleteShader(shader);
+                        throw error_message;
+                    }
+                    return shader;
+                }
+                // load shaders
+                const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+                const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+                // create shader program
+                const shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    throw "Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram);
+                }
+                return shaderProgram;
+            }
+
+
+            // initialize GL context
+            const gl = canvas.getContext("webgl");
+            if (gl === null) throw "Unable to initialize WebGL";
+            WebGL.context = gl;
+
+            // vertex shader source
+            // run at each vertex of the shape to transform input vertex to clip space coordinate system
+            // each axis has range from -1.0 to 1.0
+            const vsSource = `
+                    attribute vec4 aVertexPosition;  // to be interpolated
+
+                    uniform vec2 uPmin;  // bottom-left position
+                    uniform vec2 uPmax;  // top-right position
+
+                    varying vec2 vPos;  // send to fragment shader
+
+                    void main() {
+                        gl_Position = aVertexPosition;
+                        vec2 pos = vec2(0.5)+0.5*gl_Position.xy;
+                        vPos = uPmin + pos * (uPmax - uPmin);
+                    }`;
+            // fragment shader source
+            // called once at every pixel after the vertices have been processed by vertex shader
+            // calculate the color of the pixel
+            const fsSource = `// fragment shader for WebGL complex grapher
+
+precision highp float;
+varying vec2 vPos;
+
+float brightness = 0.5;
+
+
+#define sinh(x) (0.5*(exp(x)-exp(-x)))
+#define cosh(x) (0.5*(exp(x)+exp(-x)))
+//#define tanh(x) (1.0-2./(exp(2.*x)+1))
+#define tanh(x) (sinh(x)/cosh(x))
+
+// complex arithmetic
+float Mag(vec2 a) { return length(a); }
+float Arg(vec2 a) { return atan(a.y, a.x); }
+float logMag(vec2 a) { return 0.5*log(dot(a,a)); }
+vec2 ADD(vec2 a, vec2 b) { return a + b; }
+vec2 SUB(vec2 a, vec2 b) { return a - b; }
+vec2 MUL(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x); }
+vec2 DIV(vec2 a, vec2 b) { return (1.0/dot(b,b)) * vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y); }
+vec2 POW(vec2 e, vec2 t) {
+    float a = Arg(e), r = logMag(e), c = exp(t.x*r-t.y*a), s = t.x*a+t.y*r;
+    return c * vec2(cos(s), sin(s));
+}
+vec2 EXP(vec2 e) { return exp(e.x) * vec2(cos(e.y),sin(e.y)); }
+vec2 LOG(vec2 e) { return vec2(logMag(e), Arg(e)); }
+vec2 SQR(vec2 e) {
+    float m = Mag(e);
+    return e.y>0. ? vec2(sqrt(0.5*(m+e.x)), sqrt(0.5*(m-e.x))) :
+        vec2(sqrt(0.5*(m+e.x)), -sqrt(0.5*(m-e.x)));
+}
+vec2 INV(vec2 e) { return (1./dot(e,e)) * vec2(e.x, -e.y); }
+
+vec2 SIN(vec2 e) { return vec2(sin(e.x)*cosh(e.y), cos(e.x)*sinh(e.y)); }
+vec2 COS(vec2 e) { return vec2(cos(e.x)*cosh(e.y), -sin(e.x)*sinh(e.y)); }
+vec2 TAN(vec2 e) {
+    float a = 2.*e.x, b = 2.*e.y, d = cos(a)+cosh(b);
+    return (1./d) * vec2(sin(a), sinh(b));
+}
+vec2 COT(vec2 e) {
+    float a = 2.*e.x, b = 2.*e.y, d = cos(a)-cosh(b);
+    return (1./d) * vec2(-sin(a), sinh(b));
+}
+vec2 SEC(vec2 e) {
+    float a = e.x, b = e.y, d = 0.5*cosh(2.*b) + 0.5*cos(2.*a);
+    return (1./d) * vec2(cos(a)*cosh(b), sin(a)*sinh(b));
+}
+vec2 CSC(vec2 e) {
+    float a = e.x, b = e.y, d = 0.5*cosh(2.*b) - 0.5*cos(2.*a);
+    return (1./d) * vec2(sin(a)*cosh(b), -cos(a)*sinh(b));
+}
+vec2 SNH(vec2 e) { return vec2(sinh(e.x)*cos(e.y), cosh(e.x)*sin(e.y)); }
+vec2 CSH(vec2 e) { return vec2(cosh(e.x)*cos(e.y), sinh(e.x)*sin(e.y)); }
+vec2 TNH(vec2 e) {
+    float a = 2.*e.x, b = 2.*e.y, d = cosh(a)+cos(b);
+    return (1./d) * vec2(sinh(a), sin(b));
+}
+vec2 CTH(vec2 e) {
+    float a = 2.*e.x, b = 2.*e.y, d = cosh(a)-cos(b);
+    return (1./d) * vec2(sinh(a), -sin(b));
+}
+vec2 CCH(vec2 e) {
+    float d = cos(2.*e.y) - cosh(2.*e.x);
+    return (2./d) * vec2(-sinh(e.x)*cos(e.y), cosh(e.x)*sin(e.y));
+}
+vec2 SCH(vec2 e) {
+    float d = cos(2.*e.y) + cosh(2.*e.x);
+    return (2./d) * vec2(cosh(e.x)*cos(e.y), -sinh(e.x)*sin(e.y));
+}
+
+vec2 ASN(vec2 e) {
+    float a = e.x, b = e.y;
+    vec2 t1 = SQR(vec2(b*b-a*a+1., -2.*a*b));
+    vec2 t2 = LOG(vec2(t1.x-b, t1.y+a));
+    return vec2(t2.y, -t2.x);
+}
+vec2 ACS(vec2 e) {
+    float a = e.x, b = e.y;
+    vec2 t1 = SQR(vec2(b*b-a*a+1., -2.*a*b));
+    vec2 t2 = LOG(vec2(t1.x-b, t1.y+a));
+    return vec2(1.570796327-t2.y, t2.x);
+}
+vec2 ATN(vec2 e) {
+    float a = e.x, b = e.y, d = a*a + (1.-b)*(1.-b);
+    vec2 t1 = LOG(vec2((1.-b*b-a*a)/d, -2.*a/d));
+    return vec2(-0.5*t1.y, 0.5*t1.x);
+}
+vec2 ACT(vec2 e) { return ATN(INV(e)); }
+vec2 ASC(vec2 e) { return ACS(INV(e)); }
+vec2 ACC(vec2 e) { return ASN(INV(e)); }
+vec2 ASH(vec2 e) { vec2 r = ASN(vec2(e.y,-e.x)); return vec2(-r.y,r.x); }
+vec2 ACH(vec2 e) { vec2 r = ACS(e); return r.y<=0.?vec2(-r.y,r.x):vec2(r.y,-r.x); }
+vec2 ATH(vec2 e) {
+    float a = e.x, b = e.y;
+    float oneMinus = 1.-a, onePlus = 1.+a, d = oneMinus*oneMinus + b*b;
+    vec2 x = (1./d) * vec2(onePlus*oneMinus-b*b, b*oneMinus+b*onePlus);
+    return vec2(0.5*logMag(x), 0.5*Arg(x));
+}
+vec2 AKH(vec2 e) { return ATH(INV(e)); }
+vec2 AXH(vec2 e) { return ASH(INV(e)); }
+vec2 AGH(vec2 e) { return ACH(INV(e)); }
+
+
+
+// HSL to RGB conversion
+float hue2rgb(float p, float q, float t) {
+    if (t < 0.) t += 1.;
+    if (t > 1.) t -= 1.;
+    if (t < 1./6.) return p + (q - p) * 6. * t;
+    if (t < 1./2.) return q;
+    if (t < 2./3.) return p + (q - p) * (2./3. - t) * 6.;
+    return p;
+}
+vec3 hslToRgb(float h, float s, float l) {
+    if (s == 0.) return vec3(l);
+    float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+    float p = 2. * l - q;
+    return vec3(
+        hue2rgb(p, q, h + 1./3.),
+        hue2rgb(p, q, h),
+        hue2rgb(p, q, h - 1./3.)
+    );
+}
+
+
+// main function
+void main() {
+    vec2 z = vPos.xy;
+    vec2 fz = MUL(DIV(vec2(10,0),POW(LOG(POW(z,vec2(5,0))),vec2(2,0))),SUB(SUB(vec2(0,0),vec2(0,1)),vec2(1,0)));  // 10/ln(z^5)^2*(-i-1)
+    float h = Arg(fz) * 0.15915494309189535;
+    float s = 1.0;
+    float l = 1.0 - pow(1.0 - brightness, log(log(Mag(fz) + 1.0) + 1.05));
+    gl_FragColor = vec4(hslToRgb(h, s, l), 1);
+}
+`;
+
+            // create shader program
+            const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+            // get variable locations
+            WebGL.programInfo.program = shaderProgram;
+            WebGL.programInfo.aVertexPosition = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+            WebGL.programInfo.uPmax = gl.getUniformLocation(shaderProgram, 'uPmax');
+            WebGL.programInfo.uPmin = gl.getUniformLocation(shaderProgram, 'uPmin');
+
+            // create the buffer for vertex positions
+            const positions = [
+                -1.0, 1.0,
+                1.0, 1.0,
+                -1.0, -1.0,
+                1.0, -1.0,
+            ];
+            WebGL.positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, WebGL.positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        }
+
+        function replot_WebGL(event) {
+            const gl = WebGL.context;
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            gl.clearColor(0., 0., 0., 1.);  // clear to vec4(0,0,0,1)
+            gl.clearDepth(1.0);  // clear everything
+            gl.enable(gl.DEPTH_TEST);  // enable depth testing
+            gl.depthFunc(gl.LEQUAL);  // near objects obscure far objects
+
+            // clear the canvas
+            gl.clear(gl.COLOR_BUFFER_BIT, gl.DEPTH_BUFFER_BIT);
+
+            // tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute
+            {
+                const numComponents = 2;  // pull out 2 values per iteration
+                const type = gl.FLOAT;  // data in the buffer is 32bit float
+                const normalize = false;  // do not normalize
+                const stride = 0;  // how many bytes to get from one set of values to next; 0: same as numComponents
+                const offset = 0;  // how many bytes inside the buffer to start from
+                gl.bindBuffer(gl.ARRAY_BUFFER, WebGL.positionBuffer);
+                gl.vertexAttribPointer(
+                    WebGL.programInfo.aVertexPosition,
+                    numComponents, type, normalize, stride, offset);
+                gl.enableVertexAttribArray(
+                    WebGL.programInfo.aVertexPosition);
+            }
+
+            // tell WebGL to use the program when drawing
+            gl.useProgram(WebGL.programInfo.program);
+
+            // set shader uniforms
+            gl.uniform2fv(WebGL.programInfo.uPmin, [state.xmin, state.ymin]);
+            gl.uniform2fv(WebGL.programInfo.uPmax, [state.xmax, state.ymax]);
+
+            const offset = 0;
+            const vertexCount = 4;
+            gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+
+        }
+
+
+
+        function replot(event) {
+            if (WebGL.context == undefined)
+                init_WebGL();
+            replot_WebGL();
+            //plotAxesAndGrid(event);
+        }
+
+
+        // translate the viewport
+        function translateState(delta) {
+            state.xmin -= delta.x, state.xmax -= delta.x;
+            state.ymin -= delta.y, state.ymax -= delta.y;
+        }
+        // scale the viewport about a point on the graph
+        function scaleState(p, sc) {
+            // sc must be positive
+            // zoom in when sc<1 and zoom out when sc>1
+            state.xmin = p.x + (state.xmin - p.x) * sc.x;
+            state.xmax = p.x + (state.xmax - p.x) * sc.x;
+            state.ymin = p.y + (state.ymin - p.y) * sc.y;
+            state.ymax = p.y + (state.ymax - p.y) * sc.y;
+        }
+        // call this after window resizing
+        function resizeState() {
+            var xRes = window.innerWidth;
+            var yRes = window.innerHeight;
+            if (!((state.xmax - state.xmin) * (state.ymax - state.ymin) > 0)) {
+                var sc = Math.sqrt(xRes * yRes);
+                state.xmin = -(state.xmax = 5. * xRes / sc);
+                state.ymin = -(state.ymax = 5. * yRes / sc);
+            }
+            else if (xRes > 50 && yRes > 50 && state.xRes > 50 && state.yRes > 50) {
+                var sc = Math.sqrt(state.xRes * state.yRes) / Math.sqrt(xRes * yRes);
+                scaleState(
+                    vec2(0.5 * (state.xmin + state.xmax), 0.5 * (state.ymin + state.ymax)),
+                    vec2(sc * xRes / state.xRes, sc * yRes / state.yRes)
+                );
+            }
+            state.xRes = xRes, state.yRes = yRes;
+            canvas.width = state.xRes;
+            canvas.height = state.yRes;
+        }
+        // call this after mouse up/leave
+        function mouseUp() {
+            mouseDown = false;
+        }
+
+
+        window.onload = function () {
+            resizeState();
+            console.log(state);
+            replot(event);
+        };
+        window.addEventListener("resize", function () {
+            resizeState();
+            replot(event);
+        });
+        canvas.addEventListener("mousedown", function (event) {
+            mouseDown = true;
+            //event.preventDefault();
+            mouseDownPos = mousePos = vec2(event.clientX, event.clientY);
+            replot(event);
+        });
+        canvas.addEventListener("mouseup", function (event) {
+            if (!mouseDown) return;
+            event.preventDefault();
+            mouseUp();
+            replot(event);
+        });
+        canvas.addEventListener("mouseleave", function (event) { mouseUp(); });
+        canvas.addEventListener("mouseout", function (event) { mouseUp(); });
+        canvas.addEventListener("mousemove", function (event) {
+            if (mouseDown) {
+                event.preventDefault();
+                event.stopPropagation();
+                var delta = vec2(event.clientX - mousePos.x, event.clientY - mousePos.y);
+                delta = vec2(
+                    delta.x * (state.xmax - state.xmin) / state.xRes,
+                    -delta.y * (state.ymax - state.ymin) / state.yRes
+                );
+                translateState(delta);
+                replot(event);
+            }
+            mousePos = vec2(event.clientX, event.clientY);
+        });
+        canvas.addEventListener("wheel", function (event) {
+            event.preventDefault();
+            var p = fromCanvas(vec2(event.clientX, event.clientY));
+            var scf = Math.exp(0.001 * event.deltaY);
+            var sc = vec2(scf, scf);
+            scaleState(p, sc);
+            replot(event);
+        }, { passive: false });
+
+
+
+    </script>
+
+    <div id="control">
+        <div id="title">Hello, World!</div>
+    </div>
+
+</body>
+
+</html>

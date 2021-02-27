@@ -192,7 +192,7 @@
             var a = e.Re();
             var b = e.Im();
             var d = a * a + (1.0 - b) * (1.0 - b);
-            var t1 = Log(new Complex(
+            var t1 = LOG(new Complex(
                 (1 - b * b - a * a) / d,
                 -2 * a / d));
             return new Complex(-0.5 * t1.Im(), 0.5 * t1.Re());
@@ -266,7 +266,7 @@
                 ? ATH(new Complex(a / d, -b / d))
                 : ATH(new Complex((a !== 0) ? a / 0 : 0, (b !== 0) ? -b / 0 : 0));
         }
-        function AGH(e) {
+        function AXH(e) {
             var a = e.Re();
             var b = e.Im();
             var d = a * a + b * b;
@@ -274,7 +274,7 @@
                 ? ASH(new Complex(a / d, -b / d))
                 : ASH(new Complex((a !== 0) ? a / 0 : 0, (b !== 0) ? -b / 0 : 0));
         }
-        function AXH(e) {
+        function AGH(e) {
             var a = e.Re();
             var b = e.Im();
             var d = a * a + b * b;
@@ -714,11 +714,11 @@
             var src = ["arsinh", "arcosh", "artanh", "arcsch", "arsech", "arcoth", "arcsinh", "arccosh", "arctanh", "arccsch", "arcsech", "arccoth"];
             var rep = ["ASH", "ACH", "ATH", "AXH", "AGH", "AKH", "ASH", "ACH", "ATH", "AXH", "AGH", "AKH"];
             replaceFuncName();
-            src = ["asin", "acos", "atan", "acsc", "asec", "acot", "arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot"];
-            rep = ["ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT"];
-            replaceFuncName();
             src = ["asinh", "acosh", "atanh", "acsch", "asech", "acoth", "sinh", "cosh", "tanh", "csch", "sech", "coth"];
             rep = ["ASH", "ACH", "ATH", "AXH", "AGH", "AKH", "SNH", "CSH", "TNH", "CCH", "SCH", "CTH"];
+            replaceFuncName();
+            src = ["asin", "acos", "atan", "acsc", "asec", "acot", "arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot"];
+            rep = ["ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT"];
             replaceFuncName();
             src = ["ln", "log", "exp", "sqrt", "sin", "cos", "tan", "csc", "sec", "cot", "asin", "acos", "atan", "acsc", "asec", "acot", "gamma"];
             rep = ["LOG", "LOG", "EXP", "SQR", "SIN", "COS", "TAN", "CSC", "SEC", "COT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "GMA"];
@@ -858,7 +858,9 @@
             var str = $("#ifunction").value;
             try {
                 var cmd = parseExpression(str);
-                var exe = stringfyExpression(cmd).replace(/Complex/g, "new Complex")
+                var exe = stringfyExpression(cmd);
+                console.log(exe.replace(/Complex/g, "vec2"));
+                exe = exe.replace(/Complex/g, "new Complex")
                 eval("Fun = function(z) {return " + exe + ";}");
                 // test if it works
                 Fun(new Complex(1, i)).ToString();
