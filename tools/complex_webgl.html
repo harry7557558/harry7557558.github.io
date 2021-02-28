@@ -6,7 +6,8 @@
     <title>The Complex Grapher</title>
 
     <style>
-        #canvas {
+        #canvas,
+        #grid-canvas {
             position: fixed;
             margin: 0;
             border: 0;
@@ -17,17 +18,28 @@
             height: 100%;
         }
 
+        #grid-canvas {
+            opacity: 0.6;
+            mix-blend-mode: exclusion;
+        }
+
         #control {
             position: fixed;
             left: 20px;
             top: 20px;
-            background-color: rgba(92, 92, 92, 0.6);
-            width: 200px;
+            background-color: rgba(92, 92, 92, 0.7);
+            width: 240px;
             padding: 20px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        #function-input {
+            width: 170px;
         }
 
         #control>#title {
-            margin: -5px 10px 0px 0px;
+            margin: 0px 0px 1em 0px;
             padding: 0px 3px;
             font-family: Consolas;
             font-style: italic;
@@ -42,15 +54,233 @@
 
 <body>
     <canvas id="canvas"></canvas>
+    <canvas id="grid-canvas"></canvas>
+
+    <div id="control">
+        <div id="title" title='This tool only works in browsers with WebGL enabled.'>The Complex Grapher</div>
+        <hr />
+        <p style='margin-bottom: 0.4em;'>Function to graph:</p>
+        <input type='text' id="function-input" oninput="updateGraphingParameters(event)"
+            onkeydown="if (event.keyCode==13) { recompileShader(); }"></input>&nbsp;<button
+            onclick="recompileShader();">Update</button>
+        <br /><br />
+
+        <input type='checkbox' id='checkbox-show-axes' onchange="updateGraphingParameters()" />
+        <label for='checkbox-show-axes'>show axes</label>
+        <input type='checkbox' id='checkbox-axes-numbers' onchange="updateGraphingParameters()" />
+        <label for='checkbox-axes-numbers'>axes numbers</label>
+        <br />
+        <input type='checkbox' id='checkbox-grid-major' onchange="updateGraphingParameters()" />
+        <label for='checkbox-grid-major'>major grid</label>
+        <input type='checkbox' id='checkbox-grid-minor' onchange="updateGraphingParameters()" />
+        <label for='checkbox-grid-minor'>minor grid</label>
+        <br />
+        <br />
+
+        <input type='checkbox' id='checkbox-contour-linear' onchange="updateGraphingParameters()" />
+        <label for='checkbox-contour-linear'>linear contour</label>
+        <br />
+        <input type='checkbox' id='checkbox-contour-logarithmic' onchange="updateGraphingParameters()" />
+        <label for='checkbox-contour-logarithmic'>logarithmic contour</label>
+        <br />
+        <br />
+
+        Brightness (0-1):&nbsp;<input type='text' id='brightness-input' value='0.5' style='width:40px;'
+            oninput="updateGraphingParameters()" />
+        <br />
+        <br />
+
+        <span style='white-space:normal;'>Doesn’t work as expected?
+            Check the <a href="complex.html" target='_blank' style='color:white;'>Javascript version</a>.</span>
+
+    </div>
+
 
 
     <script>
         "use strict";
         const canvas = document.querySelector("#canvas");
+        const grid_canvas = document.querySelector("#grid-canvas");
+
+
+        function Complex(e, t) {
+            this.re = e,
+                this.im = t,
+                this.Re = function () {
+                    return this.re
+                }
+                ,
+                this.Im = function () {
+                    return this.im
+                }
+                ,
+                this.ToString = function () {
+                    return ((this.re >= 0) ? "" : " −") + Math.abs(this.re.toFixed(2)) + ((this.im >= 0) ? " + " : " − ")
+                        + ((Math.abs(this.im.toFixed(2)) == 1) ? "" : Math.abs(this.im.toFixed(2))) + "i";
+                }
+        }
+        const compE = new Complex(Math.E, 0)
+            , compI = new Complex(0, 1)
+            , comp2I = new Complex(0, 2)
+            , comp1 = new Complex(1, 0)
+            , comp2 = new Complex(2, 0)
+            , compPi = new Complex(Math.PI, 0);
+
+        // a list of function names
+        const FC = ["EXP", "LOG", "SQR",
+            "SIN", "COS", "TAN", "CSC", "SEC", "COT", "SNH", "CSH", "TNH", "CCH", "SCH", "CTH",
+            "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASH", "ACH", "ATH", "AXH", "AGH", "AKH",
+            "GMA", "REL", "IMA", "ABS", "ARG"];
+
+        // parse equation to reverse polish notation 
+        function parseExpression(str) {
+            if (str.match('&'))
+                throw ("Invalid character detected");
+            if (str.length < 1 || str.length > 1024)
+                throw ("Invalid string length");
+
+            // replace function names
+            str = str.replace(/ /g, "");
+            var replaceFuncName = function replaceFuncName() {
+                for (var i = 0; i < src.length; i++) {
+                    while (str.match(src[i])) str = str.replace(src[i], rep[i]);
+                }
+            }
+            var src = ["arsinh", "arcosh", "artanh", "arcsch", "arsech", "arcoth", "arcsinh", "arccosh", "arctanh", "arccsch", "arcsech", "arccoth"];
+            var rep = ["ASH", "ACH", "ATH", "AXH", "AGH", "AKH", "ASH", "ACH", "ATH", "AXH", "AGH", "AKH"];
+            replaceFuncName();
+            src = ["asinh", "acosh", "atanh", "acsch", "asech", "acoth", "sinh", "cosh", "tanh", "csch", "sech", "coth"];
+            rep = ["ASH", "ACH", "ATH", "AXH", "AGH", "AKH", "SNH", "CSH", "TNH", "CCH", "SCH", "CTH"];
+            replaceFuncName();
+            src = ["asin", "acos", "atan", "acsc", "asec", "acot", "arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot"];
+            rep = ["ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT"];
+            replaceFuncName();
+            src = ["ln", "log", "exp", "sqrt", "sin", "cos", "tan", "csc", "sec", "cot", "asin", "acos", "atan", "acsc", "asec", "acot", "gamma"];
+            rep = ["LOG", "LOG", "EXP", "SQR", "SIN", "COS", "TAN", "CSC", "SEC", "COT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "GMA"];
+            replaceFuncName();
+            src = ["real", "re", "imaginary", "imag", "im", "pi"];
+            rep = ["REL", "REL", "IMA", "IMA", "IMA", "π"];
+            replaceFuncName();
+
+            if (!(/z/.test(str)) && (/x/.test(str))) str = str.replace(/x/g, "z");
+
+            // Shunting-Yard algorithm, copied from https://www.complexgrapher.com/scripts.min.js
+
+            str = str.replace(/\*\*/g, '^');
+
+            for (var t = 0; t < str.length; t++)
+                t < str.length - 1 && /[zeπi\)]/.test(str[t]) && (/[zeπi\(0-9.]/.test(str[t + 1]) || FC.indexOf(str.slice(t + 1, t + 4)) >= 0) && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length)),
+                    t < str.length - 1 && /\d/.test(str[t]) && FC.indexOf(str.slice(t + 1, t + 4)) >= 0 && (str = str.slice(0, t + 1) + "*" + str.slice(t + 1, str.length)),
+                    t > 0 && /[zeπi\(]/.test(str[t]) && /[zeπi\)0-9.]/.test(str[t - 1]) && (str = str.slice(0, t) + "*" + str.slice(t, str.length));
+
+            for (var t = 0; t < str.length; t++)
+                "-" == str[t] && (0 == t || "(" == str[t - 1]) && (str = str.slice(0, t) + "0" + str.slice(t, str.length));
+
+            for (var n = [], t = 0; t < str.length; t++) {
+                var token = str[t];
+                if (/[zeπi+*-\/\^\(\)]/.test(token))
+                    n.push(token);
+                else if (/[0-9.]/.test(token)) {
+                    for (t++; /[0-9.]/.test(str[t]);)
+                        token += str[t],
+                            t++;
+                    if (t--,
+                        (token.match(/[.]/g) || []).length > 1)
+                        throw "Invalid Expression";
+                    n.push(token)
+                } else {
+                    if (!(FC.indexOf(str.slice(t, t + 3)) >= 0))
+                        throw "Invalid Expression";
+                    if (n.push(str.slice(t, t + 3)),
+                        t += 2,
+                        "(" != str[t + 1])
+                        throw "Invalid Expression"
+                }
+            }
+
+            var prec = function prec(e) {
+                const dict = {
+                    "+": 1, "-": 1, "*": 2, "/": 2, "^": 3,
+                    "SIN": 4, "COS": 4, "TAN": 4, "EXP": 4, "LOG": 4, "SQR": 4, "ASN": 4, "ACS": 4, "ATN": 4, "SNH": 4, "CSH": 4, "TNH": 4, "ASH": 4, "ACH": 4, "ATH": 4, "COT": 4, "CSC": 4, "SEC": 4, "ACC": 4, "ASC": 4, "ACT": 4, "CCH": 4, "SCH": 4, "CTH": 4, "AXH": 4, "AGH": 4, "AKH": 4, "GMA": 4, "REL": 4, "IMA": 4, "ABS": 4, "ARG": 4,
+                };
+                var res = dict[e];
+                if (res === undefined) return -1;
+                return res;
+            }
+            for (var a = [], i = [], t = 0; t < n.length; t++)
+                if (token = n[t],
+                    /[0-9.]/.test(token[0]) || /^[zeπi]/.test(token))
+                    i.push(token);
+                else if (/[+*-\/\^]/.test(token) || FC.indexOf(token) >= 0) {
+                    if (a.length > 0)
+                        for (; (prec(a[a.length - 1]) > prec(token) || prec(a[a.length - 1]) == prec(token) && "^" != a[a.length - 1]) && (i.push(a.pop()),
+                            0 != a.length);)
+                            ;
+                    a.push(token)
+                } else if ("(" == token)
+                    a.push(token);
+                else if (")" == token) {
+                    if (!(a.length > 0)) break;
+                    for (; "(" != a[a.length - 1];)
+                        if (i.push(a.pop()),
+                            0 == a.length) break;
+                    a.pop()
+                }
+
+            for (; a.length > 0;) {
+                if ("(" == a[a.length - 1]) a.pop();
+                i.push(a.pop())
+            }
+
+            for (var t = 0; t < i.length; t++)
+                "i" == i[t] ? i[t] = compI : "e" == i[t] ? i[t] = compE : "π" == i[t] ? i[t] = compPi : /[0-9.]/.test(i[t][0]) && (i[t] = new Complex(Number(i[t]), 0));
+
+            return i;
+
+        }
+
+        // opposite of parsing, convert to executable code string
+        function stringfyExpression(arr) {
+            var str = "";
+            var stack = [];
+            for (var i = 0; i < arr.length; i++) {
+                var token = arr[i];
+                if (typeof token == "string" && token != 'z') {
+                    if (!(FC.indexOf(token) >= 0)) {
+                        if (stack.length < 2) throw "Invalid Expression";
+                        var b = stack.pop(), a = stack.pop(), r = "";
+                        if (typeof a != "string")
+                            a = "vec2(" + String(a.re) + "," + String(a.im) + ")";
+                        if (typeof b != "string")
+                            b = "vec2(" + String(b.re) + "," + String(b.im) + ")";
+                        switch (token) {
+                            case "+": r = 'ADD(' + a + ',' + b + ')'; break;
+                            case "-": r = 'SUB(' + a + ',' + b + ')'; break;
+                            case "*": r = 'MUL(' + a + ',' + b + ')'; break;
+                            case "/": r = 'DIV(' + a + ',' + b + ')'; break;
+                            case "^": r = 'POW(' + a + ',' + b + ')'; break;
+                        }
+                        stack.push(r);
+                    }
+                    else {
+                        var a = stack.pop();
+                        var r = token + '(' + a + ')';
+                        stack.push(r);
+                    }
+                }
+                else stack.push(token);
+            }
+            if (1 != stack.length)
+                throw "Invalid Expression";
+            return stack.pop();
+        }
+
 
 
         // graph information
         var state = {
+            // function
+            fun_string: "",
             // viewport
             xmin: NaN,
             xmax: NaN,
@@ -58,16 +288,61 @@
             ymax: NaN,
             xRes: window.innerWidth,
             yRes: window.innerHeight,
-            // rendering parameters
-            showXAxis: true,
-            showYAxis: true,
-            showMajorGridX: true,
-            showMajorGridY: true,
-            showMinorGridX: true,
-            showMinorGridY: true,
-            showXNumbers: true,
-            showYNumbers: true
+            // graphing parameters
+            showAxes: false,
+            showMajorGrid: false,
+            showMinorGrid: false,
+            showAxesNumbers: false,
+            showLinearContour: false,
+            showLogarithmicContour: false,
+            brightness: 0.5,
         };
+
+        function highlightError(i) {
+            i.style.boxShadow = "0px 0px 3px rgb(255,0,0)";
+            i.style.color = "red";
+            i.style.fontWeight = "600";
+        }
+        function dehighlightError(i) {
+            i.style.boxShadow = "none";
+            i.style.color = "black";
+            i.style.fontWeight = "normal";
+        }
+
+        function updateGraphingParameters(event) {
+            try {
+                var str = document.querySelector("#function-input").value;
+                state.fun_string = stringfyExpression(parseExpression(str));
+            } catch (e) { state.fun_string = ""; }
+            state.showAxes = document.querySelector("#checkbox-show-axes").checked;
+            state.showAxesNumbers = document.querySelector("#checkbox-axes-numbers").checked;
+            state.showMajorGrid = document.querySelector("#checkbox-grid-major").checked;
+            state.showMinorGrid = document.querySelector("#checkbox-grid-minor").checked;
+            state.showLinearContour = document.querySelector("#checkbox-contour-linear").checked;
+            state.showLogarithmicContour = document.querySelector("#checkbox-contour-logarithmic").checked;
+            state.brightness = Number(document.querySelector("#brightness-input").value);
+            if (!(state.brightness > 0. && state.brightness < 1.))
+                highlightError(document.querySelector("#brightness-input"));
+            else dehighlightError(document.querySelector("#brightness-input"));
+            replot(event);
+        }
+
+        function recompileShader() {
+            if (!(state.brightness > 0. && state.brightness < 1.)) {
+                highlightError(document.querySelector("#brightness-input"));
+                return false;
+            }
+            else dehighlightError(document.querySelector("#brightness-input"));
+
+            try {
+                updateGraphingParameters();
+                init_WebGL();
+                dehighlightError(document.querySelector("#function-input"));
+            } catch (e) {
+                highlightError(document.querySelector("#function-input"));
+            }
+            replot();
+        }
 
         // point and coordinate transform
         function vec2(x, y) { return { x: x, y: y }; }
@@ -91,12 +366,8 @@
 
 
         function plotAxesAndGrid(event) {
-            canvas.width = canvas.width = state.xRes = canvas.clientWidth;
-            canvas.height = canvas.height = state.yRes = canvas.clientHeight;
-
-            var ctx = canvas.getContext("2d");
-            ctx.fillStyle = 'transparent';
-            ctx.fillRect(0, 0, state.xRes, state.yRes);
+            var ctx = grid_canvas.getContext("2d");
+            ctx.clearRect(0, 0, state.xRes, state.yRes);
 
             var vfloor = function (x) {
                 var xm = Math.pow(10., Math.floor(Math.log(x) / Math.log(10)));
@@ -118,9 +389,9 @@
                 // minor gridlines
                 {
                     ctx.beginPath();
-                    ctx.strokeStyle = '#ccc';
+                    ctx.strokeStyle = '#ffffffcc';
                     ctx.lineWidth = 0.5;
-                    if (state.showMinorGridX) {
+                    if (state.showMinorGrid) { // x
                         var x0 = Math.floor(state.xmin / (.2 * xd)) * (.2 * xd);
                         for (var x = x0; x <= state.xmax; x += .2 * xd) {
                             var xc = fromGraphX(x);
@@ -128,7 +399,7 @@
                             ctx.lineTo(xc, state.yRes);
                         }
                     }
-                    if (state.showMinorGridY) {
+                    if (state.showMinorGrid) { // y
                         var y0 = Math.floor(state.ymin / (.2 * yd)) * (.2 * yd);
                         for (var y = y0; y <= state.ymax; y += .2 * yd) {
                             var yc = fromGraphY(y);
@@ -141,9 +412,9 @@
                 // major gridlines
                 {
                     ctx.beginPath();
-                    ctx.strokeStyle = '#aaa';
+                    ctx.strokeStyle = '#ffffffaa';
                     ctx.lineWidth = 0.5;
-                    if (state.showMajorGridX) {
+                    if (state.showMajorGrid) { // x
                         var x0 = Math.floor(state.xmin / xd) * xd;
                         for (var x = x0; x <= state.xmax; x += xd) {
                             var xc = fromGraphX(x);
@@ -151,7 +422,7 @@
                             ctx.lineTo(xc, state.yRes);
                         }
                     }
-                    if (state.showMajorGridY) {
+                    if (state.showMajorGrid) { // y
                         var y0 = Math.floor(state.ymin / yd) * yd;
                         for (var y = y0; y <= state.ymax; y += yd) {
                             var yc = fromGraphY(y);
@@ -161,19 +432,52 @@
                     }
                     ctx.stroke();
                 }
+                // numbers
+                {
+                    ctx.font = "10px sans-serif";
+                    ctx.fillStyle = "white";
+                    if (state.showAxesNumbers) {  // x
+                        ctx.textAlign = "center";
+                        var y = Math.min(Math.max(c.y, 0) + 10, state.yRes - 2);
+                        var x0 = Math.floor(state.xmin / xd) * xd;
+                        for (var x = x0; x <= state.xmax; x += xd) {
+                            if (Math.abs(x) > 1e-12) {
+                                var xc = fromGraphX(x);
+                                var xr = Number(x.toPrecision(12));
+                                ctx.fillText(Math.abs(xr) >= 1e6 || Math.abs(xr) <= 1e-6 ?
+                                    xr.toExponential(6).replace(/0+e/, 'e').replace('.e', 'e') :
+                                    xr.toString(), xc, y);
+                            }
+                        }
+                    }
+                    if (state.showAxesNumbers) {  // y
+                        var x = Math.min(Math.max(c.x - 4, 2), state.xRes - 2);
+                        ctx.textAlign = x <= 5 ? "left" : "right";
+                        var y0 = Math.floor(state.ymin / yd) * yd;
+                        for (var y = y0; y <= state.ymax; y += yd) {
+                            if (Math.abs(y) > 1e-12) {
+                                var yc = fromGraphY(y);
+                                var yr = Number(y.toPrecision(12));
+                                ctx.fillText(Math.abs(yr) >= 1e6 || Math.abs(yr) <= 1e-6 ?
+                                    yr.toExponential(6).replace(/0+e/, 'e').replace('.e', 'e') :
+                                    yr.toString(), x, yc + 4);
+                            }
+                        }
+                    }
+                }
             }
 
             // axes
             {
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = 'black';
-                if (state.showXAxis) {
+                ctx.strokeStyle = '#ffffffff';
+                if (state.showAxes) { // x
                     ctx.beginPath();
                     ctx.moveTo(0, c.y);
                     ctx.lineTo(state.xRes, c.y);
                     ctx.stroke();
                 }
-                if (state.showYAxis) {
+                if (state.showAxes) { // y
                     ctx.beginPath();
                     ctx.moveTo(c.x, 0);
                     ctx.lineTo(c.x, state.yRes);
@@ -184,8 +488,7 @@
 
 
         var WebGL = {
-            // getContext("webgl")
-            context: undefined,
+            context: undefined,  // getContext("webgl")
             programInfo: {
                 // shader program
                 program: undefined,
@@ -193,6 +496,9 @@
                 aVertexPosition: undefined,
                 uPmin: undefined,
                 uPmax: undefined,
+                LINEAR_CONTOUR: undefined,
+                LOGARITHMIC_CONTOUR: undefined,
+                brightness: undefined,
             },
             positionBuffer: undefined,
         };
@@ -259,7 +565,10 @@
 precision highp float;
 varying vec2 vPos;
 
-float brightness = 0.5;
+uniform bool LINEAR_CONTOUR;
+uniform bool LOGARITHMIC_CONTOUR;
+
+uniform float brightness;
 
 
 #define sinh(x) (0.5*(exp(x)-exp(-x)))
@@ -270,7 +579,10 @@ float brightness = 0.5;
 // complex arithmetic
 float Mag(vec2 a) { return length(a); }
 float Arg(vec2 a) { return atan(a.y, a.x); }
-float logMag(vec2 a) { return 0.5*log(dot(a,a)); }
+float logMag(vec2 a) {
+    //return 0.5*log(dot(a,a));
+    return log(length(a));
+}
 vec2 ADD(vec2 a, vec2 b) { return a + b; }
 vec2 SUB(vec2 a, vec2 b) { return a - b; }
 vec2 MUL(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x); }
@@ -383,9 +695,11 @@ vec3 hslToRgb(float h, float s, float l) {
 // main function
 void main() {
     vec2 z = vPos.xy;
-    vec2 fz = MUL(DIV(vec2(10,0),POW(LOG(POW(z,vec2(5,0))),vec2(2,0))),SUB(SUB(vec2(0,0),vec2(0,1)),vec2(1,0)));  // 10/ln(z^5)^2*(-i-1)
+    vec2 fz = ${state.fun_string};
     float h = Arg(fz) * 0.15915494309189535;
     float s = 1.0;
+    if (LINEAR_CONTOUR) s *= 0.5 + 0.5 * sqrt(abs(sin(3.141592653569793 * Mag(fz))));
+    if (LOGARITHMIC_CONTOUR) s *= 0.5 + 0.5 * sqrt(abs(sin(1.3643763538418412 * logMag(fz))));
     float l = 1.0 - pow(1.0 - brightness, log(log(Mag(fz) + 1.0) + 1.05));
     gl_FragColor = vec4(hslToRgb(h, s, l), 1);
 }
@@ -399,6 +713,9 @@ void main() {
             WebGL.programInfo.aVertexPosition = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
             WebGL.programInfo.uPmax = gl.getUniformLocation(shaderProgram, 'uPmax');
             WebGL.programInfo.uPmin = gl.getUniformLocation(shaderProgram, 'uPmin');
+            WebGL.programInfo.LINEAR_CONTOUR = gl.getUniformLocation(shaderProgram, 'LINEAR_CONTOUR');
+            WebGL.programInfo.LOGARITHMIC_CONTOUR = gl.getUniformLocation(shaderProgram, 'LOGARITHMIC_CONTOUR');
+            WebGL.programInfo.brightness = gl.getUniformLocation(shaderProgram, 'brightness');
 
             // create the buffer for vertex positions
             const positions = [
@@ -445,6 +762,10 @@ void main() {
             // set shader uniforms
             gl.uniform2fv(WebGL.programInfo.uPmin, [state.xmin, state.ymin]);
             gl.uniform2fv(WebGL.programInfo.uPmax, [state.xmax, state.ymax]);
+            gl.uniform1i(WebGL.programInfo.LINEAR_CONTOUR, state.showLinearContour);
+            gl.uniform1i(WebGL.programInfo.LOGARITHMIC_CONTOUR, state.showLogarithmicContour);
+            if (state.brightness > 0. && state.brightness < 1.)
+                gl.uniform1f(WebGL.programInfo.brightness, state.brightness);
 
             const offset = 0;
             const vertexCount = 4;
@@ -458,7 +779,7 @@ void main() {
             if (WebGL.context == undefined)
                 init_WebGL();
             replot_WebGL();
-            //plotAxesAndGrid(event);
+            plotAxesAndGrid(event);
         }
 
 
@@ -493,8 +814,8 @@ void main() {
                 );
             }
             state.xRes = xRes, state.yRes = yRes;
-            canvas.width = state.xRes;
-            canvas.height = state.yRes;
+            grid_canvas.width = canvas.width = state.xRes;
+            grid_canvas.height = canvas.height = state.yRes;
         }
         // call this after mouse up/leave
         function mouseUp() {
@@ -503,33 +824,46 @@ void main() {
 
 
         window.onload = function () {
+            // choose a random equation from the list
+            var random_list = [
+                "1/z^2",
+                "(z^3-4)^2",
+                "10/ln(z^5)^2*(-i-1)",
+                "sin(ln(z^2.8))",
+                "(z^6+z)^6+z",
+                "cos(7/z^2.5)",
+                "z*atan(1-z^2)",
+                "sqrt(2*pi*z)*(z/e)^z",
+            ];
+            document.querySelector("#function-input").value
+                = random_list[Math.floor(Math.random() * random_list.length)];
             resizeState();
-            console.log(state);
+            updateGraphingParameters();
             replot(event);
         };
         window.addEventListener("resize", function () {
             resizeState();
             replot(event);
         });
-        canvas.addEventListener("mousedown", function (event) {
+        grid_canvas.addEventListener("mousedown", function (event) {
             mouseDown = true;
             //event.preventDefault();
             mouseDownPos = mousePos = vec2(event.clientX, event.clientY);
             replot(event);
         });
-        canvas.addEventListener("mouseup", function (event) {
+        grid_canvas.addEventListener("mouseup", function (event) {
             if (!mouseDown) return;
             event.preventDefault();
             mouseUp();
             replot(event);
         });
-        canvas.addEventListener("mouseleave", function (event) { mouseUp(); });
-        canvas.addEventListener("mouseout", function (event) { mouseUp(); });
-        canvas.addEventListener("mousemove", function (event) {
+        grid_canvas.addEventListener("mouseleave", function (event) { mouseUp(); });
+        grid_canvas.addEventListener("mouseout", function (event) { mouseUp(); });
+        grid_canvas.addEventListener("mousemove", function (event) {
             if (mouseDown) {
                 event.preventDefault();
-                event.stopPropagation();
                 var delta = vec2(event.clientX - mousePos.x, event.clientY - mousePos.y);
+                mousePos = vec2(event.clientX, event.clientY);
                 delta = vec2(
                     delta.x * (state.xmax - state.xmin) / state.xRes,
                     -delta.y * (state.ymax - state.ymin) / state.yRes
@@ -539,7 +873,7 @@ void main() {
             }
             mousePos = vec2(event.clientX, event.clientY);
         });
-        canvas.addEventListener("wheel", function (event) {
+        grid_canvas.addEventListener("wheel", function (event) {
             event.preventDefault();
             var p = fromCanvas(vec2(event.clientX, event.clientY));
             var scf = Math.exp(0.001 * event.deltaY);
@@ -551,10 +885,6 @@ void main() {
 
 
     </script>
-
-    <div id="control">
-        <div id="title">Hello, World!</div>
-    </div>
 
 </body>
 
