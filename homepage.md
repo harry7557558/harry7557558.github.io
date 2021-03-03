@@ -6,7 +6,7 @@ This site was created initially for hosting pages I made for personal use. I mad
 
 [Math notes](https://harry7557558.github.io/notes/equations.html): a math formula sheet I keep for years that can never be completed. I don't memorize all the formulas, so I check them when I need to. I "discovered" some of the equations, but their correctness is not guaranteed.
 
-[Complex grapher](https://harry7557558.github.io/tools/complex.html): A tool for visualizing and sharing complex-variable math functions.
+[Complex grapher](https://harry7557558.github.io/tools/complex.html): A Javascript tool for visualizing and sharing complex-variable math functions; Also check the real-time [WebGL version](https://harry7557558.github.io/tools/complex_webgl.html);
 
 #### My other tools/notes that you may find helpful:
 

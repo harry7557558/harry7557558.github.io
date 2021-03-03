@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>The Complex Grapher</title>
+    <title>The Complex Grapher (WebGL)</title>
 
     <style>
         #canvas,
@@ -38,7 +38,8 @@
             width: 170px;
         }
 
-        #control>#title {
+        #control>#title,
+        #title a {
             margin: 0px 0px 1em 0px;
             padding: 0px 3px;
             font-family: Consolas;
@@ -47,6 +48,7 @@
             font-size: 20px;
             color: orange;
             text-shadow: 1.5px 1.5px 1px maroon;
+            text-decoration: none;
         }
     </style>
 
@@ -57,8 +59,10 @@
     <canvas id="grid-canvas"></canvas>
 
     <div id="control">
-        <div id="title" title='This tool only works in browsers with WebGL enabled.'>The Complex Grapher</div>
+        <div id="title"><a id='copy-link' href="javascript:copyLink()" title='click to copy shareable link'>The Complex
+                Grapher</a></div>
         <hr />
+
         <p style='margin-bottom: 0.4em;'>Function to graph:</p>
         <input type='text' id="function-input" oninput="updateGraphingParameters(event)"
             onkeydown="if (event.keyCode==13) { recompileShader(); }"></input>&nbsp;<button
@@ -91,7 +95,8 @@
         <br />
 
         <span style='white-space:normal;'>Doesn’t work as expected?
-            Check the <a href="complex.html" target='_blank' style='color:white;'>Javascript version</a>.</span>
+            Check the <a id="js-link" href="complex.html" target='_blank' style='color:white;'>Javascript
+                version</a>.</span>
 
     </div>
 
@@ -99,8 +104,9 @@
 
     <script>
         "use strict";
-        const canvas = document.querySelector("#canvas");
-        const grid_canvas = document.querySelector("#grid-canvas");
+        function $(s) { return document.querySelector(s); }
+        const canvas = $("#canvas");
+        const grid_canvas = $("#grid-canvas");
 
 
         function Complex(e, t) {
@@ -296,6 +302,8 @@
             showLinearContour: false,
             showLogarithmicContour: false,
             brightness: 0.5,
+            // sharing
+            share_hash: ""
         };
 
         function highlightError(i) {
@@ -309,23 +317,135 @@
             i.style.fontWeight = "normal";
         }
 
-        function updateGraphingParameters(event) {
+        function getGraphingParametersFromHash() {
             try {
-                var str = document.querySelector("#function-input").value;
+                var hash = document.location.hash.replace('#', '');
+                if (hash == "") return;
+                hash = hash.split('&').reduce(function (res, s) {
+                    s = s.split('=');
+                    res[s[0]] = decodeURIComponent(s[1]);
+                    return res;
+                }, {});
+                // read function
+                if (hash['f'] != undefined) $('#function-input').value = hash['f'];
+                // read graph
+                var cx = hash['cx'] == undefined ? 0.0 : Number(hash['cx']);
+                var cy = hash['cy'] == undefined ? 0.0 : Number(hash['cy']);
+                var rx = hash['rx'] == undefined ? 6.0 : Number(hash['rx']);
+                var ry = hash['ry'] == undefined ? 4.0 : Number(hash['ry']);
+                var xRes = window.innerWidth, yRes = window.innerHeight;
+                var sc = Math.sqrt((rx * ry) / (xRes * yRes));
+                state.xmax = cx + sc * xRes;
+                state.xmin = cx - sc * xRes;
+                state.ymax = cy + sc * yRes;
+                state.ymin = cy - sc * yRes;
+                // read brightness
+                $("#brightness-input").value = hash['a'] == undefined ? '0.5' : hash['a'];
+                // read contour option
+                var contour = Number(hash['contour']);
+                if (!(contour >= 0 && contour < 3)) contour = 0;
+                if (contour == 1) $("#checkbox-contour-linear").checked == true, $("#checkbox-contour-logarithmic").checked = false;
+                else if (contour == 2) $("#checkbox-contour-linear").checked == false, $("#checkbox-contour-logarithmic").checked = true;
+                else $("#checkbox-contour-linear").checked == false, $("#checkbox-contour-logarithmic").checked = false;
+                // read boolean values
+                var parseBool = function (s) {
+                    try {
+                        return Boolean(eval(s));  // undefined => false
+                    } catch (e) { return false; }
+                };
+                $("#checkbox-show-axes").checked = parseBool(hash['showaxes']);
+                $("#checkbox-axes-numbers").checked = parseBool(hash['showaxesnumbers']);
+                $("#checkbox-grid-major").checked = parseBool(hash['majorgrid']);
+                $("#checkbox-grid-minor").checked = parseBool(hash['minorgrid']);
+                console.log(window.location);
+            } catch (e) {
+                console.error(e);
+            }
+            window.location.hash = "";
+            updateGraphingParameters();
+        }
+
+        function updateGraphingParameters(event) {
+            // get parameters
+            try {
+                var str = $("#function-input").value;
                 state.fun_string = stringfyExpression(parseExpression(str));
             } catch (e) { state.fun_string = ""; }
-            state.showAxes = document.querySelector("#checkbox-show-axes").checked;
-            state.showAxesNumbers = document.querySelector("#checkbox-axes-numbers").checked;
-            state.showMajorGrid = document.querySelector("#checkbox-grid-major").checked;
-            state.showMinorGrid = document.querySelector("#checkbox-grid-minor").checked;
-            state.showLinearContour = document.querySelector("#checkbox-contour-linear").checked;
-            state.showLogarithmicContour = document.querySelector("#checkbox-contour-logarithmic").checked;
-            state.brightness = Number(document.querySelector("#brightness-input").value);
+            state.showAxes = $("#checkbox-show-axes").checked;
+            state.showAxesNumbers = $("#checkbox-axes-numbers").checked;
+            state.showMajorGrid = $("#checkbox-grid-major").checked;
+            state.showMinorGrid = $("#checkbox-grid-minor").checked;
+            state.showLinearContour = $("#checkbox-contour-linear").checked;
+            state.showLogarithmicContour = $("#checkbox-contour-logarithmic").checked;
+            state.brightness = Number($("#brightness-input").value);
             if (!(state.brightness > 0. && state.brightness < 1.))
-                highlightError(document.querySelector("#brightness-input"));
-            else dehighlightError(document.querySelector("#brightness-input"));
+                highlightError($("#brightness-input"));
+            else dehighlightError($("#brightness-input"));
+
+            updateHash();
             replot(event);
         }
+
+        function updateHash() {
+            var hash = 'f=' + encodeURIComponent(document.querySelector("#function-input").value);
+            hash += '&cx=' + encodeURIComponent((0.5 * (state.xmin + state.xmax)).toFixed(2));
+            hash += '&cy=' + encodeURIComponent((0.5 * (state.ymin + state.ymax)).toFixed(2));
+            var area = (state.xmax - state.xmin) * (state.ymax - state.ymin);
+            hash += '&rx=' + encodeURIComponent(Math.sqrt(0.375 * area).toFixed(2));
+            hash += '&ry=' + encodeURIComponent(Math.sqrt(area / 6.).toFixed(2));
+            hash += '&a=' + encodeURIComponent(state.brightness.toFixed(2));
+            hash += "&contour=" + (state.showLinearContour ? "1" : state.showLogarithmicContour ? "2" : "0");
+            if (state.showAxes) hash += "&showaxes=1";
+            if (state.showAxesNumbers) hash += "&showaxesnumbers=1";
+            if (state.showMajorGrid) hash += "&majorgrid=1";
+            if (state.showMinorGrid) hash += "&minorgrid=1";
+            state.share_hash = hash;
+            document.querySelector("#js-link").href = "complex.html#" + hash;
+        }
+
+        function copyLink() {
+            var link = window.location.href;
+            if (link.search('#', 0) != -1)
+                link = link.substring(0, link.search('#', 0));
+            link = link + '#' + state.share_hash;
+
+            // https://stackoverflow.com/a/30810322
+
+            function fallbackCopyTextToClipboard(text) {
+                var textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'successful' : 'unsuccessful';
+                    alert('Link copy was ' + msg);
+                } catch (err) {
+                    alert('Error copying link: ', err);
+                }
+                document.body.removeChild(textArea);
+            }
+            function copyTextToClipboard(text) {
+                if (!navigator.clipboard) {
+                    fallbackCopyTextToClipboard(text);
+                    return;
+                }
+                navigator.clipboard.writeText(text).then(function () {
+                    alert('Link copied to clipboard');
+                }, function (err) {
+                    alert('Error copying link: ', err);
+                });
+            }
+
+            copyTextToClipboard(link);
+
+        }
+
+
 
         function recompileShader() {
             if (!(state.brightness > 0. && state.brightness < 1.)) {
@@ -701,7 +821,9 @@ void main() {
     if (LINEAR_CONTOUR) s *= 0.5 + 0.5 * sqrt(abs(sin(3.141592653569793 * Mag(fz))));
     if (LOGARITHMIC_CONTOUR) s *= 0.5 + 0.5 * sqrt(abs(sin(1.3643763538418412 * logMag(fz))));
     float l = 1.0 - pow(1.0 - brightness, log(log(Mag(fz) + 1.0) + 1.05));
-    gl_FragColor = vec4(hslToRgb(h, s, l), 1);
+    vec3 hsl = hslToRgb(h, s, l);
+    if (hsl.x + min(brightness, 0.0) != hsl.x) hsl = vec3(1.0);  // NaN, set to white for some reason
+    gl_FragColor = vec4(hsl, 1);
 }
 `;
 
@@ -776,6 +898,8 @@ void main() {
 
 
         function replot(event) {
+            if (isNaN((state.xmax - state.xmin) * (state.ymax - state.ymin)))
+                resizeState();
             if (WebGL.context == undefined)
                 init_WebGL();
             replot_WebGL();
@@ -802,9 +926,10 @@ void main() {
             var xRes = window.innerWidth;
             var yRes = window.innerHeight;
             if (!((state.xmax - state.xmin) * (state.ymax - state.ymin) > 0)) {
-                var sc = Math.sqrt(xRes * yRes);
-                state.xmin = -(state.xmax = 5. * xRes / sc);
-                state.ymin = -(state.ymax = 5. * yRes / sc);
+                // make the area of each quadrant 6x4=24
+                var sc = Math.sqrt(24 / (xRes * yRes));
+                state.xmin = -(state.xmax = sc * xRes);
+                state.ymin = -(state.ymax = sc * yRes);
             }
             else if (xRes > 50 && yRes > 50 && state.xRes > 50 && state.yRes > 50) {
                 var sc = Math.sqrt(state.xRes * state.yRes) / Math.sqrt(xRes * yRes);
@@ -831,18 +956,26 @@ void main() {
                 "10/ln(z^5)^2*(-i-1)",
                 "sin(ln(z^2.8))",
                 "(z^6+z)^6+z",
+                "sin(7/z^1.5)",
                 "cos(7/z^2.5)",
                 "z*atan(1-z^2)",
                 "sqrt(2*pi*z)*(z/e)^z",
             ];
             document.querySelector("#function-input").value
                 = random_list[Math.floor(Math.random() * random_list.length)];
+            getGraphingParametersFromHash();
             resizeState();
             updateGraphingParameters();
             replot(event);
         };
+        window.addEventListener("hashchange", function () {
+            getGraphingParametersFromHash();
+            recompileShader();
+            replot();
+        });
         window.addEventListener("resize", function () {
             resizeState();
+            updateHash();
             replot(event);
         });
         grid_canvas.addEventListener("mousedown", function (event) {
@@ -869,6 +1002,7 @@ void main() {
                     -delta.y * (state.ymax - state.ymin) / state.yRes
                 );
                 translateState(delta);
+                updateHash();
                 replot(event);
             }
             mousePos = vec2(event.clientX, event.clientY);
@@ -879,6 +1013,7 @@ void main() {
             var scf = Math.exp(0.001 * event.deltaY);
             var sc = vec2(scf, scf);
             scaleState(p, sc);
+            updateHash();
             replot(event);
         }, { passive: false });
 

@@ -324,8 +324,10 @@
         #canvas {
             position: absolute;
             left: 0px;
-            top: -0.5px; /* Chrome */
-            top: 0px; /* Firefox */
+            top: -0.5px;
+            /* Chrome */
+            top: 0px;
+            /* Firefox */
             cursor: crosshair;
         }
 
@@ -415,6 +417,13 @@
             padding: 0.5em 0.8em;
             font-size: 15px;
         }
+
+        /* WebGL version link */
+        #webgl-link {
+            position: relative;
+            float: right;
+            color: rgb(0,0,238);
+        }
     </style>
 
     <script>
@@ -426,6 +435,7 @@
 
 <body>
     <div class="main">
+        <a id='webgl-link' href="complex_webgl.html" alt="WebGL link" target="_blank" title="view in the WebGL version">WebGL</a>
         <p id="title">The Complex Grapher</p>
         <div id="graph-container">
             <canvas id="canvas" width="600" height="400"></canvas>
@@ -491,6 +501,7 @@
             <div style="text-align:center;">
                 <button id="start" onclick="graph()">Draw Graph</button>
             </div>
+
         </div>
         <br style="clear:both;" />
     </div>
@@ -647,14 +658,15 @@
         }
         function setGraphingParamsToHash() {
             var params = 'f=' + encodeURIComponent($("#ifunction").value);
-            params += '&cx=' + encodeURIComponent(ctrx_input.value)
-            params += '&cy=' + encodeURIComponent(ctry_input.value)
-            params += '&rx=' + encodeURIComponent(radx_input.value)
-            params += '&ry=' + encodeURIComponent(rady_input.value)
+            params += '&cx=' + encodeURIComponent(ctrx_input.value);
+            params += '&cy=' + encodeURIComponent(ctry_input.value);
+            params += '&rx=' + encodeURIComponent(radx_input.value);
+            params += '&ry=' + encodeURIComponent(rady_input.value);
             params += '&a=' + encodeURIComponent(cprea_input.value);
             var contour = contour_select.selectedIndex;
             params += "&contour=" + encodeURI(String(contour));
             window.location.hash = params;
+            $("#webgl-link").href = "complex_webgl.html#" + params;
         }
 
     </script>
