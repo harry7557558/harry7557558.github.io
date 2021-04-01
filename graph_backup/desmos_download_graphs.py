@@ -46,7 +46,7 @@ def getEquation(obj):
 
 
 # a list of my Desmos graphs obtained using desmos_get_id.js
-Graphs = ["hvtbjw6rue","ktnucw466t","nudbqrxkti","7lr5htcel6","vu4xm0n9ir","w4wocwv0dw","ivasvrustk","nwoctkrg80","raeuahskxm","4vo8ccfuvp","hsp3ccmdhw","diuy6hrgw6","1z17yc5djh","zn9d68fqzt","btal70uvxv","l99tjopqcx","kmkcgt5eld","zyxas5zy8w","hznnunxnx6","ar8trp3g9s","nn29zfpyiq","bq5nc43zfh","59x14hqpt3","4omxg0mi1w","f9vwgan2ip","fa7mwvpxb3","dqsx3i3txz","gbji3acmwp","bzecuo9xix","hhoemjbsm5","px9ftgrzo4","ozmnil3v00","szky83xovy"]
+Graphs = ["pv4gxyyckx","hvtbjw6rue","ktnucw466t","nudbqrxkti","7lr5htcel6","vu4xm0n9ir","w4wocwv0dw","ivasvrustk","nwoctkrg80","raeuahskxm","4vo8ccfuvp","hsp3ccmdhw","diuy6hrgw6","1z17yc5djh","zn9d68fqzt","btal70uvxv","l99tjopqcx","kmkcgt5eld","zyxas5zy8w","hznnunxnx6","ar8trp3g9s","nn29zfpyiq","bq5nc43zfh","59x14hqpt3","4omxg0mi1w","f9vwgan2ip","fa7mwvpxb3","dqsx3i3txz","gbji3acmwp","bzecuo9xix","hhoemjbsm5","px9ftgrzo4","ozmnil3v00","szky83xovy"]
 
 
 
