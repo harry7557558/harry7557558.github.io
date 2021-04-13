@@ -26,19 +26,19 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
     html = ""
     for i in range(len(dirs)):
         if dirs_content[i]=='': continue
-        html += "<div class='dirname'>"+name+dirs[i][trunc:]+"</div>"
-        html += "<div class='dir'>"+dirs_content[i]+"</div>"
+        html += "<div class='dirname'>"+name+dirs[i][trunc:]+"</div>\n"
+        html += "<div class='dir'>\n"+dirs_content[i].replace('\n','\n    ')+"\n</div>\n"
     if len(files):
-        html += "<table>"
+        html += "<table>\n"
         for fn in files:
             ext = getExtension(fn)
             if web_only and ['htm','html','js','css','svg','pdf'].count(ext)==0:
                 continue
-            html += "<tr>"
+            html += "    <tr>"
             html += "<td class='file' type='"+ext+"'>"+name+fn[trunc:]+"</td>"
             html += "<td>"+getFileSize(fn)+"</td>"
             html += "<td>"+ext+"</td>"
-            html += "</tr>"
+            html += "</tr>\n"
         html += "</table>"
     if html.find("class='file'")==-1:
         return ''
