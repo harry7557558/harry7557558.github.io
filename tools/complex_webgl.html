@@ -64,7 +64,7 @@
         <hr />
 
         <p style='margin-bottom: 0.4em;'>Function to graph:</p>
-        <input type='text' id="function-input" oninput="updateGraphingParameters(event)"
+        <input type='text' id="function-input" spellcheck="false" oninput="updateGraphingParameters(event)"
             onkeydown="if (event.keyCode==13) { recompileShader(); }"></input>&nbsp;<button
             onclick="recompileShader();">Update</button>
         <br /><br />

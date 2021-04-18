@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8" />
     <title>Harry Chen</title>
+    <link rel="icon" href="./logo.png" />
+
     <style>
         body {
             background-color: #002;
@@ -54,7 +56,7 @@
             position: fixed;
             left: 20px;
             top: 20px;
-            font-size: 1em;
+            font-size: 16px;
         }
 
         #right {
@@ -62,7 +64,7 @@
             right: 20px;
             top: 20px;
             text-align: right;
-            font-size: 1em;
+            font-size: 16px;
         }
 
         #bottom {
@@ -72,7 +74,7 @@
             left: 50%;
             bottom: 5%;
             text-align: center;
-            font-size: 1.3em;
+            font-size: 21px;
         }
 
         /* ::selection {
@@ -252,9 +254,10 @@ void main() {
             ["“Sometimes, who we wish we were, what we wish we could do… It’s just not meant to be.”", "", 1],
             ["A = {x | x ∉ A}", "¯\\_(ツ)_/¯", 1],
             ["“Life is suffering, I wanna die.”", "random quote, refresh to get a new one", 1],
+            ["“I wish I could be a child forever.”", "", 1],
             ["Why am I so tired?", "Anhedonia", 1],
             ["“Do I look odd to you?”", "Yes, you are.", 1],
-            ["Unfriending notes", "pending delete", 1],
+            ["Unfriending Notes", "pending delete", 1],
             ["Never regret your insanity.", "", 1],
             ["Don’t judge.", "Don't dodge.", 1],
             ["Humans have the highest desire among all living creatures.", "😭", 0.5],
@@ -264,6 +267,7 @@ void main() {
             ["It’s like the tide, always falling and rising.", "", 1],
             ["To the place I know where I cannot go, where I long to be.", "", 1],
             ["Sometimes you come last but you do the best.", "Sometimes I did the nest.", 1],
+            ["“Some look for trouble, while others don’t.”", "", 1],
             ["When people can’t do something themselves, they’re gonna tell you that you can’t do it.", "", 0.5],
         ];
         const LINKS = [
@@ -313,11 +317,25 @@ void main() {
 
         var gl_loaded = false;
         function resetWordStyle() {
+            const left = document.getElementById("left"),
+                right = document.getElementById("right"),
+                bottom = document.getElementById("bottom");
             var w = window.innerWidth, h = window.innerHeight;
+
+            // set width
             var word_w = max(min(w, h), min(800, gl_loaded ? 1.2 * h : h));
-            var pad = max((w - word_w) / 2, 0) + 20;
-            //document.getElementById("left").style.left = pad + "px";
-            //document.getElementById("right").style.right = pad + "px";
+            //var pad = max((w - word_w) / 2, 0) + 20;
+            var pad = max(0.025 * w, 20);
+            left.style.left = pad.toFixed(1) + "px";
+            right.style.right = pad.toFixed(1) + "px";
+            var bottom_w = min(600, 0.8 * w);
+            bottom.style.width = bottom_w.toFixed(1) + "px";
+            bottom.style.marginLeft = (-0.5 * bottom_w).toFixed(1) + "px";
+
+            // set font size
+            var font_size = max(0.02 * min(w, h), 16);
+            left.style.fontSize = right.style.fontSize = font_size.toFixed(1) + "px";
+            bottom.style.fontSize = (1.3 * font_size).toFixed(1) + "px";
         };
 
         function setRandomQuote() {
@@ -455,8 +473,8 @@ void main() {
             function render_main(now) {
 
                 var w = window.innerWidth, h = window.innerHeight;
-                canvas.width = canvas.style.width = w;
-                canvas.height = canvas.style.height = h;
+                canvas.width = w, canvas.style.width = w + "px";
+                canvas.height = h, canvas.style.height = h + "px";
 
                 drawScene(gl, programInfo, buffers);
 
@@ -482,11 +500,6 @@ void main() {
                 mouseDown = false;
                 iMouse[2] = -1.0;
             };
-            window.onresize = function (event) {
-                var w = window.innerWidth, h = window.innerHeight;
-                canvas.width = canvas.style.width = w;
-                canvas.height = canvas.style.height = h;
-            }
             canvas.onmousemove = function (e) {
                 if (mouseDown) {
                     iMouse[0] = e.clientX;
