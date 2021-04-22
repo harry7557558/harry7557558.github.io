@@ -50,6 +50,31 @@
             text-shadow: 1.5px 1.5px 1px maroon;
             text-decoration: none;
         }
+
+        #reset-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            margin: 10px;
+            width: 24px;
+            height: 24px;
+            border: 2px solid gray;
+            border-radius: 4px;
+            line-height: 24px;
+            font-size: 20px;
+            text-align: center;
+            background-color: white;
+            opacity: 0.8;
+        }
+
+        #reset-button:before {
+            content: '⌂';
+        }
+
+        #reset-button:hover {
+            background-color: lightgray;
+            opacity: 1.0;
+        }
     </style>
 
 </head>
@@ -100,6 +125,8 @@
 
     </div>
 
+    <div id='reset-button' title="click to reset viewport"></div>
+
 
 
     <script>
@@ -133,10 +160,10 @@
             , compPi = new Complex(Math.PI, 0);
 
         // a list of function names
-        const FC = ["EXP", "LOG", "SQR",
+        const FC = ["EXP", "LOG", "SQR", "CBR",
             "SIN", "COS", "TAN", "CSC", "SEC", "COT", "SNH", "CSH", "TNH", "CCH", "SCH", "CTH",
             "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASH", "ACH", "ATH", "AXH", "AGH", "AKH",
-            "GMA", "REL", "IMA", "ABS", "ARG"];
+            "GMA", "REL", "IMA", "ABS", "ARG", "CNJ"];
 
         // parse equation to reverse polish notation 
         function parseExpression(str) {
@@ -161,11 +188,11 @@
             src = ["asin", "acos", "atan", "acsc", "asec", "acot", "arsin", "arcos", "artan", "arcsc", "arsec", "arcot", "arcsin", "arccos", "arctan", "arccsc", "arcsec", "arccot"];
             rep = ["ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT"];
             replaceFuncName();
-            src = ["ln", "log", "exp", "sqrt", "sin", "cos", "tan", "csc", "sec", "cot", "asin", "acos", "atan", "acsc", "asec", "acot", "gamma"];
-            rep = ["LOG", "LOG", "EXP", "SQR", "SIN", "COS", "TAN", "CSC", "SEC", "COT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "GMA"];
+            src = ["ln", "log", "exp", "sqrt", "cbrt", "sin", "cos", "tan", "csc", "sec", "cot", "asin", "acos", "atan", "acsc", "asec", "acot", "gamma"];
+            rep = ["LOG", "LOG", "EXP", "SQR", "CBR", "SIN", "COS", "TAN", "CSC", "SEC", "COT", "ASN", "ACS", "ATN", "ACC", "ASC", "ACT", "GMA"];
             replaceFuncName();
-            src = ["real", "re", "imaginary", "imag", "im", "pi"];
-            rep = ["REL", "REL", "IMA", "IMA", "IMA", "π"];
+            src = ["conjugate", "conj", "real", "re", "imaginary", "imag", "im", "pi"];
+            rep = ["CNJ", "CNJ", "REL", "REL", "IMA", "IMA", "IMA", "π"];
             replaceFuncName();
 
             if (!(/z/.test(str)) && (/x/.test(str))) str = str.replace(/x/g, "z");
@@ -207,7 +234,7 @@
             var prec = function prec(e) {
                 const dict = {
                     "+": 1, "-": 1, "*": 2, "/": 2, "^": 3,
-                    "SIN": 4, "COS": 4, "TAN": 4, "EXP": 4, "LOG": 4, "SQR": 4, "ASN": 4, "ACS": 4, "ATN": 4, "SNH": 4, "CSH": 4, "TNH": 4, "ASH": 4, "ACH": 4, "ATH": 4, "COT": 4, "CSC": 4, "SEC": 4, "ACC": 4, "ASC": 4, "ACT": 4, "CCH": 4, "SCH": 4, "CTH": 4, "AXH": 4, "AGH": 4, "AKH": 4, "GMA": 4, "REL": 4, "IMA": 4, "ABS": 4, "ARG": 4,
+                    "CNJ": 4, "REL": 4, "IMA": 4, "SIN": 4, "COS": 4, "TAN": 4, "EXP": 4, "LOG": 4, "SQR": 4, "CBR": 4, "ASN": 4, "ACS": 4, "ATN": 4, "SNH": 4, "CSH": 4, "TNH": 4, "ASH": 4, "ACH": 4, "ATH": 4, "COT": 4, "CSC": 4, "SEC": 4, "ACC": 4, "ASC": 4, "ACT": 4, "CCH": 4, "SCH": 4, "CTH": 4, "AXH": 4, "AGH": 4, "AKH": 4, "GMA": 4, "REL": 4, "IMA": 4, "ABS": 4, "ARG": 4,
                 };
                 var res = dict[e];
                 if (res === undefined) return -1;
@@ -333,6 +360,7 @@
                 var cy = hash['cy'] == undefined ? 0.0 : Number(hash['cy']);
                 var rx = hash['rx'] == undefined ? 6.0 : Number(hash['rx']);
                 var ry = hash['ry'] == undefined ? 4.0 : Number(hash['ry']);
+                //var area = hash['area'] == undefined ? 48.0 : Number(hash['area']);
                 var xRes = window.innerWidth, yRes = window.innerHeight;
                 var sc = Math.sqrt((rx * ry) / (xRes * yRes));
                 state.xmax = cx + sc * xRes;
@@ -344,8 +372,8 @@
                 // read contour option
                 var contour = Number(hash['contour']);
                 if (!(contour >= 0 && contour < 3)) contour = 0;
-                if (contour == 1) $("#checkbox-contour-linear").checked == true, $("#checkbox-contour-logarithmic").checked = false;
-                else if (contour == 2) $("#checkbox-contour-linear").checked == false, $("#checkbox-contour-logarithmic").checked = true;
+                if (contour == 1) $("#checkbox-contour-linear").checked = true, $("#checkbox-contour-logarithmic").checked = false;
+                else if (contour == 2) $("#checkbox-contour-linear").checked = false, $("#checkbox-contour-logarithmic").checked = true;
                 else $("#checkbox-contour-linear").checked == false, $("#checkbox-contour-logarithmic").checked = false;
                 // read boolean values
                 var parseBool = function (s) {
@@ -386,15 +414,33 @@
             replot(event);
         }
 
+        var encodeFloat = function (x) {
+            if (x == 0.0) return "0";
+            var sign = x < 0 ? "-" : "";
+            x = Math.abs(x);
+            var s = x <= 1e-3 ? x.toExponential(2) :
+                x < 1e-2 ? x.toFixed(5) :
+                    x < 1e-1 ? x.toFixed(4) :
+                        x < 1 ? x.toFixed(3) :
+                            x < 1e+1 ? x.toFixed(2) :
+                                x < 1e+2 ? x.toFixed(1) :
+                                    x < 1e+4 ? x.toFixed(0) :
+                                        x.toExponential(4).replace("e+", "e");
+            return sign + s.replace(/0+$/, '').replace(/0+e/, 'e').replace(/\.$/, '').replace(/\.e/, 'e');
+        }
         function updateHash() {
             var hash = 'f=' + encodeURIComponent(document.querySelector("#function-input").value);
-            hash += '&cx=' + encodeURIComponent((0.5 * (state.xmin + state.xmax)).toFixed(2));
-            hash += '&cy=' + encodeURIComponent((0.5 * (state.ymin + state.ymax)).toFixed(2));
+            if (Math.abs(state.xmin + state.xmax) > 1e-12)
+                hash += '&cx=' + encodeURIComponent(encodeFloat(0.5 * (state.xmin + state.xmax)));
+            if (Math.abs(state.ymin + state.ymax) > 1e-12)
+                hash += '&cy=' + encodeURIComponent(encodeFloat(0.5 * (state.ymin + state.ymax)));
             var area = (state.xmax - state.xmin) * (state.ymax - state.ymin);
-            hash += '&rx=' + encodeURIComponent(Math.sqrt(0.375 * area).toFixed(2));
-            hash += '&ry=' + encodeURIComponent(Math.sqrt(area / 6.).toFixed(2));
-            hash += '&a=' + encodeURIComponent(state.brightness.toFixed(2));
-            hash += "&contour=" + (state.showLinearContour ? "1" : state.showLogarithmicContour ? "2" : "0");
+            hash += '&rx=' + encodeURIComponent(encodeFloat(Math.sqrt(0.375 * area)));
+            hash += '&ry=' + encodeURIComponent(encodeFloat(Math.sqrt(area / 6.)));
+            //hash += '&area=' + encodeURIComponent(encodeFloat(area));
+            hash += '&a=' + encodeURIComponent(encodeFloat(state.brightness));
+            if (state.showLinearContour || state.showLogarithmicContour)
+                hash += "&contour=" + (state.showLinearContour ? "1" : state.showLogarithmicContour ? "2" : "0");
             if (state.showAxes) hash += "&showaxes=1";
             if (state.showAxesNumbers) hash += "&showaxesnumbers=1";
             if (state.showMajorGrid) hash += "&majorgrid=1";
@@ -703,6 +749,9 @@ float logMag(vec2 a) {
     //return 0.5*log(dot(a,a));
     return log(length(a));
 }
+vec2 REL(vec2 e) { return vec2(e.x, 0); }
+vec2 IMA(vec2 e) { return vec2(e.y, 0); }
+vec2 CNJ(vec2 e) { return vec2(e.x, -e.y); }
 vec2 ADD(vec2 a, vec2 b) { return a + b; }
 vec2 SUB(vec2 a, vec2 b) { return a - b; }
 vec2 MUL(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x); }
@@ -711,6 +760,7 @@ vec2 POW(vec2 e, vec2 t) {
     float a = Arg(e), r = logMag(e), c = exp(t.x*r-t.y*a), s = t.x*a+t.y*r;
     return c * vec2(cos(s), sin(s));
 }
+vec2 CBR(vec2 e) { return POW(e, vec2(1.0/3.0,0)); }
 vec2 EXP(vec2 e) { return exp(e.x) * vec2(cos(e.y),sin(e.y)); }
 vec2 LOG(vec2 e) { return vec2(logMag(e), Arg(e)); }
 vec2 SQR(vec2 e) {
@@ -962,7 +1012,8 @@ void main() {
                 "sqrt(2*pi*z)*(z/e)^z",
                 "(1+i)*(ln(z)^10)^0.1",
                 "sqrt(ln(z^6)^5)*(-i-1)",
-                "sin(cos(tan(csc(sec(cot(sqrt(5(x+1)"
+                "sin(cos(tan(csc(sec(cot(sqrt(5(x+1)",
+                "4imag(z)*conj(z)*(i+1)"
             ];
             document.querySelector("#function-input").value
                 = random_list[Math.floor(Math.random() * random_list.length)];
@@ -1019,6 +1070,16 @@ void main() {
             updateHash();
             replot(event);
         }, { passive: false });
+        document.getElementById("reset-button").addEventListener("click", function (e) {
+            var xRes = window.innerWidth, yRes = window.innerHeight;
+            var sc = Math.sqrt((6.0 * 4.0) / (xRes * yRes));
+            state.xmax = 0.0 + sc * xRes;
+            state.xmin = 0.0 - sc * xRes;
+            state.ymax = 0.0 + sc * yRes;
+            state.ymin = 0.0 - sc * yRes;
+            updateHash();
+            replot(event);
+        });
 
 
 
