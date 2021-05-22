@@ -12,7 +12,8 @@
             overflow: hidden;
         }
 
-        #canvas {
+        #canvas,
+        #easter-egg-canvas {
             position: absolute;
             left: 0;
             top: 0;
@@ -77,6 +78,10 @@
             font-size: 21px;
         }
 
+        #easter-egg-canvas {
+            pointer-events: none;
+        }
+
         /* ::selection {
             background-color: transparent;
         } */
@@ -89,7 +94,7 @@
 
     <div id='left'>
         <p id="webgl-message">Powered by WebGL</p>
-        <p>a weak silly <span title='sofake'>snowflake</span></p>
+        <p>a weak silly <span id='sofake' title='sofake'>snowflake</span></p>
         <p>❄️❄️❄️</p>
     </div>
     <div id='right'>
@@ -99,6 +104,8 @@
                 onclick="setTimeout(setRandomLink,100);return true;">random link</a></p>
     </div>
     <div id='bottom'></div>
+
+    <canvas id='easter-egg-canvas'></canvas>
 
     <pre id="fsSource" style="display:none;">
 precision highp float;
@@ -247,28 +254,29 @@ void main() {
             ["Just stay away and You’ll be safe from me!", "by Queen Elsa from the movie Frozen", 3],
             ["“Don’t touch me!”", "Don't touch me!", 1.5],
             ["I am Frozen!", "❄️❄️❄️", 1],
-            ["I am very very bad at math.", "and English", 1],
-            ["Don't like to meet people due to certain <del>mental illness</del>.", "That's me.", 0.5],
-            ["What purpose does this web page serve?", "", 1.5],
-            ["“Sometimes I imagine if I could become a fairy, or a mermaid… or some sort of creature.”", "", 2],
+            ["I am very very bad at English.", "and math", 0.5],
+            ["Don't like to meet people due to certain <del>mental illness</del>.", "", 0.5],
+            ["What purpose does this web page serve?", "", 1.0],
+            ["“Sometimes I dream I become a fairy, or a mermaid… or some sort of creature.”", "", 2],
             ["“Sometimes, who we wish we were, what we wish we could do… It’s just not meant to be.”", "", 1],
             ["A = {x | x ∉ A}", "¯\\_(ツ)_/¯", 1],
+            ["404 Not Found", "", 1],
             ["“Life is suffering, I wanna die.”", "random quote, refresh to get a new one", 1],
             ["I wish I could be a child forever.", "", 1],
-            ["Why am I so tired?", "Anhedonia", 1],
-            ["Do I look odd to you?", "", 1],
+            ["Why am I so tired?", "", 0.5],
+            ["Do I look odd to you?", "", 0.5],
             ["Unfriending Notes", "pending delete", 1],
-            ["Never regret your insanity.", "", 1],
-            ["Don’t judge.", "Don't dodge.", 1],
-            ["Humans have the highest desire and expectation among all living creatures.", "😭", 0.5],
+            ["Never regret your insanity.", "", 0.5],
+            ["Don’t judge.", "Don't dodge.", 0.5],
             ["A lotus flower grows out of the mud unsullied.", "", 1],
             ["Be the good girl you always have to be.", "", 1],
             ["Do you want to build a snowman?", "Go away, Anna.", 1],
+            ["Sometimes, the world seems against you.", "", 1],
             ["It’s like the tide, always falling and rising.", "", 1],
             ["To the place I know where I cannot go, where I long to be.", "", 1],
-            ["Sometimes you come last but you do the best.", "Sometimes I did the nest.", 1],
+            ["Sometimes you come last but you do the best.", "", 1],
             ["“Some look for trouble, while others don’t.”", "", 1],
-            ["When people can’t do something themselves, they’re gonna tell you that you can’t do it.", "", 0.5],
+            ["The world is too complicated for me to understand.", "", 1],
         ];
         const LINKS = [
             ["https://github.com/Harry7557558", "my Github profile", 2],
@@ -290,10 +298,11 @@ void main() {
             ["https://harry7557558.github.io/Graphics/UI/webgl_test/webgl_test_02.html", "WebGL experiment", 1],
             ["https://harry7557558.github.io/miscellaneous/math/sumpow.html", "math exploration", 0.5],
             ["https://harry7557558.github.io/Graphics/simulation/experiment/frictest/frictest.svg", "physics exploration", 0.5],
-            ["https://www.shadertoy.com/view/3dXfDr", "my artwork", 0.5],  // algebraic star
-            ["https://www.shadertoy.com/view/WtcSR2", "my artwork", 0.5],  // triangled
-            ["https://www.shadertoy.com/view/WdKXDt", "my artwork", 0.5],  // frozen fractals
+            ["https://www.shadertoy.com/view/3dXfDr", "algebraic star", 0.5],  // algebraic star
+            ["https://www.shadertoy.com/view/WtcSR2", "Triangled", 0.5],  // triangled
+            ["https://www.shadertoy.com/view/WdKXDt", "Frozen Fractals", 0.5],  // frozen fractals
             ["https://www.shadertoy.com/view/wly3WG", "math trick", 0.5],  // fitting art using bezier
+            ["https://www.shadertoy.com/view/NsSSRK", "least square fitting experiment", 0.5],  // mathematica color schemes
             ["https://www.shadertoy.com/view/wl2SWt", "boring Mandelbrot set", 0.5],  // Mandelbrot++
             ["https://www.desmos.com/calculator/vu4xm0n9ir", "math exploration", 0.5],  // torus projection
             ["https://www.desmos.com/calculator/4vo8ccfuvp", "math exploration", 0.5],  // polynomial trigonometric fit
@@ -353,10 +362,94 @@ void main() {
             document.getElementById("randlink").setAttribute("alt", link[1]);
         }
 
+        function setSofakeClick() {
+            const sofake = document.getElementById('sofake');
+
+            const canvas = document.getElementById('easter-egg-canvas');
+            canvas.style.width = canvas.style.height = '100%';
+            var resizeCanvas = function (e) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            function Snowflake(pos, vel, ang_pos, ang_vel, size, color) {
+                this.p = pos, this.v = vel, this.r = ang_pos, this.w = ang_vel;
+                this.size = size, this.color = color;
+            };
+            function randomSnowflake() {
+                var sx = Math.max(canvas.width / 600, 1.0);
+                var sy = Math.max(canvas.height / 400, 1.0);
+                var alpha = Math.random();
+                return new Snowflake(
+                    { x: Math.random() * canvas.width, y: (0.0 + 0.2 * Math.random()) * canvas.height },
+                    { x: sy * (20.0 * (2 * Math.random() - 1)), y: sx * (50 + 50 * Math.random()) },
+                    0, 0,
+                    5 + 3 * Math.random(),
+                    'rgba(255,255,255,' + (1.0 - Math.pow(alpha, 6.0)) + ')'
+                );
+            }
+            var snowflakes = [];
+            if (Math.random() < 0.2) snowflakes.push(randomSnowflake());
+
+            function render(time) {
+                if (snowflakes.length > 0) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    var new_snowflakes = [];
+
+                    for (var si = 0; si < snowflakes.length; si++) {
+                        var sf = snowflakes[si];
+
+                        ctx.beginPath();
+                        ctx.fillStyle = sf.color;
+                        ctx.moveTo(sf.p.x, sf.p.y);
+                        ctx.arc(sf.p.x, sf.p.y, sf.size, 0, 2 * Math.PI);
+                        ctx.fill();
+
+                        var dt = 1.0 / 60.0;
+                        var sf_new = new Snowflake(
+                            { x: sf.p.x + sf.v.x * dt, y: sf.p.y + sf.v.y * dt },
+                            { x: sf.v.x, y: sf.v.y },
+                            sf.r + sf.w * dt,
+                            sf.w,
+                            sf.size - 0.2 * dt,
+                            sf.color
+                        );
+                        if (sf_new.size > 1
+                            && (sf_new.p.x > -0.2 * canvas.width && sf_new.p.x < 1.2 * canvas.width)
+                            && (sf_new.p.y > -0.2 * canvas.height && sf_new.p.y < 1.2 * canvas.height)) {
+                            new_snowflakes.push(sf_new);
+                        }
+                    }
+
+                    snowflakes = new_snowflakes;
+                }
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+
+            sofake.addEventListener("click", function (e) {
+                if (Math.random() < 0.001) {
+                    alert("Easter Egg!");
+                }
+                var n = Math.random(); n = 8 + 10 * n * n;
+                for (var i = 0; i < n; i++) {
+                    snowflakes.push(randomSnowflake());
+                }
+            });
+        }
+
         window.onload = function () {
 
             setRandomQuote();
             setRandomLink();
+            resetWordStyle();
+
+            try { setSofakeClick(); }
+            catch (e) { console.error(e); }
 
             var webgl_failed = function () {
                 document.getElementById("webgl-message").textContent = "Failed to load WebGL";
@@ -372,7 +465,6 @@ void main() {
                 return;
             }
             gl_loaded = true;
-            resetWordStyle();
 
             // vertex and fragment shader code
             var vsSource = "attribute vec4 aVertexPosition;void main(void){gl_Position=aVertexPosition;}";
@@ -509,22 +601,20 @@ void main() {
 
             // interactions
             var mouseDown = false;
-            canvas.onmousedown = function (event) {
-                //event.preventDefault();
+            canvas.addEventListener('mousedown', function (event) {
                 mouseDown = true;
                 iMouse[2] = 1.0;
-            };
-            window.onmouseup = function (event) {
-                //event.preventDefault();
+            });
+            window.addEventListener('mouseup', function (event) {
                 mouseDown = false;
                 iMouse[2] = -1.0;
-            };
-            canvas.onmousemove = function (e) {
+            });
+            canvas.addEventListener('mousemove', function (e) {
                 if (mouseDown) {
                     iMouse[0] = e.clientX;
                     iMouse[1] = canvas.height - e.clientY;
                 }
-            };
+            });
         };
 
         window.addEventListener("resize", resetWordStyle);
