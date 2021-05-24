@@ -1,13 +1,21 @@
 ﻿<!doctype html>
 <html>
+
 <head>
     <title>MathJax Tester</title>
     <meta charset="utf-8" />
+
+    <meta name="description" content="A simple tool for typing LaTeX math equations." />
+    <meta name="keywords" content="harry7557558, mathjax, latex, math, equation, type" />
+    <meta name="author" content="Harry Chen">
+    <meta name="robots" content="index, follow" />
+
     <script id="mathjax-config-script" type="text/x-mathjax-config">
         MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
         MathJax.Hub.Config({ "HTML-CSS": { styles: { ".MathJax nobr": { padding: "0.2em 0.2em" }, } } });
     </script>
-    <script type="text/javascript" async="" id="MathJax_JS" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" async="" id="MathJax_JS"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>
         #MathJax_MenuFrame {
             opacity: 0.0;
@@ -15,10 +23,12 @@
             display: none;
         }
 
-        .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
+        .MathJax:focus,
+        .mjx-chtml:focus,
+        .MathJax_SVG:focus {
             outline-width: 0px;
             outline-style: none;
-            outline-color: rgba(255,255,255,0.0);
+            outline-color: rgba(255, 255, 255, 0.0);
         }
 
         #MathJax_Message {
@@ -27,9 +37,8 @@
         }
     </style>
     <style>
-
         body {
-            background-color: rgb(68,68,68);
+            background-color: rgb(68, 68, 68);
         }
 
         #LaTeX_Tester {
@@ -37,12 +46,9 @@
             margin-right: auto;
             text-align: center;
             max-width: 1000px;
-            background-color: rgb(26,35,50);
+            background-color: rgb(26, 35, 50);
             width: 656px;
             padding: 24px 20px 30px 20px;
-        }
-
-        #TeX_Input_container {
         }
 
         .title {
@@ -52,7 +58,7 @@
             font-family: Consolas;
             font-style: italic;
             font-weight: 600;
-            color: rgb(180,190,190);
+            color: rgb(180, 190, 190);
             text-decoration: none;
         }
 
@@ -61,7 +67,7 @@
             width: 620px;
             border: none;
             padding: 10px;
-            background-color: rgb(12,12,12);
+            background-color: rgb(12, 12, 12);
             font-family: Consolas;
             font-size: 14px;
             font-weight: 400;
@@ -89,6 +95,7 @@
         }
     </script>
 </head>
+
 <body onload="init();">
     <!-- Latex macros -->
     <div style="height:0px; visibility:hidden; display:none;">
@@ -106,9 +113,11 @@
         <div id="TeX_Input_container">
             <div id="title" class="title">
                 <span>type LaTeX here: </span>
-                <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title" style="float:right;display:none">⇒</a>
+                <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title"
+                    style="float:right;display:none">⇒</a>
             </div>
-            <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false" oninput="onInput(event)">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
+            <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false"
+                oninput="onInput(event)">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
         </div>
         <div id="TeX_PreviewBox_Frame">
             <div id="TeX_PreviewBox">
@@ -284,4 +293,5 @@
         </script>
     </div>
 </body>
+
 </html>

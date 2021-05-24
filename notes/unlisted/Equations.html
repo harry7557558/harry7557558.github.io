@@ -1,22 +1,45 @@
 ﻿<!doctype html>
 <html lang="en">
+
 <head>
-    <title>Equations in Mathematics</title>
     <meta charset="utf-8" />
-    <!-- MathJax -->
-    <script id="mathjax-config-script" type="text/x-mathjax-config">
-        MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
-    </script>
-    <script type="text/javascript" id="MathJax_src" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <title>Equations in Mathematics</title>
+    <meta name="description" content="A note sheet I use to keep useful math equations.">
+    <meta name="keywords" content="harry7557558, math, note, equation, formula, function, trigonometric">
+    <meta name="author" content="Harry Chen">
+    <meta name="robots" content="index, follow">
     <script>
-        document.getElementById("MathJax_src").onerror = function () {
-            alert("Failed loading MathJax \nCannot display LaTeX formulas");
+        // use the faster 'compiled' version
+        if (window.location.protocol.match('http')) {
+            window.location = "https://harry7557558.github.io/notes/equations.html";
         }
     </script>
-    <style>
 
+    <!-- MathJax -->
+    <script id="mathjax-config-script" type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [["$", "$"]],
+                preview: "none"
+            },
+            "fast-preview": { disabled: true },
+            AssistiveMML: { disabled: true },
+            menuSettings: { inTabOrder: false },
+            messageStyle: "simple",
+            positionToHash: false
+        });
+    </script>
+    <script type="text/javascript" id="MathJax_src" async=""
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script>
+        document.getElementById("MathJax_src").onerror = function () {
+            alert("Failed to load MathJax \nCannot render LaTeX equations");
+        }
+    </script>
+
+    <style>
         body {
-            background-color: rgb(82,86,89);
+            background-color: rgb(82, 86, 89);
             padding: 20px 0px 60px 0px;
         }
 
@@ -33,71 +56,83 @@
             margin: 12px 0px;
             background-color: white;
             text-align: left;
-            box-shadow: 0px 0px 12px rgba(0,0,0,0.6);
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.6);
             padding: 80px 100px 160px 100px;
             white-space: nowrap;
         }
 
-            .page > h1 {
-                font-size: 32px;
-            }
+        .page>h1 {
+            font-size: 32px;
+        }
 
-            .page > h2 {
-                font-size: 24px;
-                margin: 10px 0px;
-            }
+        .page>h2 {
+            font-size: 24px;
+            margin: 10px 0px;
+        }
 
-            .page > h3 {
-                font-size: 20px;
-                margin: 10px 0px;
-            }
+        .page>h3 {
+            font-size: 20px;
+            margin: 10px 0px;
+        }
 
-            .page > .cat {
-                margin: 2em 0em;
-            }
+        .page>.cat {
+            margin: 2em 0em;
+        }
 
         .cat p {
             font-size: 15px;
         }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 6px 10px;
+        }
+
 
         .graphfun {
             position: relative;
             display: inline-block;
         }
 
-            .graphfun > .graphfun-canvas {
-                border: 1px solid #555;
-                /*cursor: crosshair;*/
-            }
-
-            .graphfun > span {
-                background-color: white;
-                position: absolute;
-                right: 0;
-                top: 0;
-                margin: 6px 10px;
-                font-size: 14px;
-            }
-
-        ::selection {
-            background: rgb(153,193,218);
+        .graphfun>.graphfun-canvas {
+            border: 1px solid #555;
+            /*cursor: crosshair;*/
         }
 
-        /*a {
-            color: rgb(0,0,238);
-        }*/
+        .graphfun>span {
+            background-color: white;
+            position: absolute;
+            right: 0;
+            top: 0;
+            margin: 6px 10px;
+            font-size: 14px;
+        }
+
+        ::selection {
+            background: rgb(153, 193, 218);
+        }
     </style>
 
 </head>
+
 <body>
     <script>
         // set this to non-empty when editing for faster loading
         // pages without keyword will not be loaded
         var enable = "";  // case sensitive
     </script>
-    <div id="click2edit" style="position:fixed;top:0px;left:0px;width:10px;height:10px;background-color:red;display:none;" onclick="document.body.contentEditable = document.body.contentEditable!='true';"></div>
+    <div id="click2edit"
+        style="position:fixed;top:0px;left:0px;width:10px;height:10px;background-color:red;display:none;"
+        onclick="document.body.contentEditable = document.body.contentEditable!='true';"></div>
+
     <!-- LaTeX Macros -->
-    <div style="height:0px; visibility:hidden; display:none;">
+    <div style="display:none">
         $\newcommand{\e}{\operatorname{e}}$
         $\newcommand{\csch}{\operatorname{csch}}$
         $\newcommand{\sech}{\operatorname{sech}}$
@@ -151,6 +186,10 @@
 
     </div>
 
+    <span style="color:#555;width:100%;display:inline-block;text-align:center;">
+        No guarantee for correctness, use at own risk.
+    </span>
+
 
     <div class="article" id="main">
         <!-- Trigonometric Functions -->
@@ -189,7 +228,7 @@
             </div>
             <!-- Special Values -->
             <div class="cat">
-                <p>
+                <!-- <p>
                     $\sin{0^\circ}=0, \quad
                     \sin{15^\circ}=\dfrac{\sqrt{6}-\sqrt{2}}{4}, \quad
                     \sin{30^\circ}=\dfrac{1}{2}, \quad
@@ -203,7 +242,105 @@
                     \sin{36^\circ}=\dfrac{\sqrt{10-2\sqrt{5}}}{4}, \quad
                     \sin{54^\circ}=\dfrac{\sqrt{5}+1}{4}, \quad
                     \sin{72^\circ}=\dfrac{\sqrt{10+2\sqrt{5}}}{4};$
-                </p>
+                </p> -->
+                <table>
+                    <tr>
+                        <td>$\theta$</td>
+                        <td>$\sin(\theta)$</td>
+                        <td>$\cos(\theta)$</td>
+                        <td>$\tan(\theta)$</td>
+                        <td>$\csc(\theta)$</td>
+                        <td>$\sec(\theta)$</td>
+                        <td>$\cot(\theta)$</td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{6} = 30^\circ$</td>
+                        <td>$\dfrac{1}{2}$</td>
+                        <td>$\dfrac{\sqrt{3}}{2}$
+                            <!--&nbsp;$\approx 0.866025$-->
+                        </td>
+                        <td>$\dfrac{\sqrt{3}}{3}$
+                            <!--&nbsp;$\approx 0.577350$-->
+                        </td>
+                        <td>$2$</td>
+                        <td>$\dfrac{2\sqrt{3}}{3}$
+                            <!--&nbsp;$\approx 1.154701$-->
+                        </td>
+                        <td>$\sqrt{3}$
+                            <!--&nbsp;$\approx 1.732051$-->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{3} = 60^\circ$</td>
+                        <td>$\dfrac{\sqrt{3}}{2}$
+                            <!--&nbsp;$\approx 0.866025$-->
+                        </td>
+                        <td>$\dfrac{1}{2}$</td>
+                        <td>$\sqrt{3}$
+                            <!--&nbsp;$\approx 1.732051$-->
+                        </td>
+                        <td>$\dfrac{2\sqrt{3}}{3}$
+                            <!--&nbsp;$\approx 1.154701$-->
+                        </td>
+                        <td>$2$</td>
+                        <td>$\dfrac{\sqrt{3}}{3}$
+                            <!--&nbsp;$\approx 0.577350$-->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{4} = 45^\circ$</td>
+                        <td>$\dfrac{\sqrt{2}}{2}$
+                            <!--&nbsp;$\approx 0.707107$-->
+                        </td>
+                        <td>$\dfrac{\sqrt{2}}{2}$
+                            <!--&nbsp;$\approx 0.707107$-->
+                        </td>
+                        <td>$1$</td>
+                        <td>$\sqrt{2}$
+                            <!--&nbsp;$\approx 1.414214$-->
+                        </td>
+                        <td>$\sqrt{2}$
+                            <!--&nbsp;$\approx 1.414214$-->
+                        </td>
+                        <td>$1$</td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{12} = 15^\circ$</td>
+                        <td>$\dfrac{\sqrt{6}-\sqrt{2}}{4}$</td>
+                        <td>$\dfrac{\sqrt{6}+\sqrt{2}}{4}$</td>
+                        <td>$2-\sqrt{3}$</td>
+                        <td>$\sqrt{6}+\sqrt{2}$</td>
+                        <td>$\sqrt{6}-\sqrt{2}$</td>
+                        <td>$2+\sqrt{3}$</td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{8} = 22.5^\circ$</td>
+                        <td>$\dfrac{\sqrt{2-\sqrt{2}}}{2}$</td>
+                        <td>$\dfrac{\sqrt{2+\sqrt{2}}}{2}$</td>
+                        <td>$\sqrt{2}-1$</td>
+                        <td>$\sqrt{4+2\sqrt{2}}$</td>
+                        <td>$\sqrt{4-2\sqrt{2}}$</td>
+                        <td>$\sqrt{2}+1$</td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{10} = 18^\circ$</td>
+                        <td>$\dfrac{\sqrt{5}-1}{4}$</td>
+                        <td>$\dfrac{\sqrt{10+2\sqrt{5}}}{4}$</td>
+                        <td>$\sqrt{\dfrac{5-2\sqrt{5}}{5}}$</td>
+                        <td>$\sqrt{5}+1$</td>
+                        <td>$\sqrt{\dfrac{10-2\sqrt{5}}{5}}$</td>
+                        <td>$\sqrt{5+2\sqrt{5}}$</td>
+                    </tr>
+                    <tr>
+                        <td>$\dfrac{\pi}{5} = 36^\circ$</td>
+                        <td>$\dfrac{\sqrt{10-2\sqrt{5}}}{4}$</td>
+                        <td>$\dfrac{\sqrt{5}+1}{4}$</td>
+                        <td>$\sqrt{5-2\sqrt{5}}$</td>
+                        <td>$\sqrt{\dfrac{10+2\sqrt{5}}{5}}$</td>
+                        <td>$\sqrt{5}-1$</td>
+                        <td>$\sqrt{\dfrac{5+2\sqrt{5}}{5}}$</td>
+                    </tr>
+                </table>
             </div>
             <!-- Basic Properties -->
             <div class="cat">
@@ -225,8 +362,8 @@
                     \tan\left(\dfrac{\pi}{2}-x\right)=\cot{x};$
                 </p>
                 <p>
-                    $\sin\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{1}{\sqrt{2}}(\sin{x}\pm\cos{x}), \quad
-                    \cos\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{1}{\sqrt{2}}(\cos{x}\mp\sin{x}), \quad
+                    $\sin\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sqrt{2}}{2}(\sin{x}\pm\cos{x}), \quad
+                    \cos\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sqrt{2}}{2}(\cos{x}\mp\sin{x}), \quad
                     \tan\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sin{x}\pm\cos{x}}{\cos{x}\mp\sin{x}}=\dfrac{\tan{x}\pm1}{1\mp\tan{x}};$
                 </p>
                 <p>
@@ -244,18 +381,42 @@
                     =\dfrac{\sin(x\pm y)}{\cos{x}\cos{y}};$
                 </p>
                 <p>
-                    $\sin{2x}=2\sin{x}\cos{x}, \quad
-                    \cos{2x}=\cos^2{x}-\sin^2{x}=2\cos^2{x}-1=1-2\sin^2{x}, \quad
+                    $\sin{2x}=2\sin{x}\cos{x},
+                    \quad
+                    \cos{2x}=\begin{cases}\cos^2{x}-\sin^2{x}\\2\cos^2{x}-1\\1-2\sin^2{x}\end{cases},
+                    \quad
                     \tan{2x}=\dfrac{2\tan{x}}{1-\tan^2{x}};$
                 </p>
                 <p>
-                    <!--$\sin{3x}=3\sin{x}-4\sin^3{x}=3\sin{x}\cos^2x-\sin^3x=4\sin{x}\cos^2{x}-\sin{x}, \;
-                    \cos{3x}=4\cos^3{x}-3\cos{x}=\cos^3x-3\cos{x}\sin^2x=\cos{x}-4\cos{x}\sin^2{x}, \;
-                    \tan{3x}=\dfrac{3\tan{x}-\tan^3{x}}{1-3\tan^2{x}};$-->
-                    $\sin{3x}=\begin{cases}3\sin{x}-4\sin^3{x}\\3\sin{x}\cos^2x-\sin^3x\\4\sin{x}\cos^2{x}-\sin{x}\end{cases}, \quad
-                    \cos{3x}=\begin{cases}4\cos^3{x}-3\cos{x}\\\cos^3x-3\cos{x}\sin^2x\\\cos{x}-4\cos{x}\sin^2{x}\end{cases}, \quad
+                    $\sin{3x}=\begin{cases}3\sin{x}-4\sin^3{x}\\3\sin{x}\cos^2x-\sin^3x\\4\sin{x}\cos^2{x}-\sin{x}\end{cases},
+                    \quad
+                    \cos{3x}=\begin{cases}4\cos^3{x}-3\cos{x}\\\cos^3x-3\cos{x}\sin^2x\\\cos{x}-4\cos{x}\sin^2{x}\end{cases},
+                    \quad
                     \tan{3x}=\dfrac{3\tan{x}-\tan^3{x}}{1-3\tan^2{x}};$
                 </p>
+                <!-- <p>
+                    $\sin4x=4\sin x\cos x \cdot \cos 2x,
+                    \quad
+                    \cos4x=\begin{cases} \sin^{4}x+\cos^{4}x-6\sin^{2}x\cos^{2}x \\ 8\sin^{4}x-8\sin^{2}x+1 \\
+                    8\cos^{4}x-8\cos^{2}x+1 \end{cases}
+                    ;$
+                </p> -->
+                <p title='sin odd, cos even, step size 2, take turns in sign'>
+                    $ \sin(nx)=\displaystyle\sum_{k=0\atop 2k+1\le
+                    n}{\binom{n}{2k+1}(-1)^k\sin^{2k+1}x\cos^{n-(2k+1)}x},
+                    &emsp;
+                    \cos(nx)=\displaystyle\sum_{k=0\atop 2k\le n}{\binom{n}{2k}(-1)^k\sin^{2k}x\cos^{n-2k}x},
+                    &emsp;
+                    \tan(nx)=\dfrac{\sum_{k=0\atop 2k+1\le n}{\binom{n}{2k+1}(-1)^k\tan^{2k+1}x}}{\sum_{k=0\atop
+                    2k\le n}{\binom{n}{2k}(-1)^k\tan^{2k}x}};
+                    $
+                </p>
+                <p>
+                    $\cos(n\theta)+i\sin(n\theta)=(\cos\theta+i\sin\theta)^n$, &emsp;
+                    $\begin{bmatrix}\cos(n\theta)\\\sin(n\theta)\end{bmatrix}=\begin{bmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{bmatrix}^n\begin{bmatrix}1\\0\end{bmatrix}$;
+                </p>
+            </div>
+            <div class="cat">
                 <p>
                     $\sin^2\dfrac{x}{2}=\dfrac{1-\cos{x}}{2}, \quad
                     \cos^2\dfrac{x}{2}=\dfrac{1+\cos{x}}{2}, \quad
@@ -278,8 +439,10 @@
                     \cos{x}-\cos{y}=-2\sin\left(\dfrac{x+y}{2}\right)\sin\left(\dfrac{x-y}{2}\right);$
                 </p>
                 <p>
-                    $\sin{x}+\cos{y}=2\sin\left(\dfrac{x+y+\frac{\pi}{2}}{2}\right)\sin\left(\dfrac{x-y+\frac{\pi}{2}}{2}\right), \quad
-                    \sin{x}-\cos{y}=-2\cos\left(\dfrac{x+y+\frac{\pi}{2}}{2}\right)\cos\left(\dfrac{x-y+\frac{\pi}{2}}{2}\right); $
+                    $\sin{x}+\cos{y}=2\sin\left(\dfrac{x+y+\frac{\pi}{2}}{2}\right)\sin\left(\dfrac{x-y+\frac{\pi}{2}}{2}\right),
+                    \quad
+                    \sin{x}-\cos{y}=-2\cos\left(\dfrac{x+y+\frac{\pi}{2}}{2}\right)\cos\left(\dfrac{x-y+\frac{\pi}{2}}{2}\right);
+                    $
                 </p>
             </div>
             <br />
@@ -305,7 +468,8 @@
                     <canvas class="graphfun-canvas" width="160" height="140">0, 0.6, 4.8, 4, Math.atan(x)</canvas>
                     <span>$f(x)=\tan^{-1}{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="160" height="140">0, 1.2, 4.8, 4, .5*Math.PI-Math.atan(x)</canvas>
+                    <canvas class="graphfun-canvas" width="160" height="140">0, 1.2, 4.8, 4,
+                        .5*Math.PI-Math.atan(x)</canvas>
                     <span>$f(x)=\cot^{-1}{x}$</span>
                 </div>&nbsp;<div class="graphfun">
                     <canvas class="graphfun-canvas" width="160" height="140">0, 1.2, 4.8, 4, Math.acos(1./x)</canvas>
@@ -344,35 +508,46 @@
             <div class="cat">
                 <div class="graph" style="display:inline; float:right;">
                     <div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8, Math.asin(Math.sin(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8,
+                            Math.asin(Math.sin(x))</canvas>
                     </div>&nbsp;<div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0, Math.acos(Math.sin(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0,
+                            Math.acos(Math.sin(x))</canvas>
                     </div><br />
                     <div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8, Math.asin(Math.cos(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8,
+                            Math.asin(Math.cos(x))</canvas>
                     </div>&nbsp;<div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0, Math.acos(Math.cos(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0,
+                            Math.acos(Math.cos(x))</canvas>
                     </div><br />
                     <div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8, Math.atan(Math.tan(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8,
+                            Math.atan(Math.tan(x))</canvas>
                     </div>&nbsp;<div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8, Math.atan(1./Math.tan(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 0, 6.0, 1.8,
+                            Math.atan(1./Math.tan(x))</canvas>
                     </div><br />
                     <div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0, Math.PI/2-Math.atan(1./Math.tan(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0,
+                            Math.PI/2-Math.atan(1./Math.tan(x))</canvas>
                     </div>&nbsp;<div class="graphfun">
-                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0, Math.PI/2-Math.atan(Math.tan(x))</canvas>
+                        <canvas class="graphfun-canvas" width="170" height="45">0, 1.5, 6.0, 2.0,
+                            Math.PI/2-Math.atan(Math.tan(x))</canvas>
                     </div>
                 </div>
                 <p>
-                    $\sin^{-1}(\sin(x))=\begin{cases}x,&|x|< \frac{\pi}{2}\\\sgn(x)\pi-x,&\frac{\pi}{2}< |x|< \frac{3\pi}{2}\end{cases}, \quad
-                    \cos^{-1}(\sin(x))=\begin{cases}\frac{\pi}{2}-x,&|x|< \frac{\pi}{2}\\x-\sgn(x)\pi+\frac{\pi}{2},&\frac{\pi}{2}< |x|< \frac{3\pi}{2}\end{cases}, \\
-                    \sin^{-1}(\cos(x))=\begin{cases}\frac{\pi}{2}-|x|,&|x|< \pi\\|x|-\frac{3\pi}{2},&\pi< |x|< 2\pi\end{cases}, \quad
-                    \cos^{-1}(\cos(x))=\begin{cases}|x|,&|x|< \pi\\2\pi-|x|,&\pi< |x|< 2\pi\end{cases};$
+                    $\sin^{-1}(\sin(x))=\begin{cases}x,&|x|\lt \frac{\pi}{2}\\\sgn(x)\pi-x,&\frac{\pi}{2}\lt|x|\lt
+                    \frac{3\pi}{2}\end{cases}, \quad \cos^{-1}(\sin(x))=\begin{cases}\frac{\pi}{2}-x,&|x|\lt
+                    \frac{\pi}{2}\\x-\sgn(x)\pi+\frac{\pi}{2},&\frac{\pi}{2}\lt|x|\lt\frac{3\pi}{2}\end{cases}, \\
+                    \sin^{-1}(\cos(x))=\begin{cases}\frac{\pi}{2}-|x|,&|x|\lt\pi\\|x|-\frac{3\pi}{2},&\pi\lt|x|\lt
+                    2\pi\end{cases}, \quad \cos^{-1}(\cos(x))=\begin{cases}|x|,&|x|\lt\pi\\2\pi-|x|,&\pi\lt|x|\lt
+                    2\pi\end{cases};$
                 </p>
                 <p>
                     $\tan^{-1}(\tan(x))=x-\pi\operatorname{round}\left(\dfrac{x}{\pi}\right), \quad
-                    \tan^{-1}(\cot(x))=-x+\pi\left(\dfrac{1}{2}+\operatorname{floor}\left(\dfrac{x}{\pi}\right)\right), \\
+                    \tan^{-1}(\cot(x))=-x+\pi\left(\dfrac{1}{2}+\operatorname{floor}\left(\dfrac{x}{\pi}\right)\right),
+                    \\
                     \cot^{-1}(\cot(x))=x-\pi\operatorname{floor}\left(\dfrac{x}{\pi}\right), \quad
                     \cot^{-1}(\tan(x))=-x+\pi\left(\dfrac{1}{2}+\operatorname{round}\left(\dfrac{x}{\pi}\right)\right);$
                 </p>
@@ -405,7 +580,8 @@
             <div class="cat">
                 <p>
                     $\sin\left(\dfrac{1}{2}\sin^{-1}(x)\right)=\dfrac{1}{2}\left(\sqrt{1+x}-\sqrt{1-x}\right)=\dfrac{1}{\sqrt{2}}\cdot\dfrac{x}{\sqrt{\sqrt{1-x^2}+1}},\quad
-                    \cos\left(\dfrac{1}{2}\sin^{-1}(x)\right)=\dfrac{1}{2}\left(\sqrt{1+x}+\sqrt{1-x}\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\sqrt{1-x^2}+1}, \\
+                    \cos\left(\dfrac{1}{2}\sin^{-1}(x)\right)=\dfrac{1}{2}\left(\sqrt{1+x}+\sqrt{1-x}\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\sqrt{1-x^2}+1},
+                    \\
                     \tan\left(\dfrac{1}{2}\sin^{-1}(x)\right)=\dfrac{x}{\sqrt{1-x^2}+1};\quad
                     \sin\left(\dfrac{1}{2}\cos^{-1}(x)\right)=\dfrac{\sqrt{1-x}}{\sqrt{2}},\quad
                     \cos\left(\dfrac{1}{2}\cos^{-1}(x)\right)=\dfrac{\sqrt{1+x}}{\sqrt{2}},\quad
@@ -413,8 +589,10 @@
                     \sin\left(\dfrac{1}{2}\tan^{-1}(x)\right)=\dfrac{1}{\sqrt{2}}\cdot\dfrac{x}{\sqrt{(1+x^2)+\sqrt{1+x^2}}},\quad
                     \cos\left(\dfrac{1}{2}\tan^{-1}(x)\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\dfrac{1}{\sqrt{1+x^2}}+1},\quad
                     \tan\left(\dfrac{1}{2}\tan^{-1}(x)\right)=\dfrac{\sqrt{x^2+1}-1}{x}=\dfrac{x}{\sqrt{x^2+1}+1};\\
-                    \sin\left(\dfrac{1}{2}\mathrm{atan2}(y,x)\right)=\dfrac{1}{\sqrt{2}}\cdot\dfrac{y}{\sqrt{(x^2+y^2)+x\sqrt{x^2+y^2}}}, \quad
-                    \cos\left(\dfrac{1}{2}\mathrm{atan2}(y,x)\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\dfrac{x}{\sqrt{x^2+y^2}}+1};$ <br />
+                    \sin\left(\dfrac{1}{2}\mathrm{atan2}(y,x)\right)=\dfrac{1}{\sqrt{2}}\cdot\dfrac{y}{\sqrt{(x^2+y^2)+x\sqrt{x^2+y^2}}},
+                    \quad
+                    \cos\left(\dfrac{1}{2}\mathrm{atan2}(y,x)\right)=\dfrac{1}{\sqrt{2}}\cdot\sqrt{\dfrac{x}{\sqrt{x^2+y^2}}+1};$
+                    <br />
                 </p>
             </div>
             <div class="cat">
@@ -496,10 +674,12 @@
                     <canvas class="graphfun-canvas" width="180" height="140">1.8, 1.8, 4, 4, Math.pow(0.4,x)</canvas>
                     <span>$f(x)=0.4^x$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="180" height="140">1.8, 0.6, 4, 4, Math.log(x)/Math.log(0.4)</canvas>
+                    <canvas class="graphfun-canvas" width="180" height="140">1.8, 0.6, 4, 4,
+                        Math.log(x)/Math.log(0.4)</canvas>
                     <span>$f(x)=\log_{0.4}{x}$</span>
                 </div>&nbsp;<div class="graphfun">
-                    <canvas class="graphfun-canvas" width="180" height="140">1.8, 0.6, 4, 4, Math.log(x)/Math.log(1.8)</canvas>
+                    <canvas class="graphfun-canvas" width="180" height="140">1.8, 0.6, 4, 4,
+                        Math.log(x)/Math.log(1.8)</canvas>
                     <span>$f(x)=\log_{1.8}{x}$</span>
                 </div>
             </div>
@@ -534,7 +714,8 @@
                 <p>
                     <red>*</red>
                     $(ab)^x=a^x b^x,\; \sqrt{ab}=\sqrt{a}\sqrt{b}
-                    \qquad (\Re(a),\Re(b)\ge 0,\ a,b\text{ not both negative imaginary};\quad a,b\in\R,\ a,b \text{ not both negative})$;
+                    \qquad (\Re(a),\Re(b)\ge 0,\ a,b\text{ not both negative imaginary};\quad a,b\in\R,\ a,b \text{ not
+                    both negative})$;
                 </p>
                 <p>
                     <red>*</red>
@@ -543,12 +724,13 @@
                     &emsp;&emsp;&emsp;&emsp;
                     <red>*</red>
                     $\dfrac{1}{\sqrt{a}}=\sqrt{\dfrac{1}{a}}
-                    \qquad (a \text{ not negative real number})$;
+                    \qquad (a \text{ not negative real})$;
                 </p>
             </div>
             <div class="cat">
                 <p>
-                    $\sqrt{a^2}=\begin{cases}a,&\Re(a)>0;\ \Re(a)=0,\Im(a)>0\\-a,&\Re(a)\lt0;\ \Re(a)=0,\Im(a)\lt0\end{cases}$;
+                    $\sqrt{a^2}=\begin{cases}a,&\Re(a)>0;\ \Re(a)=0,\Im(a)>0\\-a,&\Re(a)\lt0;\
+                    \Re(a)=0,\Im(a)\lt0\end{cases}$;
                     &emsp;&emsp;
                     $\left(\sqrt{a}\right)^2=a$;
                 </p>
@@ -585,7 +767,7 @@
                     &emsp;&emsp;&emsp;&emsp;
                     <red>*</red>
                     $\ln\sqrt{x}=\dfrac{1}{2}\ln(x)
-                    \qquad (x \text{ not negative real number})$;
+                    \qquad (x \text{ not negative real})$;
                 </p>
             </div>
 
@@ -596,11 +778,13 @@
             <!-- Definitions -->
             <div class="cat">
                 <p>
-                    $\sinh{x}={\dfrac{\e^{x}-\e^{-x}}{2}}={\dfrac{\e^{2x}-1}{2\e^{x}}}={\dfrac{1-\e^{-2x}}{2\e^{-x}}}, \quad
+                    $\sinh{x}={\dfrac{\e^{x}-\e^{-x}}{2}}={\dfrac{\e^{2x}-1}{2\e^{x}}}={\dfrac{1-\e^{-2x}}{2\e^{-x}}},
+                    \quad
                     \cosh{x}={\dfrac{\e^{x}+\e^{-x}}{2}}={\dfrac{\e^{2x}+1}{2\e^{x}}}={\dfrac{1+\e^{-2x}}{2\e^{-x}}};$
                 </p>
                 <p>
-                    $\tanh{x}={\dfrac{\sinh{x}}{\cosh{x}}}={\dfrac{\e^{x}-\e^{-x}}{\e^{x}+\e^{-x}}}={\dfrac{\e^{2x}-1}{\e^{2x}+1}}={1-\dfrac{2}{\e^{2x}+1}}, \quad
+                    $\tanh{x}={\dfrac{\sinh{x}}{\cosh{x}}}={\dfrac{\e^{x}-\e^{-x}}{\e^{x}+\e^{-x}}}={\dfrac{\e^{2x}-1}{\e^{2x}+1}}={1-\dfrac{2}{\e^{2x}+1}},
+                    \quad
                     \coth{x}={\dfrac{\cosh{x}}{\sinh{x}}}={\dfrac{\e^{x}+\e^{-x}}{\e^{x}-\e^{-x}}}={\dfrac{\e^{2x}+1}{\e^{2x}-1}}={1+\dfrac{2}{\e^{2x}-1}};$
                 </p>
             </div>
@@ -676,8 +860,10 @@
                     \tanh{2x}=\dfrac{2\tanh x}{1+\tanh^2x};$
                 </p>
                 <p>
-                    $\sinh{3x}=\begin{cases}4\sinh^3{x}+3\sinh{x}\\4\sinh{x}\cosh^2{x}-\sinh{x}\\3\sinh{x}\cosh^2{x}+\sinh^3{x}\end{cases}, \quad
-                    \cosh{3x}=\begin{cases}4\cosh^3{x}-3\cosh{x}\\4\sinh^2{x}\cosh{x}+\cosh{x}\\3\sinh^2{x}\cosh{x}+\cosh^3{x}\end{cases}, \quad
+                    $\sinh{3x}=\begin{cases}4\sinh^3{x}+3\sinh{x}\\4\sinh{x}\cosh^2{x}-\sinh{x}\\3\sinh{x}\cosh^2{x}+\sinh^3{x}\end{cases},
+                    \quad
+                    \cosh{3x}=\begin{cases}4\cosh^3{x}-3\cosh{x}\\4\sinh^2{x}\cosh{x}+\cosh{x}\\3\sinh^2{x}\cosh{x}+\cosh^3{x}\end{cases},
+                    \quad
                     \tanh{3x}=\dfrac{3\tanh{x}+\tanh^3{x}}{1+3\tanh^2{x}};$
                 </p>
                 <!-- Prod to Sum -->
@@ -693,7 +879,8 @@
                 </p>
                 <!-- Sum to Prod -->
                 <p>
-                    $\sinh{x}\pm\sinh{y}=2\sinh\left(\dfrac{x\pm{y}}{2}\right)\cosh\left(\dfrac{x\mp{y}}{2}\right); \quad
+                    $\sinh{x}\pm\sinh{y}=2\sinh\left(\dfrac{x\pm{y}}{2}\right)\cosh\left(\dfrac{x\mp{y}}{2}\right);
+                    \quad
                     \cosh{x}+\cosh{y}=2\cosh\left(\dfrac{x+y}{2}\right)\cosh\left(\dfrac{x-y}{2}\right), \quad
                     \cosh{x}-\cosh{y}=2\sinh\left(\dfrac{x+y}{2}\right)\sinh\left(\dfrac{x-y}{2}\right);$
                 </p>
@@ -732,13 +919,16 @@
                         If $ \>{y_n}\le{x_n}\le{z_n}\> $ and $\>\lim{y_n}=\lim{z_n}=a\>$, &ensp;then $\>\lim{x_n}=a\>$;
                     </p>
                     <p>
-                        If $ \>\lim\dfrac{f(x)}{g(x)}=1\> $, &ensp;then $\>\lim[{f(x)\cdot{h(x)}}]=\lim[{g(x)\cdot{h(x)}}]\>$, &ensp;$\>\lim\dfrac{h(x)}{f(x)}=\lim\dfrac{h(x)}{g(x)} \> $;
+                        If $ \>\lim\dfrac{f(x)}{g(x)}=1\> $, &ensp;then
+                        $\>\lim[{f(x)\cdot{h(x)}}]=\lim[{g(x)\cdot{h(x)}}]\>$,
+                        &ensp;$\>\lim\dfrac{h(x)}{f(x)}=\lim\dfrac{h(x)}{g(x)} \> $;
                     </p>
                 </div>
                 <!-- L'Hôpital's Rule -->
                 <div class="cat">
                     <p>
-                        L'Hôpital's Rule: &emsp;If $\>\lim{f(x)}=\lim{g(x)}=0\>$ or $\>\lim{f(x)}=\lim{g(x)}=\infty\>$, &ensp;then $\>\lim\dfrac{f(x)}{g(x)}=\lim\dfrac{f'(x)}{g'(x)}\>$;
+                        L'Hôpital's Rule: &emsp;If $\>\lim{f(x)}=\lim{g(x)}=0\>$ or $\>\lim{f(x)}=\lim{g(x)}=\infty\>$,
+                        &ensp;then $\>\lim\dfrac{f(x)}{g(x)}=\lim\dfrac{f'(x)}{g'(x)}\>$;
                     </p>
                     <p>
                         $\text{L'Hôpital's Rule for other indeterminates: } \quad
@@ -762,7 +952,8 @@
                     $\ddx[f(x)\cdot{g(x)}]=f'(x)\cdot{g(x)}+f(x)\cdot{g'(x)};$
                 </p>
                 <p>
-                    $\ddx[f_1(x)\cdot{f_2(x)}\cdot{f_3(x)}]=f'_1(x)\cdot{f_2(x)}\cdot{f_3(x)}+f_1(x)\cdot{f'_2(x)}\cdot{f_3(x)}+f_1(x)\cdot{f_2(x)}\cdot{f'_3(x)}; \quad$
+                    $\ddx[f_1(x)\cdot{f_2(x)}\cdot{f_3(x)}]=f'_1(x)\cdot{f_2(x)}\cdot{f_3(x)}+f_1(x)\cdot{f'_2(x)}\cdot{f_3(x)}+f_1(x)\cdot{f_2(x)}\cdot{f'_3(x)};
+                    \quad$
                     “Each item take turns at derivation”
                 </p>
                 <p>
@@ -833,7 +1024,8 @@
             <div class="cat">
                 <p>
                     Taylor Series: &emsp;
-                    $ f(x)=\displaystyle\sum\limits_{k=0}\limits^{n}{\dfrac{(x-x_0)^k\cdot{f^{(k)}}(x_0)}{k!}}+R_n$; &emsp;
+                    $ f(x)=\displaystyle\sum\limits_{k=0}\limits^{n}{\dfrac{(x-x_0)^k\cdot{f^{(k)}}(x_0)}{k!}}+R_n$;
+                    &emsp;
                     Maclaurin Series: &emsp;
                     $ f(x)=\displaystyle\sum\limits_{k=0}\limits^{n}{\dfrac{x^k\cdot{f^{(k)}}(0)}{k!}}+R_n$; &emsp;
                 </p>
@@ -850,7 +1042,8 @@
             </div>
             <div class="cat">
                 <p>
-                    Curvature: &ensp;$\kappa=\lim\limits_{\Delta s\to 0}{\dfrac{\Delta\theta}{\Delta{s}}}=\left|\dfrac{\d\theta}{\d{s}}\right|$;
+                    Curvature: &ensp;$\kappa=\lim\limits_{\Delta s\to
+                    0}{\dfrac{\Delta\theta}{\Delta{s}}}=\left|\dfrac{\d\theta}{\d{s}}\right|$;
                 </p>
                 <p>
                     $\vec{r}=\mathbf{r}(t)$:&ensp;
@@ -866,7 +1059,8 @@
                     Binormal unit vector: $B=T\times N$;&ensp;
                 </p>
                 <p>
-                    Frenet–Serret formulas: &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$,
+                    Frenet–Serret formulas:
+                    &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$,
                     &ensp;where $\tau=-\dfrac{\d{B}}{\d{s}}\cdot N$ is the <i>torsion</i>;
                 </p>
             </div>
@@ -880,7 +1074,8 @@
                     $\vec{a}=\dfrac{\d^2{x}}{\d{t}^2}\vec{i}+\dfrac{\d^2{y}}{\d{t}^2}\vec{j}+\dfrac{\d^2{z}}{\d{t}^2}\vec{k}$;
                 </p>
                 <p>
-                    Velocity and acceleration in polar coordinate $\begin{cases}r=r(t)\\\theta=\theta(t)\end{cases}$:&ensp;
+                    Velocity and acceleration in polar coordinate
+                    $\begin{cases}r=r(t)\\\theta=\theta(t)\end{cases}$:&ensp;
                     $\vec{p}=r\vec{e_r}$,&ensp;
                     $\vec{v}=\dot{r}\vec{e_r}+r\dot{\theta}\vec{e_\theta}$,&ensp;
                     $\vec{a}=(\ddot{r}-r\dot{\theta}^2)\vec{e_r}+(2\dot{r}\dot{\theta}+r\ddot{\theta})\vec{e_\theta}$;
@@ -890,7 +1085,8 @@
                     $\vec{v}=v\vec{e_t}$,&ensp;
                     $\vec{a}=\dfrac{\d{v}}{\d{t}}\vec{e_t}+\dfrac{v^2}{R}\vec{e_n}$,&ensp;
                     $R$ is the curvature radius;<br />
-                    &emsp;($\vec{a}$ can also be calculated by projecting acceleration vector in $\vec{e_t}$ and $\vec{e_n}$ directions)
+                    &emsp;($\vec{a}$ can also be calculated by projecting acceleration vector in $\vec{e_t}$ and
+                    $\vec{e_n}$ directions)
                 </p>
                 <p>
                     Derivatives of unit vectors in polar coordinate:&ensp;
@@ -971,12 +1167,15 @@
                     \intd{\dfrac{1}{\sqrt{x^2\pm{a^2}}}}=\ln\left|\sqrt{x^2\pm{a^2}}+x\right|+C;$
                 </p>
                 <p>
-                    $\intd{\sqrt{a^2-x^2}}=\dfrac{1}{2}\left(a^2\sin^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2-x^2}\right)+C; \quad
-                    \intd{\sqrt{a^2+x^2}}=\dfrac{1}{2}\left({a^2\sinh^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2+x^2}}\right)+C; \qquad
+                    $\intd{\sqrt{a^2-x^2}}=\dfrac{1}{2}\left(a^2\sin^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2-x^2}\right)+C;
+                    \quad
+                    \intd{\sqrt{a^2+x^2}}=\dfrac{1}{2}\left({a^2\sinh^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2+x^2}}\right)+C;
+                    \qquad
                     (a>0)$
                 </p>
                 <p>
-                    $\intd{\sqrt{x^2-a^2}}=\dfrac{1}{2}\left(x\sqrt{x^2-a^2}-a^2\cosh^{-1}\left(\dfrac{x}{a}\right)\right)+C; \quad
+                    $\intd{\sqrt{x^2-a^2}}=\dfrac{1}{2}\left(x\sqrt{x^2-a^2}-a^2\cosh^{-1}\left(\dfrac{x}{a}\right)\right)+C;
+                    \quad
                     (x,a>0)$
                 </p>
             </div>
@@ -1004,16 +1203,19 @@
                 <p>
                     $\intabd{[f(x)\pm{g(x)}]}{a}{b}=\intabd{f(x)}{a}{b}\pm\intabd{g(x)}{a}{b}$, &ensp;
                     $\intabd{k\cdot{f(x)}}{a}{b}=k\cdot\intabd{f(x)}{a}{b}$, &ensp;
-                    $\intabd{k_{1}f_{1}(x)\pm{k_2}f_{2}(x)}{a}{b}=k_{1}\intabd{f_1(x)}{a}{b}\pm{k_2}\intabd{f_2(x)}{a}{b}$; &ensp;
+                    $\intabd{k_{1}f_{1}(x)\pm{k_2}f_{2}(x)}{a}{b}=k_{1}\intabd{f_1(x)}{a}{b}\pm{k_2}\intabd{f_2(x)}{a}{b}$;
+                    &ensp;
                 </p>
                 <p>
-                    $\ddx{\left({\intabd[t]{f(t)}{\varphi(x)}{\psi(x)}}\right)}=\psi'(x)f[\psi(x)]-\varphi'(x)f[\varphi(x)]$; &emsp;
+                    $\ddx{\left({\intabd[t]{f(t)}{\varphi(x)}{\psi(x)}}\right)}=\psi'(x)f[\psi(x)]-\varphi'(x)f[\varphi(x)]$;
+                    &emsp;
                 </p>
             </div>
             <div class="cat">
                 <p>
                     $\intabd{f(x)}{a}{b}=\intabd[t]{f[\varphi(t)]\varphi'(t)}{\varphi^{-1}(a)}{\varphi^{-1}(b)}$, &ensp;
-                    $\intabd{f[\varphi(x)]\varphi'(x)}{a}{b}=\intabd{f(x)}{\varphi(a)}{\varphi(b)}=\intabd[\varphi(x)]{f[\varphi(x)]}{a}{b}$; &emsp;
+                    $\intabd{f[\varphi(x)]\varphi'(x)}{a}{b}=\intabd{f(x)}{\varphi(a)}{\varphi(b)}=\intabd[\varphi(x)]{f[\varphi(x)]}{a}{b}$;
+                    &emsp;
                     $\intabd{f(\sin{x})}{0}{\pi\over2}=\intabd{f(\cos{x})}{0}{\pi\over2}$; &ensp;
                 </p>
             </div>
@@ -1022,15 +1224,21 @@
                     Newton-Leibniz Formula: &ensp;$\intabd{f(x)}{a}{b}=F(b)-F(a)$; &emsp;
                 </p>
                 <p>
-                    Green Formula: &ensp;$\Oint_LP\d{x}+Q\d{y}=\Iint_D\left(\dfrac{\partial{Q}}{\partial{x}}-\dfrac{\partial{P}}{\partial{y}}\right)\d{x}\d{y}$; &emsp;
+                    Green Formula:
+                    &ensp;$\Oint_LP\d{x}+Q\d{y}=\Iint_D\left(\dfrac{\partial{Q}}{\partial{x}}-\dfrac{\partial{P}}{\partial{y}}\right)\d{x}\d{y}$;
+                    &emsp;
                     ($A=\dfrac{1}{2}\Oint_Lx\d{y}-y\d{x}$); &emsp;
                 </p>
                 <p>
-                    Gauss Formula: &ensp;$\Oiint_{\Sigma^+}P\,\d{y}\d{z}+Q\,\d{x}\d{z}+R\,\d{x}\d{y}=\Iiint_V\left(\dfrac{\partial{P}}{\partial{x}}+\dfrac{\partial{Q}}{\partial{y}}+\dfrac{\partial{R}}{\partial{z}}\right)\d{x}\d{y}\d{z}$; &emsp;
+                    Gauss Formula:
+                    &ensp;$\Oiint_{\Sigma^+}P\,\d{y}\d{z}+Q\,\d{x}\d{z}+R\,\d{x}\d{y}=\Iiint_V\left(\dfrac{\partial{P}}{\partial{x}}+\dfrac{\partial{Q}}{\partial{y}}+\dfrac{\partial{R}}{\partial{z}}\right)\d{x}\d{y}\d{z}$;
+                    &emsp;
                     ($V=\dfrac{1}{3}\;\Oiint_{\Sigma}x\,\d{y}\d{z}+y\,\d{z}\d{x}+z\,\d{x}\d{y}$); &emsp;
                 </p>
                 <p>
-                    Stokes Formula: &ensp;$\Oint_LP\d{x}+Q\d{y}+R\d{z}=\Iint_\Sigma\left(\dfrac{\partial{R}}{\partial{y}}-\dfrac{\partial{Q}}{\partial{z}}\right)\d{y}\d{z}+\left(\dfrac{\partial{P}}{\partial{z}}-\dfrac{\partial{R}}{\partial{x}}\right)\d{z}\d{x}+\left(\dfrac{\partial{Q}}{\partial{x}}-\dfrac{\partial{P}}{\partial{y}}\right)\d{x}\d{y}$; &emsp;
+                    Stokes Formula:
+                    &ensp;$\Oint_LP\d{x}+Q\d{y}+R\d{z}=\Iint_\Sigma\left(\dfrac{\partial{R}}{\partial{y}}-\dfrac{\partial{Q}}{\partial{z}}\right)\d{y}\d{z}+\left(\dfrac{\partial{P}}{\partial{z}}-\dfrac{\partial{R}}{\partial{x}}\right)\d{z}\d{x}+\left(\dfrac{\partial{Q}}{\partial{x}}-\dfrac{\partial{P}}{\partial{y}}\right)\d{x}\d{y}$;
+                    &emsp;
                 </p>
             </div>
             <div class="cat">
@@ -1047,13 +1255,17 @@
             <div class="cat">
                 <p>
                     Elliptic integral of the first kind: &ensp;
-                    $F(\varphi ,k)=F\left(\varphi \,|\,k^{2}\right)=F(\sin \varphi; k)=\displaystyle\int _{0}^{\varphi }{\dfrac {\d\theta }{\sqrt {1-k^{2}\sin ^{2}\theta }}}$; &emsp;
-                    $\displaystyle K(k)=\int _{0}^{\tfrac {\pi }{2}}{\frac {\d\theta }{\sqrt {1-k^{2}\sin ^{2}\theta }}}=\int _{0}^{1}{\frac {\d t}{\sqrt {\left(1-t^{2}\right)\left(1-k^{2}t^{2}\right)}}}$; &emsp;
+                    $F(\varphi ,k)=F\left(\varphi \,|\,k^{2}\right)=F(\sin \varphi; k)=\displaystyle\int _{0}^{\varphi
+                    }{\dfrac {\d\theta }{\sqrt {1-k^{2}\sin ^{2}\theta }}}$; &emsp;
+                    $\displaystyle K(k)=\int _{0}^{\tfrac {\pi }{2}}{\frac {\d\theta }{\sqrt {1-k^{2}\sin ^{2}\theta
+                    }}}=\int _{0}^{1}{\frac {\d t}{\sqrt {\left(1-t^{2}\right)\left(1-k^{2}t^{2}\right)}}}$; &emsp;
                 </p>
                 <p>
                     Elliptic integral of the second kind: &ensp;
-                    $\displaystyle E(\varphi ,k)=E\left(\varphi \,|\,k^{2}\right)=E(\sin \varphi ;k)=\int _{0}^{\varphi }{\sqrt {1-k^{2}\sin ^{2}\theta }}\,\d\theta$; &emsp;
-                    $\displaystyle E(k)=\int _{0}^{\tfrac {\pi }{2}}{\sqrt {1-k^{2}\sin ^{2}\theta }}\,\d\theta =\int _{0}^{1}{\frac {\sqrt {1-k^{2}t^{2}}}{\sqrt {1-t^{2}}}}\,\d t$; &ensp;
+                    $\displaystyle E(\varphi ,k)=E\left(\varphi \,|\,k^{2}\right)=E(\sin \varphi ;k)=\int _{0}^{\varphi
+                    }{\sqrt {1-k^{2}\sin ^{2}\theta }}\,\d\theta$; &emsp;
+                    $\displaystyle E(k)=\int _{0}^{\tfrac {\pi }{2}}{\sqrt {1-k^{2}\sin ^{2}\theta }}\,\d\theta =\int
+                    _{0}^{1}{\frac {\sqrt {1-k^{2}t^{2}}}{\sqrt {1-t^{2}}}}\,\d t$; &ensp;
                 </p>
                 <p>
                     Euler's Integrals: &ensp;
@@ -1064,12 +1276,16 @@
                     $\Beta(x+1,y+1)=\dfrac{xy}{(x+y)(x+y+1)}\Beta(x,y)$,&ensp;
                     $\Beta(x+1,y)=\dfrac{x}{x+y}\Beta(x,y)$;&emsp;
                     $\Gamma(x)\Gamma(1-x)=\dfrac{\pi}{\sin(\pi x)}$,&ensp;
-                    $\Gamma(2x)=\dfrac{2^{2p-1}}{\sqrt{\pi}}\Gamma\left(p\right)\Gamma\left(p+\dfrac{1}{2}\right)$; &emsp;
+                    $\Gamma(2x)=\dfrac{2^{2p-1}}{\sqrt{\pi}}\Gamma\left(p\right)\Gamma\left(p+\dfrac{1}{2}\right)$;
+                    &emsp;
                 </p>
                 <p>
-                    $\intabd{\cos^m(x)\sin^n(x)}{0}{\frac{\pi}{2}}=\dfrac{1}{2}\Beta\left(\dfrac{m+1}{2},\dfrac{n+1}{2}\right)=\dfrac{\Gamma\left(\frac{m+1}{2}\right)\Gamma\left(\frac{n+1}{2}\right)}{2\cdot\Gamma\left(\frac{m+n}{2}+1\right)}$, &ensp;
-                    $\intabd{\sin^n(x)}{0}{\frac{\pi}{2}}=\intabd{\cos^n(x)}{0}{\frac{\pi}{2}}=\begin{cases}\dfrac{(n-1)!!}{n!!}\dfrac{\pi}{2},&n\;\text{even}\\\dfrac{(n-1)!!}{n!!},&n\;\text{odd}\end{cases}$, &ensp;
-                    $\intabd{\tan^\alpha(x)}{0}{\frac{\pi}{2}}=\dfrac{\pi}{2\cos\left(\dfrac{\alpha\;\pi}{2}\right)}$; &ensp;
+                    $\intabd{\cos^m(x)\sin^n(x)}{0}{\frac{\pi}{2}}=\dfrac{1}{2}\Beta\left(\dfrac{m+1}{2},\dfrac{n+1}{2}\right)=\dfrac{\Gamma\left(\frac{m+1}{2}\right)\Gamma\left(\frac{n+1}{2}\right)}{2\cdot\Gamma\left(\frac{m+n}{2}+1\right)}$,
+                    &ensp;
+                    $\intabd{\sin^n(x)}{0}{\frac{\pi}{2}}=\intabd{\cos^n(x)}{0}{\frac{\pi}{2}}=\begin{cases}\dfrac{(n-1)!!}{n!!}\dfrac{\pi}{2},&n\;\text{even}\\\dfrac{(n-1)!!}{n!!},&n\;\text{odd}\end{cases}$,
+                    &ensp;
+                    $\intabd{\tan^\alpha(x)}{0}{\frac{\pi}{2}}=\dfrac{\pi}{2\cos\left(\dfrac{\alpha\;\pi}{2}\right)}$;
+                    &ensp;
                 </p>
             </div>
             <br />
@@ -1079,15 +1295,21 @@
             <div class="cat">
                 <p>
                     Fourier Series: &ensp;
-                    $f(t)=\dfrac{a_{0}}{2}+a_{1}\cos(\omega t)+b_{1}\sin(\omega t)+a_{2}\cos(2\omega t)+b_{2}\sin(2\omega t)+\cdots \; =\dfrac{a_{0}}{2}+\Sum{[a_{n}\cos(n\omega t)+b_{n}\sin(n\omega t)]}{n=1}{\infty}$, &ensp; <br />
+                    $f(t)=\dfrac{a_{0}}{2}+a_{1}\cos(\omega t)+b_{1}\sin(\omega t)+a_{2}\cos(2\omega
+                    t)+b_{2}\sin(2\omega t)+\cdots \; =\dfrac{a_{0}}{2}+\Sum{[a_{n}\cos(n\omega t)+b_{n}\sin(n\omega
+                    t)]}{n=1}{\infty}$, &ensp; <br />
                     &emsp;&emsp;&emsp;&emsp;
                     which $a_{n}=\dfrac{2}{T}\intabd[t]{f(t)\cos(n\omega t)}{t_{0}}{t_{0}+T}, \quad
-                    b_{n}=\dfrac{2}{T}\intabd[t]{f(t)\sin(n\omega t)}{t_{0}}{t_{0}+T}, \quad \omega=\dfrac{2\pi}{T}$; &ensp; <br />
-                    Or $f(t) = \Sum{c_n\cdot\e^{in\omega t}}{n=-\infty}{+\infty}, \quad c_n=\dfrac{1}{T}\intabd[t]{f(t)\e^{-in\omega t}}{t_0}{t_0+T}$; &ensp;
+                    b_{n}=\dfrac{2}{T}\intabd[t]{f(t)\sin(n\omega t)}{t_{0}}{t_{0}+T}, \quad \omega=\dfrac{2\pi}{T}$;
+                    &ensp; <br />
+                    Or $f(t) = \Sum{c_n\cdot\e^{in\omega t}}{n=-\infty}{+\infty}, \quad
+                    c_n=\dfrac{1}{T}\intabd[t]{f(t)\e^{-in\omega t}}{t_0}{t_0+T}$; &ensp;
                 </p>
                 <p>
                     When $T=2\pi$: &ensp;
-                    $\displaystyle f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}[a_{k}\cos(kx)+b_{k}\sin(kx)], \quad a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\mathrm{d}x, \quad b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\mathrm{d}x$;
+                    $\displaystyle f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}[a_{k}\cos(kx)+b_{k}\sin(kx)], \quad
+                    a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\mathrm{d}x, \quad
+                    b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\mathrm{d}x$;
 
                 </p>
             </div>
@@ -1101,8 +1323,12 @@
             <div class="cat">
                 <p>
                     $\dfrac{\partial\begin{bmatrix}f_1&f_2&\cdots\end{bmatrix}^T}{\partial\begin{bmatrix}x_1&x_2&\cdots\end{bmatrix}^T}=\begin{bmatrix}\frac{\partial{f_1}}{\partial{x_1}}&\frac{\partial{f_1}}{\partial{x_2}}&\cdots\\\frac{\partial{f_2}}{\partial{x_1}}&\frac{\partial{f_2}}{\partial{x_2}}&\cdots\\\vdots&\vdots&\ddots\end{bmatrix}$;&emsp;&emsp;
-                    $\dfrac{\partial(u,v)}{\partial(x,y)}=\begin{vmatrix}\frac{\partial u}{\partial x}&\frac{\partial u}{\partial y}\\\frac{\partial v}{\partial x}&\frac{\partial v}{\partial y}\end{vmatrix}$,&emsp;
-                    $\dfrac{\partial(u,v,w)}{\partial(x,y,z)}=\begin{vmatrix}\frac{\partial u}{\partial x}&\frac{\partial u}{\partial y}&\frac{\partial u}{\partial z}\\\frac{\partial v}{\partial x}&\frac{\partial v}{\partial y}&\frac{\partial v}{\partial z}\\\frac{\partial w}{\partial x}&\frac{\partial w}{\partial y}&\frac{\partial w}{\partial z}\end{vmatrix}$;
+                    $\dfrac{\partial(u,v)}{\partial(x,y)}=\begin{vmatrix}\frac{\partial u}{\partial x}&\frac{\partial
+                    u}{\partial y}\\\frac{\partial v}{\partial x}&\frac{\partial v}{\partial y}\end{vmatrix}$,&emsp;
+                    $\dfrac{\partial(u,v,w)}{\partial(x,y,z)}=\begin{vmatrix}\frac{\partial u}{\partial
+                    x}&\frac{\partial u}{\partial y}&\frac{\partial u}{\partial z}\\\frac{\partial v}{\partial
+                    x}&\frac{\partial v}{\partial y}&\frac{\partial v}{\partial z}\\\frac{\partial w}{\partial
+                    x}&\frac{\partial w}{\partial y}&\frac{\partial w}{\partial z}\end{vmatrix}$;
                 </p>
                 <p>
                     $\dfrac{\partial(u,v)}{\partial(s,t)}=\dfrac{\partial(u,v)}{\partial(x,y)}\cdot\dfrac{\partial(x,y)}{\partial(s,t)}$,&emsp;
@@ -1114,7 +1340,8 @@
             </div>
             <!-- Area and Volume elements -->
             <div class="cat">
-                <h3>Area and volume elements<sup>&nbsp;<a href="substitution.html" title="list of multivariable integral substitutions">⭧</a></sup></h3>
+                <h3>Area and volume elements<sup>&nbsp;<a href="substitution.html"
+                            title="list of multivariable integral substitutions">⭧</a></sup></h3>
                 <p>
                     $\d{A}=\d{x}\d{y}=\dfrac{\partial(x,y)}{\partial(u,v)}\d{u}\d{v}$,&emsp;
                     $\d{V}=\d{x}\d{y}\d{z}=\dfrac{\partial(x,y,z)}{\partial(u,v,w)}\d{u}\d{v}\d{w}$;
@@ -1130,7 +1357,8 @@
                 </p>
                 <p>
                     Parametric surface $\mathbf{r}=\mathbf{r}(u,v)$:&emsp;
-                    $\d{A}=|\mathbf{r}_u'\times\mathbf{r}_v'|\d{u}\d{v}=\sqrt{\mathbf{r}_u'^2\mathbf{r}_v'^2-(\mathbf{r}_u'\cdot\mathbf{r}_v')^2}\ \d{u}\d{v}$;
+                    $\d{A}=|\mathbf{r}_u'\times\mathbf{r}_v'|\d{u}\d{v}=\sqrt{\mathbf{r}_u'^2\mathbf{r}_v'^2-(\mathbf{r}_u'\cdot\mathbf{r}_v')^2}\
+                    \d{u}\d{v}$;
                 </p>
             </div>
             <!-- Implicit Differentiation -->
@@ -1138,8 +1366,12 @@
                 <h3>Derivative of implicit functions</h3>
                 <p>
                     $F(x,y(x))=0$: &ensp;
-                    $\displaystyle{\dfrac{\d{y}}{\d{x}}=-\frac{\frac{\partial{F}}{\partial{x}}}{\frac{\partial{F}}{\partial{y}}}}=-F_x'/F_y'$, &emsp;
-                    $\displaystyle{\frac{\d^2 y}{\d x^2}=-\frac{\frac{\partial^2 F}{\partial x^2}\left(\frac{\partial F}{\partial y}\right)^2-2\frac{\partial^{2}F}{\partial x\partial y}\frac{\partial F}{\partial x}\frac{\partial F}{\partial y}+\frac{\partial^2 F}{\partial y^2}\left(\frac{\partial F}{\partial x}\right)^2}{\left(\frac{\partial F}{\partial y}\right)^3}}$;
+                    $\displaystyle{\dfrac{\d{y}}{\d{x}}=-\frac{\frac{\partial{F}}{\partial{x}}}{\frac{\partial{F}}{\partial{y}}}}=-F_x'/F_y'$,
+                    &emsp;
+                    $\displaystyle{\frac{\d^2 y}{\d x^2}=-\frac{\frac{\partial^2 F}{\partial x^2}\left(\frac{\partial
+                    F}{\partial y}\right)^2-2\frac{\partial^{2}F}{\partial x\partial y}\frac{\partial F}{\partial
+                    x}\frac{\partial F}{\partial y}+\frac{\partial^2 F}{\partial y^2}\left(\frac{\partial F}{\partial
+                    x}\right)^2}{\left(\frac{\partial F}{\partial y}\right)^3}}$;
                 </p>
                 <p>
                     $F(x,y,z(x,y))=0$: &ensp;
@@ -1153,7 +1385,8 @@
             <div class="cat">
                 <p>
                     Gradient of a scalar field:&ensp;
-                    $\mathbf{grad}\ u=\nabla{u}=\dfrac{\partial{u}}{\partial{x}}\mathbf{i}+\dfrac{\partial{u}}{\partial{y}}\mathbf{j}+\dfrac{\partial{u}}{\partial{z}}\mathbf{k}$;
+                    $\mathbf{grad}\
+                    u=\nabla{u}=\dfrac{\partial{u}}{\partial{x}}\mathbf{i}+\dfrac{\partial{u}}{\partial{y}}\mathbf{j}+\dfrac{\partial{u}}{\partial{z}}\mathbf{k}$;
                     &emsp;&emsp;&emsp;&emsp;Directional derivative:
                     $\dfrac{\d}{\d{t}}u(\mathbf{x_0}+\mathbf{l}\cdot t)=\mathbf{grad}\ u(\mathbf{x_0})\cdot\mathbf{l}$;
                 </p>
@@ -1167,10 +1400,12 @@
             <div class="cat">
                 <p>
                     Divergence of a vector field:&ensp;
-                    $\mathbf{div}\ F=\nabla\cdot F=\dfrac{\partial F_x}{\partial x}+\dfrac{\partial F_y}{\partial y}+\dfrac{\partial F_z}{\partial z}$;
+                    $\mathbf{div}\ F=\nabla\cdot F=\dfrac{\partial F_x}{\partial x}+\dfrac{\partial F_y}{\partial
+                    y}+\dfrac{\partial F_z}{\partial z}$;
                 </p>
                 <p>
-                    $\mathrm{div}(C_1\mathbf{v}_1+C_2\mathbf{v}_2) = C_1\mathrm{div}(\mathbf{v}_1)+C_2\mathrm{div}(\mathbf{v}_2)$,&emsp;
+                    $\mathrm{div}(C_1\mathbf{v}_1+C_2\mathbf{v}_2) =
+                    C_1\mathrm{div}(\mathbf{v}_1)+C_2\mathrm{div}(\mathbf{v}_2)$,&emsp;
                     $\mathrm{div}(u\mathbf{v})=u\cdot\mathrm{div}(\mathbf{v})+\mathbf{v}\cdot\mathrm{grad}(u)$;
                 </p>
             </div>
@@ -1178,8 +1413,12 @@
             <div class="cat">
                 <p>
                     Curl of a vector field:&ensp;
-                    $\mathbf{curl}\ F=\nabla\times{F}=\begin{vmatrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\frac{\partial}{\partial x}&\frac{\partial}{\partial y}&\frac{\partial}{\partial z}\\F_x&F_y&F_z\end{vmatrix}
-                    =\left(\dfrac{\partial F_{z}}{\partial y}-\dfrac{\partial F_{y}}{\partial z}\right)\mathbf{i} +\left(\dfrac{\partial F_{x}}{\partial z}-\dfrac{\partial F_{z}}{\partial x}\right)\mathbf{j} +\left(\dfrac{\partial F_{y}}{\partial x}-\dfrac{\partial F_{x}}{\partial y}\right)\mathbf{k}$;
+                    $\mathbf{curl}\
+                    F=\nabla\times{F}=\begin{vmatrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\frac{\partial}{\partial
+                    x}&\frac{\partial}{\partial y}&\frac{\partial}{\partial z}\\F_x&F_y&F_z\end{vmatrix}
+                    =\left(\dfrac{\partial F_{z}}{\partial y}-\dfrac{\partial F_{y}}{\partial z}\right)\mathbf{i}
+                    +\left(\dfrac{\partial F_{x}}{\partial z}-\dfrac{\partial F_{z}}{\partial x}\right)\mathbf{j}
+                    +\left(\dfrac{\partial F_{y}}{\partial x}-\dfrac{\partial F_{x}}{\partial y}\right)\mathbf{k}$;
                 </p>
             </div>
             <div class="incomplete_mark">
@@ -1212,8 +1451,10 @@
                 </p>
                 <p title="homogeneous differential equation">
                     Solve $\dfrac{\d{y}}{\d{x}}=\varphi\left(\dfrac{y}{x}\right)$:&ensp;
-                    $z=\dfrac{y}{x} \Longrightarrow x\dfrac{\d{z}}{\d{x}}+z=\varphi(z)\Longrightarrow\dfrac{\d{z}}{\d{x}}=\dfrac{\varphi(z)-z}{x}$;
-                    &emsp;$\varphi(z)-z\ne0: \Int\dfrac{\d{z}}{\varphi(z)-z}=\ln\left|\dfrac{x}{C}\right|; \quad \varphi(z)-z\equiv0: z=\dfrac{y}{x}=C$;
+                    $z=\dfrac{y}{x} \Longrightarrow
+                    x\dfrac{\d{z}}{\d{x}}+z=\varphi(z)\Longrightarrow\dfrac{\d{z}}{\d{x}}=\dfrac{\varphi(z)-z}{x}$;
+                    &emsp;$\varphi(z)-z\ne0: \Int\dfrac{\d{z}}{\varphi(z)-z}=\ln\left|\dfrac{x}{C}\right|; \quad
+                    \varphi(z)-z\equiv0: z=\dfrac{y}{x}=C$;
                 </p>
                 <p title="first order linear differential equation">
                     Solve $\dfrac{\d{y}}{\d{x}}+p(x)y=q(x)$:&ensp;
@@ -1267,7 +1508,8 @@
                 </p>
                 <div style="margin-left:2em">
                     <p>
-                        $\lambda^2+p\lambda+q$ and $2\lambda+p$ are both zero when $\lambda$ is a multiple root of $\lambda^2+p\lambda+q=0$;
+                        $\lambda^2+p\lambda+q$ and $2\lambda+p$ are both zero when $\lambda$ is a multiple root of
+                        $\lambda^2+p\lambda+q=0$;
                     </p>
                     <p>
                         $P(x)=P_m(x)$ is a degree-$m$ polynomial:&ensp;
@@ -1286,16 +1528,19 @@
                 </div>
                 <p title="second order linear homogeneous differential equation">
                     Solve $y''+p(x)y'+q(x)y=0$:&ensp;
-                    Find any non-zero solution $y_1(x)$,&ensp; let $y_2(x)=y_1(x)\Int\dfrac{\e^{-\int p(x)\d{x}}}{y_1(x)^2}\d{x}$,&ensp;
+                    Find any non-zero solution $y_1(x)$,&ensp; let $y_2(x)=y_1(x)\Int\dfrac{\e^{-\int
+                    p(x)\d{x}}}{y_1(x)^2}\d{x}$,&ensp;
                     $\Longrightarrow y=C_1y_1(x)+C_2y_2(x)$;
                 </p>
                 <p title="second order linear nonhomogeneous differential equation">
                     Solve $y''+p(x)y'+q(x)y=f(x)$:&ensp;
-                    Find any solution $y^*(x)$,&ensp; $\Longrightarrow y(x)=y^*(x)+(\text{solution of }y''+p(x)y'+q(x)y=0)$;
+                    Find any solution $y^*(x)$,&ensp; $\Longrightarrow y(x)=y^*(x)+(\text{solution of
+                    }y''+p(x)y'+q(x)y=0)$;
                 </p>
                 <div style="margin-left:2em">
                     <p>
-                        If $y=y_1(x)$ satisfies $y''+p(x)y'+q(x)y=f_1(x)$ and $y=y_2(x)$ satisfies $y''+p(x)y'+q(x)y=f_2(x)$,<br />
+                        If $y=y_1(x)$ satisfies $y''+p(x)y'+q(x)y=f_1(x)$ and $y=y_2(x)$ satisfies
+                        $y''+p(x)y'+q(x)y=f_2(x)$,<br />
                         then $y=C_1y_1(x)+C_2y_2(x)$ satisfies $y''+p(x)y'+q(x)y=C_1f_1(x)+C_2f_2(x)$;
                     </p>
                 </div>
@@ -1322,11 +1567,13 @@
                 </p>
                 <p>
                     $A$ invertible:&ensp;
-                    $\Longrightarrow$ $AB=O \Rightarrow A=O$, &ensp;$AX=AY \Rightarrow X=Y$, &ensp;$AX=O \Rightarrow X=O$, &ensp;$AX=B \Rightarrow X=A^{-1}B$; &ensp;
+                    $\Longrightarrow$ $AB=O \Rightarrow A=O$, &ensp;$AX=AY \Rightarrow X=Y$, &ensp;$AX=O \Rightarrow
+                    X=O$, &ensp;$AX=B \Rightarrow X=A^{-1}B$; &ensp;
                 </p>
                 <p>
                     $A,B$ invertible:&ensp;
-                    $\Longrightarrow$ $(A^{-1})^{-1}=A$, &ensp;$(\lambda{A})^{-1}=\lambda^{-1}A^{-1}$, &ensp;$(AB)^{-1}=B^{-1}A^{-1}$, &ensp;$(A^T)^{-1}=(A^{-1})^T$; &ensp;
+                    $\Longrightarrow$ $(A^{-1})^{-1}=A$, &ensp;$(\lambda{A})^{-1}=\lambda^{-1}A^{-1}$,
+                    &ensp;$(AB)^{-1}=B^{-1}A^{-1}$, &ensp;$(A^T)^{-1}=(A^{-1})^T$; &ensp;
                 </p>
                 <p>
                 </p>
@@ -1334,7 +1581,8 @@
             <!-- Basic of Determinant -->
             <div class="cat">
                 <p>
-                    $\det{AB}=\det{A}\cdot\det{B}$, &ensp;$\det{A^T}=\det{A}$, &ensp;$\det{A^{-1}}=\dfrac{1}{\det{A}}$; &ensp;
+                    $\det{AB}=\det{A}\cdot\det{B}$, &ensp;$\det{A^T}=\det{A}$, &ensp;$\det{A^{-1}}=\dfrac{1}{\det{A}}$;
+                    &ensp;
                 </p>
                 <p>
                     Swap two rows/cols: &ensp;$\det{A'}=-\det{A}$; &emsp;
@@ -1355,7 +1603,7 @@
                     x_1^2&x_2^2&x_3^2&\cdots&x_n^2\\
                     \vdots&\vdots&\vdots&\ddots&\vdots\\
                     x_1^{n-1}&x_2^{n-1}&x_3^{n-1}&\cdots&x_n^{n-1}}=
-                    \displaystyle{\prod\limits_{i< j}(x_j-x_i)}$; &emsp;
+                    \displaystyle{\prod\limits_{i\lt j}(x_j-x_i)}$; &emsp;
                 </p>
                 <p>
                     $A^{-1}=\dfrac{A^*}{|A|}$; &emsp;
@@ -1369,7 +1617,8 @@
                     \bmat{x_1\\[3pt]x_2\\[3pt]\vdots\\[3pt]x_n}=
                     \bmat{y_1\\[3pt]y_2\\[3pt]\vdots\\[3pt]y_n}=Y}$&ensp;
                     is &ensp;$x_i=\dfrac{|A_i|}{|A|}$, &ensp;
-                    which $A_i$ is the matrix formed by replacing the <i>i</i><sup>th</sup> column of $A$ by $Y$;
+                    which $A_i$ is the matrix formed by replacing the <i>i</i><sup>th</sup> column of $A$ by
+                    $Y$;
                 </p>
             </div>
             <!-- Basic of Rank -->
@@ -1378,7 +1627,7 @@
                     $R(A)=0 \iff A=O$, &ensp;
                     $R(A_{n\times{n}})=n \iff A \> \text{intertible}$; &ensp;
                     $R(kA)=R(A)(k\ne0)$, &ensp;$R(A^T)=R(A)$, &ensp;
-                    $R(A^*)=\begin{cases}n, &R(A)=n \\ 1, &R(A)=n-1 \\ 0, &R(A)< n-1\end{cases}$; &ensp;
+                    $R(A^*)=\begin{cases}n, &R(A)=n \\ 1, &R(A)=n-1 \\ 0, &R(A)\lt n-1\end{cases}$; &ensp;
                     $\Rk\bmat{A&O\\O&B}=R(A)+R(B)$; &ensp;
                 </p>
                 <p>
@@ -1410,14 +1659,15 @@
                 <p>
                     $|\vec{a}|=\sqrt{a_1^2+a_2^2+a_3^2}$, &ensp;
                     $|k\cdot\vec{a}|=|k|\cdot|\vec{a}|$; &emsp;
-                    $\displaystyle{\left|\Prj_u{\vec{a}}\right|=|\vec{a}|\cdot\cos\left< \vec{a},u\right>}$, &ensp;
+                    $\displaystyle{\left|\Prj_u{\vec{a}}\right|=|\vec{a}|\cdot\cos\left\lt \vec{a},u\right>}$, &ensp;
                     $\Prj_u(\vec{a}_1+\vec{a}_2)=\Prj_u\vec{a}_1+\Prj_u\vec{a}_2$; &emsp;
                     $|\vec{a}\pm\vec{b}|\le|\vec{a}|+|\vec{b}|$; &ensp;
                     $|\vec{a}\cdot\vec{b}|\le|\vec{a}|\cdot|\vec{b}|$; &emsp;
                 </p>
                 <!-- Direction Cosine -->
                 <p>
-                    $\cos\theta_x=\dfrac{a_1}{|\vec{a}|}$, &ensp;$\cos\theta_y=\dfrac{a_2}{|\vec{a}|}$, &ensp;$\cos\theta_z=\dfrac{a_3}{|\vec{a}|}$; &emsp;
+                    $\cos\theta_x=\dfrac{a_1}{|\vec{a}|}$, &ensp;$\cos\theta_y=\dfrac{a_2}{|\vec{a}|}$,
+                    &ensp;$\cos\theta_z=\dfrac{a_3}{|\vec{a}|}$; &emsp;
                     $\vec{e}_\vec{a}=\dfrac{\vec{a}}{|\vec{a}|}=(\cos\theta_x,\cos\theta_y,\cos\theta_z)$; &ensp;
                     $\cos^2\theta_x+\cos^2\theta_y+\cos^2\theta_z=1$; &ensp;
                 </p>
@@ -1427,19 +1677,21 @@
                 <p>
                     $\vec{a}\cdot\vec{b}=|\vec{a}|\cdot|\vec{b}|\cdot\cos\theta=a_1b_1+a_2b_2+a_3b_3$, &ensp;
                     $\vec{a}\cdot\vec{b}=\vec{b}\cdot\vec{a}$, &ensp;
-                    $(\lambda\cdot\vec{a})\cdot\vec{b}=\vec{a}\cdot(\lambda\cdot\vec{b})=\lambda\cdot(\vec{a}\cdot\vec{b})$, &ensp;
+                    $(\lambda\cdot\vec{a})\cdot\vec{b}=\vec{a}\cdot(\lambda\cdot\vec{b})=\lambda\cdot(\vec{a}\cdot\vec{b})$,
+                    &ensp;
                     $(\vec{a}\pm\vec{b})\cdot\vec{c}=\vec{a}\cdot\vec{b}\pm\vec{a}\cdot\vec{c}$; &ensp;
                     $(\vec{a}\pm\vec{b})^2=\vec{a}^2\pm2\vec{a}\cdot\vec{b}+\vec{b}^2$, &ensp;
                     $\vec{a}^2=|\vec{a}|^2$; &ensp;
                 </p>
                 <p>
                     $\vec{a}\perp\vec{b} \iff \vec{a}\cdot\vec{b}=0 \iff a_1b_1+a_2b_2+a_3b_3=0$; &emsp;
-                    $\left|\Prj_\vec{a}\vec{b}\right|=\dfrac{\vec{a}\cdot\vec{b}}{|\vec{a}|}=\vec{b}\cdot\vec{e}_\vec{a}$; &emsp;
-                    $\displaystyle{\left< \vec{a},\vec{b}\right>}=\cos^{-1}
+                    $\left|\Prj_\vec{a}\vec{b}\right|=\dfrac{\vec{a}\cdot\vec{b}}{|\vec{a}|}=\vec{b}\cdot\vec{e}_\vec{a}$;
+                    &emsp;
+                    $\displaystyle{\left\lt\vec{a},\vec{b}\right>}=\cos^{-1}
                     \dfrac{\vec{a}\cdot\vec{b}}{|\vec{a}|\cdot|\vec{b}|}=\cos^{-1}
                     \dfrac{a_1b_1+a_2b_2+a_3b_3}{\sqrt{a_1^2+a_2^2+a_3^2}\sqrt{b_1^2+b_2^2+b_3^3}}$, &emsp;
-                    $\vec{a}\cdot\vec{b} \quad \begin{cases}>0,&\left< \vec{a},\vec{b}\right><
-                    \dfrac{\pi}{2}\\< 0,&\left< \vec{a},\vec{b}\right>>\dfrac{\pi}{2}\end{cases}$; &emsp;
+                    $\vec{a}\cdot\vec{b} \quad \begin{cases}>0,&\left\lt\vec{a},\vec{b}\right>
+                    \lt\dfrac{\pi}{2}\\\lt0,&\left\lt\vec{a},\vec{b}\right>>\dfrac{\pi}{2}\end{cases}$; &emsp;
                 </p>
             </div>
             <!-- Cross Product -->
@@ -1463,9 +1715,11 @@
             <!-- Triple Product -->
             <div class="cat">
                 <p>
-                    $[\vec{a},\vec{b},\vec{c}]=(\vec{a}\times\vec{b})\cdot\vec{c}=\vmat{a_1&a_2&a_3\\b_1&b_2&b_3\\c_1&c_2&c_3}$; &emsp;
+                    $[\vec{a},\vec{b},\vec{c}]=(\vec{a}\times\vec{b})\cdot\vec{c}=\vmat{a_1&a_2&a_3\\b_1&b_2&b_3\\c_1&c_2&c_3}$;
+                    &emsp;
                     $[\vec{a},\vec{b},\vec{c}]=[\vec{b},\vec{c},\vec{a}]=[\vec{c},\vec{a},\vec{b}]$; &ensp;
-                    $[\vec{a},\vec{b},(\lambda\vec{c}+\mu\vec{d})]=\lambda[\vec{a},\vec{b},\vec{c}]+\mu[\vec{a},\vec{b},\vec{d}]$; &ensp;
+                    $[\vec{a},\vec{b},(\lambda\vec{c}+\mu\vec{d})]=\lambda[\vec{a},\vec{b},\vec{c}]+\mu[\vec{a},\vec{b},\vec{d}]$;
+                    &ensp;
                 </p>
             </div>
 
@@ -1479,8 +1733,10 @@
                 <h3>Basic Equations</h3>
                 <div class="cat">
                     <p>
-                        $S_\text{cylinder}=2\pi{r}^2+2\pi{rl}$, &ensp;$S_\text{cone}=\pi{r}^2+\pi{rl}$, &ensp;$S_\text{sphere}=4\pi{r^2}$; &emsp;
-                        $V_\text{cylinder}=Sh$, &ensp;$V_\text{cone}=\dfrac{1}{3}Sh$, &ensp;$V_\text{sphere}=\dfrac{4}{3}\pi{R^3}$; &emsp;
+                        $S_\text{cylinder}=2\pi{r}^2+2\pi{rl}$, &ensp;$S_\text{cone}=\pi{r}^2+\pi{rl}$,
+                        &ensp;$S_\text{sphere}=4\pi{r^2}$; &emsp;
+                        $V_\text{cylinder}=Sh$, &ensp;$V_\text{cone}=\dfrac{1}{3}Sh$,
+                        &ensp;$V_\text{sphere}=\dfrac{4}{3}\pi{R^3}$; &emsp;
                     </p>
                     <!--<p>
                         $S_\text{ellipse}=\pi{a}{b}$; &ensp;
@@ -1500,29 +1756,35 @@
                         $\dfrac{a}{\sin{A}}=\dfrac{b}{\sin{B}}=\dfrac{c}{\sin{C}}=2R$; &ensp;
                         $c^2=a^2+b^2-2ab\cos{C}$, &ensp;$\cos{A}=\dfrac{b^2+c^2-a^2}{2bc}$; &ensp;
                         where $R=\dfrac{abc}{4\cdot Area}$ is the circumradius of the triangle; &ensp; <br />
-                        &emsp;&emsp;$Area=\sqrt{p(p-a)(p-b)(p-c)}=rs$, &ensp;where $s=\dfrac{1}{2}(a+b+c)$, $r$ denotes the inradius; &ensp;
+                        &emsp;&emsp;$Area=\sqrt{p(p-a)(p-b)(p-c)}=rs$, &ensp;where $s=\dfrac{1}{2}(a+b+c)$, $r$ denotes
+                        the inradius; &ensp;
                         <!--Also &ensp;$\displaystyle S=\sqrt{\frac{1}{4}\left[c^2a^2-\left(\frac{c^2+a^2-b^2}{2}\right)^2\right]}$; &ensp;-->
                     </p>
                 </div>
                 <div class="cat">
                     <p>
                         Area of quadrilateral: &ensp;$\sqrt{(s-a)(s-b)(s-c)(s-d)-abcd\cos^2\theta}$, &ensp;
-                        where $s=\dfrac{1}{4}(a+b+c+d)$, $\cos\theta=\cos[\frac{1}{2}(\angle{A}+\angle{C})]=\cos[\frac{1}{2}(\angle{B}+\angle{D})]$;
+                        where $s=\dfrac{1}{4}(a+b+c+d)$,
+                        $\cos\theta=\cos[\frac{1}{2}(\angle{A}+\angle{C})]=\cos[\frac{1}{2}(\angle{B}+\angle{D})]$;
                     </p>
                 </div>
                 <div class="cat">
                     <p>
-                        Distance from $P_1(x_1,y_1)$ to $P_2(x_2,y_2)$: &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$; &emsp; <br />
+                        Distance from $P_1(x_1,y_1)$ to $P_2(x_2,y_2)$: &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$;
+                        &emsp; <br />
                     </p>
                     <p>
-                        Distance from $P_1(x_1,y_1,z_1)$ to $P_2(x_2,y_2,z_2)$: &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}$; &emsp;
+                        Distance from $P_1(x_1,y_1,z_1)$ to $P_2(x_2,y_2,z_2)$:
+                        &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}$; &emsp;
                     </p>
                     <p>
-                        Distance from point $(x_0,y_0)$ to line $Ax+By+C=0$: &ensp;$d=\dfrac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}$; &emsp;
+                        Distance from point $(x_0,y_0)$ to line $Ax+By+C=0$:
+                        &ensp;$d=\dfrac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}$; &emsp;
                         <!--(Distance between two parallel lines: Distance from any point on a line to the other line. )-->
                     </p>
                     <p>
-                        Distance from point $(x_0,y_0,z_0)$ to plane $Ax+By+Cz+D=0$: &ensp;$d=\dfrac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}$; &emsp;
+                        Distance from point $(x_0,y_0,z_0)$ to plane $Ax+By+Cz+D=0$:
+                        &ensp;$d=\dfrac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}$; &emsp;
                     </p>
                     <p>
                         Distance between $y=mx+b$ and $y=mx+c$: &ensp;$\dfrac{|b-c|}{\sqrt{m^2+1}}$; &ensp;
@@ -1533,17 +1795,7 @@
             <!-- Equation of Planar Lines -->
             <div class="cat">
                 <h3>Equations of Planar Straight Line</h3>
-                <style>
-
-                    .Table_2DLineEqu {
-                        margin: -10px 0px 10px 2.4em;
-                    }
-
-                        .Table_2DLineEqu tr {
-                            height: 50px;
-                        }
-                </style>
-                <table class="Table_2DLineEqu">
+                <table>
                     <colgroup>
                         <col span="1" style="width: 40px;">
                         <col span="1" style="width: 260px;">
@@ -1553,8 +1805,11 @@
                     <tr>
                         <td>0)</td>
                         <td>General</td>
-                        <td><p>$Ax+By+C=0$</p></td>
-                        <td>$m=-\dfrac{A}{B}$, &ensp;$a=-\dfrac{C}{A}$, &ensp;$b=-\dfrac{C}{B}$, &ensp;$\vec{n}=(A,B)$</td>
+                        <td>
+                            <p>$Ax+By+C=0$</p>
+                        </td>
+                        <td>$m=-\dfrac{A}{B}$, &ensp;$a=-\dfrac{C}{A}$, &ensp;$b=-\dfrac{C}{B}$, &ensp;$\vec{n}=(A,B)$
+                        </td>
                     </tr>
                     <tr>
                         <td>1)</td>
@@ -1572,7 +1827,8 @@
                         <td>3)</td>
                         <td>Points $(x_1,y_1)$ and $(x_2,y_2)$</td>
                         <td>$\dfrac{y-y_1}{y_2-y_1}=\dfrac{x-x_1}{x_2-x_1}$</td>
-                        <td>$m=\dfrac{y_2-y_1}{x_2-x_1}$, &ensp;$a=\dfrac{x_1y_2-x_2y_1}{y_2-y_1}$, &ensp;$b=\dfrac{x_2y_1-x_1y_2}{x_2-x_1}$</td>
+                        <td>$m=\dfrac{y_2-y_1}{x_2-x_1}$, &ensp;$a=\dfrac{x_1y_2-x_2y_1}{y_2-y_1}$,
+                            &ensp;$b=\dfrac{x_2y_1-x_1y_2}{x_2-x_1}$</td>
                     </tr>
                     <tr>
                         <td>4)</td>
@@ -1582,13 +1838,8 @@
                     </tr>
                     <tr style="height:auto;">
                         <td colspan="4">
-                            <br />
-                            <span>
-                                <u>Note:</u> &ensp; Different countries use different notations for slope and <i>y</i>-intercept of a straight line. <br />
-                                &emsp; &emsp; &ensp; Common representations are <i>y</i> = <i>mx+b</i>, <i>y</i> = <i>mx+c</i>, <i>y</i> = <i>ax+b</i>, <i>y</i> = <i>kx+b</i> etc.
-                            </span>
                             <p>
-                                In this document, <i>m</i> is slope and <i>a</i>, <i>b</i> are <i>x</i> and <i>y</i> intercepts.
+                                <i>m</i> is slope and <i>a</i>, <i>b</i> are <i>x</i> and <i>y</i> intercepts.
                             </p>
                         </td>
                     </tr>
@@ -1600,7 +1851,8 @@
                 </p>
                 <p>
                     Points of intersection between $A_1x+B_1y+C_1=0$ and $A_2x+B_2y+C_2=0$: &ensp;
-                    Solve $\displaystyle\left\{ {\begin{array}{l} A_1x+B_1y+C_1=0 \\ A_2x+B_2y+C_2=0 \end{array}}\right.$, &ensp;
+                    Solve $\displaystyle\left\{ {\begin{array}{l} A_1x+B_1y+C_1=0 \\ A_2x+B_2y+C_2=0
+                    \end{array}}\right.$, &ensp;
                     $\det=0$ means parallel;
                 </p>
                 <br />
@@ -1608,17 +1860,7 @@
             <!-- Equation of Circle -->
             <div class="cat">
                 <h3>Equations of Circle</h3>
-                <style>
-
-                    .Table_CircEqu {
-                        margin: -10px 0px 10px 2.4em;
-                    }
-
-                        .Table_CircEqu tr {
-                            height: 50px;
-                        }
-                </style>
-                <table class="Table_CircEqu">
+                <table>
                     <colgroup>
                         <col span="1" style="width: 40px;">
                         <col span="1" style="width: 240px;">
@@ -1628,7 +1870,9 @@
                     <tr>
                         <td>1)</td>
                         <td>Center $C(a,b)$ and radius $r$</td>
-                        <td><p>$(x-a)^2+(y-b)^2=r^2$</p></td>
+                        <td>
+                            <p>$(x-a)^2+(y-b)^2=r^2$</p>
+                        </td>
                         <td>$\Rightarrow \> x^2+y^2+(-2a)x+(-2b)y+(a^2+b^2-r^2)=0$</td>
                     </tr>
                     <tr>
@@ -1637,10 +1881,6 @@
                         <td>$x^2+y^2+Dx+Ey+F=0$ <br /> $\scriptsize{(D^2+E^2-4F>0)}$</td>
                         <td>$C=(-\dfrac{D}{2},-\dfrac{E}{2})$, &ensp;$r=\dfrac{1}{2}\sqrt{D^2+E^2-4F}$</td>
                     </tr>
-                    <tr style="height:auto;">
-                        <td></td>
-                        <td colspan="3"></td>
-                    </tr>
                 </table>
                 <p>
                     Equation #2 is very convenient to determine the equation of a circle through 3 given points.
@@ -1648,7 +1888,8 @@
                 </p>
                 <p>
                     Points of intersection between $Ax+By+C=0$ and $(x-a)^2+(y-b)^2=r^2$: &ensp;
-                    $\left(\dfrac{\pm{B\sqrt{\Delta}}+aB^2-bAB-AC}{A^2+B^2}, \> \dfrac{\mp{A\sqrt{\Delta}}+bA^2-aAB-BC}{A^2+B^2}\right)$, &ensp;
+                    $\left(\dfrac{\pm{B\sqrt{\Delta}}+aB^2-bAB-AC}{A^2+B^2}, \>
+                    \dfrac{\mp{A\sqrt{\Delta}}+bA^2-aAB-BC}{A^2+B^2}\right)$, &ensp;
                     <br />&emsp; &emsp; which $\Delta=r^2(A^2+B^2)-(aA+bB+C)^2$, &ensp;
                     $\Delta>0 \iff \frac{|Aa+Bb+C|}{\sqrt{A^2+B^2}}>r$; &ensp;
                 </p>
@@ -1660,44 +1901,27 @@
             </div>
             <!-- Quadratic Curves -->
             <div class="cat">
-                <table style="display:inline-block; float:right; font-size: 14px;">
-                    <colgroup>
-                        <col span="1" width="80" />
-                        <col span="1" />
-                    </colgroup>
-                    <tr>
-                        <td>ellipse</td>
-                        <td>/ɪ'lɪps/</td>
-                    </tr>
-                    <tr>
-                        <td>hyperbola</td>
-                        <td>/haɪ'pɝbələ/</td>
-                    </tr>
-                    <tr>
-                        <td>parabola</td>
-                        <td>/pə'ræbələ/</td>
-                    </tr>
-                    <tr>
-                        <td>hyperbolic</td>
-                        <td>/,haɪpɚ'bɑlɪk/</td>
-                    </tr>
-                </table>
                 <h3>Quadratic Curves</h3>
                 <p>
                     <u>Ellipse</u>: &ensp;$\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}=1 \quad (a>b>0)$; &emsp;
-                    $x\in[-a,a]$, &ensp;$y\in[-b,b]$, &ensp;$c=\sqrt{a^2-b^2}$, &ensp;$F=(\pm{c},0)$, &ensp;$e=\dfrac{c}{a}< 1$; &emsp;
+                    $x\in[-a,a]$, &ensp;$y\in[-b,b]$, &ensp;$c=\sqrt{a^2-b^2}$, &ensp;$F=(\pm{c},0)$,
+                    &ensp;$e=\dfrac{c}{a}\lt 1$; &emsp;
                 </p>
                 <p>
                     <u>Hyperbola</u>: &ensp;$\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2}=1 \quad (a,b>0)$; &emsp;
-                    $|x|\ge{a}$, &ensp;$c=\sqrt{a^2+b^2}$, &ensp;$F=(\pm{c},0)$, &ensp;$e=\dfrac{c}{a}>1$; &ensp; $\text{asymptote: }\dfrac{x}{a}\pm\dfrac{y}{b}=0$;
+                    $|x|\ge{a}$, &ensp;$c=\sqrt{a^2+b^2}$, &ensp;$F=(\pm{c},0)$, &ensp;$e=\dfrac{c}{a}>1$;
+                    &ensp; $\text{asymptote: }\dfrac{x}{a}\pm\dfrac{y}{b}=0$;
                 </p>
                 <p>
                     <u>Parabola</u>: &ensp;$y^2=2px \quad (p>0)$; &emsp;
-                    $\text{Focus: }\left(\dfrac{p}{2},0\right)$, &ensp; $\text{Directrix: }x=-\dfrac{p}{2}$, &ensp;$e=1$; &ensp;
-                    &emsp;&emsp; $y=ax^2$: &emsp;$F=\dfrac{1}{4a}$, &ensp;$\text{directrix: } y=-\dfrac{1}{4a}$; &ensp;
+                    $\text{Focus: }\left(\dfrac{p}{2},0\right)$, &ensp; $\text{Directrix: }x=-\dfrac{p}{2}$,
+                    &ensp;$e=1$; &ensp;
+                    &emsp;&emsp; $y=ax^2$: &emsp;$F=\dfrac{1}{4a}$, &ensp;$\text{directrix: } y=-\dfrac{1}{4a}$;
+                    &ensp;
                 </p>
                 <p>
-                    Ellipse: &ensp;also &ensp;$\rho(\theta)=\dfrac{ab}{\displaystyle\sqrt{(b\cos\theta)^2+(a\sin\theta)^2}}$
+                    Ellipse: &ensp;also
+                    &ensp;$\rho(\theta)=\dfrac{ab}{\displaystyle\sqrt{(b\cos\theta)^2+(a\sin\theta)^2}}$
                     or &ensp;$\equd{x=a\cdot\cos{t}}{y=b\cdot\sin{t}} \, 0 \leq t \leq 2\pi$; &emsp;
                     and $\equd{x=a\cdot\sec{t}}{y=b\cdot\tan{t}}$ is hyperbola; &ensp;
                 </p>
@@ -1707,18 +1931,7 @@
             <!-- Equation of Plane -->
             <div class="cat">
                 <h3>Equations of Plane</h3>
-                <style>
-
-                    .Table_PlaneEqu {
-                        margin: -10px 0px 10px 2.4em;
-                    }
-
-                        .Table_PlaneEqu tr {
-                            height: auto;
-                            min-height: 60px;
-                        }
-                </style>
-                <table class="Table_PlaneEqu">
+                <table>
                     <colgroup>
                         <col span="1" style="width: 40px;">
                         <col span="1" style="width: 260px;">
@@ -1728,7 +1941,9 @@
                     <tr>
                         <td>0)</td>
                         <td>General</td>
-                        <td><p>$Ax+By+Cz+D=0$</p></td>
+                        <td>
+                            <p>$Ax+By+Cz+D=0$</p>
+                        </td>
                         <td>$\vec{n}=(A,B,C)$</td>
                     </tr>
                     <tr>
@@ -1740,8 +1955,11 @@
                     <tr>
                         <td>2)</td>
                         <td>Three points $P_i(x_i,y_i,z_i)$ <br />$\scriptsize{(i=\{1,2,3\})}$</td>
-                        <td style="padding: 10px 0px;">$\vmat{x-x_1&y-y_1&z-z_1\\x_2-x_1&y_2-y_1&z_2-z_1\\x_3-x_1&y_3-y_1&z_3-z_1}=0$</td>
-                        <td><div class="incomplete_mark"></div></td>
+                        <td>
+                            $\vmat{x-x_1&y-y_1&z-z_1\\x_2-x_1&y_2-y_1&z_2-z_1\\x_3-x_1&y_3-y_1&z_3-z_1}=0$</td>
+                        <td>
+                            <div class="incomplete_mark"></div>
+                        </td>
                     </tr>
                     <tr>
                         <td>3)</td>
@@ -1758,24 +1976,16 @@
                 <p>
                     $\pi_1\perp\pi_2 \iff A_1A_2+B_1B_2+C_1C_2=0$, &ensp;
                     $\pi_1\parallel\pi_2 \iff \dfrac{A_1}{A_2}=\dfrac{B_1}{B_2}=\dfrac{C_1}{C_2}$; &emsp;
-                    $\displaystyle\left< \pi_1,\pi_2\right>=\cos^{-1}\dfrac{|A_1A_2+B_1B_2+C_1C_2|}{\sqrt{A_1^2+B_1^2+C_1^2}\cdot\sqrt{A_2^2+B_2^2+C_2^2}}$; &emsp;
+                    $\displaystyle\left\lt \pi_1,\pi_2\right>
+                    =\cos^{-1}\dfrac{|A_1A_2+B_1B_2+C_1C_2|}{\sqrt{A_1^2+B_1^2+C_1^2}\cdot\sqrt{A_2^2+B_2^2+C_2^2}}$;
+                    &emsp;
                 </p>
                 <br />
             </div>
             <!-- Equation of Spatial Line -->
             <div class="cat">
                 <h3>Equations of Spatial Straight Line</h3>
-                <style>
-
-                    .Table_3DLineEqu {
-                        margin: -10px 0px 10px 2.4em;
-                    }
-
-                        .Table_3DLineEqu tr {
-                            height: 60px;
-                        }
-                </style>
-                <table class="Table_3DLineEqu">
+                <table>
                     <colgroup>
                         <col span="1" style="width: 40px;">
                         <col span="1" style="width: 260px;">
@@ -1797,7 +2007,8 @@
                     <tr>
                         <td>3)</td>
                         <td>Parameter</td>
-                        <td style="padding:8px 0px;">$\begin{cases}x=x_0+a\cdot{t}\\y=y_0+b\cdot{t}\\z=z_0+c\cdot{t}\end{cases}$</td>
+                        <td style="padding:8px 0px;">
+                            $\begin{cases}x=x_0+a\cdot{t}\\y=y_0+b\cdot{t}\\z=z_0+c\cdot{t}\end{cases}$</td>
                         <td>
                             $P_0(x_0,y_0,z_0)$ and direction vector $\vec{s}=(a,b,c)$, &ensp;same as #1; <br />
                             Usually for solving equations
@@ -1819,22 +2030,26 @@
                 <p>
                     $l_1\parallel{l_2}\iff\vec{s}_1\parallel\vec{s}_2$, &ensp;
                     $l_1=l_2\iff\vec{s}_1\parallel\vec{s}_2\parallel\vec{P_1P_2}$; &emsp;
-                    $l_1 \text{ intersect } l_2 \iff \vec{s}_1\nparallel\vec{s}_2\>\land\>[\vec{s_1},\>\vec{s_2},\>\vec{P_1P_2}]=0$; &emsp;
-                    $\left< l_1,l_2\right>=\cos^{-1}\dfrac{|\vec{s}_1\cdot\vec{s}_2|}{|\vec{s}_1|\cdot|\vec{s}_2|}$, &ensp;
+                    $l_1 \text{ intersect } l_2 \iff
+                    \vec{s}_1\nparallel\vec{s}_2\>\land\>[\vec{s_1},\>\vec{s_2},\>\vec{P_1P_2}]=0$; &emsp;
+                    $\left\lt l_1,l_2\right>=\cos^{-1}\dfrac{|\vec{s}_1\cdot\vec{s}_2|}{|\vec{s}_1|\cdot|\vec{s}_2|}$,
+                    &ensp;
                     $l_1\perp{l_2}\iff\vec{s}_1\cdot\vec{s}_2=0$; &ensp;
                 </p>
                 <p>
                     $l\parallel\pi\iff\vec{s}\cdot\vec{n}=0$, &ensp;
                     $l\subset\pi\iff\vec{s}\cdot\vec{n}=0\>\land\>Ax_0+By_0+Cz_0+D=0$; &emsp;
                     $l\text{ intersect }\pi\iff\vec{s}\cdot\vec{n}\ne0$, &ensp;
-                    $\left< l,\pi\right>=\sin^{-1}\dfrac{|\vec{s}\cdot\vec{n}|}{|\vec{s}|\cdot|\vec{n}|}$; &emsp;
+                    $\left\lt l,\pi\right>=\sin^{-1}\dfrac{|\vec{s}\cdot\vec{n}|}{|\vec{s}|\cdot|\vec{n}|}$; &emsp;
                 </p>
                 <p>
                     Sheaf of Planes: &ensp;
-                    Suppose the equation of straight line $l$ is $\equd{A_1x+B_1y+C_1z+D_1=0\qquad(1)}{A_2x+B_2y+C_2z+D_2=0\qquad(2)}$, <br />
+                    Suppose the equation of straight line $l$ is
+                    $\equd{A_1x+B_1y+C_1z+D_1=0\qquad(1)}{A_2x+B_2y+C_2z+D_2=0\qquad(2)}$, <br />
                 </p>
                 <p>
-                    &emsp;&emsp; then all planes through $l$ is given by: &ensp;$A_1x+B_1y+C_1z+D_1+\lambda\left(A_2x+B_2y+C_2z+D_2\right)=0$, &ensp;
+                    &emsp;&emsp; then all planes through $l$ is given by:
+                    &ensp;$A_1x+B_1y+C_1z+D_1+\lambda\left(A_2x+B_2y+C_2z+D_2\right)=0$, &ensp;
                     except #2 &ensp;$(\lambda\rightarrow\infty)$; &emsp;
                 </p>
                 <br />
@@ -1844,34 +2059,70 @@
 
         <!-- Miscellaneous -->
         <div class="page">
+            <!-- Sequence and Series -->
             <div class="cat">
-                <p>
-                    $\displaystyle{\dfrac{x_1+x_2+\cdots+x_n}{n}\ge{\sqrt[n]{x_1\cdot{x_2}\cdots{x_n}}}}$;
-                </p>
-                <div class="incomplete_mark"></div>
-                <br />
-            </div>
-            <div class="cat">
+                <h3>Sequence and Series</h3>
                 <p>
                     Arithmetic Sequence: &ensp;
                     $a_n=a_1+d(n-1)$, &ensp;$n=\dfrac{a_n-a_1}{d}+1$, &ensp;$d=\dfrac{a_n-a_1}{n-1}$; &ensp;
                     $S_n=\dfrac{n(a_1+a_n)}{2}=na_1+\dfrac{n(n-1)}{2}d$, &ensp;
-                    $P_n=d^{n}{\dfrac{\Gamma\left(a_{1}/d+n\right)}{\Gamma\left(a_{1}/d\right)}} \; (a_1/d\notin{N^-})$; &ensp;
+                    $P_n=d^{n}{\dfrac{\Gamma\left(a_{1}/d+n\right)}{\Gamma\left(a_{1}/d\right)}} \; (a_1/d\notin{N^-})$;
+                    &ensp;
                 </p>
                 <p>
                     Geometric Sequence: &ensp;
-                    $a_n=a_1\cdot q^{n-1}$, &ensp;$n=\log_q\dfrac{a_n}{a_1}+1$, &ensp;$q=\displaystyle\left(\frac{a_n}{a_1}\right)^{\frac{1}{n-1}}$; &ensp;
+                    $a_n=a_1\cdot q^{n-1}$, &ensp;$n=\log_q\dfrac{a_n}{a_1}+1$,
+                    &ensp;$q=\displaystyle\left(\frac{a_n}{a_1}\right)^{\frac{1}{n-1}}$; &ensp;
                     $S_n=\dfrac{a_1(q^n-1)}{q-1}=\dfrac{a_nq-a_1}{q-1}$; &ensp;
                     $P_n=\displaystyle a_1^n \cdot q^{n(n-1)\over2}$; &ensp;
                 </p>
+            </div>
+            <div class="cat">
                 <p>
-                    $\Sum{q^n}{n=0}{\infty}=\begin{cases} +\infty & q\ge1 \\[3pt] \dfrac{1}{1-q} & |q|< 1 \\[3pt] \text{divergent} & q\le-1 \end{cases}$; &emsp;
-                    $\displaystyle\sum_{k=1}^n{r^k}=\frac{r(1-r^n)}{(1-r)}$; &ensp;
+                    $\Sum{r^k}{k=0}{\infty}=\begin{cases} +\infty & r\ge1 \\[3pt] \dfrac{1}{1-r} & |r|\lt 1 \\[3pt]
+                    \text{diverge} & r\le-1 \end{cases}$; &emsp;
+                    $\displaystyle\sum_{k=1}^n{r^k}=\frac{r(1-r^n)}{(1-r)}, \quad
+                    \displaystyle\sum_{k=0}^n{r^k}=\frac{1-r^{n+1}}{1-r};$
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    $\displaystyle{\sum_{k=1}^{n}k=\frac{1}{2}n\left(n+1\right)}, \quad
+                    \displaystyle{\sum_{k=1}^{n}k^{2}=\frac{1}{6}n\left(n+1\right)\left(2n+1\right)}, \quad
+                    \displaystyle{\sum_{k=1}^{n}k^{3}=\frac{1}{4}n^{2}\left(n+1\right)^{2}}, \quad
+                    \displaystyle{\sum_{k=1}^{n}k^{4}=\frac{1}{30}n\left(n+1\right)\left(2n+1\right)\left(3n^{2}+3n-1\right)};
+                    \quad
+                    $
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    $(a+b)^n=\displaystyle\sum_{k=0}^{n}{\binom{n}{k}a^{k}b^{n-k}}=\sum_{k=0}^n{\binom{n}{k}a^{n-k}b^{k}},
+                    \quad
+                    (1+x)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}x^k}, \quad
+                    (1-x)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}(-1)^{k}b^{k}};$
                 </p>
             </div>
 
+            <div class="cat">
+                <div class="incomplete_mark"></div>
+            </div>
             <br />
-            <div class="incomplete_mark"></div>
+
+            <!-- Algebra -->
+            <div class="cat">
+                <h3>Miscellaneous Algebra</h3>
+                <p>
+                    $a^3\pm b^3=(a\pm b)\left(a^2\mp ab+b^2\right), \quad
+                    a^4-b^4=(a-b)\left(a^3+a^2b+ab^2+b^3\right), \quad
+                    a^n-b^n=(a-b)\left(a^{n-1}+a^{n-2}b+a^{n-3}b^2+\cdots+a^2b^{n-3}+ab^{n-2}+b^{n-1}\right);$
+                </p>
+            </div>
+
+            <div class="cat">
+                <div class="incomplete_mark"></div>
+            </div>
+            <br />
 
             <!-- Permutation and Combination -->
             <div class="cat">
@@ -1891,7 +2142,8 @@
                 </p>
                 <p>
                     Combinations without Repetition: &ensp;$C^n_k=\dfrac{n!}{k!(n-k)!}$; &emsp;
-                    (Also denoted as $C(n,k)$,&ensp;$\dbinom{n}{k}$, &ensp;$C^k_n$, &ensp;$\sideset{^n}{_k}C$, &ensp;$\sideset{_n}{_k}C$)
+                    (Also denoted as $C(n,k)$,&ensp;$\dbinom{n}{k}$, &ensp;$C^k_n$, &ensp;$\sideset{^n}{_k}C$,
+                    &ensp;$\sideset{_n}{_k}C$)
                     &emsp;&emsp;$\dbinom{n}{k}=\dbinom{n}{n-k}=\dfrac{n}{k}\dbinom{n-1}{k-1}$; &ensp;
                 </p>
                 <p>
@@ -1911,59 +2163,8 @@
                 </p>
             </div>
 
-            <div class="incomplete_mark"></div>
             <div class="cat">
-                Bayes' theorem: &ensp; $\displaystyle P(A\mid B)={\frac {P(B\mid A)\,P(A)}{P(B)}}$
-            </div>
-            <br />
-            <div class="incomplete_mark"></div>
-            <div class="cat">
-                <h3><red>*</red>Normal Distribution</h3>
-                <p>
-                    $\text{PDF}=\displaystyle{\frac{1}{\sqrt{2\pi\sigma^2}}\cdot\exp\left({-\frac{(x-\mu)^2}{2\sigma^2}}\right)}$, &emsp;
-                    $\text{CDF}=\displaystyle{\frac{1}{2}\left[1+\erf\left(\frac{x-\mu}{\sqrt{2}\cdot\sigma}\right)\right]}$; &emsp;
-                </p>
-                <br />
-            </div>
-            <br />
-
-            <h1><red>*</red>Statistics</h1>
-            <div class="cat">
-                <p>
-                    Variance: &ensp;$S=\dfrac{1}{n}\displaystyle\sum{(x_i-\overline{x})^2}$; &emsp;
-                    Standard Deviation: &ensp;$s=\sqrt{S}=\sqrt{\dfrac{1}{n}\displaystyle\sum{(x_i-\overline{x})^2}}$; &emsp;
-                </p>
-            </div>
-            <div class="cat">
-                <p>
-                    Linear Regression: &ensp;
-                    $\displaystyle{\equd{
-                    m=\dfrac{n\sum{xy}-\sum{x}\sum{xy}}{n\sum{x^2}-(\sum{x})^2}
-                    =\dfrac{\sum{xy-n\overline{x}\overline{y}}}{\sum{x^2-n\overline{x}^2}}}
-                    {b=\overline{y}-m\overline{x}}
-                    }$ , &ensp;
-                    $y=mx+b$; <br />
-                    Strength of linear relationship in Linear Regression: &ensp;
-                    $ \displaystyle{r = \dfrac{
-                    \sum{(x_i-\overline{x})(y_i-\overline{y})}}{
-                    \sqrt{\sum{(x_i-\overline{x})^2}\sum{(y_i-\overline{y})^2}}
-                    } \in (0,1]}$ ; &ensp;
-                </p>
-                <p>
-                    Polynomial Regression $y=\Sum{a_ix^i}{i=0}{n}$: &ensp;Solve systems of linear equations
-                    $\displaystyle{\bmat{\sum{x^{2n}}&\sum{x^{2n-1}}&\sum{x^{2n-2}}&\cdots&\sum{x^n}\\\sum{x^{2n-1}}&\sum{x^{2n-2}}&\sum{x^{2n-3}}&\cdots&\sum{x^{n-1}}\\\sum{x^{2n-2}}&\sum{x^{2n-3}}&\sum{x^{2n-4}}&\cdots&\sum{x^{n-2}}\\\vdots&\vdots&\vdots&\ddots&\vdots\\\sum{x^n}&\sum{x^{n-1}}&\sum{x^{n-2}}&\cdots&\sum{1}}
-                    \bmat{a_n\\a_{n-1}\\a_{n-2}\\\vdots\\a_{0}}=\bmat{\sum{x^ny}\\\sum{x^{n-1}y}\\\sum{x^{n-2}y}\\\vdots\\\sum{y}}}$; &ensp;
-                </p>
-                <p>
-                    Exponential Regression: &ensp;
-                    $\displaystyle{\equd{
-                    a=\dfrac{\sum{\ln{y}}\sum{x^2}-\sum{x}\sum{x\ln{y}}}{n\sum{x^2}-(\sum{x})^2}} {b=\dfrac{n\sum{x\ln{y}}-\sum{x}\sum{\ln{y}}}{n\sum{x^2}-(\sum{x})^2}}
-                    }$, &ensp; $y=\e^{a+bx}$ or $y=A\cdot B^x {\LARGE\vert}_{A=\e^a,\;B=\e^b}$; &ensp;
-                </p>
-            </div>
-            <div class="incomplete_mark"></div>
-
-            <div class="cat">
+                <div class="incomplete_mark"></div>
             </div>
         </div>
         <hr />
@@ -2142,7 +2343,8 @@
                     function graphBetween(p0, p1, recurse_remain) {
                         if (!(recurse_remain >= 0))
                             return;
-                        if (Math.hypot(p1.x - p0.x, p1.y - p0.y) < 1) {
+                        var dx = p1.x - p0.x, dy = p1.y - p0.y;
+                        if (Math.sqrt(dx * dx + dy * dy) < 1) {
                             if (!(isNaN(p0.y) || isNaN(p1.y))) {
                                 ctx.moveTo(p0.x, p0.y);
                                 ctx.lineTo(p1.x, p1.y);
@@ -2208,4 +2410,5 @@
     </script>
 
 </body>
+
 </html>

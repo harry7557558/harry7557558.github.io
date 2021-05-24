@@ -46,7 +46,7 @@ def getEquation(obj):
 
 
 # a list of my Desmos graphs obtained using desmos_get_id.js
-Graphs = ["pv4gxyyckx","hvtbjw6rue","ktnucw466t","nudbqrxkti","7lr5htcel6","vu4xm0n9ir","w4wocwv0dw","ivasvrustk","nwoctkrg80","raeuahskxm","4vo8ccfuvp","hsp3ccmdhw","diuy6hrgw6","1z17yc5djh","zn9d68fqzt","btal70uvxv","l99tjopqcx","kmkcgt5eld","zyxas5zy8w","hznnunxnx6","ar8trp3g9s","nn29zfpyiq","bq5nc43zfh","59x14hqpt3","4omxg0mi1w","f9vwgan2ip","fa7mwvpxb3","dqsx3i3txz","gbji3acmwp","bzecuo9xix","hhoemjbsm5","px9ftgrzo4","ozmnil3v00","szky83xovy"]
+Graphs = ["pv4gxyyckx","hvtbjw6rue","ktnucw466t","7lr5htcel6","vu4xm0n9ir","ivasvrustk","nwoctkrg80","raeuahskxm","4vo8ccfuvp","hsp3ccmdhw","diuy6hrgw6","1z17yc5djh","zn9d68fqzt","btal70uvxv","l99tjopqcx","kmkcgt5eld","zyxas5zy8w","hznnunxnx6","ar8trp3g9s","nn29zfpyiq","bq5nc43zfh","59x14hqpt3","f9vwgan2ip","fa7mwvpxb3","gbji3acmwp","bzecuo9xix","ozmnil3v00"]
 
 
 
@@ -57,8 +57,13 @@ index = """<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>List of my Desmos graphs</title>
+    <title>List of my saved Desmos graphs</title>
     <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+
+    <meta name="description" content="List of my saved Desmos graphs" />
+    <meta name="keywords" content="harry7557558, Desmos, graph" />
+    <meta name="robots" content="index, follow" />
+
     <script id="mathjax-config-script" type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax:{inlineMath:[["$","$"]],preview:"none"},"fast-preview":{disabled:true},AssistiveMML:{disabled:true},menuSettings:{inTabOrder:false},messageStyle:"simple",positionToHash: false});</script>
     <script type="text/javascript" id="MathJax_src" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <style>.graph{display:block;margin:10px;padding:10px;border-bottom:1px solid gray}img{height:240px;display:inline-block;margin:0 30px 0 0}.description{display:inline-block;vertical-align:top;margin:0}h2{margin:16px 0 10px;font-size:28px}.time{margin:0;font-size:16px;color:#222}.equation{margin:24px 0;font-size:20px}a{font-size:16px;padding:0 2px;text-decoration:none}a:hover{text-decoration:underline}</style>

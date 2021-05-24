@@ -1,8 +1,15 @@
 <!doctype html>
 <html>
+
 <head>
     <title>Simple 3D Matrix Visualizer</title>
     <meta charset="utf-8" />
+
+    <meta name="description" content="Visualizing 2D/3D/4D transformation matrices with determinant and eigensystem." />
+    <meta name="keywords"
+        content="harry7557558, matrix, transform, determinant, eigen, eigenvalue, eigenvector, affine, perspective" />
+    <meta name="author" content="Harry Chen">
+    <meta name="robots" content="index, follow" />
 
     <!-- vector, matrix, math functions -->
     <script>
@@ -187,6 +194,7 @@
         }
     </script>
 </head>
+
 <body>
     <!-- canvas events -->
     <canvas id="canvas" style="position:fixed;left:0;top:0;width:100%;height:100%;"></canvas>
@@ -236,44 +244,45 @@
             position: fixed;
             left: 20px;
             top: 20px;
-            background-color: rgba(92,92,92,0.6);
+            background-color: rgba(92, 92, 92, 0.6);
             width: 200px;
             padding: 20px;
         }
 
-            #control > #title {
-                margin: -5px 10px 0px 0px;
-                padding: 0px 3px;
-                font-family: Consolas;
-                font-style: italic;
-                font-weight: 800;
-                font-size: 20px;
-                color: Orange;
-                text-shadow: 1.5px 1.5px 1px Maroon;
-            }
+        #control>#title {
+            margin: -5px 10px 0px 0px;
+            padding: 0px 3px;
+            font-family: Consolas;
+            font-style: italic;
+            font-weight: 800;
+            font-size: 20px;
+            color: Orange;
+            text-shadow: 1.5px 1.5px 1px Maroon;
+        }
 
-            #control > #matrix-input {
-                text-align: left;
-                margin: 0px -10px;
-                padding: 10px;
-                display: inline-block;
-                white-space: nowrap;
-            }
+        #control>#matrix-input {
+            text-align: left;
+            margin: 0px -10px;
+            padding: 10px;
+            display: inline-block;
+            white-space: nowrap;
+        }
 
-                #control > #matrix-input > .ele {
-                    margin: 0.5px;
-                    width: 45px;
-                    height: 16px;
-                    border-width: 1.5px;
-                    border-style: inset;
-                    border-color: white;
-                    text-align: center;
-                    font-family: Calibri;
-                    font-weight: 400;
-                    outline: none;
-                }
+        #control>#matrix-input>.ele {
+            margin: 0.5px;
+            width: 45px;
+            height: 16px;
+            border-width: 1.5px;
+            border-style: inset;
+            border-color: white;
+            text-align: center;
+            font-family: Calibri;
+            font-weight: 400;
+            outline: none;
+        }
 
-        #determinant, #eigens {
+        #determinant,
+        #eigens {
             display: inline;
             font-family: Calibri;
             color: white;
@@ -285,7 +294,8 @@
             margin-bottom: 5px;
         }
 
-        #det2, #det3 {
+        #det2,
+        #det3 {
             display: inline;
             font-weight: 400;
         }
@@ -372,7 +382,7 @@
                 // elimination
                 var E = [];
                 var i, j, k, d = 0;
-                for (i = 0, d = 0; d < 3; i++ , d++) {
+                for (i = 0, d = 0; d < 3; i++, d++) {
                     if (isZero(M[i][d])) {
                         for (j = i + 1; j < 3; j++) if (!isZero(M[j][d])) {
                             for (k = d; k < 3; k++) {
@@ -688,7 +698,7 @@
             margin: 2px;
             border-radius: 3px;
             padding: 3px 10px;
-            background-color: rgba(128,128,128,0.6);
+            background-color: rgba(128, 128, 128, 0.6);
             font-size: 16px;
             font-family: Calibri;
             line-height: 16px;
@@ -709,5 +719,5 @@
     </script>
 
 </body>
-</html>
 
+</html>
