@@ -60,7 +60,8 @@ content = """<!doctype html>
 <head>
     <meta charset="utf-8" />
     <title>Harry Chen - unlisted</title>
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="This is the index of a sick website created by a sick guy." />
+    <meta name="robots" content="index, follow" />
     <link rel="icon" href="./logo.png" />
     <style>body{margin:10px 10px 40px 10px}div,table{margin-left:40px}td{padding-right:16px}span{padding-left:20px}a{color:#000}.htm,.html{color:blue}.js{color:#ff4500}.css{color:#006400}.png,.jpg,.svg,.ico,.webp{color:#8b008b}.md,.txt{text-decoration:none}</style>
     <script>
