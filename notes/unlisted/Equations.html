@@ -1635,14 +1635,44 @@
                     $A_{m\times{n}} \cong \bmat{I_{R(A)}&O\\O&O}_{m\times{n}}$; &ensp;
                 </p>
             </div>
+            <div class="incomplete_mark"></div>
+
+            <!-- 2x2 matrix -->
             <div class="cat">
+                <h3>2×2 matrix</h3>
+                <p>
+                    Let $A=\begin{bmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{bmatrix}$.&emsp;&emsp;
+                    $\det{A}=a_{11}a_{22}-a_{12}a_{21}$,&emsp;
+                    $A^{-1}=\dfrac{1}{\det{A}}\begin{bmatrix}a_{22}&-a_{12}\\-a_{21}&a_{11}\end{bmatrix}$;&emsp;&emsp;
+                    $R(A)=1 \Longleftrightarrow A\ \text{rows and columns in proportion}$,&emsp;
+                    $R(A)=0 \Longleftrightarrow A=\mathbf{O}$.
+                </p>
+                <p>
+                    Characteristic polynomial:&ensp;
+                    $\lambda^2-(a_{11}+a_{22})\lambda+(a_{11}a_{22}-a_{12}a_{21})$;&emsp;&emsp;
+                    $\lambda\mathbf{I}-A=\begin{bmatrix}\lambda-a_{11}&-a_{12}\\-a_{21}&\lambda-a_{22}\end{bmatrix}$
+                </p>
+                <p>
+                    Eigenvalues:&ensp;
+                    $\lambda=\dfrac{1}{2}\left(\left(a_{11}+a_{22}\right)
+                    \pm\sqrt{\left(a_{11}-a_{22}\right)^{2}+4a_{12}a_{21}}\right)$;
+                </p>
                 <p>
                     <red>*</red>
-                    $\left(A=\bmat{a&b\\c&d}\right)^n=\dfrac{\lambda_1^n-\lambda_2^n}{\lambda_1-\lambda_2}A-\lambda_1\lambda_2\dfrac{\lambda_1^{n-1}-\lambda_2^{n-1}}{\lambda_1-\lambda_2}I
-                    \quad\left(\lambda=\frac{a+d}{2}\pm\sqrt{\frac{(a+d)^2}{4}-(ad-bc)}\right)$
+                    Eigenvectors:&ensp;
+                    $\left(\lambda-a_{22},a_{21}\right) \parallel
+                    \left(\left(a_{11}-a_{22}\right)\pm\sqrt{\left(a_{11}-a_{22}\right)^{2}+4a_{12}a_{21}},\
+                    2a_{21}\right),\
+                    \left(a_{12},\lambda-a_{11}\right) \parallel
+                    \left(2a_{12},\
+                    \left(-a_{11}+a_{22}\right)\pm\sqrt{\left(a_{11}-a_{22}\right)^{2}+4a_{12}a_{21}}\right)$;
+                </p>
+                <p>
+                    <red>*</red>
+                    $A^n=\dfrac{\lambda_1^n-\lambda_2^n}{\lambda_1-\lambda_2}A
+                    -\lambda_1\lambda_2\dfrac{\lambda_1^{n-1}-\lambda_2^{n-1}}{\lambda_1-\lambda_2}\mathbf{I}$;
                 </p>
             </div>
-            <div class="incomplete_mark"></div>
             <div class="cat"><br /></div>
 
             <h1>Vector</h1>
@@ -2007,7 +2037,7 @@
                     <tr>
                         <td>3)</td>
                         <td>Parameter</td>
-                        <td style="padding:8px 0px;">
+                        <td>
                             $\begin{cases}x=x_0+a\cdot{t}\\y=y_0+b\cdot{t}\\z=z_0+c\cdot{t}\end{cases}$</td>
                         <td>
                             $P_0(x_0,y_0,z_0)$ and direction vector $\vec{s}=(a,b,c)$, &ensp;same as #1; <br />
@@ -2018,7 +2048,7 @@
                         <td>4)</td>
                         <td>Intersection of two planes</td>
                         <td>$\begin{cases}A_1x+B_1y+C_1z+D_1=0\\A_2x+B_2y+C_2z+D_2=0\end{cases}$</td>
-                        <td style="padding:5px 0px;">
+                        <td>
                             $\vec{s}=\vmat{\vec{i}&\vec{j}&\vec{k}\\A_1&B_1&C_1\\A_2&B_2&C_2}$; &ensp;
                         </td>
                     </tr>
@@ -2251,11 +2281,12 @@
         }
 
     </script>
+
     <!-- Function Grapher -->
     <script>
         "use strict";
 
-        var abs = Math.abs;
+        const abs = Math.abs;
 
         function initCanvas(c, cx, cy, ux, uy) {
             var ctx = c.getContext("2d");
@@ -2384,7 +2415,6 @@
 
 
                 var time_end = performance.now();
-                //console.log("Graph #" + G, (time_end - time_start).toFixed(2) + "ms");
             }
         }
 
