@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <title>Equations in Mathematics</title>
-    <meta name="description" content="A note sheet I use to keep useful math equations.">
-    <meta name="keywords" content="harry7557558, math, note, equation, formula, function, trigonometric">
-    <meta name="author" content="Harry Chen">
-    <meta name="robots" content="index, follow">
+    <meta name="description" content="A note sheet I use to keep useful math equations." />
+    <meta name="keywords" content="harry7557558, math, note, equation, formula, function, trigonometric" />
+    <meta name="author" content="Harry Chen" />
+    <meta name="robots" content="index, follow" />
     <script>
         // use the faster 'compiled' version
         if (window.location.protocol.match('http')) {
@@ -26,7 +26,8 @@
             AssistiveMML: { disabled: true },
             menuSettings: { inTabOrder: false },
             messageStyle: "simple",
-            positionToHash: false
+            positionToHash: false,
+            TeX: { noErrors: { disabled: true } }
         });
     </script>
     <script type="text/javascript" id="MathJax_src" async=""
@@ -346,25 +347,40 @@
             <div class="cat">
                 <p>
                     $\sin(-x)=-\sin{x}, \quad\cos(-x)=\cos{x}, \quad\tan(-x)=-\tan{x};$
+                    <!-- &emsp; -->
+                    <!-- $\csc(-x)=-\csc{x}, \quad\sec(-x)=\sec{x}, \quad\cot(-x)=-\cot{x};$ -->
                 </p>
                 <p>
-                    $\sin(x\pm\pi)=-\sin{x}, \quad\cos(x\pm\pi)=-\cos{x}, \quad\tan(x\pm\pi)=\tan{x};
-                    \qquad
-                    \sin\left(x\pm\dfrac{\pi}{2}\right)=\pm\cos{x}, \quad
+                    $\sin(x\pm\pi)=-\sin{x}, \quad\cos(x\pm\pi)=-\cos{x}, \quad\tan(x\pm\pi)=\tan{x};$&emsp;
+                    <!-- $\csc(x\pm\pi)=-\csc{x}, \quad\sec(x\pm\pi)=-\sec{x}, \quad\cot(x\pm\pi)=\cot{x};$ -->
+                    $\sin(\pi-x)=\sin{x}, \quad\cos(\pi-x)=-\cos{x}, \quad\tan(\pi-x)=-\tan{x};$
+                    <!-- &emsp; -->
+                    <!-- $\csc(\pi-x)=\csc{x}, \quad\sec(\pi-x)=-\sec{x}, \quad\cot(\pi-x)=-\cot{x};$ -->
+                </p>
+                <p>
+                    $\sin\left(x\pm\dfrac{\pi}{2}\right)=\pm\cos{x}, \quad
                     \cos\left(x\pm\dfrac{\pi}{2}\right)=\mp\sin{x}, \quad
-                    \tan\left(x\pm\dfrac{\pi}{2}\right)=\cot{x};$
-                </p>
-                <p>
-                    $\sin(\pi-x)=\sin{x}, \quad\cos(\pi-x)=-\cos{x}, \quad\tan(\pi-x)=-\tan{x};
-                    \qquad
-                    \sin\left(\dfrac{\pi}{2}-x\right)=\cos{x}, \quad
+                    \tan\left(x\pm\dfrac{\pi}{2}\right)=-\cot{x};$&emsp;
+                    <!-- $\csc\left(x\pm\dfrac{\pi}{2}\right)=\pm\sec{x}, \quad
+                    \sec\left(x\pm\dfrac{\pi}{2}\right)=\mp\csc{x}, \quad
+                    \cot\left(x\pm\dfrac{\pi}{2}\right)=-\tan{x};$ -->
+                    $\sin\left(\dfrac{\pi}{2}-x\right)=\cos{x}, \quad
                     \cos\left(\dfrac{\pi}{2}-x\right)=\sin{x}, \quad
                     \tan\left(\dfrac{\pi}{2}-x\right)=\cot{x};$
+                    <!-- &emsp; -->
+                    <!-- $\csc\left(\dfrac{\pi}{2}-x\right)=\sec{x}, \quad
+                    \sec\left(\dfrac{\pi}{2}-x\right)=\csc{x}, \quad
+                    \cot\left(\dfrac{\pi}{2}-x\right)=\tan{x};$ -->
                 </p>
                 <p>
                     $\sin\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sqrt{2}}{2}(\sin{x}\pm\cos{x}), \quad
                     \cos\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sqrt{2}}{2}(\cos{x}\mp\sin{x}), \quad
                     \tan\left(x\pm\dfrac{\pi}{4}\right)=\dfrac{\sin{x}\pm\cos{x}}{\cos{x}\mp\sin{x}}=\dfrac{\tan{x}\pm1}{1\mp\tan{x}};$
+                </p>
+                <p>
+                    $\sin\left(\dfrac{\pi}{4}-x\right)=\dfrac{\sqrt{2}}{2}\left(\cos x-\sin x\right), \quad
+                    \cos\left(\dfrac{\pi}{4}-x\right)=\dfrac{\sqrt{2}}{2}\left(\cos x+\sin x\right), \quad
+                    \tan\left(\dfrac{\pi}{4}-x\right)=\dfrac{1-\tan x}{1+\tan x};$
                 </p>
                 <p>
                     $\sin^2{x}+\cos^2{x}=1, \quad
@@ -377,15 +393,16 @@
                 <p>
                     $\sin\left(x\pm{y}\right)=\sin{x}\cos{y}\pm\cos{x}\sin{y}, \quad
                     \cos\left(x\pm{y}\right)=\cos{x}\cos{y}\mp\sin{x}\sin{y}, \quad
-                    \tan\left(x\pm{y}\right)=\dfrac{\tan{x}\pm\tan{y}}{1\mp\tan{x}\tan{y}}
-                    =\dfrac{\sin(x\pm y)}{\cos{x}\cos{y}};$
+                    \tan\left(x\pm{y}\right)=\dfrac{\tan{x}\pm\tan{y}}{1\mp\tan{x}\tan{y}}, \quad
+                    \cot\left(x\pm y\right)=\dfrac{\cot x\cot y\mp 1}{\cot y\pm\cot x};$
                 </p>
                 <p>
                     $\sin{2x}=2\sin{x}\cos{x},
                     \quad
                     \cos{2x}=\begin{cases}\cos^2{x}-\sin^2{x}\\2\cos^2{x}-1\\1-2\sin^2{x}\end{cases},
                     \quad
-                    \tan{2x}=\dfrac{2\tan{x}}{1-\tan^2{x}};$
+                    \tan{2x}=\dfrac{2\tan{x}}{1-\tan^2{x}}, \quad
+                    \cot2x=\dfrac{\cot^{2}x-1}{2\cot x};$
                 </p>
                 <p>
                     $\sin{3x}=\begin{cases}3\sin{x}-4\sin^3{x}\\3\sin{x}\cos^2x-\sin^3x\\4\sin{x}\cos^2{x}-\sin{x}\end{cases},
@@ -444,6 +461,10 @@
                     \sin{x}-\cos{y}=-2\cos\left(\dfrac{x+y+\frac{\pi}{2}}{2}\right)\cos\left(\dfrac{x-y+\frac{\pi}{2}}{2}\right);
                     $
                 </p>
+                <!-- sin(x+y)sin(x-y)=-½(cos(2x)-cos(2y))=sin²(x)cos²(y)-cos²(x)sin²(y)
+                cos(x+y)cos(x-y)=½(cos(2x)+cos(2y))=cos²x-sin²y=cos²x+cos²y-1=1-sin²x-sin²y
+                sin(x+y)cos(x-y)=½(sin(2x)+sin(2y))=sin(x)cos(x)+sin(y)cos(y)
+                cos(x+y)sin(x-y)=½(sin(2x)-sin(2y))=sin(x)cos(x)-sin(y)cos(y) -->
             </div>
             <br />
 
@@ -486,6 +507,13 @@
                     \sin^{-1}{x}+\cos^{-1}{x}=\dfrac{\pi}{2}, \quad
                     \tan^{-1}{x}+\cot^{-1}{x}=\dfrac{\pi}{2}, \quad
                     \sec^{-1}{x}+\csc^{-1}{x}=\dfrac{\pi}{2};$
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    $a\sin(kx)+b\cos(kx)
+                    =\sqrt{a^{2}+b^{2}}\cos\left(kx-\operatorname{atan2}(a,b)\right)
+                    =\sqrt{a^{2}+b^{2}}\sin\left(kx+\operatorname{atan2}(b,a)\right);$
                 </p>
             </div>
             <!-- Combined trigonometric and inverse -->
@@ -595,10 +623,29 @@
                     <br />
                 </p>
             </div>
+            <br />
+
+            <h2>Trigonometric Equations</h2>
             <div class="cat">
-                Solutions of $a\cos(x)+b\sin(x)+c=0$:&ensp;
-                $x=2\tan^{-1}\left(\dfrac{b\pm\sqrt{a^2+b^2-c^2}}{a-c}\right)+2\pi n$;
-                &emsp;(non-degenerated case)
+                <p>
+                    Solutions of $a\sin(x)=b$:&ensp;
+                    $x=\arcsin\left(\dfrac{b}{a}\right)+2\pi n$ and $x=\pi-\arcsin\left(\dfrac{b}{a}\right)+2\pi n$;
+                </p>
+                <p>
+                    Solutions of $a\cos(x)=b$:&ensp;
+                    $x=\pm\arccos\left(\dfrac{b}{a}\right)+2\pi n$;
+                </p>
+                <p>
+                    Solutions of $a\tan(x)=b$:&ensp;
+                    $x=\arctan\left(\dfrac{b}{a}\right)+\pi n$;
+                    &emsp;&emsp;
+                    Solutions of $a\cos(x)+b\sin(x)=0$:&ensp;
+                    $x=\arctan\left(-\dfrac{a}{b}\right)+\pi n$;
+                </p>
+                <p>
+                    Solutions of $a\cos(x)+b\sin(x)+c=0$:&ensp;
+                    $x=2\arctan\left(\dfrac{b\pm\sqrt{a^2+b^2-c^2}}{a-c}\right)+2\pi n$;
+                </p>
             </div>
         </div>
 
@@ -618,7 +665,7 @@
 
             <!-- Real domain -->
             <div class="cat">
-                <p>In real domain:</p>
+                <p>For real numbers:</p>
                 <p>
                     $a^x=\e^{x\ln{a}}$; &emsp;
                     $a^0=1$, &ensp;
@@ -642,11 +689,13 @@
                     $\log_a{1}=0$, &ensp;
                     $\log_a{a}=1$; <br />
                     $\log_a{b}+\log_a{c}=\log_a{bc}$, &ensp;
-                    $\log_a{b}-\log_a{c}=\log_a\left(\dfrac{b}{c}\right)$; &ensp;
+                    $\log_a{b}-\log_a{c}=\log_a\left(\dfrac{b}{c}\right)$, &ensp;
+                    $-\log_b{x}=\log_b\left(\dfrac{1}{x}\right)$; <br />
                     $\log_a{b^k}=k\cdot\log_a{b}$, &ensp;
                     $\log_{a^k}{b}=\dfrac{1}{k}\log_a{b}$, &ensp;
-                    $\log_a{b}\cdot\log_b{c}=\log_a{c}$, &ensp;
-                    $\log_a{\sqrt{x}}=\dfrac{1}{2}\log_a{x}$;
+                    $\log_a{b}\cdot\log_b{c}=\log_a{c}$; &emsp;
+                    $a+\log_b{x}=\log_b(b^ax)$; &emsp;
+                    $\log_b{\sqrt{x}}=\dfrac{1}{2}\log_b{x}$;
                 </p>
             </div>
 
@@ -759,6 +808,9 @@
                     &emsp;&emsp;&emsp;&emsp;
                     $\Re\left(\ln\left(\dfrac{x}{y}\right)\right)=\Re(\ln(x)-\ln(y))
                     \qquad (x,y\ne0)$;
+                    &emsp;&emsp;&emsp;&emsp;
+                    <red>*</red>
+                    $\ln\left(\dfrac{1}{x}\right)=-\ln(x)$;
                 </p>
                 <p>
                     <red>**</red>
@@ -976,8 +1028,9 @@
                     $\ddx{x^\mu}=\mu{x^{\mu-1}}; \quad$
                     $\ddx{\e^x}=\e^x, \quad
                     \ddx{a^x}=a^x\ln{a}; \quad$
-                    $\ddx{\sqrt{x}}=\dfrac{1}{2\sqrt{x}}; \quad
-                    \ddx{\dfrac{1}{x}}=-\dfrac{1}{x^2}$;
+                    $ \ddx{\dfrac{1}{x}}=-\dfrac{1}{x^2}, \quad
+                    \ddx{\sqrt{x}}=\dfrac{1}{2\sqrt{x}}, \quad
+                    \ddx{\sqrt[3]{x}}=\dfrac{1}{3}x^{-\frac{2}{3}};$
                 </p>
                 <p>
                     $\ddx\ln|x|=\dfrac{1}{x}, \quad
@@ -1014,11 +1067,7 @@
                     $\ddx\mathrm{erf}(x)=\dfrac{2}{\sqrt{\pi}}\e^{-x^2};$
                 </p>
             </div>
-            <div class="incomplete_mark">
-                Implicit differentiation
-                Jacobian / Multivariable
-                Curvature / Geometry
-            </div>
+            <div class="incomplete_mark"></div>
 
             <!-- Taylor Series -->
             <div class="cat">
@@ -1167,16 +1216,15 @@
                     \intd{\dfrac{1}{\sqrt{x^2\pm{a^2}}}}=\ln\left|\sqrt{x^2\pm{a^2}}+x\right|+C;$
                 </p>
                 <p>
-                    $\intd{\sqrt{a^2-x^2}}=\dfrac{1}{2}\left(a^2\sin^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2-x^2}\right)+C;
+                    $\intd{\sqrt{a^2-x^2}}=\dfrac{1}{2}\left(a^2\sin^{-1}\left(\dfrac{x}{|a|}\right)+x\sqrt{a^2-x^2}\right)+C;
                     \quad
-                    \intd{\sqrt{a^2+x^2}}=\dfrac{1}{2}\left({a^2\sinh^{-1}\left(\dfrac{x}{a}\right)+x\sqrt{a^2+x^2}}\right)+C;
-                    \qquad
-                    (a>0)$
+                    \intd{\sqrt{a^2+x^2}}=\dfrac{1}{2}\left({a^2\sinh^{-1}\left(\dfrac{x}{|a|}\right)+x\sqrt{a^2+x^2}}\right)+C;
+                    \qquad$
                 </p>
                 <p>
-                    $\intd{\sqrt{x^2-a^2}}=\dfrac{1}{2}\left(x\sqrt{x^2-a^2}-a^2\cosh^{-1}\left(\dfrac{x}{a}\right)\right)+C;
+                    $\intd{\sqrt{x^2-a^2}}=\dfrac{1}{2}\left(x\sqrt{x^2-a^2}-a^2\cosh^{-1}\left(\dfrac{x}{|a|}\right)\right)+C;
                     \quad
-                    (x,a>0)$
+                    (x>0)$
                 </p>
             </div>
             <div class="cat">

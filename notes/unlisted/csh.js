@@ -88,7 +88,7 @@ function getClassAttribute(s) {
         return [];
     var k = s.split(" ");
     // remove unused class names by MathJax
-    const removelist = ["math", "MathJax", "mi", "mo", "mn", "mrow", "mstyle", "texatom", "mspace", "msup", "msubsup", "munderover", "msqrt", "mfrac", "mtable", "mtd"];
+    const removelist = ["math", "MathJax", "mi", "mo", "mn", "mrow", "mstyle", "texatom", "mspace", "msup", "msubsup", "munderover", "msqrt", "mfrac", "mtable", "mtd", "vsc-initialized"];
     for (var i = 0; i < k.length; i++) {
         if (removelist.indexOf(k[i]) != -1) {
             k.splice(i, 1);
@@ -129,8 +129,8 @@ function countStyle(e) {
 }
 // find style attributes that occupy most HTML length
 function sortStyle() {
-    var k = Object.keys(Styles).map((key)=>[String(key), Styles[key]]);
-    k.sort(function(a, b) {
+    var k = Object.keys(Styles).map((key) => [String(key), Styles[key]]);
+    k.sort(function (a, b) {
         // may not be a good comparing function
         var l1 = Math.max(a[0].length - 3, 0) * (a[1] - 1);
         var l2 = Math.max(b[0].length - 3, 0) * (b[1] - 1);
@@ -201,7 +201,7 @@ function compressElement(e) {
 
     // compress class attribute
     var classes = []
-      , styles = [];
+        , styles = [];
     var an = at["class"], as;
     if (an != undefined) {
         as = an.value;
@@ -214,7 +214,7 @@ function compressElement(e) {
         for (var i = 0; i < styles.length; i++) {
             if (styles[i] == "")
                 styles.splice(i, 1),
-                i--;
+                    i--;
         }
     }
 
@@ -237,7 +237,7 @@ function compressElement(e) {
         if (an == "class" || an == "style")
             continue;
         as = at[an].value;
-        as = compressAttribute(as);
+        //as = compressAttribute(as);
         if (as != "") {
             if (an == 'id' && as.indexOf("MathJax") == 0)
                 ;
@@ -270,6 +270,3 @@ sortStyle();
 var h = "<!DOCTYPE html>" + compressElement(html);
 console.log(h);
 console.log(h.length + "/" + html.outerHTML.length + " (" + (h.length / html.outerHTML.length).toFixed(3) + ")");
-
-// https://www.w3schools.com/html/html5_syntax.asp
-// https://google.github.io/styleguide/htmlcssguide.html

@@ -227,14 +227,15 @@
                 mouse_down = false;
                 OrigCursor = [NaN, NaN];
             };
-            canvas.onmousewheel = function (event) {  // doesn't work in IE and Firefox
+            canvas.addEventListener("wheel", function (event) {
+                event.preventDefault();
                 const MAX = 500, MIN = 0.5;
-                var d = Math.exp(0.0005 * event.wheelDelta);
+                var d = Math.exp(-0.0005 * event.deltaY);
                 //if (Unit * d > MAX) d = MAX / Unit;
                 //else if (Unit * d < MIN) d = MIN / Unit;
                 Unit *= d;
                 redraw();
-            };
+            });
         }
     </script>
 
@@ -646,11 +647,11 @@
                 var dx = 0.01, rg = 3 * N;
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = "rgb(255,255,255)";
-                for (var x = -rg; x < rg; x += dx) {
-                    var y = ((C3 * x + C2) * x + C1) * x + C0;
-                    var y1 = ((C3 * (x + dx) + C2) * (x + dx) + C1) * (x + dx) + C0;
-                    if ((y > -rg && y < rg) || (y1 > -rg && y1 < rg)) drawline([x, y, 0], [x + dx, y1, 0]);
-                }
+                // for (var x = -rg; x < rg; x += dx) {
+                //     var y = ((C3 * x + C2) * x + C1) * x + C0;
+                //     var y1 = ((C3 * (x + dx) + C2) * (x + dx) + C1) * (x + dx) + C0;
+                //     if ((y > -rg && y < rg) || (y1 > -rg && y1 < rg)) drawline([x, y, 0], [x + dx, y1, 0]);
+                // }
             }
 
             // reference cube
