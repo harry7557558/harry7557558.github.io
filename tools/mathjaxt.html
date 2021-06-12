@@ -5,7 +5,7 @@
     <title>MathJax Tester</title>
     <meta charset="utf-8" />
 
-    <meta name="description" content="A simple tool for typing LaTeX math equations." />
+    <meta name="description" content="A simple LaTeX math equation editor." />
     <meta name="keywords" content="harry7557558, mathjax, latex, math, equation, type" />
     <meta name="author" content="Harry Chen" />
     <meta name="robots" content="index, follow" />
@@ -257,17 +257,27 @@
                             tex.value = tex.value.erase(pos, 1);
                             moveCursortTo(tex, pos);
                         }
-                        else {
+                        else if (tex.value[pos - 2] != '\\') {
                             tex.value = tex.value.insert(pos, '}');
-                            if (tex.value.substring(pos - 5, pos - 1) == "frac")
-                                tex.value = tex.value.insert(pos + 1, "{}");
+                            const words = ["dfrac", "frac", "dbinom", "binom"];
+                            for (var i = 0; i < words.length; i++) {
+                                var word = words[i];
+                                var si = pos - word.length - 1;
+                                console.log(tex.value[si]);
+                                if (tex.value[si - 1] == '\\' && tex.value.substring(si, pos - 1) == word) {
+                                    tex.value = tex.value.insert(pos + 1, "{}");
+                                    break;
+                                }
+                            }
                             moveCursortTo(tex, pos);
                         }
                     }
                     // close '}'
                     if (event.data == '}' && tex.value[pos] == '}') {
-                        tex.value = tex.value.erase(pos, 1);
-                        moveCursortTo(tex, pos);
+                        if (tex.value[pos - 2] != '\\') {
+                            tex.value = tex.value.erase(pos, 1);
+                            moveCursortTo(tex, pos);
+                        }
                     }
                     // \left([|<
                     var c = tex.value[pos - 1];

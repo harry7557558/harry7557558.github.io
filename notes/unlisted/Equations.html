@@ -1202,6 +1202,7 @@
                 <p>
                     $\intd{\tan^{-1}(x)}=x\tan^{-1}\left(x\right)-\dfrac{\ln\left(x^2+1\right)}{2}+C, \quad
                     \intd{\cot^{-1}(x)}=x\cot^{-1}\left(x\right)+\dfrac{\ln\left(x^2+1\right)}{2}+C;$
+                    &emsp;
                     $\intd{\e^{-x^2}}=\dfrac{\sqrt{\pi}}{2}\erf(x)+C;$
                 </p>
             </div>
@@ -1338,29 +1339,6 @@
             </div>
             <br />
             <div class="incomplete_mark"></div>
-
-            <!-- Fourier Series -->
-            <div class="cat">
-                <p>
-                    Fourier Series: &ensp;
-                    $f(t)=\dfrac{a_{0}}{2}+a_{1}\cos(\omega t)+b_{1}\sin(\omega t)+a_{2}\cos(2\omega
-                    t)+b_{2}\sin(2\omega t)+\cdots \; =\dfrac{a_{0}}{2}+\Sum{[a_{n}\cos(n\omega t)+b_{n}\sin(n\omega
-                    t)]}{n=1}{\infty}$, &ensp; <br />
-                    &emsp;&emsp;&emsp;&emsp;
-                    which $a_{n}=\dfrac{2}{T}\intabd[t]{f(t)\cos(n\omega t)}{t_{0}}{t_{0}+T}, \quad
-                    b_{n}=\dfrac{2}{T}\intabd[t]{f(t)\sin(n\omega t)}{t_{0}}{t_{0}+T}, \quad \omega=\dfrac{2\pi}{T}$;
-                    &ensp; <br />
-                    Or $f(t) = \Sum{c_n\cdot\e^{in\omega t}}{n=-\infty}{+\infty}, \quad
-                    c_n=\dfrac{1}{T}\intabd[t]{f(t)\e^{-in\omega t}}{t_0}{t_0+T}$; &ensp;
-                </p>
-                <p>
-                    When $T=2\pi$: &ensp;
-                    $\displaystyle f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}[a_{k}\cos(kx)+b_{k}\sin(kx)], \quad
-                    a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\mathrm{d}x, \quad
-                    b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\mathrm{d}x$;
-
-                </p>
-            </div>
             <br /><br />
         </div>
 
@@ -2138,8 +2116,8 @@
         <!-- Miscellaneous -->
         <div class="page">
             <!-- Sequence and Series -->
+            <h3>Sequence and Series</h3>
             <div class="cat">
-                <h3>Sequence and Series</h3>
                 <p>
                     Arithmetic Sequence: &ensp;
                     $a_n=a_1+d(n-1)$, &ensp;$n=\dfrac{a_n-a_1}{d}+1$, &ensp;$d=\dfrac{a_n-a_1}{n-1}$; &ensp;
@@ -2157,7 +2135,8 @@
             </div>
             <div class="cat">
                 <p>
-                    $\Sum{r^k}{k=0}{\infty}=\begin{cases} +\infty & r\ge1 \\[3pt] \dfrac{1}{1-r} & |r|\lt 1 \\[3pt]
+                    $\displaystyle\sum_{k=0}^{\infty}{r^k}=\begin{cases} +\infty & r\ge1 \\[3pt] \dfrac{1}{1-r} & |r|\lt
+                    1 \\[3pt]
                     \text{diverge} & r\le-1 \end{cases}$; &emsp;
                     $\displaystyle\sum_{k=1}^n{r^k}=\frac{r(1-r^n)}{(1-r)}, \quad
                     \displaystyle\sum_{k=0}^n{r^k}=\frac{1-r^{n+1}}{1-r};$
@@ -2169,8 +2148,7 @@
                     \displaystyle{\sum_{k=1}^{n}k^{2}=\frac{1}{6}n\left(n+1\right)\left(2n+1\right)}, \quad
                     \displaystyle{\sum_{k=1}^{n}k^{3}=\frac{1}{4}n^{2}\left(n+1\right)^{2}}, \quad
                     \displaystyle{\sum_{k=1}^{n}k^{4}=\frac{1}{30}n\left(n+1\right)\left(2n+1\right)\left(3n^{2}+3n-1\right)};
-                    \quad
-                    $
+                    \quad$
                 </p>
             </div>
             <div class="cat">
@@ -2178,7 +2156,60 @@
                     $(a+b)^n=\displaystyle\sum_{k=0}^{n}{\binom{n}{k}a^{k}b^{n-k}}=\sum_{k=0}^n{\binom{n}{k}a^{n-k}b^{k}},
                     \quad
                     (1+x)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}x^k}, \quad
-                    (1-x)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}(-1)^{k}x^{k}};$
+                    (1-x)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}(-1)^{k}x^{k}}, \quad
+                    (x-1)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}(-1)^{n-k}x^{k}};$
+                </p>
+            </div>
+            <br />
+
+            <h3>Taylor and Maclaurin Series</h3>
+            <div class="cat">
+                <p>
+                    $\displaystyle\frac{1}{1-x}=\sum_{k=0}^{\infty}x^{k}=1+x+x^{2}+x^{3}+\cdots, \quad$
+                    $\displaystyle\frac{1}{1+x}=\sum_{k=0}^{\infty}\left(-1\right)^{k}x^{k}=1-x+x^{2}-x^{3}+\cdots,\quad$
+                    $\displaystyle\ln\left(1+x\right)=\sum_{k=0}^{\infty}\frac{\left(-1\right)^{k}x^{k+1}}{k+1}=x-\frac{x^{2}}{2}+\frac{x^{3}}{3}-\frac{x^{4}}{4}+\cdots;\quad$
+                    $(|x|\le1)$
+                </p>
+                <p>
+                    $\displaystyle\frac{1}{1-x^{2}}=\sum_{k=0}^{\infty}x^{2k}=1+x^{2}+x^{4}+x^{6}+\cdots,\quad$
+                    $\displaystyle\frac{1}{1+x^{2}}=\sum_{k=0}^{\infty}\left(-1\right)^{k}x^{2k}=1-x^{2}+x^{4}-x^{6}+\cdots,\quad$
+                </p>
+                <p>
+                    $\displaystyle\arctan\left(x\right)=\sum_{k=0}^{\infty}\frac{\left(-1\right)^{k}x^{2k+1}}{2k+1}=x-\frac{x^{3}}{3}+\frac{x^{5}}{5}-\frac{x^{7}}{7}+\cdots,\quad$
+                    $\displaystyle\operatorname{arctanh}\left(x\right)=\sum_{k=0}^{\infty}\frac{x^{2k+1}}{2k+1}=x+\frac{x^{3}}{3}+\frac{x^{5}}{5}+\frac{x^{7}}{7}+\cdots;\quad$
+                    $(|x|\le1)$
+                </p>
+                <p>
+                    $\displaystyle\e^{x}=\sum_{k=0}^{\infty}\frac{x^{k}}{k!}=1+x+\frac{x^{2}}{2!}+\frac{x^{3}}{3!}+\cdots,\quad$
+                    $\displaystyle\sin\left(x\right)=\sum_{k=0}^{\infty}\frac{\left(-1\right)^{k}x^{2k+1}}{\left(2k+1\right)!}=x-\frac{x^{3}}{3!}+\frac{x^{5}}{5!}-\frac{x^{7}}{7!}+\cdots,\quad$
+                    $\displaystyle\cos\left(x\right)=\sum_{k=0}^{\infty}\frac{\left(-1\right)^{k}x^{2k}}{\left(2k\right)!}=1-\frac{x^{2}}{2!}+\frac{x^{4}}{4!}-\frac{x^{6}}{6!}+\cdots,\quad$
+                </p>
+                <p>
+                    $\displaystyle\sinh\left(x\right)=\sum_{k=0}^{\infty}\frac{x^{2k+1}}{\left(2k+1\right)!}=x+\frac{x^{3}}{3!}+\frac{x^{5}}{5!}+\frac{x^{7}}{7!}+\cdots,\quad$
+                    $\displaystyle\cosh\left(x\right)=\sum_{k=0}^{\infty}\frac{x^{2k}}{\left(2k\right)!}=1+\frac{x^{2}}{2!}+\frac{x^{4}}{4!}+\frac{x^{6}}{6!}+\cdots;\quad$
+                </p>
+            </div>
+            <br />
+
+            <h3>Fourier Series</h3>
+            <div class="cat">
+                <p>
+                    $f(t)=\dfrac{a_{0}}{2}+a_{1}\cos(\omega t)+b_{1}\sin(\omega t)+a_{2}\cos(2\omega
+                    t)+b_{2}\sin(2\omega t)+\cdots \; =\dfrac{a_{0}}{2}+\Sum{[a_{n}\cos(n\omega t)+b_{n}\sin(n\omega
+                    t)]}{n=1}{\infty}$, &ensp; <br />
+                    &emsp;&emsp;&emsp;&emsp;
+                    where $a_{n}=\dfrac{2}{T}\intabd[t]{f(t)\cos(n\omega t)}{t_{0}}{t_{0}+T}, \quad
+                    b_{n}=\dfrac{2}{T}\intabd[t]{f(t)\sin(n\omega t)}{t_{0}}{t_{0}+T}, \quad \omega=\dfrac{2\pi}{T}$;
+                    &ensp; <br />
+                    Or $f(t) = \Sum{c_n\cdot\e^{in\omega t}}{n=-\infty}{+\infty}, \quad
+                    c_n=\dfrac{1}{T}\intabd[t]{f(t)\e^{-in\omega t}}{t_0}{t_0+T}$; &ensp;
+                </p>
+                <p>
+                    When $T=2\pi$: &ensp;
+                    $\displaystyle f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}[a_{k}\cos(kx)+b_{k}\sin(kx)], \quad
+                    a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\mathrm{d}x, \quad
+                    b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\mathrm{d}x$;
+
                 </p>
             </div>
 
@@ -2222,7 +2253,6 @@
                     Combinations without Repetition: &ensp;$C^n_k=\dfrac{n!}{k!(n-k)!}$; &emsp;
                     (Also denoted as $C(n,k)$,&ensp;$\dbinom{n}{k}$, &ensp;$C^k_n$, &ensp;$\sideset{^n}{_k}C$,
                     &ensp;$\sideset{_n}{_k}C$)
-                    &emsp;&emsp;$\dbinom{n}{k}=\dbinom{n}{n-k}=\dfrac{n}{k}\dbinom{n-1}{k-1}$; &ensp;
                 </p>
                 <p>
                     Combinations with Repetition: &ensp;$H^n_k=\dfrac{(n+k-1)!}{k!(n-1)!}$; &emsp;
@@ -2238,6 +2268,13 @@
                 <p>
                     <red>*</red>Circular Permutation with Repetition: &emsp;
                     $\dfrac{\sum_{r|k}(r\cdot\varphi(r)\cdot{n^{\frac{k}{r}}})}{k}$; &ensp;
+                </p>
+            </div>
+            <div class="cat">
+                <p>
+                    $\dbinom{n}{k}=\dbinom{n}{n-k}=\dfrac{n}{k}\dbinom{n-1}{k-1}; \quad
+                    \dbinom{n}{k-1}+\dbinom{n}{k}=\dbinom{n+1}{k}, \quad
+                    \dbinom{n}{k}=\dbinom{n-1}{k-1}+\dbinom{n-1}{k}; \quad$
                 </p>
             </div>
 
