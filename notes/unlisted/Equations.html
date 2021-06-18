@@ -388,7 +388,7 @@
                     \csc^2{x}-\cot^2{x}=1;$
                 </p>
             </div>
-            <!-- Sum, Double-angle, and Half-angle formulas -->
+            <!-- Sum, Double-angle, and Half-angle formulae -->
             <div class="cat">
                 <p>
                     $\sin\left(x\pm{y}\right)=\sin{x}\cos{y}\pm\cos{x}\sin{y}, \quad
@@ -500,13 +500,36 @@
                     <span>$f(x)=\csc^{-1}{x}$</span>
                 </div>
             </div>
+            <!-- Some equations only work for $x\in\R$ -->
             <div class="cat">
                 <p>
-                    $\csc^{-1}{x}=\sin^{-1}\dfrac{1}{x}, \quad
-                    \sec^{-1}{x}=\cos^{-1}\dfrac{1}{x}; \qquad
+                    $\sin^{-1}(-x)=-\sin^{-1}(x),\quad
+                    \tan^{-1}(-x)=-\tan^{-1}(x),\quad
+                    \csc^{-1}(-x)=-\csc^{-1}(x),\quad
+                    \operatorname{atan2}(y,x)=-\operatorname{atan2}(-y,x)
+                    \ne-\operatorname{atan2}(y,-x)=\operatorname{atan2}(-y,-x);$
+                </p>
+                <p>
+                    $\csc^{-1}{x}=\sin^{-1}\left(\dfrac{1}{x}\right), \quad
+                    \sec^{-1}{x}=\cos^{-1}\left(\dfrac{1}{x}\right); \quad
+                    \tan^{-1}{x}=\cot^{-1}\left(\dfrac{1}{x}\right)\ (x\gt0); \qquad
                     \sin^{-1}{x}+\cos^{-1}{x}=\dfrac{\pi}{2}, \quad
                     \tan^{-1}{x}+\cot^{-1}{x}=\dfrac{\pi}{2}, \quad
                     \sec^{-1}{x}+\csc^{-1}{x}=\dfrac{\pi}{2};$
+                </p>
+                <p>
+                    $\operatorname{atan2}(y,x)=\begin{cases}
+                    \tan^{-1}(\frac{y}{x})&x>0\\
+                    \tan^{-1}(\frac{y}{x})+\pi &x\lt0,\ y\ge0\\
+                    \tan^{-1}(\frac{y}{x})-\pi &x\lt0,\ y\lt0\\
+                    \frac{\pi}{2}&x=0,\ y\gt0\\
+                    -\frac{\pi}{2}&x=0,\ y\lt0
+                    \end{cases} = \begin{cases}
+                    \cot^{-1}(\frac{x}{y})&y>0\\\cot^{-1}(\frac{x}{y})-\pi &y\lt0\\
+                    0&y=0,\ x\gt0\\
+                    \pi&y=0,\ x\lt0\end{cases}
+                    =2\tan^{-1}\left(\dfrac{y}{\sqrt{x^2+y^2}+x}\right)
+                    =2\tan^{-1}\left(\dfrac{\sqrt{x^2+y^2}-x}{y}\right);$
                 </p>
             </div>
             <div class="cat">
@@ -519,6 +542,11 @@
             <!-- Combined trigonometric and inverse -->
             <div class="cat">
                 <p>
+                    $\sin^{-1}(x)=\cos^{-1}\left(\sqrt{1-x^2}\right)=\tan^{-1}\left(\dfrac{x}{\sqrt{1-x^2}}\right),\quad
+                    \cos^{-1}(x)=\sin^{-1}\left(\sqrt{1-x^2}\right)=\tan^{-1}\left(\dfrac{\sqrt{1-x^2}}{x}\right);\quad
+                    (0\lt x\lt1)$
+                </p>
+                <p>
                     $\sin(\cos^{-1}{x})=\sqrt{1-x^2}, \quad
                     \sin(\tan^{-1}{x})=\dfrac{x}{\sqrt{1+x^2}}, \quad
                     \cos(\sin^{-1}{x})=\sqrt{1-x^2}, \quad
@@ -530,6 +558,11 @@
                     $\cos(\mathrm{atan2}(y,x))=\dfrac{x}{\sqrt{x^2+y^2}}, \quad
                     \sin(\mathrm{atan2}(y,x))=\dfrac{y}{\sqrt{x^2+y^2}}; \qquad
                     \tan^{-1}(x)\pm\tan^{-1}(y)=\mathrm{atan2}(x\pm y, 1\mp xy);$
+                </p>
+                <p>
+                    $\tan(\operatorname{atan2}(y,x))=\dfrac{y}{x},\quad
+                    \cot(\operatorname{atan2}(y,x))=\dfrac{x}{y};\qquad
+                    \operatorname{atan2}(\sin{x},\cos{x})=x;\ \ (-\pi\lt x\lt\pi)$
                 </p>
             </div>
             <!-- Combined inverse and trigonometric -->
@@ -1108,7 +1141,7 @@
                     Binormal unit vector: $B=T\times N$;&ensp;
                 </p>
                 <p>
-                    Frenet–Serret formulas:
+                    Frenet–Serret formula:
                     &ensp;$\bmat{T'\\N'\\B'\\}=\bmat{0&\kappa&0\\-\kappa&0&\tau\\0&-\tau&0}\bmat{T\\N\\B}$,
                     &ensp;where $\tau=-\dfrac{\d{B}}{\d{s}}\cdot N$ is the <i>torsion</i>;
                 </p>
