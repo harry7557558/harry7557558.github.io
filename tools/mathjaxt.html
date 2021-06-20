@@ -11,11 +11,18 @@
     <meta name="robots" content="index, follow" />
 
     <script id="mathjax-config-script" type="text/x-mathjax-config">
-        MathJax.Hub.Config({tex2jax:{inlineMath: [["$", "$"]], preview: "none"}, "fast-preview":{disabled: true}, AssistiveMML:{disabled: true}, menuSettings:{inTabOrder: false}, messageStyle: "simple", positionToHash: false});
-        MathJax.Hub.Config({ "HTML-CSS": { styles: { ".MathJax nobr": { padding: "0.2em 0.2em" }, } } });
+        MathJax.Hub.Config({
+            tex2jax: { inlineMath: [["$", "$"]], preview: "none" },
+            "fast-preview": { disabled: true },
+            AssistiveMML: { disabled: true },
+            menuSettings: { inTabOrder: false },
+            messageStyle: "simple",
+            positionToHash: false
+        });
     </script>
-    <script type="text/javascript" async="" id="MathJax_JS"
+    <script type="text/javascript" id="MathJax_src" async=""
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
     <style>
         #MathJax_MenuFrame {
             opacity: 0.0;
@@ -52,7 +59,7 @@
         }
 
         .title {
-            padding: 0px 0px 10px 10px;
+            padding: 0px 10px 10px 10px;
             font-size: 20px;
             text-align: left;
             font-family: Consolas;
@@ -85,22 +92,14 @@
             background-color: white;
         }
     </style>
-    <script>
-        function $(name) {
-            return document.getElementById(name);
-        }
-        $("MathJax_JS").onerror = function () {
-            alert("Loading MathJax Failed!");
-            $("TeX_Preview").style.color = "red";
-        }
-    </script>
 </head>
 
-<body onload="init();">
+<body>
     <!-- Latex macros -->
     <div style="height:0px; visibility:hidden; display:none;">
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\e}{\operatorname{e}}$
+        $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\erf}{\operatorname{erf}}$
         $\newcommand{\abs}{\operatorname{abs}}$
         $\newcommand{\sgn}{\operatorname{sgn}}$
@@ -108,16 +107,23 @@
         $\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}$
         $\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}$
         $\newcommand{\vmat}[1]{\begin{vmatrix}#1\end{vmatrix}}$
+
+        $\newcommand{\N}{\unicode{0x2115}}$
+        $\newcommand{\Z}{\unicode{0x2124}}$
+        $\newcommand{\P}{\unicode{0x2119}}$
+        $\newcommand{\Q}{\unicode{0x211A}}$
+        $\newcommand{\R}{\unicode{0x211D}}$
+        $\newcommand{\C}{\unicode{0x2102}}$
+        $\newcommand{\H}{\unicode{0x210D}}$
     </div>
     <div id="LaTeX_Tester">
         <div id="TeX_Input_container">
             <div id="title" class="title">
                 <span>type LaTeX here: </span>
-                <a href="https://harry7557558.github.io/tools/mathjaxt.html" class="title"
-                    style="float:right;display:none">⇒</a>
+                <div style="float:right">$<input id="checkbox" type="checkbox" checked /></div>
             </div>
             <textarea id="TeX_Input" type="text" spellcheck="false" data-gramm="false"
-                oninput="onInput(event)">\displaystyle f(a) = \dfrac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a}\d{z}</textarea>
+                oninput="onInput(event)"></textarea>
         </div>
         <div id="TeX_PreviewBox_Frame">
             <div id="TeX_PreviewBox">
@@ -152,14 +158,41 @@
             }
 
 
-            var tex = $("TeX_Input");
-            var pref = $("TeX_PreviewBox_Frame");
-            var pre = $("TeX_PreviewBox");
-            var fom = $("TeX_Preview");
+            var tex = document.getElementById("TeX_Input");
+            var pref = document.getElementById("TeX_PreviewBox_Frame");
+            var pre = document.getElementById("TeX_PreviewBox");
+            var fom = document.getElementById("TeX_Preview");
             var maxheight = 0;
             var histht = 0;
             var cookie_enabled = navigator.cookieEnabled;
-            var input_history = [];
+            var input_history = [], redo_history = [];
+
+            function addHistory(tex_value, insert_pos) {
+                var l = input_history.length;
+                if (l < 1 || input_history[l - 1][0] != tex_value) {
+                    input_history.push([tex_value, insert_pos]);
+                    redo_history = [];
+                }
+            }
+            function undoHistory() {
+                var l = input_history.length;
+                if (l <= 1) return;
+                redo_history.push(input_history[l - 1]);
+                input_history.pop();
+                tex.value = input_history[l - 2][0];
+                moveCursorTo(tex, input_history[l - 2][1]);
+                render();
+            }
+            function redoHistory() {
+                var l = redo_history.length;
+                if (l < 1) return;
+                input_history.push(redo_history[l - 1]);
+                redo_history.pop();
+                l = input_history.length;
+                tex.value = input_history[l - 1][0];
+                moveCursorTo(tex, input_history[l - 1][1]);
+                render();
+            }
 
             function init() {
                 String.prototype.splice = function (start, delCount, newSubStr) {
@@ -172,7 +205,8 @@
                     return this.substr(0, dir) + this.substring(dir + num, this.length);
                 }
 
-                if (cookie_enabled) {
+                // load from cookie
+                try {
                     var getCookie = function getCookie(cname) {
                         var name = cname + "=";
                         var ca = document.cookie.split(';');
@@ -182,37 +216,46 @@
                         }
                         return "";
                     };
-                    var s = getCookie("FinInput");
+                    var checked = (getCookie("Checked") != "0");
+                    document.getElementById("checkbox").checked = checked;
+                    var base64 = getCookie("FinInput");
+                    var s = decodeURIComponent(escape(window.atob(base64)));
                     if (s != "") tex.value = s;
+                    if (tex.value == "") throw (tex.value);
                 }
-                else {
-                    tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z} \n";
+                catch (e) {
+                    tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z}";
                 }
-                input_history.push([tex.value, tex.value.length]);
+                addHistory(tex.value, tex.value.length);
 
-                if (document.URL.match("file")) {
-                    document.getElementsByTagName('a')[0].style.display = "";
-                }
-                fom.innerHTML = "$" + escape(tex.value) + "$";
+                // $ checkbox
+                const checkbox = document.getElementById("checkbox");
+                checkbox.addEventListener("input", function (e) {
+                    render();
+                });
 
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                render();
 
                 setTimeout(function () {
                     histht = fom.getBoundingClientRect().height;
                     fom.style.minHeight = histht + "px";
-                }, 1000)
+                }, 1000);
             }
 
-            function backup() {
+            function backupCookie() {
                 if (!cookie_enabled) return 0;
-                document.cookie = "FinInput=" + tex.value + "; expires=Thu, 18 Dec 2043 12:00:00 GMT";
-                if (document.cookie == "") return 0;
-                return 1;
+                var date = new Date();
+                date.setTime(date.getTime() + (365 * 86400000));
+                var expires = " expires=" + date.toUTCString();
+
+                var base64 = window.btoa(unescape(encodeURIComponent(tex.value)));
+                var checked = document.getElementById("checkbox").checked ? "1" : "0";
+                document.cookie = "FinInput=" + base64 + ";" + expires;
+                document.cookie = "Checked=" + checked + ";" + expires;
             }
 
-            function Render() {
-                if (cookie_enabled) backup();
-                else document.body.setAttribute("onbeforeunload", "return backup()");
+            function render() {
+                if (cookie_enabled) backupCookie();
 
                 var ht = fom.getBoundingClientRect().height;
                 if (ht > histht) {
@@ -221,12 +264,19 @@
                 }
 
                 if (tex.value != "") {
-                    fom.innerHTML = "$" + escape(tex.value) + "$";
-                    backup();
+                    if (document.getElementById("checkbox").checked)
+                        fom.innerHTML = "$" + escape(tex.value) + "$";
+                    else fom.innerHTML = escape(tex.value);
+                    backupCookie();
                 }
                 else fom.innerText = "";
 
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
+                try {
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
+                }
+                catch (e) {
+                    document.getElementById("TeX_Preview").innerHTML = "<b style='color:red'>" + e + "</b>";
+                }
             }
 
 
@@ -242,7 +292,7 @@
                 }
                 return cursorIndex;
             };
-            var moveCursortTo = function (obj, pos) {
+            var moveCursorTo = function (obj, pos) {
                 obj.setSelectionRange(pos, pos);
             };
 
@@ -255,7 +305,7 @@
                     if (event.data == '{' && tex.value[pos - 1] == "{") {
                         if (tex.value[pos] == '{') {
                             tex.value = tex.value.erase(pos, 1);
-                            moveCursortTo(tex, pos);
+                            moveCursorTo(tex, pos);
                         }
                         else if (tex.value[pos - 2] != '\\') {
                             tex.value = tex.value.insert(pos, '}');
@@ -263,20 +313,20 @@
                             for (var i = 0; i < words.length; i++) {
                                 var word = words[i];
                                 var si = pos - word.length - 1;
-                                console.log(tex.value[si]);
+                                //console.log(tex.value[si]);
                                 if (tex.value[si - 1] == '\\' && tex.value.substring(si, pos - 1) == word) {
                                     tex.value = tex.value.insert(pos + 1, "{}");
                                     break;
                                 }
                             }
-                            moveCursortTo(tex, pos);
+                            moveCursorTo(tex, pos);
                         }
                     }
                     // close '}'
                     if (event.data == '}' && tex.value[pos] == '}') {
                         if (tex.value[pos - 2] != '\\') {
                             tex.value = tex.value.erase(pos, 1);
-                            moveCursortTo(tex, pos);
+                            moveCursorTo(tex, pos);
                         }
                     }
                     // \left([|<
@@ -285,21 +335,35 @@
                         && tex.value.substring(pos - 6, pos - 1) == "\\left") {
                         tex.value = tex.value.insert(pos, "\\right" +
                             (c == '(' ? ')' : c == '[' ? ']' : c == '|' ? '|' : c == '<' ? '>' : ''));
-                        moveCursortTo(tex, pos);
+                        moveCursorTo(tex, pos);
                     }
                 }
                 else if (event.inputType == 'deleteContentBackward' && tex.value.length == tex_old.length - 1) {
                     // erase '{'
                     if (tex_old[pos] == '{' && tex.value[pos] == '}' && matchBracket(tex_old, pos) == pos + 1) {
                         tex.value = tex.value.erase(pos, 1);
-                        moveCursortTo(tex, pos);
+                        moveCursorTo(tex, pos);
                     }
+                }
+                // some don't work in Firefox
+                else if (event.inputType == 'insertLineBreak') {
+
+                }
+                else if (event.inputType == 'historyUndo') {
+                    undoHistory();
+                }
+                else if (event.inputType == 'historyRedo') {
+                    redoHistory();
                 }
                 else console.log(event);
 
-                Render();
-                input_history.push([tex.value, getCursortPos(tex)]);
+                render();
+                addHistory(tex.value, getCursortPos(tex));
             }
+
+            window.addEventListener("load", function (e) {
+                init();
+            });
         </script>
     </div>
 </body>
