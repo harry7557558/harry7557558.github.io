@@ -52,14 +52,14 @@
             margin-left: auto;
             margin-right: auto;
             text-align: center;
+            width: 90%;
             max-width: 1000px;
             background-color: rgb(26, 35, 50);
-            width: 656px;
-            padding: 24px 20px 30px 20px;
+            padding: 24px 30px 30px 30px;
         }
 
         .title {
-            padding: 0px 10px 10px 10px;
+            padding: 0px 0px 10px 0px;
             font-size: 20px;
             text-align: left;
             font-family: Consolas;
@@ -70,10 +70,13 @@
         }
 
         #TeX_Input {
+            width: 100%;
             height: 140px;
-            width: 620px;
+            box-sizing: border-box;
+            display: block;
             border: none;
             padding: 10px;
+            /*outline: none;*/
             background-color: rgb(12, 12, 12);
             font-family: Consolas;
             font-size: 14px;
@@ -82,14 +85,17 @@
         }
 
         #TeX_PreviewBox_Frame {
-            margin-left: auto;
-            margin-right: auto;
+            margin: 10px 0px;
+            width: auto;
             height: auto;
             min-height: 40px;
             vertical-align: central;
-            width: 620px;
             padding: 16px 10px;
             background-color: white;
+        }
+
+        #TeX_PreviewBox_Frame ::selection {
+            background: rgb(153, 193, 218);
         }
     </style>
 </head>
@@ -116,6 +122,8 @@
         $\newcommand{\C}{\unicode{0x2102}}$
         $\newcommand{\H}{\unicode{0x210D}}$
     </div>
+
+    <!-- Editor -->
     <div id="LaTeX_Tester">
         <div id="TeX_Input_container">
             <div id="title" class="title">
@@ -130,242 +138,261 @@
                 <div id="TeX_Preview"></div>
             </div>
         </div>
-        <script>
+    </div>
 
-            function escape(str) {
-                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-            }
-            function matchBracket(s, d) {
-                if (s[d] == '{') {
-                    var st = 1;
-                    for (var i = d + 1; i < s.length; i++) {
-                        if (s[i] == '{') st++;
-                        if (s[i] == '}') st--;
-                        if (st == 0) return i;
-                    }
-                    return -1;
-                }
-                if (s[d] == '}') {
-                    var st = 1;
-                    for (var i = d - 1; i >= 0; i--) {
-                        if (s[i] == '}') st++;
-                        if (s[i] == '{') st--;
-                        if (st == 0) return i;
-                    }
-                    return -1;
+    <!-- Script -->
+    <script>
+
+        const tex = document.getElementById("TeX_Input");
+        const pref = document.getElementById("TeX_PreviewBox_Frame");
+        const pre = document.getElementById("TeX_PreviewBox");
+        const fom = document.getElementById("TeX_Preview");
+        var maxheight = 0;
+        var histht = 0;
+        var cookie_enabled = navigator.cookieEnabled;
+        var input_history = [], redo_history = [];
+
+        function escape(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+        function matchBracket(s, d) {
+            if (s[d] == '{') {
+                var st = 1;
+                for (var i = d + 1; i < s.length; i++) {
+                    if (s[i] == '{') st++;
+                    if (s[i] == '}') st--;
+                    if (st == 0) return i;
                 }
                 return -1;
             }
-
-
-            var tex = document.getElementById("TeX_Input");
-            var pref = document.getElementById("TeX_PreviewBox_Frame");
-            var pre = document.getElementById("TeX_PreviewBox");
-            var fom = document.getElementById("TeX_Preview");
-            var maxheight = 0;
-            var histht = 0;
-            var cookie_enabled = navigator.cookieEnabled;
-            var input_history = [], redo_history = [];
-
-            function addHistory(tex_value, insert_pos) {
-                var l = input_history.length;
-                if (l < 1 || input_history[l - 1][0] != tex_value) {
-                    input_history.push([tex_value, insert_pos]);
-                    redo_history = [];
+            if (s[d] == '}') {
+                var st = 1;
+                for (var i = d - 1; i >= 0; i--) {
+                    if (s[i] == '}') st++;
+                    if (s[i] == '{') st--;
+                    if (st == 0) return i;
                 }
+                return -1;
             }
-            function undoHistory() {
-                var l = input_history.length;
-                if (l <= 1) return;
-                redo_history.push(input_history[l - 1]);
-                input_history.pop();
-                tex.value = input_history[l - 2][0];
-                moveCursorTo(tex, input_history[l - 2][1]);
-                render();
+            return -1;
+        }
+
+        function addHistory(tex_value, insert_pos) {
+            var l = input_history.length;
+            if (l < 1 || input_history[l - 1][0] != tex_value) {
+                input_history.push([tex_value, insert_pos]);
+                redo_history = [];
             }
-            function redoHistory() {
-                var l = redo_history.length;
-                if (l < 1) return;
-                input_history.push(redo_history[l - 1]);
-                redo_history.pop();
-                l = input_history.length;
-                tex.value = input_history[l - 1][0];
-                moveCursorTo(tex, input_history[l - 1][1]);
-                render();
+        }
+        function undoHistory() {
+            var l = input_history.length;
+            if (l <= 1) return;
+            redo_history.push(input_history[l - 1]);
+            input_history.pop();
+            tex.value = input_history[l - 2][0];
+            moveCursorTo(tex, input_history[l - 2][1]);
+            render();
+        }
+        function redoHistory() {
+            var l = redo_history.length;
+            if (l < 1) return;
+            input_history.push(redo_history[l - 1]);
+            redo_history.pop();
+            l = input_history.length;
+            tex.value = input_history[l - 1][0];
+            moveCursorTo(tex, input_history[l - 1][1]);
+            render();
+        }
+
+        function init() {
+            String.prototype.splice = function (start, delCount, newSubStr) {
+                return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
+            };
+            String.prototype.insert = function (dir, part) {
+                return this.substr(0, dir) + part + this.substring(dir, this.length);
+            }
+            String.prototype.erase = function (dir, num) {
+                return this.substr(0, dir) + this.substring(dir + num, this.length);
             }
 
-            function init() {
-                String.prototype.splice = function (start, delCount, newSubStr) {
-                    return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
+            // load from cookie
+            try {
+                var getCookie = function getCookie(cname) {
+                    var name = cname + "=";
+                    var ca = document.cookie.split(';');
+                    for (var i = 0; i < ca.length; i++) {
+                        var c = ca[i].trim();
+                        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+                    }
+                    return "";
                 };
-                String.prototype.insert = function (dir, part) {
-                    return this.substr(0, dir) + part + this.substring(dir, this.length);
-                }
-                String.prototype.erase = function (dir, num) {
-                    return this.substr(0, dir) + this.substring(dir + num, this.length);
-                }
+                var checked = (getCookie("Checked") != "0");
+                document.getElementById("checkbox").checked = checked;
+                var base64 = getCookie("FinInput");
+                var s = decodeURIComponent(escape(window.atob(base64)));
+                if (s != "") tex.value = s;
+                if (tex.value == "") throw (tex.value);
+            }
+            catch (e) {
+                tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z}";
+            }
+            addHistory(tex.value, tex.value.length);
 
-                // load from cookie
-                try {
-                    var getCookie = function getCookie(cname) {
-                        var name = cname + "=";
-                        var ca = document.cookie.split(';');
-                        for (var i = 0; i < ca.length; i++) {
-                            var c = ca[i].trim();
-                            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-                        }
-                        return "";
-                    };
-                    var checked = (getCookie("Checked") != "0");
-                    document.getElementById("checkbox").checked = checked;
-                    var base64 = getCookie("FinInput");
-                    var s = decodeURIComponent(escape(window.atob(base64)));
-                    if (s != "") tex.value = s;
-                    if (tex.value == "") throw (tex.value);
-                }
-                catch (e) {
-                    tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z}";
-                }
-                addHistory(tex.value, tex.value.length);
-
-                // $ checkbox
-                const checkbox = document.getElementById("checkbox");
-                checkbox.addEventListener("input", function (e) {
-                    render();
-                });
-
+            // $ checkbox
+            const checkbox = document.getElementById("checkbox");
+            checkbox.addEventListener("input", function (e) {
                 render();
+            });
 
-                setTimeout(function () {
-                    histht = fom.getBoundingClientRect().height;
-                    fom.style.minHeight = histht + "px";
-                }, 1000);
+            render();
+
+            setTimeout(function () {
+                histht = fom.getBoundingClientRect().height;
+                fom.style.minHeight = histht + "px";
+            }, 1000);
+        }
+
+        function backupCookie() {
+            if (!cookie_enabled) return 0;
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 86400000));
+            var expires = " expires=" + date.toUTCString();
+
+            var base64 = window.btoa(unescape(encodeURIComponent(tex.value)));
+            var checked = document.getElementById("checkbox").checked ? "1" : "0";
+            document.cookie = "FinInput=" + base64 + ";" + expires;
+            document.cookie = "Checked=" + checked + ";" + expires;
+        }
+
+        function render() {
+            if (cookie_enabled) backupCookie();
+
+            var ht = fom.getBoundingClientRect().height;
+            if (ht > histht) {
+                histht = ht;
+                fom.style.minHeight = histht + "px";
             }
 
-            function backupCookie() {
-                if (!cookie_enabled) return 0;
-                var date = new Date();
-                date.setTime(date.getTime() + (365 * 86400000));
-                var expires = " expires=" + date.toUTCString();
-
-                var base64 = window.btoa(unescape(encodeURIComponent(tex.value)));
-                var checked = document.getElementById("checkbox").checked ? "1" : "0";
-                document.cookie = "FinInput=" + base64 + ";" + expires;
-                document.cookie = "Checked=" + checked + ";" + expires;
+            if (tex.value != "") {
+                if (document.getElementById("checkbox").checked)
+                    fom.innerHTML = "$" + escape(tex.value) + "$";
+                else fom.innerHTML = "<div style='text-align:left;display:inline-block;'>" + escape(tex.value).replace(/\n/g, '<br/>') + "</div>"
+                backupCookie();
             }
+            else fom.innerText = "";
 
-            function render() {
-                if (cookie_enabled) backupCookie();
-
-                var ht = fom.getBoundingClientRect().height;
-                if (ht > histht) {
-                    histht = ht;
-                    fom.style.minHeight = histht + "px";
-                }
-
-                if (tex.value != "") {
-                    if (document.getElementById("checkbox").checked)
-                        fom.innerHTML = "$" + escape(tex.value) + "$";
-                    else fom.innerHTML = escape(tex.value);
-                    backupCookie();
-                }
-                else fom.innerText = "";
-
-                try {
-                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
-                }
-                catch (e) {
-                    document.getElementById("TeX_Preview").innerHTML = "<b style='color:red'>" + e + "</b>";
-                }
+            try {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
             }
+            catch (e) {
+                document.getElementById("TeX_Preview").innerHTML = "<b style='color:red'>" + e + "</b>";
+            }
+        }
 
 
-            var getCursortPos = function (obj) {
-                var cursorIndex = 0;
-                if (document.selection) {
-                    obj.focus();
-                    var range = document.selection.createRange();
-                    range.moveStart('character', -obj.value.length);
-                    cursorIndex = range.text.length;
-                } else if (obj.selectionStart || obj.selectionStart == 0) {
-                    cursorIndex = obj.selectionStart;
-                }
-                return cursorIndex;
-            };
-            var moveCursorTo = function (obj, pos) {
-                obj.setSelectionRange(pos, pos);
-            };
+        var getCursortPos = function (obj) {
+            var cursorIndex = 0;
+            if (document.selection) {
+                obj.focus();
+                var range = document.selection.createRange();
+                range.moveStart('character', -obj.value.length);
+                cursorIndex = range.text.length;
+            } else if (obj.selectionStart || obj.selectionStart == 0) {
+                cursorIndex = obj.selectionStart;
+            }
+            return cursorIndex;
+        };
+        var moveCursorTo = function (obj, pos) {
+            obj.setSelectionRange(pos, pos);
+        };
 
-            function onInput(event) {
-                // auto bracket {}, not 100% accurate
-                var pos = getCursortPos(tex);
-                var tex_old = input_history[input_history.length - 1][0];
-                if (event.inputType == 'insertText') {
-                    // type '{'
-                    if (event.data == '{' && tex.value[pos - 1] == "{") {
-                        if (tex.value[pos] == '{') {
-                            tex.value = tex.value.erase(pos, 1);
-                            moveCursorTo(tex, pos);
-                        }
-                        else if (tex.value[pos - 2] != '\\') {
-                            tex.value = tex.value.insert(pos, '}');
-                            const words = ["dfrac", "frac", "dbinom", "binom"];
-                            for (var i = 0; i < words.length; i++) {
-                                var word = words[i];
-                                var si = pos - word.length - 1;
-                                //console.log(tex.value[si]);
-                                if (tex.value[si - 1] == '\\' && tex.value.substring(si, pos - 1) == word) {
-                                    tex.value = tex.value.insert(pos + 1, "{}");
-                                    break;
-                                }
+        function onInput(event) {
+            // auto bracket {}, not 100% accurate
+            var pos = getCursortPos(tex);
+            var tex_old = input_history[input_history.length - 1][0];
+            if (event.inputType == 'insertText') {
+                var c = tex.value[pos - 1];
+                // type '{'
+                if (event.data == '{' && c == "{") {
+                    if (tex.value[pos] == '{') {
+                        tex.value = tex.value.erase(pos, 1);
+                        moveCursorTo(tex, pos);
+                    }
+                    else if (tex.value[pos - 2] != '\\') {
+                        tex.value = tex.value.insert(pos, '}');
+                        const words = ["dfrac", "frac", "dbinom", "binom"];
+                        for (var i = 0; i < words.length; i++) {
+                            var word = words[i];
+                            var si = pos - word.length - 1;
+                            //console.log(tex.value[si]);
+                            if (tex.value[si - 1] == '\\' && tex.value.substring(si, pos - 1) == word) {
+                                tex.value = tex.value.insert(pos + 1, "{}");
+                                break;
                             }
-                            moveCursorTo(tex, pos);
                         }
-                    }
-                    // close '}'
-                    if (event.data == '}' && tex.value[pos] == '}') {
-                        if (tex.value[pos - 2] != '\\') {
-                            tex.value = tex.value.erase(pos, 1);
-                            moveCursorTo(tex, pos);
-                        }
-                    }
-                    // \left([|<
-                    var c = tex.value[pos - 1];
-                    if ((c == '(' || c == '[' || c == '|' || c == '<')
-                        && tex.value.substring(pos - 6, pos - 1) == "\\left") {
-                        tex.value = tex.value.insert(pos, "\\right" +
-                            (c == '(' ? ')' : c == '[' ? ']' : c == '|' ? '|' : c == '<' ? '>' : ''));
                         moveCursorTo(tex, pos);
                     }
                 }
-                else if (event.inputType == 'deleteContentBackward' && tex.value.length == tex_old.length - 1) {
-                    // erase '{'
-                    if (tex_old[pos] == '{' && tex.value[pos] == '}' && matchBracket(tex_old, pos) == pos + 1) {
+                // close '}'
+                else if (event.data == '}' && tex.value[pos] == '}') {
+                    if (tex.value[pos - 2] != '\\') {
                         tex.value = tex.value.erase(pos, 1);
                         moveCursorTo(tex, pos);
                     }
                 }
-                // some don't work in Firefox
-                else if (event.inputType == 'insertLineBreak') {
-
+                // type '$'
+                else if (event.data == '$') {
+                    if (c == '$') {
+                        if (tex.value[pos] == '$') {
+                            tex.value = tex.value.erase(pos, 1);
+                            moveCursorTo(tex, pos);
+                        }
+                        else {
+                            tex.value = tex.value.insert(pos, '$');
+                            moveCursorTo(tex, pos);
+                        }
+                    }
                 }
-                else if (event.inputType == 'historyUndo') {
-                    undoHistory();
+                // \left([|<
+                else if ((c == '(' || c == '[' || c == '|' || c == '<')
+                    && tex.value.substring(pos - 6, pos - 1) == "\\left") {
+                    tex.value = tex.value.insert(pos, "\\right" +
+                        (c == '(' ? ')' : c == '[' ? ']' : c == '|' ? '|' : c == '<' ? '>' : ''));
+                    moveCursorTo(tex, pos);
                 }
-                else if (event.inputType == 'historyRedo') {
-                    redoHistory();
-                }
-                else console.log(event);
-
-                render();
-                addHistory(tex.value, getCursortPos(tex));
             }
+            else if (event.inputType == 'deleteContentBackward' && tex.value.length == tex_old.length - 1) {
+                // erase '{'
+                if (tex_old[pos] == '{' && tex.value[pos] == '}' && matchBracket(tex_old, pos) == pos + 1) {
+                    tex.value = tex.value.erase(pos, 1);
+                    moveCursorTo(tex, pos);
+                }
+                // erase '$'
+                if (tex_old[pos] == '$' && tex.value[pos] == '$') {
+                    tex.value = tex.value.erase(pos, 1);
+                    moveCursorTo(tex, pos);
+                }
+            }
+            // some don't work in Firefox
+            else if (event.inputType == 'insertLineBreak') {
 
-            window.addEventListener("load", function (e) {
-                init();
-            });
-        </script>
-    </div>
+            }
+            else if (event.inputType == 'historyUndo') {
+                undoHistory();
+            }
+            else if (event.inputType == 'historyRedo') {
+                redoHistory();
+            }
+            else console.log(event);
+
+            render();
+            addHistory(tex.value, getCursortPos(tex));
+        }
+
+        window.addEventListener("load", function (e) {
+            init();
+        });
+    </script>
 </body>
 
 </html>

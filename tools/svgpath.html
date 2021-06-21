@@ -74,7 +74,7 @@
         <span id="coord"></span>
     </div>
     <script>
-        var input = document.getElementById("input"), path = document.getElementById("path"), svgcontainer = document.getElementById("svgdata"),
+        const input = document.getElementById("input"), path = document.getElementById("path"), svgcontainer = document.getElementById("svgdata"),
             transform = document.getElementById("transform"), transform_app = document.getElementById("transfm");
 
         function update_path() {
@@ -155,6 +155,12 @@
                 iTr = [0, 0];
                 update_transform();
             }
+
+            input.addEventListener('paste', function (e) {
+                e.preventDefault()
+                var text = e.clipboardData.getData('text/plain')
+                document.execCommand('insertText', false, text)
+            });
 
             update_path();
         }
