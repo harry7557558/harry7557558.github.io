@@ -13,90 +13,326 @@
         body {
             font-family: Consolas;
             font-size: 16px;
+            padding: 10px;
         }
 
         #input {
-            width: 80%;
-            max-width: 800px;
-            min-height: 200px;
-            margin: 10px;
+            width: 100%;
+            max-width: 1000px;
+            height: 180px;
             border: 2px solid #555;
             padding: 15px;
+            resize: none;
         }
 
         #transform {
-            padding: 2px 5px;
+            padding: 2px 0px;
             width: 60%;
             font-family: Consolas;
             font-size: 16px;
             font-style: italic;
         }
 
+        p {
+            margin: 10px 0px;
+            white-space: nowrap;
+        }
+
         :focus {
             outline: none;
         }
 
-        #svgdata {
+        #svgcontainer {
             width: max-content;
-            margin: 10px;
             border: 2px solid #555;
             padding: 0;
             position: absolute;
         }
 
-        #coord {
+        #topright {
             position: absolute;
             top: 0;
             right: 0;
             margin: 10px 20px;
+            text-align: right;
         }
 
-        p {
-            margin: 10px;
+        #coord {
+            display: inline-block;
+            margin: 10px 5px;
         }
     </style>
 </head>
 
 <body>
-    <div id="input" title="" contenteditable="true" spellcheck="false" data-gramm="false" oninput="update_path()">
-        M 180 60 C 30 -60 -70 200 180 300 C 430 200 330 -60 180 60 Z
-    </div>
+
+    <textarea id="input" title="" spellcheck="false" data-gramm="false"
+        value="">M 180 60 C 30 -60 -70 200 180 300 C 430 200 330 -60 180 60 Z</textarea>
+
     <div style="margin: 10px;">
-        transform = "<input id="transform" type="text" value="matrix(1,0,0,1,0,0)" oninput="update_path()" />"
+        transform = &quot;<input id="transform" type="text" value="matrix(1,0,0,1,0,0)" />&quot;
     </div>
     <p>Drag to move, scroll to zoom, right click to reset.</p>
-    <div id="svgdata">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="1000">
+
+    <div id="svgcontainer">
+        <svg id="svg" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <defs>
+                <marker id="anchor-square" viewBox="0 0 10 10" refX="5" refY="5" orient="" markerUnits="strokeWidth"
+                    markerWidth="10" markerHeight="10">
+                    <rect x="3.8" y="3.8" width="2.4" height="2.4" style="stroke:gray;stroke-width:1px;fill:gray">
+                    </rect>
+                </marker>
+                <marker id="anchor-circle" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth"
+                    markerWidth="10" markerHeight="10">
+                    <ellipse cx="5" cy="5" rx="1.5" ry="1.5" style="stroke:gray;stroke-width:1px;fill:gray"></ellipse>
+                </marker>
+                <marker id="end-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" orient="auto"
+                    markerWidth="10" markerHeight="10">
+                    <polyline points="10,5 0,10 4,5 0,0 10,5" fill="black"></polyline>
+                </marker>
+                <marker id="red-cross" viewBox="0 0 20 20" refX="10" refY="10" markerUnits="strokeWidth" orient="auto"
+                    markerWidth="16" markerHeight="16">
+                    <rect x="-10" y="-3" width="20" height="6" style="stroke:none;fill:red"
+                        transform="translate(10,10)rotate(45)"></rect>
+                    <rect x="-3" y="-10" width="6" height="20" style="stroke:none;fill:red"
+                        transform="translate(10,10)rotate(45)"></rect>
+                </marker>
+                <marker id="start-circle" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth"
+                    markerWidth="10" markerHeight="10">
+                    <ellipse cx="5" cy="5" rx="3" ry="3" style="stroke:black;stroke-width:1px;fill:black"></ellipse>
+                </marker>
+            </defs>
             <g id="transfm" transform="matrix(1,0,0,1,0,0)">
-                <path id="path" style="fill:white;stroke:black;" vector-effect="non-scaling-stroke" d="M 0,0" />
+                <g id="path-transform">
+                    <g id="anchors" style='fill:none;'>
+                        <g id="anchor-lines" style="stroke-width:1px;stroke:gray"></g>
+                        <g id="middle-arrows" style="stroke-width:1px;stroke:gray"></g>
+                        <g id="error-cross"></g>
+                    </g>
+                    <path id="path" style="fill:none;stroke:black;" vector-effect="non-scaling-stroke" d="M 0,0" />
+                </g>
             </g>
         </svg>
-        <span id="coord"></span>
+        <div id="topright">
+            <span>
+                anchors<input id="anchor-checkbox" type="checkbox" />
+                arrows<input id="arrow-checkbox" type="checkbox" />
+            </span>
+            <br />
+            <span id="coord">(0.000, 0.000)</span>
+        </div>
     </div>
+
     <script>
-        const input = document.getElementById("input"), path = document.getElementById("path"), svgcontainer = document.getElementById("svgdata"),
-            transform = document.getElementById("transform"), transform_app = document.getElementById("transfm");
 
-        function update_path() {
-            input.style.borderColor = "#555";
-            transform.style.color = "black";
-
-            var txt = input.innerText;
-            txt = txt.replace(/\u00A0/g, " ");
-            txt = txt.replace(/\"/g, "");
-            input.setAttribute("title", txt.length + " chars");
-            try {
-                path.setAttribute('d', txt);
-            } catch (e) {  // doesn't work
-                input.style.borderColor = "red";
+        String.prototype.count = function (s) {
+            var cnt = 0;
+            for (var i = 0; i < this.length - s.length + 1; i++) {
+                if (this.substr(i, s.length) == s) cnt += 1;
             }
+            return cnt;
+        };
 
-            try {
-                path.setAttribute('transform', transform.value)
-            } catch (e) {  // doesn't work
-                transform.style.color = "red";
+        function addPoint(p, q) { return [p[0] + q[0], p[1] + q[1]]; }
+        function subPoint(p, q) { return [p[0] - q[0], p[1] - q[1]]; }
+        function mulPoint(p, k) { return [p[0] * k, p[1] * k]; }
+        function normalizePoint(p) { return mulPoint(p, 1.0 / Math.sqrt(p[0] * p[0] + p[1] * p[1])); }
+        function lengthPoint(p) { return Math.sqrt(p[0] * p[0] + p[1] * p[1]); }
+
+        function parsePath(s) {
+            // official documentation: https://www.w3.org/TR/SVG/paths.html#DProperty
+            var cmd = '';  // MZLHVCSQTA
+            var p_start = [NaN, NaN], p0 = [0, 0];  // starting point, ending point
+            var s_prev = [NaN, NaN], t_prev = [NaN, NaN];  // for reflection in smoothed curves
+            var res = [], res_tmp = [];
+
+            for (var d = 0; d < s.length;) {
+                while (d < s.length && /^[\s\,]$/.test(s[d])) d++;
+
+                function isFloat(c) {
+                    return (!isNaN(Number(c))) || c == '-' || c == '.';
+                }
+                function readFloat() {
+                    while (d < s.length && /^[\s\,]$/.test(s[d])) d++;
+                    if (d >= s.length || !isFloat(s[d])) {
+                        res_tmp.push(['X']);
+                        return NaN;
+                    }
+                    var ns = "";
+                    for (; d < s.length; d++) {
+                        if (/^[0-9]$/.test(s[d])
+                            || (/^[\+\-]$/.test(s[d]) && (ns == "" || ns[ns.length - 1] == 'e'))
+                            || (/^[Ee\.]$/.test(s[d]) && ns.count(s[d].toLowerCase()) == 0))
+                            ns += s[d].toLowerCase();
+                        else break;
+                    }
+                    var x = Number(ns);
+                    if (isNaN(x)) res_tmp.push(['X']);
+                    return x;
+                }
+                function readPoint() {
+                    var x = readFloat();
+                    var y = readFloat();
+                    return [x, y];
+                }
+
+                if (/^[MZLHVCSQTA]$/.test(s[d].toUpperCase())) {
+                    cmd = s[d], d++;
+                }
+                else if (!isFloat(s[d])) {
+                    res.push(['X', p0]);
+                    return res;
+                }
+                var p0_backup = p0;
+
+                switch (cmd) {
+                    case 'M': ;
+                    case 'm': {
+                        var p = readPoint();
+                        if (cmd == 'm') p = addPoint(p0, p);
+                        res_tmp.push(['M', p]);
+                        p_start = p, p0 = p;
+                        break;
+                    }
+                    case 'Z': ;
+                    case 'z': {
+                        res_tmp.push(['Z', p0, p_start]);
+                        p0 = p_start;
+                        break;
+                    }
+                    case 'L': ;
+                    case 'l': {
+                        var p = readPoint();
+                        if (cmd == 'l') p = addPoint(p0, p);
+                        res_tmp.push(['L', p0, p]);
+                        p0 = p;
+                        break;
+                    }
+                    case 'H': ;
+                    case 'h': {
+                        var x = readFloat();
+                        var p = [p0[0], p0[1]];
+                        if (cmd == 'h') p[0] += x;
+                        else p[0] = x;
+                        res_tmp.push(['L', p0, p]);
+                        p0 = p;
+                        break;
+                    }
+                    case 'V': ;
+                    case 'v': {
+                        var y = readFloat();
+                        var p = [p0[0], p0[1]];
+                        if (cmd == 'V') p[1] = y;
+                        else p[1] += y;
+                        res_tmp.push(['L', p0, p]);
+                        p0 = p;
+                        break;
+                    }
+                    case 'C': ;
+                    case 'c': {
+                        var p1 = readPoint();
+                        var p2 = readPoint();
+                        var p3 = readPoint();
+                        if (cmd == 'c') p1 = addPoint(p0, p1), p2 = addPoint(p0, p2), p3 = addPoint(p0, p3);
+                        res_tmp.push(['C', p0, p1, p2, p3]);
+                        s_prev = p2, p0 = p3;
+                        break;
+                    }
+                    case 'S': ;
+                    case 's': {
+                        var p2 = readPoint();
+                        var p3 = readPoint();
+                        if (cmd == 's') p2 = addPoint(p0, p2), p3 = addPoint(p0, p3);
+                        var p1 = subPoint(mulPoint(p0, 2), s_prev);
+                        res_tmp.push(['C', p0, p1, p2, p3]);
+                        s_prev = p2, p0 = p3;
+                        break;
+                    }
+                    case 'Q': ;
+                    case 'q': {
+                        var p1 = readPoint();
+                        var p2 = readPoint();
+                        if (cmd == 'q') p1 = addPoint(p0, p1), p2 = addPoint(p0, p2);
+                        res_tmp.push(['Q', p0, p1, p2]);
+                        t_prev = p1, p0 = p2;
+                        break;
+                    }
+                    case 'T': ;
+                    case 't': {
+                        var p2 = readPoint();
+                        if (cmd == 't') p2 = addPoint(p0, p2);
+                        var p1 = subPoint(mulPoint(p0, 2), t_prev);
+                        res_tmp.push(['Q', p0, p1, p2]);
+                        t_prev = p1, p0 = p2;
+                        break;
+                    }
+                    case 'A': ;
+                    case 'a': {
+                        var r = readPoint();
+                        var theta = readFloat();
+                        var laf_sf = readPoint();
+                        var p = readPoint();
+                        if (cmd == 'a') p = addPoint(p0, p);
+                        r[0] = Math.abs(r[0]), r[1] = Math.abs(r[1]);
+                        if (r[0] * r[1] == 0.0) res_tmp.push(['L', p0, p]);
+                        else res_tmp.push(['A', p0, r, [theta], laf_sf, p]);
+                        p0 = p;
+                        break;
+                    }
+                    default: {
+                        res.push(['X', p0]);
+                        return res;
+                    }
+                }
+
+                if (!(/^[CcSs]$/.test(cmd))) s_prev = p0;
+                if (!(/^[QqTt]$/.test(cmd))) t_prev = p0;
+
+                for (var i = 0; i < res_tmp.length; i++) {
+                    if (res_tmp[i][0] == 'X') {
+                        res.push(['X', p0_backup]);
+                        return res;
+                    }
+                    res.push(res_tmp[i]);
+                }
+                res_tmp = [];
             }
+            return res;
         }
+
+        function countPieces(parsed) {
+            var count = 0;
+            for (var i = 0; i < parsed.length; i++) {
+                var seg = parsed[i];
+                if (seg[0][0] == 'X')
+                    return count;
+                else if (/[LCQA]/.test(seg[0][0]))
+                    count += 1;
+                else if (seg[0][0] == 'Z')
+                    count += lengthPoint(subPoint(seg[2], seg[1])) == 0.0 ? 0 : 1;
+            }
+            return count;
+        }
+
+        // debug
+        if (0) {
+            var s = "M50,350 l 50,-25 a25,25 -30 0,1 50,-25 l 50,-25 a25,50 -30 0,1 50,-25 l 50,-25 a25,75 -30 0,1 50,-25 l 50,-25 a25,100 -30 0,1 50,-25 l 50,-25";
+            document.getElementById("input").innerText = s;
+            document.getElementById("transform").value = "scale(1.0)"
+            document.getElementById("anchor-checkbox").checked = true, document.getElementById("arrow-checkbox").checked = true;
+        }
+    </script>
+
+    <script>
+        const input = document.getElementById("input");
+        const path = document.getElementById("path");
+        const anchors = document.getElementById("anchors");
+        const svgcontainer = document.getElementById("svgcontainer");
+        const svg = document.getElementById("svg");
+        const transform_input = document.getElementById("transform");
+        const transform_app = document.getElementById("transfm");
+        const anchor_checkbox = document.getElementById("anchor-checkbox");
+        const arrow_checkbox = document.getElementById("arrow-checkbox");
 
         var iSc = [1, 1];  // image scaling
         var iTr = [0, 0];  // translation from top-left
@@ -112,48 +348,213 @@
                 (p[1] + iTr[1]) * iSc[1]
             ];
         }
-        function update_transform() {
+
+        var pathString = "";
+        var pathParsed = [];
+
+        function render() {
+            input.style.borderColor = "#555";
+            transform_input.style.color = "black";
+
+            // update path
+            input.setAttribute("title", pathString.length + " chars, " + countPieces(pathParsed) + " pieces");
+            try {
+                path.setAttribute('d', pathString);
+            } catch (e) {  // doesn't work
+                input.style.borderColor = "red";
+            }
+
+            // update transform
             var mat = "matrix(" + (1. * iSc[0]) + ",0,0," + (1. * iSc[1]) + "," + (iTr[0] * iSc[0]) + "," + (iTr[1] * iSc[1]) + ")";
             transform_app.setAttribute("transform", mat);
+            try {
+                document.getElementById("path-transform").setAttribute('transform', transform_input.value);
+            } catch (e) {  // doesn't work
+                transform_input.style.color = "red";
+            }
+
+            // anchor
+            input.style.color = "black";
+            renderAnchor(pathParsed);
+        }
+
+        function renderAnchor(parsed) {
+            var anchorLines = "", middleArrows = "", errorCross = "";
+
+            var line = function (p, q, markerStart, markerEnd) {
+                if (isNaN(p[0] * q[0] + p[1] * q[1])) return "";
+                return "<line x1='" + p[0] + "' y1='" + p[1] + "' x2='" + q[0] + "' y2='" + q[1] + "' "
+                    + (markerStart.length > 0 ? "marker-start='url(#" + markerStart + ")' " : "")
+                    + (markerEnd.length > 0 ? "marker-end='url(#" + markerEnd + ")' " : " ")
+                    + " vector-effect='non-scaling-stroke'></line>";
+            };
+            var arrow = function (p, dp, markerEnd = "end-arrow") {
+                dp = mulPoint(normalizePoint(dp), 1e-4);
+                return line(subPoint(p, dp), addPoint(p, dp), "", markerEnd);
+            };
+
+            //var transfm = fromCanvas;
+            var transfm = function transfm(x) { return x; };
+
+            for (var si = 0; si < parsed.length; si++) {
+                var seg = parsed[si];
+                switch (seg[0]) {  // MZLCQA
+                    case 'M': {
+                        var p0 = transfm(seg[1]);
+                        middleArrows += line(p0, p0, "start-circle", "");
+                        break;
+                    }
+                    case 'Z': {
+                        var p0 = transfm(seg[1]);
+                        var p1 = transfm(seg[2]);
+                        var pc = mulPoint(addPoint(p0, p1), 0.5);
+                        var dp = subPoint(p1, p0);
+                        //middleArrows += arrow(pc, dp);
+                        break;
+                    }
+                    case 'L': {
+                        var p0 = transfm(seg[1]);
+                        var p1 = transfm(seg[2]);
+                        var pc = mulPoint(addPoint(p0, p1), 0.5);
+                        var dp = subPoint(p1, p0);
+                        middleArrows += arrow(pc, dp);
+                        break;
+                    }
+                    case 'C': {
+                        var p0 = transfm(seg[1]);
+                        var p1 = transfm(seg[2]);
+                        var p2 = transfm(seg[3]);
+                        var p3 = transfm(seg[4]);
+                        anchorLines += line(p0, p1, "anchor-square", "anchor-circle");
+                        anchorLines += line(p3, p2, "anchor-square", "anchor-circle");
+                        var pc = addPoint(mulPoint(addPoint(p0, p3), 0.125), mulPoint(addPoint(p1, p2), 0.375));
+                        var dp = subPoint(addPoint(p2, p3), addPoint(p0, p1));
+                        middleArrows += arrow(pc, dp);
+                        break;
+                    }
+                    case 'Q': {
+                        var p0 = transfm(seg[1]);
+                        var p1 = transfm(seg[2]);
+                        var p2 = transfm(seg[3]);
+                        anchorLines += line(p0, p1, "anchor-square", "anchor-circle");
+                        anchorLines += line(p2, p2, "anchor-square", "anchor-square");
+                        var pc = addPoint(mulPoint(addPoint(p0, p2), 0.25), mulPoint(p1, 0.5));
+                        var dp = subPoint(p2, p0);
+                        middleArrows += arrow(pc, dp);
+                        break;
+                    }
+                    case 'A': {
+                        const sin = Math.sin, cos = Math.cos, PI = Math.PI, abs = Math.abs;
+                        var p0 = seg[1], p1 = seg[5],
+                            rx = seg[2][0], ry = seg[2][1],
+                            theta = seg[3][0] * (PI / 180),
+                            laf = seg[4][0], sf = seg[4][1];
+                        anchorLines += line(p0, p0, "anchor-square", "anchor-square");
+                        anchorLines += line(p1, p1, "anchor-square", "anchor-square");
+                        // arrows: is my formula correct??
+                        var dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+                        var R = [[rx * cos(theta), -ry * sin(theta)], [rx * sin(theta), ry * cos(theta)]];
+                        var detR = R[0][0] * R[1][1] - R[0][1] * R[1][0];
+                        var invR = [[R[1][1] / detR, -R[0][1] / detR], [-R[1][0] / detR, R[0][0] / detR]];
+                        var dcos = invR[0][0] * dx + invR[0][1] * dy;
+                        var dsin = invR[1][0] * dx + invR[1][1] * dy;
+                        var sc = (2.0 - 1e-12) / Math.hypot(dcos, dsin);
+                        if (sc < 1.0) {
+                            // formula is guessed, no guarantee to work
+                            // https://www.w3.org/TR/SVG/paths.html#ArcOutOfRangeParameters
+                            // https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii
+                            rx /= sc, ry /= sc, detR /= sc * sc;
+                            for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) R[i][j] /= sc, invR[i][j] *= sc;
+                            dcos *= sc, dsin *= sc;
+                        }
+                        var avr_t = Math.atan2(-dcos, dsin);
+                        var amp_t = Math.asin(0.5 * Math.hypot(dcos, dsin));
+                        if (cos(avr_t) * sin(amp_t) * dsin < 0.0) amp_t = -amp_t;
+                        // laf: abs(t1-t0)>PI; sf: t1>t0
+                        var t0 = avr_t - amp_t, t1 = avr_t + amp_t;
+                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - amp_t + 2.0 * PI, t1 = avr_t + amp_t;
+                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t), t1 = avr_t + (PI - amp_t);
+                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t) + 2.0 * PI, t1 = avr_t + (PI - amp_t);
+                        var cx = p0[0] - (R[0][0] * cos(t0) + R[0][1] * sin(t0));
+                        var cy = p0[1] - (R[1][0] * cos(t0) + R[1][1] * sin(t0));
+                        // formula: [x(t),y(t)] = [cx,cy] + R·[cos(t),sin(t)]
+                        var t = 0.5 * (t0 + t1);
+                        var x = cx + R[0][0] * cos(t) + R[0][1] * sin(t);
+                        var y = cy + R[1][0] * cos(t) + R[1][1] * sin(t);
+                        var dxdt = R[0][0] * (-sin(t)) + R[0][1] * cos(t);
+                        var dydt = R[1][0] * (-sin(t)) + R[1][1] * cos(t);
+                        if (t0 > t1) dxdt = -dxdt, dydt = -dydt;
+                        middleArrows += arrow([x, y], [dxdt, dydt]);
+                        break;
+                    }
+                    case 'X': {
+                        input.style.color = "red";
+                        var p0 = transfm(seg[1]);
+                        errorCross += arrow(p0, [1, 0], "red-cross");
+                        break;
+                    }
+                }
+            }
+            document.getElementById("anchor-lines").innerHTML = anchor_checkbox.checked ? anchorLines : "";
+            document.getElementById("middle-arrows").innerHTML = arrow_checkbox.checked ? middleArrows : "";
+            document.getElementById("error-cross").innerHTML = errorCross;
+        }
+
+        function updateInput() {
+            pathString = input.value;
+            pathString = pathString.replace(/\s/g, " ");
+            pathString = pathString.replace(/^[\s\"\'\=]*/, "").replace(/[\"\'\,\;\s]*$/, "");  // copy-pasted string
+            pathParsed = parsePath(pathString);
+            render();
         }
 
         window.onload = function () {
 
+            function onResize() {
+                var bodyStyle = window.getComputedStyle(document.body);
+                var w = Math.min(parseFloat(bodyStyle.width), 1000), h = Math.max(parseFloat(bodyStyle.height), 400);
+                svg.setAttribute("width", w), svgcontainer.style.width = w + "px";
+                svg.setAttribute("height", h), svgcontainer.style.height = h + "px";  // should overflow
+            }
+            window.addEventListener("resize", onResize);
+            onResize();
+
             var drag = false;
             var mousePos = [0, 0];
-            svgcontainer.onmousedown = function () {
+            svgcontainer.onmousedown = function (event) {
                 drag = true;
-                mousePos = [e.clientX, e.clientY];
+                mousePos = [event.clientX, event.clientY];
             };
             window.onmouseup = function () { drag = false; };
-            window.onmousemove = function (e) {
+            window.onmousemove = function (event) {
                 if (drag) {
-                    iTr[0] += (e.clientX - mousePos[0]) / iSc[0];
-                    iTr[1] += (e.clientY - mousePos[1]) / iSc[1];
-                    update_transform();
+                    event.preventDefault();
+                    iTr[0] += (event.clientX - mousePos[0]) / iSc[0];
+                    iTr[1] += (event.clientY - mousePos[1]) / iSc[1];
+                    render();
                 }
-                mousePos = [e.clientX, e.clientY];
+                mousePos = [event.clientX, event.clientY];
             };
             svgcontainer.onmousemove = function (e) {
                 var x = e.offsetX / iSc[0] - iTr[0];
                 var y = e.offsetY / iSc[1] - iTr[1];
                 document.getElementById("coord").innerHTML = "(" + x.toPrecision(4) + ", " + y.toPrecision(4) + ")";
             }
-            svgcontainer.onmousewheel = function (e) {
+            svgcontainer.addEventListener("wheel", function (e) {
                 e.preventDefault();
                 var p = fromScreen([e.offsetX, e.offsetY]);
-                var scf = Math.exp(0.001 * e.wheelDelta);
+                var scf = Math.exp(-0.001 * e.deltaY);
                 var sc = [scf, scf];
                 iTr[0] = (p[0] + iTr[0]) / sc[0] - p[0];
                 iTr[1] = (p[1] + iTr[1]) / sc[1] - p[1];
                 iSc[0] *= sc[0], iSc[1] *= sc[1];
-                update_transform();
-            }
+                render();
+            });
             svgcontainer.oncontextmenu = function (e) {
                 e.preventDefault();
                 iSc = [1, 1];
                 iTr = [0, 0];
-                update_transform();
+                render();
             }
 
             input.addEventListener('paste', function (e) {
@@ -162,7 +563,12 @@
                 document.execCommand('insertText', false, text)
             });
 
-            update_path();
+            input.addEventListener("input", updateInput);
+            transform_input.addEventListener("input", render);
+            anchor_checkbox.addEventListener("input", render);
+            arrow_checkbox.addEventListener("input", render);
+
+            updateInput();
         }
 
     </script>
