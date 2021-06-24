@@ -22,13 +22,12 @@
     </script>
     <script type="text/javascript" id="MathJax_src" async=""
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
     <style>
-        #MathJax_MenuFrame {
+        /* #MathJax_MenuFrame {
             opacity: 0.0;
             visibility: hidden;
             display: none;
-        }
+        } */
 
         .MathJax:focus,
         .mjx-chtml:focus,
@@ -43,6 +42,7 @@
             display: none;
         }
     </style>
+
     <style>
         body {
             background-color: rgb(68, 68, 68);
@@ -82,6 +82,7 @@
             font-size: 14px;
             font-weight: 400;
             color: white;
+            resize: vertical;
         }
 
         #TeX_PreviewBox_Frame {
@@ -105,7 +106,6 @@
     <div style="height:0px; visibility:hidden; display:none;">
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\e}{\operatorname{e}}$
-        $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\erf}{\operatorname{erf}}$
         $\newcommand{\abs}{\operatorname{abs}}$
         $\newcommand{\sgn}{\operatorname{sgn}}$
@@ -113,10 +113,12 @@
         $\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}$
         $\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}$
         $\newcommand{\vmat}[1]{\begin{vmatrix}#1\end{vmatrix}}$
+        $\newcommand{\E}{\operatorname{E}}$
+        $\newcommand{\P}{\operatorname{P}}$
+        $\newcommand{\Var}{\operatorname{Var}}$
 
         $\newcommand{\N}{\unicode{0x2115}}$
         $\newcommand{\Z}{\unicode{0x2124}}$
-        $\newcommand{\P}{\unicode{0x2119}}$
         $\newcommand{\Q}{\unicode{0x211A}}$
         $\newcommand{\R}{\unicode{0x211D}}$
         $\newcommand{\C}{\unicode{0x2102}}$
@@ -147,8 +149,6 @@
         const pref = document.getElementById("TeX_PreviewBox_Frame");
         const pre = document.getElementById("TeX_PreviewBox");
         const fom = document.getElementById("TeX_Preview");
-        var maxheight = 0;
-        var histht = 0;
         var cookie_enabled = navigator.cookieEnabled;
         var input_history = [], redo_history = [];
 
@@ -235,6 +235,7 @@
             }
             catch (e) {
                 tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z}";
+                document.getElementById("checkbox").checked = true;
             }
             addHistory(tex.value, tex.value.length);
 
@@ -246,10 +247,6 @@
 
             render();
 
-            setTimeout(function () {
-                histht = fom.getBoundingClientRect().height;
-                fom.style.minHeight = histht + "px";
-            }, 1000);
         }
 
         function backupCookie() {
@@ -267,11 +264,9 @@
         function render() {
             if (cookie_enabled) backupCookie();
 
-            var ht = fom.getBoundingClientRect().height;
-            if (ht > histht) {
-                histht = ht;
-                fom.style.minHeight = histht + "px";
-            }
+            //var ht = fom.getBoundingClientRect().height;
+            var ht = pre.getBoundingClientRect().height;
+            pre.style.minHeight = ht + "px";
 
             if (tex.value != "") {
                 if (document.getElementById("checkbox").checked)
