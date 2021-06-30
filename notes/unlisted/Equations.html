@@ -149,7 +149,7 @@
         $\newcommand{\divisible}{ {\>\large\mid\>}}$
         $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\P}{\operatorname{P}}$
-        $\newcommand{\Var}{\operatorname{var}}$
+        $\newcommand{\Var}{\operatorname{Var}}$
 
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\ddx}{\displaystyle\dfrac{\mathrm{d}}{\mathrm{d}x}}$
@@ -183,7 +183,6 @@
 
         $\newcommand{\N}{\unicode{0x2115}}$
         $\newcommand{\Z}{\unicode{0x2124}}$
-        $\newcommand{\P}{\unicode{0x2119}}$
         $\newcommand{\Q}{\unicode{0x211A}}$
         $\newcommand{\R}{\unicode{0x211D}}$
         $\newcommand{\C}{\unicode{0x2102}}$
@@ -2150,6 +2149,163 @@
             <div class="incomplete_mark"></div>
         </div>
 
+        <!-- Statistics and Probability -->
+        <div class="page">
+
+            <h3>Permutation and Combination</h3>
+            <div class="cat">
+                <p>
+                    <strong><u>$n$ different types, $k$ choices:</u> &ensp;</strong>
+                </p>
+                <p>
+                    Number of Orders: &ensp;$n!$; &ensp;
+                </p>
+                <p>
+                    Permutations without Repetition: &ensp;$P_k^n=\dfrac{n!}{(n-k)!}$; &emsp;
+                    (Also denoted as $P^k_n$, &ensp;$A^k_n$, &ensp;$\sideset{^n}{_k}P$, &ensp;$\sideset{_n}{_k}P$)
+                </p>
+                <p>
+                    Permutations with Repetition: &ensp;$U^n_k=n^k$; &emsp;
+                </p>
+                <p>
+                    Combinations without Repetition: &ensp;$C^n_k=\dfrac{n!}{k!(n-k)!}$; &emsp;
+                    (Also denoted as $C(n,k)$,&ensp;$\dbinom{n}{k}$, &ensp;$C^k_n$, &ensp;$\sideset{^n}{_k}C$,
+                    &ensp;$\sideset{_n}{_k}C$)
+                </p>
+                <p>
+                    Combinations with Repetition: &ensp;$H^n_k=\dfrac{(n+k-1)!}{k!(n-1)!}$; &emsp;
+                    (Also denoted as $F^n_k$) &emsp;&emsp;$H^n_k=C^{n+k-1}_{k}=C^{n+k-1}_{n-1}$; &ensp;
+                </p>
+                <p>
+                    Number of Orders in Circular Permutation: &emsp;$(n-1)!$; &ensp;
+                </p>
+                <p>
+                    <red>*</red>Circular Permutation without Repetition: &emsp;
+                    $Q^n_k=\dfrac{n!}{k\cdot(n-k)!}$; &emsp;&emsp;$Q^n_k=\dfrac{P^n_k}{k}$; &ensp;
+                </p>
+                <p>
+                    <red>*</red>Circular Permutation with Repetition: &emsp;
+                    $\dfrac{\sum_{r|k}(r\cdot\varphi(r)\cdot{n^{\frac{k}{r}}})}{k}$; &ensp;
+                </p>
+            </div>
+            <div class="cat" alt="properties of binomial coefficient">
+                <p>
+                    $\dbinom{n}{k}=\dbinom{n}{n-k}=\dfrac{n}{k}\dbinom{n-1}{k-1}; \quad
+                    \dbinom{n}{k-1}+\dbinom{n}{k}=\dbinom{n+1}{k}, \quad
+                    \dbinom{n}{k}=\dbinom{n-1}{k-1}+\dbinom{n-1}{k}; \quad$
+                </p>
+            </div>
+            <br />
+
+            <h1>Statistics and Probability</h1>
+            <div class="cat">
+                <p>
+                    Mean: $\mu=\displaystyle\frac{1}{N}\sum_{i=1}^{N}{x_i}$; &emsp;
+                    Variance: $\sigma^2 =\displaystyle\frac{1}{N}\sum_{i=0}^{N}{(x_i-\mu)^2}
+                    =\frac{1}{N}\left(\sum_{i=1}^{N}{x_i^2}-\frac{1}{N}\left(\sum_{i=1}^{N}{x_i}\right)^2\right)$;
+                    &emsp;
+                    Standard deviation: $\sigma=\sqrt{\sigma^2}$;
+                </p>
+                <p>
+                    Variance of a sample: $s^2 =\displaystyle\frac{1}{n-1}\sum_{i=0}^{n}{(x_i-\mu)^2}
+                    =\frac{1}{n-1}\left(\sum_{i=1}^{n}{x_i^2}-\frac{1}{n}\left(\sum_{i=1}^{n}{x_i}\right)^2\right)$;
+                    &emsp;
+                    Standard deviation of a sample: $s=\sqrt{s^2}$;
+                </p>
+            </div>
+            <h3>Random variable, expected value and variance</h3>
+            <div class="cat">
+                <p>
+                    Discrete random variable:&emsp;
+                    $\E(X)=\displaystyle\sum_i{x_i\P(x_i)}, \quad
+                    \Var(X)=\displaystyle\sum_i{(x_i-\mu_X)\P(x_i)};$
+                </p>
+                <p>
+                    Continuous random variable:&emsp;
+                    $\E(X)=\displaystyle\int_{-\infty}^{\infty}{x\cdot p_X(x)\d{x}},\quad
+                    \Var(X)=\displaystyle\int_{-\infty}^{\infty}{(x-\mu_X)^2\cdot p_X(x)\d{x}};$
+                </p>
+                <p>
+                    $\E(aX+b)=a\E(X)+b,\quad
+                    \Var(aX+b)=a^2\Var(X),\quad
+                    \sigma_{aX+b}=|a|\cdot\sigma_X;$
+                    &emsp;
+                    $\Var(X)=\E(X^2)-\E(X)^2;$
+                    &emsp;
+                    $\E(X\pm Y)=\E(X)\pm\E(Y);$
+                </p>
+                <p>
+                    For independent random variables $X$, $Y$:&emsp;
+                    $\E(XY)=\E(X)\E(Y);\quad
+                    \Var(X+Y)=\Var(X)+\Var(Y),\ \
+                    \sigma_{X+Y}=\sqrt{\sigma_X^2+\sigma_Y^2};$
+                </p>
+            </div>
+            <h3><red>*</red>Probability distributions</h3>
+            <div class="cat">
+                <p>
+                    Normal distribution:&emsp;
+                    $PDF(x)=\dfrac{1}{\sigma\sqrt{2\pi}}\exp\left(-\dfrac{\left(x-\mu\right)^{2}}{2\sigma^{2}}\right),\quad
+                    CDF(x)=\dfrac{1}{2}\left(1+\erf\left(\dfrac{x-\mu}{\sigma\sqrt{2}}\right)\right),\quad
+                    Quantile(p)=\mu+\sigma\sqrt{2}\operatorname{erf}^{-1}(2p-1);
+                    \\
+                    \Pr(|X-\mu|\lt\sigma_X)\approx68.27\%,\quad
+                    \Pr(|X-\mu|\lt2\sigma_X)\approx95.45\%,\quad
+                    \Pr(|X-\mu|\lt3\sigma_X)\approx99.73\%;$
+                </p>
+                <p>
+                    Exponential distribution:&emsp;
+                    $x\ge0,\quad
+                    PDF(x)=\lambda\e^{-\lambda x},\quad
+                    CDF(x)=1-\e^{-\lambda x},\quad
+                    Quantile(p)=-\dfrac{\ln(1-p)}{\lambda};\qquad
+                    \mu=\dfrac{1}{\lambda},\quad
+                    \sigma^2=\dfrac{1}{\lambda^2};$
+                </p>
+                <p>
+                    Binomial distribution:&emsp;
+                    $\Pr(X=k)=\dbinom{n}{k}p^{k}(1-p)^{n-k};\qquad
+                    \mu=np,\quad \sigma^2=np(1-p);$
+                </p>
+                <p>
+                    Geometric distribution with $k\ge1$:&emsp;
+                    $\Pr(X=k)=(1-p)^{k-1}p,\quad \Pr(X\le k)=1-(1-p)^{k};\qquad
+                    \mu=\dfrac{1}{p},\quad \sigma^2=\dfrac{1-p}{p^2};$
+                    <br />
+                    Geometric distribution with $k\ge0$:&emsp;
+                    $\Pr(X=k)=(1-p)^{k}p,\quad \Pr(X\le k)=1-(1-p)^{k+1};\qquad
+                    \mu=\dfrac{1-p}{p},\quad \sigma^2=\dfrac{1-p}{p^2};$
+                </p>
+                <p>
+                    Poisson distribution:&emsp;
+                    $PDF(k)=\dfrac{\lambda^{k}\e^{-\lambda}}{k!};\qquad
+                    \mu=\lambda,\quad \sigma^2=\lambda;$
+                </p>
+            </div>
+            <h3><red>*</red>Transformations of probability density functions</h3>
+            <div class="cat">
+                Probability density function $p_X(x)$ transformed using $y=y(x)$:&ensp;
+                $p_Y(y)=p_X(x(y))\left|\dfrac{\d{x}}{\d{y}}\right|$;&emsp;&emsp;
+                $p_{aX+b}(y)=\dfrac{1}{|a|}p_X\left(\dfrac{y-b}{a}\right)$;
+            </div>
+            <div class="cat">
+                <p>
+                    Convolution of probability distributions:&emsp;
+                    $\text{let }Z=X+Y,\quad
+                    \Pr(Z=z)=\displaystyle\sum_{k}{\Pr(X=k)\Pr(Y=z-k)},\quad
+                    p_Z(z)=\displaystyle\int_{-\infty}^{\infty}{p_X(z-t)p_Y(t)}\d{t}=\int_{-\infty}^{\infty}{p_X(t)p_Y(z-t)}\d{t};$
+                </p>
+                <p>
+                    $\displaystyle\sum_{i=1}^{n}\mathrm{Normal}\left(\mu_i,\sigma_i^2\right)
+                    \sim\mathrm{Normal}\left(\sum_{i=1}^{n}\mu_i,\sum_{i=1}^{n}\sigma_i^2\right);\quad
+                    \sum_{i=1}^{n}\mathrm{Binomial}\left(n_i,p\right)
+                    \sim\mathrm{Binomial}\left(\sum_{i=1}^{n}{n_i},p\right);\quad
+                    \sum_{i=1}^{n}\text{Poisson}\left(\lambda_i\right)
+                    \sim\text{Poisson}\left(\sum_{i=1}^{n}{\lambda_i}\right);$
+                </p>
+            </div>
+        </div>
+
         <!-- Miscellaneous -->
         <div class="page">
             <!-- Sequence and Series -->
@@ -2270,54 +2426,6 @@
             </div>
             <br />
 
-            <!-- Permutation and Combination -->
-            <div class="cat">
-                <h3>Permutation and Combination</h3>
-                <p>
-                    <strong><u>$n$ different types, $k$ choices: &ensp;($n$ choose $k$):</u> &ensp;</strong>
-                </p>
-                <p>
-                    Number of Orders: &ensp;$n!$; &ensp;
-                </p>
-                <p>
-                    Permutations without Repetition: &ensp;$P_k^n=\dfrac{n!}{(n-k)!}$; &emsp;
-                    (Also denoted as $P^k_n$, &ensp;$A^k_n$, &ensp;$\sideset{^n}{_k}P$, &ensp;$\sideset{_n}{_k}P$)
-                </p>
-                <p>
-                    Permutations with Repetition: &ensp;$U^n_k=n^k$; &emsp;
-                </p>
-                <p>
-                    Combinations without Repetition: &ensp;$C^n_k=\dfrac{n!}{k!(n-k)!}$; &emsp;
-                    (Also denoted as $C(n,k)$,&ensp;$\dbinom{n}{k}$, &ensp;$C^k_n$, &ensp;$\sideset{^n}{_k}C$,
-                    &ensp;$\sideset{_n}{_k}C$)
-                </p>
-                <p>
-                    Combinations with Repetition: &ensp;$H^n_k=\dfrac{(n+k-1)!}{k!(n-1)!}$; &emsp;
-                    (Also denoted as $F^n_k$) &emsp;&emsp;$H^n_k=C^{n+k-1}_{k}=C^{n+k-1}_{n-1}$; &ensp;
-                </p>
-                <p>
-                    Number of Orders in Circular Permutation: &emsp;$(n-1)!$; &ensp;
-                </p>
-                <p>
-                    <red>*</red>Circular Permutation without Repetition: &emsp;
-                    $Q^n_k=\dfrac{n!}{k\cdot(n-k)!}$; &emsp;&emsp;$Q^n_k=\dfrac{P^n_k}{k}$; &ensp;
-                </p>
-                <p>
-                    <red>*</red>Circular Permutation with Repetition: &emsp;
-                    $\dfrac{\sum_{r|k}(r\cdot\varphi(r)\cdot{n^{\frac{k}{r}}})}{k}$; &ensp;
-                </p>
-            </div>
-            <div class="cat">
-                <p>
-                    $\dbinom{n}{k}=\dbinom{n}{n-k}=\dfrac{n}{k}\dbinom{n-1}{k-1}; \quad
-                    \dbinom{n}{k-1}+\dbinom{n}{k}=\dbinom{n+1}{k}, \quad
-                    \dbinom{n}{k}=\dbinom{n-1}{k-1}+\dbinom{n-1}{k}; \quad$
-                </p>
-            </div>
-
-            <div class="cat">
-                <div class="incomplete_mark"></div>
-            </div>
         </div>
         <hr />
     </div>
@@ -2379,26 +2487,27 @@
             for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
         }
         function RenderIncompleteMarks() {
-            var Fix = document.getElementsByClassName("incomplete_mark"), fix;
-            for (var i = 0; i < Fix.length; i++) {
-                fix = Fix[i];
+            var marks = document.getElementsByClassName("incomplete_mark");
+            for (var i = 0; i < marks.length; i++) {
+                var fix = marks[i];
                 fix.style.width = "200px";
                 fix.style.padding = "10px";
                 fix.style.border = "6px solid SaddleBrown";
                 fix.style.backgroundColor = "BurlyWood";
                 fix.style.textAlign = "center";
                 fix.style.fontFamily = "Consolas";
+                fix.style.display = "inline-block";
                 fix.innerHTML = "<strong>Incomplete Mark<strong/>";
             }
-            Fix = document.getElementsByTagName("red");
-            for (var i = 0; i < Fix.length; i++) {
-                Fix[i].style.fontWeight = "800";
-                Fix[i].style.color = 'red';
+            marks = document.getElementsByTagName("red");
+            for (var i = 0; i < marks.length; i++) {
+                marks[i].style.fontWeight = "800";
+                marks[i].style.color = 'red';
             }
-            Fix = document.getElementsByTagName("brown");
-            for (var i = 0; i < Fix.length; i++) {
-                Fix[i].style.fontWeight = "800";
-                Fix[i].style.color = 'brown';
+            marks = document.getElementsByTagName("brown");
+            for (var i = 0; i < marks.length; i++) {
+                marks[i].style.fontWeight = "800";
+                marks[i].style.color = 'brown';
             }
         }
 
