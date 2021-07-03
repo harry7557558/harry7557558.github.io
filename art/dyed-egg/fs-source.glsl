@@ -4,10 +4,8 @@ varying vec3 vRo;  // ray origin
 varying vec3 vRd;  // ray direction
 
 uniform vec3 uEggParameters;
-uniform mat3 uEggOrientation;
+uniform mat3 uEggOrientation;  // transposed
 uniform vec3 uEggTranslation;
-
-mat3 transpose(mat3 m) { return mat3(m[0].x, m[1].x, m[2].x, m[0].y, m[1].y, m[2].y, m[0].z, m[1].z, m[2].z); }
 
 
 // MODELING
@@ -22,7 +20,7 @@ float eggEquationPolar(float t) {
 }
 
 float eggSDF(vec3 p) {
-    p = transpose(uEggOrientation) * (p - uEggTranslation);
+    p = uEggOrientation * (p - uEggTranslation);
     float d = length(p.xy), z = p.z;
     float a = atan(abs(d), z);
     float r = length(vec2(d, z));
@@ -31,7 +29,10 @@ float eggSDF(vec3 p) {
 
 vec3 getEggNormal(vec3 p) {
     const float eps = 0.01;
-    return normalize(vec3(eggSDF(p+vec3(eps,0,0))-eggSDF(p-vec3(eps,0,0)),eggSDF(p+vec3(0,eps,0))-eggSDF(p-vec3(0,eps,0)),eggSDF(p+vec3(0,0,eps))-eggSDF(p-vec3(0,0,eps))));
+    return normalize(vec3(
+        eggSDF(p+vec3(eps,0,0))-eggSDF(p-vec3(eps,0,0)),
+        eggSDF(p+vec3(0,eps,0))-eggSDF(p-vec3(0,eps,0)),
+        eggSDF(p+vec3(0,0,eps))-eggSDF(p-vec3(0,0,eps))));
 }
 
 
@@ -47,6 +48,7 @@ bool intersectSphere(vec3 ce, float r, in vec3 ro, in vec3 rd, out float t) {
 bool raymarch(in vec3 ro, in vec3 rd, out float t) {
     const float eps = 0.001;
     if (!intersectSphere(uEggTranslation, 1.0+eps, ro, rd, t)) return false;
+    t = max(t, 0.0);
     ro = ro + rd*t;
     float t0 = t;
     t = eps;
@@ -73,8 +75,8 @@ bool intersectScene(in vec3 ro, in vec3 rd, out float min_t, out vec3 min_n, out
     // intersect with the egg
     if (raymarch(ro, rd, t)) {
         min_t = t, min_n = getEggNormal(ro+rd*t);
-        vec3 p = transpose(uEggOrientation)*(ro+rd*t-uEggTranslation);
-        fcol = eggTexture(atan(p.x, -p.y)/PI, 1.0-atan(length(p.xy), p.z)/PI);
+        vec3 p = uEggOrientation*(ro+rd*t-uEggTranslation);
+        fcol = eggTexture(p);
         fcol *= vec3(0.99, 0.95, 0.81);
         intersect_id = ID_EGG;
     }
@@ -129,11 +131,11 @@ float calcAO(vec3 p, vec3 n) {
 }
 
 
-vec3 getColor(vec3 ro, vec3 rd, vec3 n, vec3 fcol, int intersect_id) {
+vec3 getShade(vec3 ro, vec3 rd, vec3 n, vec3 fcol, int intersect_id) {
     vec3 lightdir = light - ro;
     vec3 ambient = (0.5+0.2*dot(n,vec3(0.5,0.5,0.5)))*vec3(1.0,1.0,1.0)*fcol / (0.01*dot(ro,ro)+1.0);
     vec3 direct = 3.0*max(dot(n,lightdir)/dot(lightdir,lightdir), 0.0) * fcol;
-    vec3 specular = (intersect_id==ID_EGG?0.0:0.1) * vec3(1.0,0.95,0.9)*pow(max(dot(rd, normalize(lightdir)), 0.0), 40.0);
+    vec3 specular = (intersect_id==ID_EGG?0.05:0.1) * vec3(1.0,0.95,0.9)*pow(max(dot(rd, normalize(lightdir)), 0.0), (intersect_id==ID_EGG?5.0:40.0));
     float shadow = calcSoftShadow(ro, 0.2);
     float ao = calcAO(ro, n);
     return ao*(ambient+shadow*(direct+specular));
@@ -151,24 +153,25 @@ vec3 traceRay(vec3 ro, vec3 rd) {
 
     ro = ro + rd*t;
     vec3 refl = rd - 2.0*dot(rd, n)*n;
-    vec3 col_direct = getColor(ro, refl, n, fcol, intersect_id);
+    vec3 col_direct = getShade(ro, refl, n, fcol, intersect_id);
+    vec3 n0 = n;
 
     if (intersect_id==ID_EGG) return col_direct;
 
     vec3 col_refl = vec3(0.0);
     if (intersectScene(ro+0.01*refl, refl, t, n, fcol, intersect_id)) {
-        col_refl = getColor(ro+refl*t, refl-2.0*dot(refl,n)*n, n, fcol, intersect_id);
+        col_refl = getShade(ro+refl*t, refl-2.0*dot(refl,n)*n, n, fcol, intersect_id);
     }
-    else col_refl = vec3(dot(refl, normalize(light-ro)));
+    else col_refl = vec3(max(dot(refl, normalize(light-ro)), 0.0));
 
-    return mix(col_refl, col_direct, 0.8);
+    return mix(col_direct, col_refl, 0.2+0.3*pow(1.0-abs(dot(refl,n0)),5.0));
 }
 
 
 void main() {
     vec3 col = traceRay(vRo, normalize(vRd));
-    float gamma = 0.9;
+    float gamma = 1.2;
     col = vec3(pow(col.x,gamma), pow(col.y,gamma), pow(col.z,gamma));
-    col = 1.0*col;
+    col = 1.1*col;
     gl_FragColor = vec4(col, 1.0);
 }

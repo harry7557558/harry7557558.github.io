@@ -217,7 +217,7 @@ function calcEggOrientation(params) {
     var p = [R[0][2] * cz, R[1][2] * cz, R[2][2] * cz];
     var translate = [0, -p[1], -p[2] + min_h];
     return {
-        orientation: [R[0][0], R[1][0], R[2][0], R[0][1], R[1][1], R[2][1], R[0][2], R[1][2], R[2][2]],
+        orientation: [R[0][0], R[0][1], R[0][2], R[1][0], R[1][1], R[1][2], R[2][0], R[2][1], R[2][2]],  // transposed
         position: translate,
     }
 }
@@ -275,30 +275,31 @@ function main() {
     canvas.addEventListener("wheel", function (e) {
         e.preventDefault();
         var sc = Math.exp(0.0002 * e.deltaY);
-        variables.uDist *= sc;
+        variables.uDist = Math.max(variables.uDist * sc, 1.2);
         render_needed = true;
     }, { passive: false });
 
     var mouseDown = false;
-    canvas.onmousedown = function (event) {
+    canvas.addEventListener("pointerdown", function (event) {
         event.preventDefault();
         mouseDown = true;
-    };
-    window.onmouseup = function (event) {
+    });
+    window.addEventListener("pointerup", function (event) {
         event.preventDefault();
         mouseDown = false;
-    };
-    window.onresize = function (event) {
+    });
+    window.addEventListener("resize", function (event) {
         canvas.width = canvas.style.width = window.innerWidth;
         canvas.height = canvas.style.height = window.innerHeight;
         render_needed = true;
-    }
-    canvas.onmousemove = function (e) {
+    });
+    canvas.addEventListener("pointermove", function (e) {
+        e.preventDefault();
         if (mouseDown) {
             variables.uRx += 0.01 * e.movementY;
             variables.uRz -= 0.01 * e.movementX;
             render_needed = true;
         }
-    };
+    });
 
 }

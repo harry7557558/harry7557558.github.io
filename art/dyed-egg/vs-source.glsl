@@ -20,6 +20,11 @@ void main(void) {
 
     vec3 cam = uDist*w + vec3(1, 1, 0.8)*uEggTranslation;
 
+    if (cam.z < 0.0) {
+        float t = cam.z / w.z;
+        cam -= w * (t+1e-3);  // prevent below horizon
+    }
+
     vec3 rd = normalize(mat3(u,v,-w)*vec3(aVertexPosition.xy*uResolution.xy, 2.0*length(uResolution)));
 
     vRo = cam, vRd = rd;

@@ -3,7 +3,8 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title>Random Egg Generator</title>
+	<meta name="viewport" content="user-scalable=no" />
+	<title>IdentiEgg</title>
 	<style>
 		#canvas {
 			position: absolute;
@@ -22,6 +23,7 @@
 			color: white;
 		}
 	</style>
+	<script src="script.js"></script>
 </head>
 
 <body>
@@ -29,10 +31,16 @@
 
 	<div id="fps">fps</div>
 
-	<script src="script.js">
-	</script>
 	<script>
-		window.onload = main;
+		window.onload = function (event) {
+            try {
+                main();
+            }
+            catch(e) {
+                console.error(e);
+                document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";
+            }
+        };
 	</script>
 
 </body>
