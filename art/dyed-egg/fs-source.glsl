@@ -3,15 +3,17 @@ precision highp float;
 varying vec3 vRo;  // ray origin
 varying vec3 vRd;  // ray direction
 
-uniform vec3 uEggParameters;
-uniform mat3 uEggOrientation;  // transposed
-uniform vec3 uEggTranslation;
+uniform vec2 uRotate;
+uniform float uDist;
+uniform vec2 uResolution;
 
 
 // MODELING
 
-#define ID_PLANE 0
-#define ID_EGG 1
+uniform vec3 uEggParameters;
+uniform mat3 uEggOrientation;  // transposed
+uniform vec3 uEggTranslation;
+
 
 float eggEquationPolar(float t) {
     float s = sin(t);
@@ -65,6 +67,9 @@ bool raymarch(in vec3 ro, in vec3 rd, out float t) {
     return false;
 }
 
+
+#define ID_PLANE 0
+#define ID_EGG 1
 
 bool intersectScene(in vec3 ro, in vec3 rd, out float min_t, out vec3 min_n, out vec3 fcol, out int intersect_id) {
     float t;
@@ -131,13 +136,13 @@ float calcAO(vec3 p, vec3 n) {
 }
 
 
-vec3 getShade(vec3 ro, vec3 rd, vec3 n, vec3 fcol, int intersect_id) {
-    vec3 lightdir = light - ro;
-    vec3 ambient = (0.5+0.2*dot(n,vec3(0.5,0.5,0.5)))*vec3(1.0,1.0,1.0)*fcol / (0.01*dot(ro,ro)+1.0);
+vec3 getShade(vec3 pos, vec3 rd, vec3 n, vec3 fcol, int intersect_id) {
+    vec3 lightdir = light - pos;
+    vec3 ambient = (0.5+0.2*dot(n,vec3(0.5,0.5,0.5)))*vec3(1.0,1.0,1.0)*fcol / (0.02*dot(pos,pos)+1.0);
     vec3 direct = 3.0*max(dot(n,lightdir)/dot(lightdir,lightdir), 0.0) * fcol;
     vec3 specular = (intersect_id==ID_EGG?0.05:0.1) * vec3(1.0,0.95,0.9)*pow(max(dot(rd, normalize(lightdir)), 0.0), (intersect_id==ID_EGG?5.0:40.0));
-    float shadow = calcSoftShadow(ro, 0.2);
-    float ao = calcAO(ro, n);
+    float shadow = calcSoftShadow(pos, 0.2);
+    float ao = calcAO(pos, n);
     return ao*(ambient+shadow*(direct+specular));
 }
 
@@ -162,16 +167,39 @@ vec3 traceRay(vec3 ro, vec3 rd) {
     if (intersectScene(ro+0.01*refl, refl, t, n, fcol, intersect_id)) {
         col_refl = getShade(ro+refl*t, refl-2.0*dot(refl,n)*n, n, fcol, intersect_id);
     }
-    else col_refl = vec3(max(dot(refl, normalize(light-ro)), 0.0));
+    else col_refl = vec3(pow(max(dot(refl, normalize(light-ro)), 0.0), 2.0)/(0.02*dot(ro,ro)+1.0));
 
     return mix(col_direct, col_refl, 0.2+0.3*pow(1.0-abs(dot(refl,n0)),5.0));
 }
 
 
-void main() {
-    vec3 col = traceRay(vRo, normalize(vRd));
+void main(void) {
+    vec2 uv = 2.0 * gl_FragCoord.xy/uResolution.xy - 1.0;
+        
+    // barrel distortion from https://www.shadertoy.com/view/wslcDS by Shane
+    float r = dot(uv, uv);
+    uv *= 1. + vec2(.03,.02)*(r*r + r);
+
+    // calculate projection
+    float rx = uRotate.x;
+    float rz = uRotate.y;
+    vec3 w = vec3(cos(rx)*vec2(cos(rz),sin(rz)), sin(rx));
+    vec3 u = vec3(-sin(rz),cos(rz),0);
+    vec3 v = cross(w,u);
+
+    // camera position
+    vec3 cam = uDist*w + vec3(0, 0, 0.6);
+    if (cam.z < 0.0) {
+        cam -= w * (cam.z/w.z+1e-3);  // prevent below horizon
+    }
+
+    // generate ray
+    vec3 rd = normalize(mat3(u,v,-w)*vec3(uv*uResolution.xy, 2.0*length(uResolution)));
+    vec3 col = traceRay(cam, rd);
+
+    // adjustment
     float gamma = 1.2;
     col = vec3(pow(col.x,gamma), pow(col.y,gamma), pow(col.z,gamma));
-    col = 1.1*col;
+    col = 1.2*col-0.05;
     gl_FragColor = vec4(col, 1.0);
 }

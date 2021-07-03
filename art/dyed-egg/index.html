@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="user-scalable=no" />
+    <meta name="description" content="Random dyed egg generator inspired by WordPress/Gravatar identicon." />
 	<title>IdentiEgg</title>
 	<style>
 		#canvas {
@@ -22,14 +23,30 @@
 			font-size: 20px;
 			color: white;
 		}
+
+        #seed-input {
+            position: fixed;
+            right: 10px;
+            top: 10px;
+            outline: none;
+            border: 1px solid gray;
+            padding: 0px 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            width: 30%;
+            max-width: 280px;
+            font-size: 20px;
+            font-family: Consolas;
+            color: black;
+            /* text-align: right; */
+        }
 	</style>
 	<script src="script.js"></script>
 </head>
 
 <body>
 	<canvas id="canvas"></canvas>
-
 	<div id="fps">fps</div>
+    <input id="seed-input" title="Try to enter a string here" spellcheck="false"></input>
 
 	<script>
 		window.onload = function (event) {

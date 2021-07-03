@@ -63,6 +63,22 @@ function initWebGL(gl) {
             uEggParameters: gl.getUniformLocation(shaderProgram, "uEggParameters"),
             uEggOrientation: gl.getUniformLocation(shaderProgram, "uEggOrientation"),
             uEggTranslation: gl.getUniformLocation(shaderProgram, "uEggTranslation"),
+            uCapShape: gl.getUniformLocation(shaderProgram, "uCapShape"),
+            uCapShapeOrient: gl.getUniformLocation(shaderProgram, "uCapShapeOrient"),
+            uCapCol1: gl.getUniformLocation(shaderProgram, "uCapCol1"),
+            uCapCol2: gl.getUniformLocation(shaderProgram, "uCapCol2"),
+            uRingShape: gl.getUniformLocation(shaderProgram, "uRingShape"),
+            uRingShapeOrient: gl.getUniformLocation(shaderProgram, "uRingShapeOrient"),
+            uRingCol1: gl.getUniformLocation(shaderProgram, "uRingCol1"),
+            uRingCol2: gl.getUniformLocation(shaderProgram, "uRingCol2"),
+            uBodyShape: gl.getUniformLocation(shaderProgram, "uBodyShape"),
+            uBodyShapeOrient: gl.getUniformLocation(shaderProgram, "uBodyShapeOrient"),
+            uBodyCol1: gl.getUniformLocation(shaderProgram, "uBodyCol1"),
+            uBodyCol2: gl.getUniformLocation(shaderProgram, "uBodyCol2"),
+            uMidShape: gl.getUniformLocation(shaderProgram, "uMidShape"),
+            uMidShapeOrient: gl.getUniformLocation(shaderProgram, "uMidShapeOrient"),
+            uMidCol1: gl.getUniformLocation(shaderProgram, "uMidCol1"),
+            uMidCol2: gl.getUniformLocation(shaderProgram, "uMidCol2"),
         },
         // buffers
         buffers: {
@@ -74,14 +90,12 @@ function initWebGL(gl) {
 
 
 // call this function to re-render
-function drawScene(gl, programInfo, variables) {
+function drawScene(gl, programInfo, viewport, egg) {
 
     // clear the canvas
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 1);
     gl.clearDepth(1.0);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     {
@@ -102,12 +116,29 @@ function drawScene(gl, programInfo, variables) {
 
     // set shader uniforms
     // https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html
-    gl.uniform2f(programInfo.uniformLocations.uRotate, variables.uRx, variables.uRz);
-    gl.uniform1f(programInfo.uniformLocations.uDist, variables.uDist);
+    gl.uniform2f(programInfo.uniformLocations.uRotate, viewport.uRx, viewport.uRz);
+    gl.uniform1f(programInfo.uniformLocations.uDist, viewport.uDist);
     gl.uniform2f(programInfo.uniformLocations.uResolution, canvas.clientWidth, canvas.clientHeight);
-    gl.uniform3fv(programInfo.uniformLocations.uEggParameters, variables.uEggParameters);
-    gl.uniformMatrix3fv(programInfo.uniformLocations.uEggOrientation, false, variables.uEggOrientation);
-    gl.uniform3fv(programInfo.uniformLocations.uEggTranslation, variables.uEggTranslation);
+    gl.uniform3fv(programInfo.uniformLocations.uEggParameters, egg.uEggParameters);
+    gl.uniformMatrix3fv(programInfo.uniformLocations.uEggOrientation, false, egg.uEggOrientation);
+    gl.uniform3fv(programInfo.uniformLocations.uEggTranslation, egg.uEggTranslation);
+
+    gl.uniform1i(programInfo.uniformLocations.uCapShape, egg.uCapShape);
+    gl.uniform4iv(programInfo.uniformLocations.uCapShapeOrient, egg.uCapShapeOrient);
+    gl.uniform3fv(programInfo.uniformLocations.uCapCol1, egg.uCapCol1);
+    gl.uniform3fv(programInfo.uniformLocations.uCapCol2, egg.uCapCol2);
+    gl.uniform1i(programInfo.uniformLocations.uRingShape, egg.uRingShape);
+    gl.uniform4iv(programInfo.uniformLocations.uRingShapeOrient, egg.uRingShapeOrient);
+    gl.uniform3fv(programInfo.uniformLocations.uRingCol1, egg.uRingCol1);
+    gl.uniform3fv(programInfo.uniformLocations.uRingCol2, egg.uRingCol2);
+    gl.uniform1i(programInfo.uniformLocations.uBodyShape, egg.uBodyShape);
+    gl.uniform4iv(programInfo.uniformLocations.uBodyShapeOrient, egg.uBodyShapeOrient);
+    gl.uniform3fv(programInfo.uniformLocations.uBodyCol1, egg.uBodyCol1);
+    gl.uniform3fv(programInfo.uniformLocations.uBodyCol2, egg.uBodyCol2);
+    gl.uniform1i(programInfo.uniformLocations.uMidShape, egg.uMidShape);
+    gl.uniform4iv(programInfo.uniformLocations.uMidShapeOrient, egg.uMidShapeOrient);
+    gl.uniform3fv(programInfo.uniformLocations.uMidCol1, egg.uMidCol1);
+    gl.uniform3fv(programInfo.uniformLocations.uMidCol2, egg.uMidCol2);
 
     // render
     {
@@ -118,11 +149,30 @@ function drawScene(gl, programInfo, variables) {
 }
 
 
+// ============================ RANDOM ==============================
+
+function Random(seed) {
+    this._seed_0 = seed;
+    this._seed = Math.imul(seed, 1);
+    this.randInt = function () {  // from Numerical Recipes
+        this._seed = (Math.imul(this._seed, 1664525) + 1013904223) % 4294967296;
+        return this._seed + (this._seed < 0 ? 4294967296 : 0);
+    };
+    this.randFloat = function () {
+        return this.randInt() / 4294967296;
+    };
+    this.randBit = function () {
+        return (this.randInt() >> 15) & 1;
+    };
+};
+
 // return the three control parameters of the egg
-function randomEgg() {
-    var u = 2.0 * Math.PI * Math.random();
-    var v = 2.0 * Math.random() - 1.0;
-    var w = Math.cbrt(Math.random());
+function randomEggShape(randomObject) {
+    // generated by tracing+fitting real-world egg pictures and find the distribution of the parameters
+    // uniform random inside an ellipsoid, not quite perfect
+    var u = 2.0 * Math.PI * randomObject.randFloat();
+    var v = 2.0 * randomObject.randFloat() - 1.0;
+    var w = Math.cbrt(randomObject.randFloat());
     var x = w * Math.sqrt(1 - v * v) * Math.cos(u)
     var y = w * Math.sqrt(1 - v * v) * Math.sin(u);
     var z = w * v;
@@ -223,21 +273,89 @@ function calcEggOrientation(params) {
 }
 
 
+// color space conversion
+function hsl2rgb(hsl) {
+    function hue2rgb(t) {
+        while (t < 0) t += 6;
+        while (t > 6) t -= 6;
+        if (t < 1) return t;
+        if (t < 3) return 1;
+        if (t < 4) return 4 - t;
+        return 0;
+    }
+    var h = hsl[0] / 60, s = hsl[1], l = hsl[2];
+    var max = l <= 0.5 ? l * (s + 1) : l + s - l * s;
+    var min = 2 * l - max;
+    var r = min + (max - min) * hue2rgb(h + 2);
+    var g = min + (max - min) * hue2rgb(h);
+    var b = min + (max - min) * hue2rgb(h - 2);
+    return [r, g, b];
+}
+
+
+// generate random egg, with shape/texture/color
+function getRandomEgg(seed) {
+    var randomObject = new Random(seed);
+    var eggParameters = randomEggShape(randomObject);
+    var eggOrientation = calcEggOrientation(eggParameters);
+    // color
+    function randColor() {
+        var hue = 360 * randomObject.randFloat();
+        var sat = 0.7 + 0.3 * randomObject.randFloat();
+        var bri = 0.7 + 0.25 * randomObject.randFloat();
+        return hsl2rgb([hue, sat, bri]);
+    }
+    // result
+    return {
+        uEggParameters: eggParameters,
+        uEggOrientation: eggOrientation.orientation,
+        uEggTranslation: eggOrientation.position,
+        uCapShape: randomObject.randInt() % 44,
+        uCapShapeOrient: [randomObject.randBit(), randomObject.randBit(), randomObject.randBit(), randomObject.randBit()],
+        uCapCol1: randColor(),
+        uCapCol2: randColor(),
+        uRingShape: randomObject.randInt() % 44,
+        uRingShapeOrient: [randomObject.randBit(), randomObject.randBit(), randomObject.randBit(), randomObject.randBit()],
+        uRingCol1: randColor(),
+        uRingCol2: randColor(),
+        uBodyShape: randomObject.randInt() % 44,
+        uBodyShapeOrient: [randomObject.randBit(), randomObject.randBit(), randomObject.randBit(), randomObject.randBit()],
+        uBodyCol1: randColor(),
+        uBodyCol2: randColor(),
+        uMidShape: randomObject.randInt() % 44,
+        uMidShapeOrient: [randomObject.randBit(), randomObject.randBit(), randomObject.randBit(), randomObject.randBit()],
+        uMidCol1: randColor(),
+        uMidCol2: randColor(),
+    };
+}
+
+
+// get random number seed from string input
+function getRandomNumberSeed() {
+    const input = document.getElementById("seed-input");
+    var str = input.value.replace(/^\s+/, '').replace(/\s+$/, '');
+    // rolling hash
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+        hash = Math.imul(hash, 53) + str.charCodeAt(i);
+    }
+    return Math.imul(hash, 1);
+}
+
+
+// ============================ MAIN ==============================
+
 // window.onload
 function main() {
 
     // graphing variables
-    //var eggParameters = [0.04988658352024161, 1.1173188904187898, -0.16022814144952918];
-    var eggParameters = randomEgg(); console.log(eggParameters);
-    var eggOrientation = calcEggOrientation(eggParameters);
-    var variables = {
+    var viewport = {
         uRx: 0.2,
         uRz: -0.5,
         uDist: 8.0,
-        uEggParameters: eggParameters,
-        uEggOrientation: eggOrientation.orientation,
-        uEggTranslation: eggOrientation.position,
     };
+    document.getElementById("seed-input").value = "[sample egg]";
+    var egg = getRandomEgg(getRandomNumberSeed());
 
     // load WebGL
     const canvas = document.getElementById("canvas");
@@ -259,7 +377,7 @@ function main() {
 
             canvas.width = canvas.style.width = window.innerWidth;
             canvas.height = canvas.style.height = window.innerHeight;
-            drawScene(gl, programInfo, variables);
+            drawScene(gl, programInfo, viewport, egg);
 
             render_needed = false;
         }
@@ -269,19 +387,24 @@ function main() {
 
 
     // interactions
+    document.getElementById("seed-input").addEventListener("input", function (e) {
+        egg = getRandomEgg(getRandomNumberSeed());
+        render_needed = true;
+    });
+
     canvas.oncontextmenu = function (e) {
         //e.preventDefault();
     };
     canvas.addEventListener("wheel", function (e) {
         e.preventDefault();
         var sc = Math.exp(0.0002 * e.deltaY);
-        variables.uDist = Math.max(variables.uDist * sc, 1.2);
+        viewport.uDist = Math.min(Math.max(viewport.uDist * sc, 1.2), 100.0);
         render_needed = true;
     }, { passive: false });
 
     var mouseDown = false;
     canvas.addEventListener("pointerdown", function (event) {
-        event.preventDefault();
+        //event.preventDefault();
         mouseDown = true;
     });
     window.addEventListener("pointerup", function (event) {
@@ -296,8 +419,8 @@ function main() {
     canvas.addEventListener("pointermove", function (e) {
         e.preventDefault();
         if (mouseDown) {
-            variables.uRx += 0.01 * e.movementY;
-            variables.uRz -= 0.01 * e.movementX;
+            viewport.uRx += 0.01 * e.movementY;
+            viewport.uRz -= 0.01 * e.movementX;
             render_needed = true;
         }
     });

@@ -2,10 +2,27 @@ precision highp float;
 
 #define PI 3.1415926
 
-// Gravatar identicon components
-// https://barro.github.io/2018/02/avatars-identicons-and-hash-visualization/
+// egg texture parameters
+uniform int uCapShape;
+uniform ivec4 uCapShapeOrient;
+uniform vec3 uCapCol1;
+uniform vec3 uCapCol2;
+uniform int uRingShape;
+uniform ivec4 uRingShapeOrient;
+uniform vec3 uRingCol1;
+uniform vec3 uRingCol2;
+uniform int uBodyShape;
+uniform ivec4 uBodyShapeOrient;
+uniform vec3 uBodyCol1;
+uniform vec3 uBodyCol2;
+uniform int uMidShape;
+uniform ivec4 uMidShapeOrient;
+uniform vec3 uMidCol1;
+uniform vec3 uMidCol2;
 
-#define N_COMPONENT 44
+
+// Gravatar identicon components, total 44
+// Reference: https://barro.github.io/2018/02/avatars-identicons-and-hash-visualization/
 
 // return a signed number, -1 < u,v < 1
 float identiconComponent_raw(int id, float u, float v) {
@@ -56,39 +73,49 @@ float identiconComponent_raw(int id, float u, float v) {
     return 0.0;
 }
 
-float identiconComponent(vec2 uv, int id, bool trspose, bool flip_h, bool flip_v, bool sgn) {
+float identiconComponent(vec2 uv, int id, ivec4 orient) {
     float u = uv.x, v = uv.y;
-    if (trspose) u = uv.y, v = uv.x;
-    if (flip_h) u = -u;
-    if (flip_v) v = -v;
-    return (sgn?-1.0:1.0) * identiconComponent_raw(id, u, v);
+    if (orient.x==1) u = uv.y, v = uv.x;
+    if (orient.y==1) u = -u;
+    if (orient.z==1) v = -v;
+    return (orient.w==1?-1.0:1.0) * identiconComponent_raw(id, u, v);
 }
 
-vec3 textureTop(float u, float v) {
+
+// texture on different parts of the egg
+// 0<u,v<1 for all functions except textureCap
+
+vec3 textureCap(float u, float v) {
     float x = v*cos(4.0*u), y = v*sin(4.0*u);
-    float sd = identiconComponent(vec2(x,y), 11, false, true, true, false);
+    float sd = identiconComponent(vec2(x,y), uCapShape, uCapShapeOrient);
+    return sd<0.0 ? uCapCol1 : uCapCol2;
     return sd<0.0 ? vec3(0.9, 0.5, 0.5) : vec3(0.5, 0.9, 0.9);
 }
 
 vec3 textureRing(float u, float v) {
     u = 2.0*u-1.0, v=2.0*v-1.0;
-    float sd = identiconComponent(vec2(u,v), 21, true, true, false, true);
+    float sd = identiconComponent(vec2(u,v), uRingShape, ivec4(0));
+    return sd<0.0 ? uRingCol1 : uRingCol2;
     return sd<0.0 ? vec3(0.5, 0.5, 0.9) : vec3(0.5, 0.9, 0.5);
 }
 
 vec3 textureBody(float u, float v) {
     u = 2.0*u-1.0, v=2.0*v-1.0;
-    float sd = identiconComponent(vec2(u,v), 43, true, true, true, false);
+    float sd = identiconComponent(vec2(u,v), uBodyShape, ivec4(0));
+    return sd<0.0 ? uBodyCol1 : uBodyCol2;
     return sd<0.0 ? vec3(0.9, 0.9, 0.5) :  vec3(0.5, 0.9, 0.9);
 }
 
 vec3 textureMiddle(float u, float v) {
     u = 2.0*u-1.0, v=2.0*v-1.0;
     vec3 k = abs(v)<0.4 ? vec3(1.0) : vec3(0.9);
-    float sd = identiconComponent(vec2(u,v), 28, false, false, false, true);
+    float sd = identiconComponent(vec2(u,v), uMidShape, ivec4(0));
     vec3 col = sd<0.0 ? vec3(0.9,0.8,0.7) : vec3(0.7,0.5,1.0);
+    col = sd<0.0 ? uMidCol1 : uMidCol2;
     return k * col;
 }
+
+// final egg texture
 
 vec3 eggTexture(vec3 p) {
     float u = atan(p.x, -p.y), v = (PI-atan(length(p.xy), p.z))/PI;
@@ -97,7 +124,7 @@ vec3 eggTexture(vec3 p) {
     vec3 col = vec3(1.0);
 
     if (vn<0.1) {
-        col = textureTop(v<0.5?u:1.0-u, vn/0.1);
+        col = textureCap(v<0.5?u:1.0-u, vn/0.1);
     }
     else if (vn<0.2) {
         float un8r = acos(cos(4.0*u))/PI;

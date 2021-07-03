@@ -1,3 +1,5 @@
+// this shader seems to be useless because everything is re-done in fragment shader
+
 precision highp float;
 
 attribute vec4 aVertexPosition;
@@ -18,11 +20,12 @@ void main(void) {
     vec3 u = vec3(-sin(rz),cos(rz),0);
     vec3 v = cross(w,u);
 
-    vec3 cam = uDist*w + vec3(1, 1, 0.8)*uEggTranslation;
+    vec3 cam = uDist*w;
+    //cam += vec3(1, 1, 0.8)*uEggTranslation;
+    cam += vec3(0, 0, 0.6);
 
     if (cam.z < 0.0) {
-        float t = cam.z / w.z;
-        cam -= w * (t+1e-3);  // prevent below horizon
+        cam -= w * (cam.z/w.z+1e-3);  // prevent below horizon
     }
 
     vec3 rd = normalize(mat3(u,v,-w)*vec3(aVertexPosition.xy*uResolution.xy, 2.0*length(uResolution)));
