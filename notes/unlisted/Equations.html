@@ -149,7 +149,7 @@
         $\newcommand{\divisible}{ {\>\large\mid\>}}$
         $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\P}{\operatorname{P}}$
-        $\newcommand{\Var}{\operatorname{Var}}$
+        $\newcommand{\var}{\operatorname{var}}$
 
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\ddx}{\displaystyle\dfrac{\mathrm{d}}{\mathrm{d}x}}$
@@ -2218,30 +2218,32 @@
                 <p>
                     Discrete random variable:&emsp;
                     $\E(X)=\displaystyle\sum_i{x_i\P(x_i)}, \quad
-                    \Var(X)=\displaystyle\sum_i{(x_i-\mu_X)\P(x_i)};$
+                    \var(X)=\displaystyle\sum_i{(x_i-\mu_X)\P(x_i)};$
                 </p>
                 <p>
                     Continuous random variable:&emsp;
                     $\E(X)=\displaystyle\int_{-\infty}^{\infty}{x\cdot p_X(x)\d{x}},\quad
-                    \Var(X)=\displaystyle\int_{-\infty}^{\infty}{(x-\mu_X)^2\cdot p_X(x)\d{x}};$
+                    \var(X)=\displaystyle\int_{-\infty}^{\infty}{(x-\mu_X)^2\cdot p_X(x)\d{x}};$
                 </p>
                 <p>
                     $\E(aX+b)=a\E(X)+b,\quad
-                    \Var(aX+b)=a^2\Var(X),\quad
+                    \var(aX+b)=a^2\var(X),\quad
                     \sigma_{aX+b}=|a|\cdot\sigma_X;$
                     &emsp;
-                    $\Var(X)=\E(X^2)-\E(X)^2;$
+                    $\var(X)=\E(X^2)-\E(X)^2;$
                     &emsp;
                     $\E(X\pm Y)=\E(X)\pm\E(Y);$
                 </p>
                 <p>
                     For independent random variables $X$, $Y$:&emsp;
                     $\E(XY)=\E(X)\E(Y);\quad
-                    \Var(X+Y)=\Var(X)+\Var(Y),\ \
+                    \var(X+Y)=\var(X)+\var(Y),\ \
                     \sigma_{X+Y}=\sqrt{\sigma_X^2+\sigma_Y^2};$
                 </p>
             </div>
-            <h3><red>*</red>Probability distributions</h3>
+            <h3>
+                <red>*</red>Probability distributions
+            </h3>
             <div class="cat">
                 <p>
                     Normal distribution:&emsp;
@@ -2282,7 +2284,9 @@
                     \mu=\lambda,\quad \sigma^2=\lambda;$
                 </p>
             </div>
-            <h3><red>*</red>Transformations of probability density functions</h3>
+            <h3>
+                <red>*</red>Transformations of probability density functions
+            </h3>
             <div class="cat">
                 Probability density function $p_X(x)$ transformed using $y=y(x)$:&ensp;
                 $p_Y(y)=p_X(x(y))\left|\dfrac{\d{x}}{\d{y}}\right|$;&emsp;&emsp;
@@ -2387,22 +2391,39 @@
             <h3>Fourier Series</h3>
             <div class="cat">
                 <p>
-                    $f(t)=\dfrac{a_{0}}{2}+a_{1}\cos(\omega t)+b_{1}\sin(\omega t)+a_{2}\cos(2\omega
-                    t)+b_{2}\sin(2\omega t)+\cdots \; =\dfrac{a_{0}}{2}+\Sum{[a_{n}\cos(n\omega t)+b_{n}\sin(n\omega
-                    t)]}{n=1}{\infty}$, &ensp; <br />
+                    Function $f$ with period $T$:&ensp;
+                    $f(t)=\dfrac{a_{0}}{2}
+                    +\displaystyle\sum_{k=1}^{\infty}\left(a_{n}\cos(k\omega t)
+                    +b_{n}\sin(k\omega t)\right)$,&emsp;
+                    where $a_k=\dfrac{2}{T}\displaystyle\int_{t_0}^{t_0+T}{f(t)\cos(k\omega t)\d{t}},\quad
+                    b_k=\dfrac{2}{T}\displaystyle\int_{t_0}^{t_0+T}{f(t)\sin(k\omega t)\d{t}},\quad
+                    \omega=\dfrac{2\pi}{T}$;
+                </p>
+                <p>
                     &emsp;&emsp;&emsp;&emsp;
-                    where $a_{n}=\dfrac{2}{T}\intabd[t]{f(t)\cos(n\omega t)}{t_{0}}{t_{0}+T}, \quad
-                    b_{n}=\dfrac{2}{T}\intabd[t]{f(t)\sin(n\omega t)}{t_{0}}{t_{0}+T}, \quad \omega=\dfrac{2\pi}{T}$;
-                    &ensp; <br />
-                    Or $f(t) = \Sum{c_n\cdot\e^{in\omega t}}{n=-\infty}{+\infty}, \quad
-                    c_n=\dfrac{1}{T}\intabd[t]{f(t)\e^{-in\omega t}}{t_0}{t_0+T}$; &ensp;
+                    or&ensp; $f(t) = \displaystyle\sum_{k=-\infty}^{\infty}c_n\e^{ki\omega t}, \quad
+                    c_k=\dfrac{1}{T}\displaystyle\int_{t_0}^{t_0+T}f(t)\e^{-ki\omega t}\d{t},\quad
+                    \omega=\dfrac{2\pi}{T}$;
+                    &emsp;&emsp;
+                    $c_{k} = \overline{c}_{-k}$ for real $f$;
                 </p>
                 <p>
                     When $T=2\pi$: &ensp;
-                    $\displaystyle f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}[a_{k}\cos(kx)+b_{k}\sin(kx)], \quad
-                    a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\mathrm{d}x, \quad
-                    b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\mathrm{d}x$;
-
+                    $\displaystyle
+                    f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}\left(a_{k}\cos(kx)+b_{k}\sin(kx)\right),\quad
+                    a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\d{x}, \quad
+                    b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\d{x}$;
+                </p>
+                <p>
+                    Fourier integral:&ensp; $\displaystyle
+                    f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\d{\lambda}\int_{-\infty}^{\infty}{f(t)\e^{-i\lambda(t-x)}}\d{t}$;
+                </p>
+                <p>
+                    &emsp;&emsp;&emsp;&emsp;
+                    or&ensp; $\displaystyle f(x)=\frac{1}{\pi}\int_{0}^{\infty}\left(A(\lambda)\cos\lambda x +
+                    B(\lambda)\sin\lambda x\right)\d\lambda,\quad
+                    A(\lambda)=\frac{1}{\pi}\int_{-\infty}^{\infty}{f(t)\cos\lambda t}\ \d{t},\quad
+                    B(\lambda)=\frac{1}{\pi}\int_{-\infty}^{\infty}{f(t)\sin\lambda t}\ \d{t}$;
                 </p>
             </div>
 
