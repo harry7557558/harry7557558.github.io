@@ -19,6 +19,11 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
         _dir = _dir.replace('\\','/')
         if _dir[-1]!='/': _dir += '/'
         trunc = len(_dir)-1
+    if os.path.isfile(_dir+'.gitignore'):
+        fp = open(_dir+'.gitignore', 'r')
+        for line in fp:
+            if line.strip() == '*':
+                return ""
     ls = [f for f in os.listdir(_dir) if f[0]!='.']
     files = [_dir+f for f in ls if os.path.isfile(_dir+f)]
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
