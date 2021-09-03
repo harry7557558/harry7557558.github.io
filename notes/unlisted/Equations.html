@@ -150,6 +150,7 @@
         $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\P}{\operatorname{P}}$
         $\newcommand{\var}{\operatorname{var}}$
+        $\newcommand{\F}{\mathcal{F}}$
 
         $\newcommand{\d} {\mathrm{d}}$
         $\newcommand{\ddx}{\displaystyle\dfrac{\mathrm{d}}{\mathrm{d}x}}$
@@ -856,6 +857,20 @@
                     <red>*</red>
                     $\ln\sqrt{x}=\dfrac{1}{2}\ln(x)
                     \qquad (x \text{ not negative real})$;
+                </p>
+            </div>
+
+            <div class="cat">
+                <h3>Properties of complex conjugate</h3>
+                <p>
+                    $\overline{z\pm w}=\overline{z}\pm\overline{w},\quad
+                    \overline{zw}=\overline{z}\cdot\overline{w},\quad
+                    \overline{\left(\dfrac{z}{w}\right)}=\dfrac{\overline{z}}{\overline{w}};\qquad
+                    z\overline{z}=|z|^2,\quad
+                    z^{-1}=\dfrac{\overline{z}}{|z|^2},\quad
+                    \overline{z^n}=\left(\overline{z}\right)^n\ (n\in\Z),\quad
+                    \exp(\overline{z})=\overline{\exp(z)},\quad
+                    \ln(\overline{z})=\overline{\ln(z)};\quad$
                 </p>
             </div>
 
@@ -2388,8 +2403,9 @@
             </div>
             <br />
 
-            <h3>Fourier Series</h3>
+            <!-- Fourier series and integral -->
             <div class="cat">
+                <h3>Fourier Series and Integral</h3>
                 <p>
                     Function $f$ with period $T$:&ensp;
                     $f(t)=\dfrac{a_{0}}{2}
@@ -2413,22 +2429,105 @@
                     f(x)=\frac{a_{0}}{2}+\sum_{k=1}^{\infty}\left(a_{k}\cos(kx)+b_{k}\sin(kx)\right),\quad
                     a_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(kx)\d{x}, \quad
                     b_{k}=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(kx)\d{x}$;
+                    &emsp;&emsp;
+                    $\displaystyle \dfrac{1}{\pi}\int_{-\pi}^{\pi}f(x)^2\d{x}
+                    =\dfrac{a_0^2}{2}+\sum_{k=1}^{\infty}\left(a_k^2+b_k^2\right)$
                 </p>
                 <p>
                     Fourier integral:&ensp; $\displaystyle
-                    f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\d{\lambda}\int_{-\infty}^{\infty}{f(t)\e^{-i\lambda(t-x)}}\d{t}$;
+                    f(x)=\frac{1}{2\pi}\int_{-\infty}^{\infty}\d{\lambda}\int_{-\infty}^{\infty}{f(t)\e^{-i\lambda(t-x)}}\d{t}
+                    =\frac{1}{2\pi}\int_{-\infty}^{\infty}C(\lambda)\e^{i\lambda x}\d{\lambda},\quad
+                    C(\lambda)=\int_{-\infty}^{\infty}{f(t)\e^{-i\lambda t}\d{t}}$;
                 </p>
                 <p>
                     &emsp;&emsp;&emsp;&emsp;
                     or&ensp; $\displaystyle f(x)=\frac{1}{\pi}\int_{0}^{\infty}\left(A(\lambda)\cos\lambda x +
                     B(\lambda)\sin\lambda x\right)\d\lambda,\quad
-                    A(\lambda)=\frac{1}{\pi}\int_{-\infty}^{\infty}{f(t)\cos\lambda t}\ \d{t},\quad
-                    B(\lambda)=\frac{1}{\pi}\int_{-\infty}^{\infty}{f(t)\sin\lambda t}\ \d{t}$;
+                    A(\lambda)=\int_{-\infty}^{\infty}{f(t)\cos\lambda t}\ \d{t},\quad
+                    B(\lambda)=\int_{-\infty}^{\infty}{f(t)\sin\lambda t}\ \d{t}$;
+                </p>
+            </div>
+            <!-- Fourier Transform -->
+            <div class="cat">
+                <h3>
+                    <red>*</red>
+                    Fourier Transform
+                </h3>
+                <p>
+                    Fourier transform and its inverse:&ensp;
+                    $\displaystyle \hat{f}(\xi)=\int_{-\infty}^{\infty}{f(x)\e^{-2\pi i\xi x}\d{x}},\quad
+                    f(x)=\int_{-\infty}^{\infty}{\hat{f}(\xi)\e^{2\pi i\xi x}\d{\xi}};$
+                </p>
+                <p>
+                    <!-- Basic properties -->
+                    $\F\{af(x)+bg(x)\}=a\hat{f}(\xi)+b\hat{g}(\xi),\quad
+                    \F\{f(x-x_0)\}=\e^{-2\pi i\xi x_0}\hat{f}(\xi),\quad
+                    \F\left\{\e^{2\pi i\xi_0x}f(x)\right\}=\hat{f}(\xi-\xi_0),\quad\\
+                    \F\{f(ax)\}=\dfrac{1}{|a|}\hat{f}\left(\dfrac{\xi}{a}\right)\;(a\in\R),\quad
+                    \F\{f(-x)\}=\hat{f}(-\xi),\quad
+                    \F\left\{\overline{f(x)}\right\}=\overline{\hat{f}(-\xi)};\quad
+                    \hat{f}(-\xi)=\overline{\hat{f}(\xi)}\quad(f\in\R);$
+                </p>
+                <p>
+                    <!-- Differentiation properties -->
+                    $\F\left\{\dfrac{\d}{\d{x}}f(x)\right\}=2\pi i\xi\cdot\hat{f}(\xi),\quad
+                    \F\left\{\dfrac{\d^n}{\d{x^n}}\right\}=(2\pi i\xi)^n\hat{f}(\xi);\quad$
+                    <red>*</red>
+                    $\F\left\{-2\pi ixf(x)\right\}=\dfrac{\d}{\d\xi}\hat{f}(\xi);$
+                </p>
+                <p>
+                    <!-- Convolution properties -->
+                    <red>*</red>
+                    $\F\{(f*g)(x)\}=\hat{f}(\xi)\cdot\hat{g}(\xi),\quad
+                    \F\{f(x)\cdot g(x)\}=(\hat{f}*\hat{g})(\xi);\quad$
+                    &emsp;where $(f*g)(x)=\displaystyle\int_{-\infty}^{\infty}{f(t)g(x-t)\d{t}};$
+                </p>
+                <p>
+                    <!-- Parseval's theorem and Plancherel theorem -->
+                    <red>*</red>
+                    $\displaystyle \int_{-\infty}^{\infty}|f(x)|^2\d{x}
+                    =\int_{-\infty}^{\infty}\left|\hat{f}(\xi)\right|^2\d{\xi},\quad
+                    \int_{-\infty}^{\infty}f(x)\overline{g(x)}\d{x}
+                    =\int_{-\infty}^{\infty}\hat{f}(\xi)\overline{\hat{g}(\xi)}\d\xi;
+                    \qquad
+                    \left(\int_{-\infty}^{\infty}|f(x)|^2\d{x}\lt\infty,
+                    \ \int_{-\infty}^{\infty}|g(x)|^2\d{x}\lt\infty;\right)$
+                </p>
+            </div>
+            <!-- Discrete Fourier transform -->
+            <div class="cat">
+                <h3>
+                    Discrete Fourier Transform
+                </h3>
+                <p>
+                    Discrete Fourier transform and its inverse:&ensp;
+                    $\displaystyle X_k=\sum_{n=0}^{N-1}{x_n\exp\left(-2\pi ik\frac{n}{N}\right)},\quad
+                    x_n=\frac{1}{N}\sum_{k=0}^{N-1}{X_k\exp\left(2\pi in\frac{k}{N}\right)};$
+                </p>
+                <p>
+                    $\F\left(\left\{ax_n+by_n\right\}\right)_k=aX_k+bY_k,\quad
+                    \F\left(\left\{x_{-n}\right\}\right)_k=X_{-k},\quad
+                    \F\left(\left\{\overline{x_n}\right\}\right)_k=\overline{X_{-k}},\quad
+                    \F\left(\left\{x_{n-t}\right\}\right)_k=\e^{-2\pi it\frac{k}{N}}X_k,\quad
+                    \F\left(\left\{\e^{2\pi it\frac{n}{N}}x_{n}\right\}\right)_k=X_{k-t};\quad$
+                </p>
+                <p>
+                    $\displaystyle
+                    \F^{-1}\left(\left\{X_{k}Y_{k}\right\}\right)_n =\sum_{t=0}^{N-1}x_{t}\cdot y_{n-t},\quad
+                    \F\left(\left\{x_{n}y_{n}\right\}\right)_k =\frac{1}{N}\sum_{t=0}^{N-1}x_{t}\cdot y_{k-t};\quad$
+                </p>
+                <p>
+                    $\displaystyle
+                    \sum_{n=0}^{N-1}x_n\overline{y_n} =\frac{1}{N}\sum_{k=0}^{N-1}X_k\overline{Y_k},\quad
+                    \sum_{n=0}^{N-1}|x_n|^2 =\dfrac{1}{N}\sum_{k=0}^{N-1}|X_k|^2;\quad$
                 </p>
             </div>
 
             <div class="cat">
-                <div class="incomplete_mark"></div>
+                <div class="incomplete_mark">
+                    Cosine transform, sine transform;
+                    Multidimensional Fourier transform;
+                </div>
             </div>
             <br />
 
@@ -2439,6 +2538,9 @@
                     $a^3\pm b^3=(a\pm b)\left(a^2\mp ab+b^2\right), \quad
                     a^4-b^4=(a-b)\left(a^3+a^2b+ab^2+b^3\right), \quad
                     a^n-b^n=(a-b)\left(a^{n-1}+a^{n-2}b+a^{n-3}b^2+\cdots+a^2b^{n-3}+ab^{n-2}+b^{n-1}\right);$
+                </p>
+                <p>
+                    $\dfrac{1}{ab}=\dfrac{1}{b-a}\left(\dfrac{1}{a}-\dfrac{1}{b}\right)$;
                 </p>
             </div>
 
@@ -2524,6 +2626,7 @@
             for (var i = 0; i < marks.length; i++) {
                 marks[i].style.fontWeight = "800";
                 marks[i].style.color = 'red';
+                marks[i].setAttribute("title", "No guarantee for correctness");
             }
             marks = document.getElementsByTagName("brown");
             for (var i = 0; i < marks.length; i++) {

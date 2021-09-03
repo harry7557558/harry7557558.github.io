@@ -116,6 +116,7 @@
         $\newcommand{\E}{\operatorname{E}}$
         $\newcommand{\P}{\operatorname{P}}$
         $\newcommand{\Var}{\operatorname{Var}}$
+        $\newcommand{\F}{\mathcal{F}}$
 
         $\newcommand{\N}{\unicode{0x2115}}$
         $\newcommand{\Z}{\unicode{0x2124}}$
@@ -308,12 +309,12 @@
             if (event.inputType == 'insertText') {
                 var c = tex.value[pos - 1];
                 // type '{'
-                if (event.data == '{' && c == "{") {
+                if (event.data == '{' && c == "{" && tex.value[pos - 2] != '\\') {
                     if (tex.value[pos] == '{') {
                         tex.value = tex.value.erase(pos, 1);
                         moveCursorTo(tex, pos);
                     }
-                    else if (tex.value[pos - 2] != '\\') {
+                    else {
                         tex.value = tex.value.insert(pos, '}');
                         const words = ["dfrac", "frac", "dbinom", "binom"];
                         for (var i = 0; i < words.length; i++) {
@@ -353,6 +354,11 @@
                     && tex.value.substring(pos - 6, pos - 1) == "\\left") {
                     tex.value = tex.value.insert(pos, "\\right" +
                         (c == '(' ? ')' : c == '[' ? ']' : c == '|' ? '|' : c == '<' ? '>' : ''));
+                    moveCursorTo(tex, pos);
+                }
+                // \left\{
+                else if (tex.value.substring(pos - 7, pos) == "\\left\\{") {
+                    tex.value = tex.value.insert(pos, "\\right\\}");
                     moveCursorTo(tex, pos);
                 }
             }
