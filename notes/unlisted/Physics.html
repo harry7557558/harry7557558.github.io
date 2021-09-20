@@ -1,0 +1,397 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Equations in Physics</title>
+    <meta name="description"
+        content="I found my math formula sheet to be pretty helpful, so I created one for physics." />
+    <meta name="keywords" content="harry7557558, physics, formula, note" />
+    <meta name="author" content="Harry Chen" />
+    <meta name="robots" content="index, follow" />
+    <script>
+        // use the faster 'compiled' version
+        if (window.location.protocol.match('http')) {
+            // window.location = "https://harry7557558.github.io/notes/physics.html";
+        }
+    </script>
+
+    <!-- MathJax -->
+    <script id="mathjax-config-script" type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [["$", "$"]],
+                preview: "none"
+            },
+            "fast-preview": { disabled: true },
+            AssistiveMML: { disabled: true },
+            menuSettings: { inTabOrder: false },
+            messageStyle: "simple",
+            positionToHash: false,
+            TeX: { noErrors: { disabled: true } }
+        });
+    </script>
+    <script type="text/javascript" id="MathJax_src" async=""
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+        document.getElementById("MathJax_src").onerror = function () {
+            alert("Failed to load MathJax \nCannot render LaTeX equations");
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: rgb(82, 86, 89);
+            padding: 20px 0px 60px 0px;
+        }
+
+        .article {
+            width: 1280px;
+            text-align: center;
+            margin: 0 auto;
+            padding: 0px;
+        }
+
+        .page {
+            font-family: 'Times New Roman';
+            font-style: normal;
+            margin: 12px 0px;
+            background-color: white;
+            text-align: left;
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.6);
+            padding: 80px 100px 160px 100px;
+            white-space: nowrap;
+        }
+
+        h1 {
+            font-size: 32px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin: 10px 0px;
+        }
+
+        h3 {
+            font-size: 19px;
+            margin: 10px 0px;
+        }
+
+        .cat {
+            margin: 2em 0em;
+        }
+
+        .cat p {
+            font-size: 15px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 6px 10px;
+        }
+
+
+        .graphfun {
+            position: relative;
+            display: inline-block;
+        }
+
+        .graphfun-canvas {
+            border: 1px solid #555;
+            /*cursor: crosshair;*/
+        }
+
+        .graphfun>span {
+            background-color: white;
+            position: absolute;
+            right: 0;
+            top: 0;
+            margin: 6px 10px;
+            font-size: 14px;
+        }
+
+        ::selection {
+            background: rgb(153, 193, 218);
+        }
+    </style>
+
+</head>
+
+<body>
+    <script>
+        // set this to non-empty when editing for faster loading
+        // pages without keyword will not be loaded
+        var enable = "";  // case sensitive
+    </script>
+    <div id="click2edit"
+        style="position:fixed;top:0px;left:0px;width:10px;height:10px;background-color:red;display:none;"
+        onclick="document.body.contentEditable = document.body.contentEditable!='true';"></div>
+
+    <!-- LaTeX Macros -->
+    <div style="display:none">
+        $\newcommand{\d} {\mathrm{d}}$
+        $\newcommand{\e}{\operatorname{e}}$
+        $\newcommand{\csch}{\operatorname{csch}}$
+        $\newcommand{\sech}{\operatorname{sech}}$
+        $\newcommand{\erf}{\operatorname{erf}}$
+        $\newcommand{\sgn}{\operatorname{sgn}}$
+        $\newcommand{\arccot}{\operatorname{arccot}}$
+        $\newcommand{\E}{\operatorname{E}}$
+        $\newcommand{\P}{\operatorname{P}}$
+        $\newcommand{\var}{\operatorname{var}}$
+        $\newcommand{\F}{\mathcal{F}}$
+
+        $\newcommand{\N}{\unicode{0x2115}}$
+        $\newcommand{\Z}{\unicode{0x2124}}$
+        $\newcommand{\Q}{\unicode{0x211A}}$
+        $\newcommand{\R}{\unicode{0x211D}}$
+        $\newcommand{\C}{\unicode{0x2102}}$
+        $\newcommand{\H}{\unicode{0x210D}}$
+    </div>
+
+    <span style="color:#555;width:100%;display:inline-block;text-align:center;">
+        No guarantee for correctness, use at own risk.
+    </span>
+
+
+    <div class="article" id="main">
+
+
+        <div class="page">
+            <h1>Dynamics</h1>
+            <div class="cat">
+                <h3>Kinematics of a point mass</h3>
+                <p>
+                    $\displaystyle
+                    \vec{v}=\frac{\partial\vec{d}}{\partial t},\quad
+                    \vec{a}=\frac{\partial\vec{v}}{\partial t}=\frac{\partial^2\vec{d}}{\partial t^2},\quad
+                    \vec{d}=\int{\vec{v}\cdot\d{t}},\quad
+                    \vec{v}=\int{\vec{a}\cdot\d{t}};\quad$
+                </p>
+                <p>
+                    Polar coordinate $\begin{cases}r=r(t)\\\theta=\theta(t)\end{cases}$:&ensp;
+                    $\dfrac{\partial\vec{e_r}}{\partial t}=\dot{\theta}\vec{e_\theta},\quad
+                    \dfrac{\partial\vec{e_\theta}}{\partial t}=-\dot{\theta}\vec{e_r};\quad$
+                    $\vec{d}=r\vec{e_r},\quad
+                    \vec{v}=\dot{r}\vec{e_r}+r\dot{\theta}\vec{e_\theta},\quad
+                    \vec{a}=\left(\ddot{r}-r\dot{\theta}^2\right)\vec{e_r}+\left(2\dot{r}\dot{\theta}+r\ddot{\theta}\right)\vec{e_\theta};\quad$
+                    <br />
+                    Eigen coordinate:&ensp;
+                    $\vec{v}=v\vec{e_t},\quad
+                    \vec{a}=\dfrac{\partial v}{\partial t}\vec{e_t}+\dfrac{v^2}{R}\vec{e_n};\quad$
+                    where $R$ is the curvature radius;
+                </p>
+                <p>
+                    Motion related to a uniformly accelerating reference frame:&ensp;
+                    $\vec{v}=\vec{v_r}+\dot{\vec{r_0}},\quad
+                    \vec{a}=\vec{a_r}+\ddot{\vec{r_0}}=\vec{a_r}+\vec{a_0};\quad$
+                    <br />&emsp;&emsp;
+                    where $\vec{v_r}$ and $\vec{a_r}$ are relative motion and acceleration,
+                    $\vec{v_0}$ and $\vec{a_0}$ are the velocity and acceleration of the reference frame;
+                </p>
+                <p>
+                    <red>*</red>
+                    Motion related to a uniformly rotating reference frame:&ensp;
+                    $\vec{v}=\vec{v_r}+\vec{\omega}\times\vec{r},\quad
+                    \vec{a}=\vec{a_r}+\vec{\omega}\times\left(\vec{\omega}\times\vec{r}\right)+2\vec{\omega}\times\vec{v_r};$
+                </p>
+                <p>
+                    Centrifugal acceleration:&ensp;
+                    $a=\dfrac{v^2}{r}=w^2r=4\pi^2rf^2=\dfrac{4\pi^2r}{T^2};$
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Motion with constant acceleration</h3>
+                <p>
+                    $\vec{v_1}=\vec{v_0}+\vec{a}\Delta t,\quad
+                    \Delta\vec{d}=\left(\dfrac{\vec{v_0}+\vec{v_1}}{2}\right)\Delta t,\quad
+                    \Delta\vec{d}=\vec{v_0}\Delta t+\dfrac{1}{2}\vec{a}\Delta t^2
+                    =\vec{v_1}\Delta t-\dfrac{1}{2}\vec{a}\Delta t^2,\quad
+                    v_1^2=v_0^2+2\vec{a}\cdot\vec{d};\quad$
+                </p>
+                <p>
+                    Projectile motion in 2D:&ensp;
+                    $\displaystyle
+                    \vec{d}(t)=\left(v_0\cos(\theta)t,\ v_0\sin(\theta)t-\frac{1}{2}gt^2\right),\quad
+                    t_1=\frac{2v_0\sin(\theta)}{g},\quad
+                    \vec{d_1}=\left(\frac{v_0^2\sin(2\theta)}{g},0\right),\quad
+                    \vec{d_{1/2}}=\left(\frac{v_0^2\sin(\theta)\cos(\theta)}{g},\frac{v_{0}^{2}\sin(\theta)^2}{2g}\right);\quad$
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Rigid body</h3>
+            </div>
+            <div class="cat">
+                <h3>Fluid</h3>
+            </div>
+        </div>
+
+
+        <div class="page">
+            <h1>Momentum and Energy</h1>
+            <div class="cat">
+                <h3>Forces</h3>
+                <p>
+                    Gravitational force:&ensp;
+                    $F=G\dfrac{Mm}{r^2},\quad
+                    \vec{F}=-G\dfrac{Mm}{r^2}\vec{e_r}=-G\dfrac{Mm\vec{r}}{|\vec{r}|^3};\quad$
+                    where $G\approx6.674\times10^{-11}\ m^3kg^{-1}s^{-2}$;
+                    <br />
+                    Gravitational potential energy:&ensp;
+                    $E=-G\dfrac{Mm}{r};\quad$
+                    Close to earth’s surface:&ensp;
+                    $E=mgh,\quad F=mg;$
+                </p>
+                <p>
+                    Hooke’s law for springs:&ensp;
+                    $\vec{F}=-k\Delta\vec{x},\quad
+                    E=\dfrac{1}{2}(\Delta\vec{x})^2;$
+                </p>
+                <p>
+                    Inertial force in uniformly accelerating reference frame:&ensp;
+                    $\vec{F}=-m\vec{a_0};$
+                    <br />
+                    Inertial force in uniformly rotating reference frame:&ensp;
+                    centrifugal force $\vec{F}=m\omega^2r\cdot\vec{e_r}$,&ensp;
+                    Coriolis force $\vec{F}=2m\cdot\vec{v}_{relative}\times\vec{\omega}$;
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Momentum</h3>
+                <p>
+                    $\vec{p}=m\vec{v},\quad
+                    \Delta\vec{p}=\vec{F}\Delta t;$
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Work and kinetic energy</h3>
+                <p>
+                    $W=\vec{F}\cdot\Delta\vec{d},\quad
+                    E_k=\dfrac{1}{2}mv^2,\quad
+                    W=\Delta E_k=\dfrac{1}{2}mv_1^2-\dfrac{1}{2}mv_0^2;\quad
+                    P=\dfrac{W}{t}=\dfrac{\Delta E}{\Delta t};$
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Collision</h3>
+                <p>
+                    Elastic collision:&ensp; $\displaystyle
+                    \sum_i{m_i\vec{u_i}}=\sum_i{m_i\vec{v_i}},\quad
+                    \sum_i{\dfrac{1}{2}m_iu_i^2}=\sum_i{\dfrac{1}{2}m_iv_i^2};\quad$
+                </p>
+                <p>
+                    Elastic collision in one dimension:&ensp;
+                    $\vec{v_1}=\dfrac{(m_1-m_2)\vec{u_1}+2m_2\vec{u_2}}{m_1+m_2},\quad
+                    \vec{v_2}=\dfrac{(m_2-m_1)\vec{u_2}+2m_1\vec{u_1}}{m_1+m_2};\quad$
+                    &emsp;&emsp;When $m_1=m_2$:&ensp;
+                    $\vec{v_1}=\vec{u_2},\ \vec{v_2}=\vec{u_1};$
+                </p>
+                <p>
+                    Elastic non-central collision:&ensp;
+                    $m_1\vec{v_1}=m_1\vec{u_1}+\Delta{p}\cdot\mathbf{n},\quad
+                    m_2\vec{v_2}=m_2\vec{u_2}-\Delta{p}\cdot\mathbf{n},\quad
+                    \Delta{p}=\dfrac{2m_1m_2\left(\vec{u_2}-\vec{u_1}\right)\cdot\mathbf{n}}{m_1+m_2};$
+                    &emsp;&emsp;
+                    where $\mathbf{n}$ is the unit normal (direction of force);
+                </p>
+            </div>
+        </div>
+
+
+        <div class="page">
+            <h1>Electromagnetism</h1>
+        </div>
+
+
+        <div class="page">
+            <h1>Thermodynamics</h1>
+        </div>
+
+
+        <div class="page">
+            <h1>Wave and Light</h1>
+        </div>
+
+
+        <div class="page">
+            <h1>Modern Physics</h1>
+        </div>
+
+    </div>
+
+    <!-- For Easier Editing -->
+    <script>
+
+        var P = document.getElementsByClassName("page");
+        var H;
+        if (enable != "") {
+            document.getElementById("click2edit").style.display = "block";
+            var inc = 0;
+            for (var i = 0; i < P.length; i++) {
+                inc = 0;
+                var fh = function () {
+                    for (var j = 0; j < H.length; j++) {
+                        if (H[j].innerText.match(enable)) {
+                            inc = 1;
+                            break;
+                        }
+                    }
+                }
+                H = P[i].getElementsByTagName("h1"); fh();
+                H = P[i].getElementsByTagName("h2"); fh();
+                H = P[i].getElementsByTagName("h3"); fh();
+                H = P[i].getElementsByTagName("h4"); fh();
+                H = P[i].getElementsByTagName("h5"); fh();
+                H = P[i].getElementsByTagName("h6"); fh();
+
+                if (inc == 0) {
+                    P[i].innerHTML = "";
+                    P[i].style.display = "none";
+                }
+            }
+
+            var style = document.createElement('style');
+            style.innerHTML = ".math{background-color:#ffcb000f;}";
+            style.innerHTML += ".MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus { outline-width:1px; outline-style:auto; outline-color:#ffae54; }";
+            document.head.appendChild(style);
+        }
+        RenderIncompleteMarks();
+
+        function RenderIncompleteMarks() {
+            var marks = document.getElementsByClassName("incomplete_mark");
+            for (var i = 0; i < marks.length; i++) {
+                var fix = marks[i];
+                fix.style.width = "200px";
+                fix.style.padding = "10px";
+                fix.style.border = "6px solid SaddleBrown";
+                fix.style.backgroundColor = "BurlyWood";
+                fix.style.textAlign = "center";
+                fix.style.fontFamily = "Consolas";
+                fix.style.display = "inline-block";
+                fix.innerHTML = "<strong>Incomplete Mark<strong/>";
+            }
+            marks = document.getElementsByTagName("red");
+            for (var i = 0; i < marks.length; i++) {
+                marks[i].style.fontWeight = "800";
+                marks[i].style.color = 'red';
+                marks[i].setAttribute("title", "No guarantee for correctness");
+            }
+            marks = document.getElementsByTagName("brown");
+            for (var i = 0; i < marks.length; i++) {
+                marks[i].style.fontWeight = "800";
+                marks[i].style.color = 'brown';
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

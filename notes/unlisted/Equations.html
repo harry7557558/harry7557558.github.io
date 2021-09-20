@@ -63,21 +63,21 @@
             white-space: nowrap;
         }
 
-        .page>h1 {
+        h1 {
             font-size: 32px;
         }
 
-        .page>h2 {
+        h2 {
             font-size: 24px;
             margin: 10px 0px;
         }
 
-        .page>h3 {
-            font-size: 20px;
+        h3 {
+            font-size: 19px;
             margin: 10px 0px;
         }
 
-        .page>.cat {
+        .cat {
             margin: 2em 0em;
         }
 
@@ -102,7 +102,7 @@
             display: inline-block;
         }
 
-        .graphfun>.graphfun-canvas {
+        .graphfun-canvas {
             border: 1px solid #555;
             /*cursor: crosshair;*/
         }
@@ -1376,7 +1376,7 @@
                     $\Beta(x+1,y+1)=\dfrac{xy}{(x+y)(x+y+1)}\Beta(x,y)$,&ensp;
                     $\Beta(x+1,y)=\dfrac{x}{x+y}\Beta(x,y)$;&emsp;
                     $\Gamma(x)\Gamma(1-x)=\dfrac{\pi}{\sin(\pi x)}$,&ensp;
-                    $\Gamma(2x)=\dfrac{2^{2p-1}}{\sqrt{\pi}}\Gamma\left(p\right)\Gamma\left(p+\dfrac{1}{2}\right)$;
+                    $\Gamma(2x)=\dfrac{2^{2x-1}}{\sqrt{\pi}}\Gamma\left(x\right)\Gamma\left(x+\dfrac{1}{2}\right)$;
                     &emsp;
                 </p>
                 <p>
@@ -1393,7 +1393,7 @@
             <br /><br />
         </div>
 
-        <!-- Multivariable Calculus -->
+        <!-- Multivariable Calculus and Differential Equations -->
         <div class="page">
             <h1>Multivariable Derivative</h1>
             <!-- Jacobian -->
@@ -1511,10 +1511,8 @@
                 </p>
                 <div class="incomplete_mark"></div>
             </div>
-        </div>
+            <div><br /></div>
 
-        <!-- Differential Equations -->
-        <div class="page">
             <h1>Differential equations</h1>
             <!-- First order differential equations -->
             <div class="cat">
@@ -1877,17 +1875,8 @@
                 </div>
                 <div class="cat">
                     <p>
-                        Distance from $P_1(x_1,y_1)$ to $P_2(x_2,y_2)$: &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}$;
-                        &emsp; <br />
-                    </p>
-                    <p>
-                        Distance from $P_1(x_1,y_1,z_1)$ to $P_2(x_2,y_2,z_2)$:
-                        &ensp;$|P_1P_2|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}$; &emsp;
-                    </p>
-                    <p>
                         Distance from point $(x_0,y_0)$ to line $Ax+By+C=0$:
                         &ensp;$d=\dfrac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}$; &emsp;
-                        <!--(Distance between two parallel lines: Distance from any point on a line to the other line. )-->
                     </p>
                     <p>
                         Distance from point $(x_0,y_0,z_0)$ to plane $Ax+By+Cz+D=0$:
@@ -1898,7 +1887,6 @@
                     </p>
                 </div>
             </div>
-            <br />
             <!-- Equation of Planar Lines -->
             <div class="cat">
                 <h3>Equations of Planar Straight Line</h3>
@@ -1946,23 +1934,16 @@
                     <tr style="height:auto;">
                         <td colspan="4">
                             <p>
-                                <i>m</i> is slope and <i>a</i>, <i>b</i> are <i>x</i> and <i>y</i> intercepts.
+                                <i>m</i> is the slope and <i>a</i>, <i>b</i> are <i>x</i> and <i>y</i> intercepts.
+                            </p>
+                            <p>
+                                $l_1 \parallel l_2 \iff m_1=m_2 $, &ensp;
+                                $l_1=l_2 \iff m_1=m_2 \land b_1=b_2 $; &emsp;
+                                $l_1 \perp l_2 \iff m_1m_2=-1 $; &emsp;
                             </p>
                         </td>
                     </tr>
                 </table>
-                <p>
-                    $l_1 \parallel l_2 \iff m_1=m_2 $, &ensp;
-                    $l_1=l_2 \iff m_1=m_2 \land b_1=b_2 $; &emsp;
-                    $l_1 \perp l_2 \iff m_1m_2=-1 $; &emsp;
-                </p>
-                <p>
-                    Points of intersection between $A_1x+B_1y+C_1=0$ and $A_2x+B_2y+C_2=0$: &ensp;
-                    Solve $\displaystyle\left\{ {\begin{array}{l} A_1x+B_1y+C_1=0 \\ A_2x+B_2y+C_2=0
-                    \end{array}}\right.$, &ensp;
-                    $\det=0$ means parallel;
-                </p>
-                <br />
             </div>
             <!-- Equation of Circle -->
             <div class="cat">
@@ -1986,25 +1967,13 @@
                         <td>2)</td>
                         <td>General</td>
                         <td>$x^2+y^2+Dx+Ey+F=0$ <br /> $\scriptsize{(D^2+E^2-4F>0)}$</td>
-                        <td>$C=(-\dfrac{D}{2},-\dfrac{E}{2})$, &ensp;$r=\dfrac{1}{2}\sqrt{D^2+E^2-4F}$</td>
+                        <td>$C=\left(-\dfrac{D}{2},-\dfrac{E}{2}\right)$, &ensp;$r=\dfrac{1}{2}\sqrt{D^2+E^2-4F}$</td>
                     </tr>
                 </table>
                 <p>
-                    Equation #2 is very convenient to determine the equation of a circle through 3 given points.
-                    (Since just need to solve systems of linear equations. )
+                    Equation 2) is convenient in determining the equation of a circle through 3 given points.
+                    (Solve systems of linear equations. )
                 </p>
-                <p>
-                    Points of intersection between $Ax+By+C=0$ and $(x-a)^2+(y-b)^2=r^2$: &ensp;
-                    $\left(\dfrac{\pm{B\sqrt{\Delta}}+aB^2-bAB-AC}{A^2+B^2}, \>
-                    \dfrac{\mp{A\sqrt{\Delta}}+bA^2-aAB-BC}{A^2+B^2}\right)$, &ensp;
-                    <br />&emsp; &emsp; which $\Delta=r^2(A^2+B^2)-(aA+bB+C)^2$, &ensp;
-                    $\Delta>0 \iff \frac{|Aa+Bb+C|}{\sqrt{A^2+B^2}}>r$; &ensp;
-                </p>
-                <!--<p>
-                    Points of intersection between circles:
-                    simultaneous equations and solve. &ensp; (This also work for intersections problems between other objects)
-                </p>-->
-                <br />
             </div>
             <!-- Quadratic Curves -->
             <div class="cat">
@@ -2026,13 +1995,6 @@
                     &emsp;&emsp; $y=ax^2$: &emsp;$F=\dfrac{1}{4a}$, &ensp;$\text{directrix: } y=-\dfrac{1}{4a}$;
                     &ensp;
                 </p>
-                <p>
-                    Ellipse: &ensp;also
-                    &ensp;$\rho(\theta)=\dfrac{ab}{\displaystyle\sqrt{(b\cos\theta)^2+(a\sin\theta)^2}}$
-                    or &ensp;$\equd{x=a\cdot\cos{t}}{y=b\cdot\sin{t}} \, 0 \leq t \leq 2\pi$; &emsp;
-                    and $\equd{x=a\cdot\sec{t}}{y=b\cdot\tan{t}}$ is hyperbola; &ensp;
-                </p>
-                <br />
             </div>
 
             <!-- Equation of Plane -->
@@ -2064,9 +2026,7 @@
                         <td>Three points $P_i(x_i,y_i,z_i)$ <br />$\scriptsize{(i=\{1,2,3\})}$</td>
                         <td>
                             $\vmat{x-x_1&y-y_1&z-z_1\\x_2-x_1&y_2-y_1&z_2-z_1\\x_3-x_1&y_3-y_1&z_3-z_1}=0$</td>
-                        <td>
-                            <div class="incomplete_mark"></div>
-                        </td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>3)</td>
@@ -2074,20 +2034,23 @@
                         <td>$\dfrac{x}{a}+\dfrac{y}{b}+\dfrac{z}{c}=1$</td>
                         <td></td>
                     </tr>
+                    <tr style="height:auto;">
+                        <td colspan="4">
+                            <p>
+                                $A=0$: &ensp;parallel to <i>x</i>-axis; &ensp;
+                                $A=B=0$: &ensp;parallel to $xOy$ plane; &ensp;
+                                $D=0$: &ensp;through Origin; &ensp;
+                            </p>
+                            <p>
+                                $\pi_1\perp\pi_2 \iff A_1A_2+B_1B_2+C_1C_2=0$, &ensp;
+                                $\pi_1\parallel\pi_2 \iff \dfrac{A_1}{A_2}=\dfrac{B_1}{B_2}=\dfrac{C_1}{C_2}$; &emsp;
+                                $\displaystyle\left\lt \pi_1,\pi_2\right>
+                                =\cos^{-1}\dfrac{|A_1A_2+B_1B_2+C_1C_2|}{\sqrt{A_1^2+B_1^2+C_1^2}\cdot\sqrt{A_2^2+B_2^2+C_2^2}}$;
+                                &emsp;
+                            </p>
+                        </td>
+                    </tr>
                 </table>
-                <p>
-                    $A=0$: &ensp;parallel to <i>x</i>-axis; &ensp;
-                    $A=B=0$: &ensp;parallel to $xOy$ plane; &ensp;
-                    $D=0$: &ensp;through Origin; &ensp;
-                </p>
-                <p>
-                    $\pi_1\perp\pi_2 \iff A_1A_2+B_1B_2+C_1C_2=0$, &ensp;
-                    $\pi_1\parallel\pi_2 \iff \dfrac{A_1}{A_2}=\dfrac{B_1}{B_2}=\dfrac{C_1}{C_2}$; &emsp;
-                    $\displaystyle\left\lt \pi_1,\pi_2\right>
-                    =\cos^{-1}\dfrac{|A_1A_2+B_1B_2+C_1C_2|}{\sqrt{A_1^2+B_1^2+C_1^2}\cdot\sqrt{A_2^2+B_2^2+C_2^2}}$;
-                    &emsp;
-                </p>
-                <br />
             </div>
             <!-- Equation of Spatial Line -->
             <div class="cat">
@@ -2151,12 +2114,12 @@
                 </p>
                 <p>
                     Sheaf of Planes: &ensp;
-                    Suppose the equation of straight line $l$ is
+                    Let the equation of straight line $l$ be
                     $\equd{A_1x+B_1y+C_1z+D_1=0\qquad(1)}{A_2x+B_2y+C_2z+D_2=0\qquad(2)}$, <br />
                 </p>
                 <p>
-                    &emsp;&emsp; then all planes through $l$ is given by:
-                    &ensp;$A_1x+B_1y+C_1z+D_1+\lambda\left(A_2x+B_2y+C_2z+D_2\right)=0$, &ensp;
+                    &emsp;&emsp; the equation of all planes through $l$ is given by:
+                    &ensp;$\left(A_1x+B_1y+C_1z+D_1\right)+\lambda\left(A_2x+B_2y+C_2z+D_2\right)=0$, &ensp;
                     except #2 &ensp;$(\lambda\rightarrow\infty)$; &emsp;
                 </p>
                 <br />
@@ -2327,9 +2290,38 @@
 
         <!-- Miscellaneous -->
         <div class="page">
-            <!-- Sequence and Series -->
-            <h3>Sequence and Series</h3>
+
+            <!-- Algebra -->
             <div class="cat">
+                <h3>Miscellaneous Algebra</h3>
+                <p>
+                    $a^3\pm b^3=(a\pm b)\left(a^2\mp ab+b^2\right), \quad
+                    a^4-b^4=(a-b)\left(a^3+a^2b+ab^2+b^3\right), \quad
+                    a^n-b^n=(a-b)\left(a^{n-1}+a^{n-2}b+a^{n-3}b^2+\cdots+a^2b^{n-3}+ab^{n-2}+b^{n-1}\right);$
+                </p>
+                <p>
+                    $\displaystyle
+                    \frac{1}{ab}=\frac{1}{b-a}\left(\frac{1}{a}-\frac{1}{b}\right);\quad
+                    \frac{1}{\frac{1}{x}+\frac{1}{y}}=\frac{xy}{x+y},\quad
+                    \frac{1}{\frac{1}{x}+\frac{1}{y}+\frac{1}{z}}=\frac{xyz}{xy+xz+yz};\quad$
+                </p>
+                <p>
+                    Solutions of $ax^2+bx+c=0$:&ensp;
+                    $x=\dfrac{\pm\sqrt{b^2-4ac}-b}{2a}$;&emsp;
+                    Solutions of $ax^2+2bx+c=0$:&ensp;
+                    $x=\dfrac{\pm\sqrt{b^2-ac}-b}{a}$;
+                </p>
+                <p>
+                    Vertex of $ax^2+bx+c$:&ensp;
+                    $\left(-\dfrac{b}{2a},\dfrac{4ac-b^{2}}{4a}\right);\quad$
+                    Inflection point of $ax^3+bx^2+cx+d$:&ensp;
+                    $\left(-\dfrac{b}{3a},\dfrac{27a^{2}d-9abc+2b^{3}}{27a^{2}}\right);\quad$
+                </p>
+            </div>
+
+            <!-- Sequence and Series -->
+            <div class="cat">
+                <h3>Sequence and Series</h3>
                 <p>
                     Arithmetic Sequence: &ensp;
                     $a_n=a_1+d(n-1)$, &ensp;$n=\dfrac{a_n-a_1}{d}+1$, &ensp;$d=\dfrac{a_n-a_1}{n-1}$; &ensp;
@@ -2372,10 +2364,9 @@
                     (x-1)^n=\displaystyle\sum_{k=0}^n{\binom{n}{k}(-1)^{n-k}x^{k}};$
                 </p>
             </div>
-            <br />
 
-            <h3>Taylor and Maclaurin Series</h3>
             <div class="cat">
+                <h3>Taylor and Maclaurin Series</h3>
                 <p>
                     $\displaystyle\frac{1}{1-x}=\sum_{k=0}^{\infty}x^{k}=1+x+x^{2}+x^{3}+\cdots, \quad$
                     $\displaystyle\frac{1}{1+x}=\sum_{k=0}^{\infty}\left(-1\right)^{k}x^{k}=1-x+x^{2}-x^{3}+\cdots,\quad$
@@ -2531,33 +2522,12 @@
             </div>
             <br />
 
-            <!-- Algebra -->
-            <div class="cat">
-                <h3>Miscellaneous Algebra</h3>
-                <p>
-                    $a^3\pm b^3=(a\pm b)\left(a^2\mp ab+b^2\right), \quad
-                    a^4-b^4=(a-b)\left(a^3+a^2b+ab^2+b^3\right), \quad
-                    a^n-b^n=(a-b)\left(a^{n-1}+a^{n-2}b+a^{n-3}b^2+\cdots+a^2b^{n-3}+ab^{n-2}+b^{n-1}\right);$
-                </p>
-                <p>
-                    $\dfrac{1}{ab}=\dfrac{1}{b-a}\left(\dfrac{1}{a}-\dfrac{1}{b}\right)$;
-                </p>
-            </div>
-
-            <div class="cat">
-                <div class="incomplete_mark"></div>
-            </div>
-            <br />
-
         </div>
-        <hr />
+
     </div>
 
     <!-- For Easier Editing -->
     <script>
-
-        const stcn = "_Subtitle_ClassName_Mark";
-        SetClassnamesForSubtitles();
 
         var P = document.getElementsByClassName("page");
         var H;
@@ -2594,21 +2564,6 @@
         }
         RenderIncompleteMarks();
 
-
-        function SetClassnamesForSubtitles() {
-            var tt = document.getElementsByTagName("h1");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-            tt = document.getElementsByTagName("h2");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-            tt = document.getElementsByTagName("h3");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-            tt = document.getElementsByTagName("h4");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-            tt = document.getElementsByTagName("h5");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-            tt = document.getElementsByTagName("h6");
-            for (var i = 0; i < tt.length; i++) tt[i].className = stcn;
-        }
         function RenderIncompleteMarks() {
             var marks = document.getElementsByClassName("incomplete_mark");
             for (var i = 0; i < marks.length; i++) {
@@ -2776,17 +2731,18 @@
 
         if (0) {
             // clear latex to debug function grapher
-            var cats = document.getElementsByClassName('cat');
-            for (var i = 0; i < cats.length; i++) {
-                var cat = cats[i];
-                if (cat.getElementsByClassName('graphfun-canvas').length == 0) {
-                    //cat.remove();
-                    //cat.style.display = 'none';
-                }
+            var pages = document.getElementsByClassName('page');
+            for (var i = 0; i < pages.length; i++) {
+                if (pages[i].getElementsByClassName('graphfun-canvas').length == 0)
+                    pages[i].remove(), i--;
             }
             var ps = document.getElementsByTagName('p');
             for (var i = 0; i < ps.length; i++) {
-                ps[i].style.display = 'none';
+                ps[i].innerHTML = "";
+            }
+            var tables = document.getElementsByTagName('table');
+            for (var i = 0; i < tables.length; i++) {
+                tables[i].innerHTML = "";
             }
         }
 
