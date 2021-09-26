@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -128,7 +128,7 @@
     <script>
         // set this to non-empty when editing for faster loading
         // pages without keyword will not be loaded
-        var enable = "";  // case sensitive
+        var enable = "Wave";  // case sensitive
     </script>
     <div id="click2edit"
         style="position:fixed;top:0px;left:0px;width:10px;height:10px;background-color:red;display:none;"
@@ -164,6 +164,7 @@
     <div class="article" id="main">
 
 
+        <!-- Dynamics -->
         <div class="page">
             <h1>Dynamics</h1>
             <div class="cat">
@@ -234,6 +235,7 @@
         </div>
 
 
+        <!-- Momentum and Energy -->
         <div class="page">
             <h1>Momentum and Energy</h1>
             <div class="cat">
@@ -295,31 +297,103 @@
                 </p>
                 <p>
                     Elastic non-central collision:&ensp;
-                    $m_1\vec{v_1}=m_1\vec{u_1}+\Delta{p}\cdot\mathbf{n},\quad
-                    m_2\vec{v_2}=m_2\vec{u_2}-\Delta{p}\cdot\mathbf{n},\quad
-                    \Delta{p}=\dfrac{2m_1m_2\left(\vec{u_2}-\vec{u_1}\right)\cdot\mathbf{n}}{m_1+m_2};$
+                    $m_1\vec{v_1}=m_1\vec{u_1}+\Delta{p}\cdot\mathbf{\vec{n}},\quad
+                    m_2\vec{v_2}=m_2\vec{u_2}-\Delta{p}\cdot\mathbf{\vec{n}},\quad
+                    \Delta{p}=\dfrac{2m_1m_2\left(\vec{u_2}-\vec{u_1}\right)\cdot\mathbf{\vec{n}}}{m_1+m_2};$
                     &emsp;&emsp;
-                    where $\mathbf{n}$ is the unit normal (direction of force);
+                    where $\mathbf{\vec{n}}$ is the unit normal (direction of force);
                 </p>
             </div>
         </div>
 
 
+        <!-- Electromagnetism -->
         <div class="page">
             <h1>Electromagnetism</h1>
         </div>
 
 
+        <!-- Thermodynamics -->
         <div class="page">
             <h1>Thermodynamics</h1>
         </div>
 
 
+        <!-- Wave and Light -->
         <div class="page">
             <h1>Wave and Light</h1>
+            <div class="cat">
+                <h3>Geometrical optics</h3>
+                <p>
+                    Fermat’s principle:
+                    the path taken by a ray between two given points is the path that takes the least time.
+                </p>
+                <p>
+                    Reflection:&ensp;
+                    $\theta_r=\theta_i,\quad
+                    \vec{r_r}=\vec{r_i}-\left(2\vec{r_i}\cdot\mathbf{\vec{n}}\right)\mathbf{\vec{n}};\quad$
+                    &emsp;where $\mathbf{\vec{n}}$ is the unit normal of reflection;
+                </p>
+                <p>
+                    Refraction (Snell’s law):&ensp;
+                    $n_1\sin\theta_1=n_2\sin\theta_2;\quad$
+                    <red>*</red>
+                    $\vec{r_r}=\eta\cdot\vec{r_i}-\left(\sqrt{k}+\eta\vec{r_i}\cdot\mathbf{\vec{n}}\right)\mathbf{\vec{n}},\;\;
+                    k=1-\eta^2\left(1-\left(\vec{r_i}\cdot\mathbf{\vec{n}}\right)^2\right),\;\;
+                    \eta=\dfrac{n_i}{n_r};\quad$
+                    <br />&emsp;&emsp;
+                    where $n=\dfrac{c}{v}$ is the index of refraction,
+                    $\vec{r_i}$ and $\vec{r_r}$ are unit vectors,
+                    $\mathbf{\vec{n}}$ is the unit normal with $\vec{r_i}\cdot\mathbf{\vec{n}}\le0$;
+                    &emsp;
+                    A negative $k=\cos^2\left(\theta_r\right)$ indicates a total internal reflection;
+                </p>
+                <p>
+                    Equations of ideal mirrors and lenses:&ensp;
+                    $\dfrac{1}{f}=\dfrac{1}{d_i}+\dfrac{1}{d_o},\quad
+                    \dfrac{-h_i}{h_o}=\dfrac{d_i}{d_o}=-m;\quad$ &emsp;
+                    $\left(d_i,h_i\right) = \dfrac{f}{d_o-f}\left(d_o,-h_o\right);\quad$
+                    <br />
+                    &emsp;&emsp;•&emsp;For mirrors: $f$ is positive for concave mirrors,
+                    a negative $d_i$ means behind the mirror;
+                    <br />
+                    &emsp;&emsp;•&emsp;For lenses: $f$ is positive for converging lenses,
+                    a negative $d_i$ means on the same side of the lens;
+                </p>
+            </div>
+            <div class="cat">
+                <h3>Wave basics</h3>
+                <p>
+                    $f=\dfrac{1}{T},\;T=\dfrac{1}{f};\quad v=\dfrac{\lambda}{T}=f\lambda;\quad$
+                    &emsp;
+                    $\omega=\dfrac{2\pi}{T}=\dfrac{2\pi v}{\lambda},\;
+                    k=\dfrac{2\pi}{\lambda}=\dfrac{\omega}{v},\quad
+                    u=A\cos\left(\omega t\mp k\left(x-x_0\right)+\varphi\right);\quad$
+                </p>
+                <p>
+                    Wave equation:&ensp;
+                    $\dfrac{\partial^2u}{\partial t^2}=v^2\left(\dfrac{\partial^2u}{\partial
+                    x_1^2}+\dfrac{\partial^2u}{\partial x_2^2}+\cdots+\dfrac{\partial^2u}{\partial x_n^2}\right);\quad$
+                    General solution to wave equation in one dimension:&ensp;
+                    $u=C_1(x-vt)+C_2(x+vt);$
+                </p>
+                <p>
+                    Speed of light in vacuum: $c=299\,792\,458\;m/s$;&emsp;
+                    Speed of wave on a string: $v=\sqrt{\dfrac{T}{\mu}}$;&emsp;
+                    Approximate speed of sound in air: $v=331.4m/s+(0.606m/s/℃)\cdot T_℃$;
+                </p>
+                <p>
+                    <red>*</red>
+                    Doppler effect:&ensp;
+                    $f_{obs}=\dfrac{v_{wave}+v_{observer}}{v_{wave}+v_{source}}f_0;\quad$
+                    $v_{wave}$ is positive when the wave source is moving away from the observer and negative when
+                    moving toward the observer;
+                </p>
+            </div>
         </div>
 
 
+        <!-- Modern Physics -->
         <div class="page">
             <h1>Modern Physics</h1>
         </div>
