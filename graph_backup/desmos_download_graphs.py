@@ -1,23 +1,26 @@
-# backup all of my Desmos graphs
+# backup all of my saved Desmos graphs
+
+from requests_html import HTMLSession
+import requests
+import json
+import html
 
 
 # the two functions return the information and contents
 # of a Desmos graph from its ID
 
 def download_graph(ID):
-    from requests_html import HTMLSession
     url = 'https://www.desmos.com/calculator/'+ID
     r = HTMLSession().get(url)
     if r.status_code != 200:
         print(r, url)
     body = r.html.find('body', first='True')
     data = body.attrs['data-load-data']
-    data = __import__('json').loads(data)
+    data = json.loads(data)
     return data['graph']
 
 
 def download_state(ID):
-    import requests
     url = 'https://saved-work.desmos.com/calc-states/production/'+ID
     r = requests.get(url)
     if r.status_code != 200:
@@ -47,8 +50,8 @@ def getEquation(obj):
 
 
 # a list of my Desmos graphs obtained using desmos_get_id.js
-Graphs = ["w4thzt4ofr", "vfizuknvjq", "pav2l1kzte", "pv4gxyyckx", "hvtbjw6rue", "ktnucw466t", "7lr5htcel6", "vu4xm0n9ir", "ivasvrustk", "nwoctkrg80", "raeuahskxm", "4vo8ccfuvp", "hsp3ccmdhw", "diuy6hrgw6", "1z17yc5djh",
-          "zn9d68fqzt", "btal70uvxv", "l99tjopqcx", "kmkcgt5eld", "zyxas5zy8w", "hznnunxnx6", "ar8trp3g9s", "nn29zfpyiq", "bq5nc43zfh", "59x14hqpt3", "f9vwgan2ip", "fa7mwvpxb3", "gbji3acmwp", "bzecuo9xix", "ozmnil3v00"]
+with open("graphs_id.json", "r") as fp:
+    graphs = json.load(fp)
 
 
 # contents of index.html
@@ -76,15 +79,15 @@ index = """<!DOCTYPE html>
     </div>""".replace('{%CURRENT_DATE%}', __import__('datetime').datetime.now().strftime("%Y/%m/%d"))
 
 # go through the list and download graphs
-for ID in Graphs:
+for graph_id in graphs:
 
     # download graph
-    print(ID)
-    info = download_graph(ID)
-    state = download_state(ID)
+    print(graph_id)
+    info = download_graph(graph_id)
+    state = download_state(graph_id)
 
     # save graph as HTML
-    HTML = """<!DOCTYPE html>
+    content = """<!DOCTYPE html>
 <html><head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
@@ -99,13 +102,13 @@ for ID in Graphs:
     <div id="calculator"></div>
     <script>Desmos.GraphingCalculator(document.getElementById('calculator')).setState({%STATE%});</script>
 </body></html>"""
-    HTML = HTML.replace("{%ID%}", ID)
-    HTML = HTML.replace('{%TITLE%}', info['title'])
-    HTML = HTML.replace('{%STATE%}', state)
-    open('desmos/'+ID+'.html', "wb").write(bytearray(HTML, 'utf-8'))
+    content = content.replace("{%ID%}", graph_id)
+    content = content.replace('{%TITLE%}', info['title'])
+    content = content.replace('{%STATE%}', state)
+    open('desmos/'+graph_id+'.html', "wb").write(bytearray(content, 'utf-8'))
 
     # add graph to the index
-    HTML = """<div class="graph">
+    content = """<div class="graph">
         <img src="https://saved-work.desmos.com/calc_thumbs/production/{%ID%}.png" />
         <div class="description">
             <h2>{%TITLE%}</h2>
@@ -117,12 +120,11 @@ for ID in Graphs:
             </p>
         </div>
     </div>"""
-    HTML = HTML.replace("{%ID%}", ID)
-    HTML = HTML.replace('{%TITLE%}', info['title'])
-    HTML = HTML.replace('{%TIME%}', info['created'])
-    HTML = HTML.replace('{%EQUATION%}', __import__(
-        'html').escape(getEquation(info)))
-    index += HTML
+    content = content.replace("{%ID%}", graph_id)
+    content = content.replace('{%TITLE%}', info['title'])
+    content = content.replace('{%TIME%}', info['created'])
+    content = content.replace('{%EQUATION%}', html.escape(getEquation(info)))
+    index += content
 
 
 index += """<div><br></div><div><br></div><div><br></div><div><br></div></body></html>"""
