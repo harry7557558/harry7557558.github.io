@@ -17,7 +17,7 @@ function setupSnowflakeRenderer() {
     // vertex and fragment shader code
     var vsSource = "attribute vec4 aVertexPosition;void main(void){gl_Position=aVertexPosition;}";
     var request = new XMLHttpRequest();
-    request.open("GET", ".index/gl-snowflake.glsl", false);
+    request.open("GET", "_index/gl-snowflake.glsl", false);
     request.send(null);
     var fsSource = request.responseText;
 

@@ -96,7 +96,7 @@ function animateQuotes() {
         document.getElementById("bottom").innerHTML = "<span style='color:red;'>" + message + "</span>";
     }
     var req = new XMLHttpRequest();
-    req.open("GET", ".index/quotes.json", true);
+    req.open("GET", "_index/quotes.json", true);
     req.responseType = "json";
     req.onload = function (e) {
         if (req.status == 200) onload(req.response);
@@ -121,7 +121,7 @@ function setRandomLink() {
         document.getElementById("randlink").innerHTML = "<span style='color:red;'>" + message + "</span>";
     }
     var req = new XMLHttpRequest();
-    req.open("GET", ".index/links.json", true);
+    req.open("GET", "_index/links.json", true);
     req.responseType = "json";
     req.onload = function (e) {
         if (req.status == 200) onload(req.response);
