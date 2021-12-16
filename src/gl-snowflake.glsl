@@ -43,9 +43,8 @@ float map(vec2 p0) {
 	d = min(d, length(q - vec2(0.0, 0.24)) - 0.02);
 	d = min(d, 0.3*sd_wedge(q, vec2(0.0, 0.2), vec2(0.05, 0.7), vec2(0.0, 0.65)));
 	d = min(d, 0.3*sd_wedge(q, vec2(0.0, 0.65), vec2(0.03, 0.65), vec2(0.0, 0.75)));
-	return d;
+	return d - 0.001;
 }
-
 
 vec3 get_background(vec3 rd) {
     vec3 col = (0.4+0.1*sin(iTime)+0.1*sin(0.5*iTime))
@@ -55,27 +54,7 @@ vec3 get_background(vec3 rd) {
         + 0.2*cos(20.*rd.x)*cos(20.*rd.y)*cos(20.*rd.z)
         + 0.05*sin(45.*rd.x)*cos(44.*rd.y)*sin(46.*rd.z));
     col = vec3(1.0)-exp(-col);
-    return clamp(col * vec3(0.2,0.2,1.0), 0.0, 1.0);
-}
-
-vec3 calcCol(vec3 ro, vec3 rd) {
-    vec3 tot_col = vec3(0.0);
-
-    float t = -ro.z / rd.z;
-    ro += rd*t;
-    float sd = map(ro.xy);
-    if (sd > 0.0) return get_background(rd);
-    vec3 n = vec3(0, 0, 1);
-
-    vec3 refr = refract(rd, n, 1.0/1.5), refl = reflect(rd, n);
-    tot_col += 0.2*get_background(refl);
-
-    rd = refr;
-    t = 2.0 * sd / dot(rd, n);
-    tot_col += 0.8 * vec3(0.8,0.4,0.6) * exp(20.0*t);
-    tot_col += 0.8 * get_background(rd);
-
-    return tot_col;
+    return clamp(col * 0.8*vec3(0.2,0.2,1.0), 0.0, 1.0);
 }
 
 void main() {
@@ -88,11 +67,28 @@ void main() {
     vec3 u = vec3(-sin(rz),cos(rz),0);
     vec3 v = cross(w,u);
 
-    vec3 ro = iDist*w;
-
-    vec2 uv = 2.0 * gl_FragCoord.xy / iResolution.xy - vec2(1.0) - vec2(0.0, 0.1);
+    vec2 uv = 2.0 * gl_FragCoord.xy / iResolution.xy - vec2(1.0) - vec2(0.0, 0.05);
     vec3 rd = normalize(mat3(u,v,-w)*vec3(uv*iResolution.xy,4.0*min(iResolution.x,iResolution.y)));
-    vec3 col = calcCol(ro+(iDist-2.0)*rd, rd);
+    vec3 ro = iDist*w + (iDist-2.0)*rd;
+
+    float t = -ro.z / rd.z;
+    ro += rd*t;
+    float sd = map(ro.xy);
+    vec3 col = get_background(rd);
+
+    if (sd < 0.0) {
+        vec3 col1 = vec3(0.0);
+        vec3 n = vec3(0, 0, 1);
+        col1 += 0.6 * get_background(rd);
+        col1 += 0.15 * get_background(reflect(rd, n));
+
+        float y = pow(0.3656*abs(sin(0.5*iTime)+2.0*sin(iTime)),20.0);
+        vec3 c = 0.8*vec3(0.8,0.4,0.6) + y * 0.2*vec3(0.8,0.6,0.2);
+        col1 += c * exp(30.0 * sd / dot(rd, n));
+
+        float t = clamp(-1.4*min(iResolution.x,iResolution.y)*sd, 0.0, 1.0);
+        col = mix(col, col1, t);
+    }
 
     gl_FragColor = vec4(col,1.0);
 }
