@@ -51,8 +51,10 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
 
 
 additional_repos = [
-    ['Graphics','D:\\Coding\\Github\\Graphics\\'],
-    ['miscellaneous','D:\\Coding\\Github\\miscellaneous'],
+    ['Graphics', '../Graphics'],
+    ['miscellaneous','../miscellaneous'],
+    ['AVI3M-CPT','../AVI3M-CPT'],
+    ['AVI4M-ISP','../AVI4M-ISP'],
     ]
 
 site_content = indexDirectory(root)

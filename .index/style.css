@@ -1,0 +1,86 @@
+body {
+    background-color: #002;
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+}
+
+#image-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("snowflake.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+#canvas,
+#easter-egg-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#background {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+}
+
+#easter-egg-canvas {
+    pointer-events: none;
+}
+
+#left,
+#right,
+#bottom {
+    font-family: Calibri;
+    font-weight: 800;
+    color: white;
+}
+
+p {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#left {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    font-size: 16px;
+}
+
+#right {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    text-align: right;
+    font-size: 16px;
+}
+
+#bottom {
+    position: fixed;
+    margin-left: 10%;
+    margin-right: 10%;
+    left: 50%;
+    bottom: 5%;
+    text-align: center;
+    font-size: 21px;
+}
