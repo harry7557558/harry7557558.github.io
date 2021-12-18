@@ -15,8 +15,8 @@ body {
     background-position: center;
 }
 
-#canvas,
-#easter-egg-canvas {
+#gl-canvas,
+#falling-snowflake-canvas {
     position: absolute;
     left: 0;
     top: 0;
@@ -34,7 +34,7 @@ body {
     height: 100%;
 }
 
-#easter-egg-canvas {
+#falling-snowflake-canvas {
     pointer-events: none;
 }
 

@@ -23,7 +23,7 @@
 
 <body>
     <div id="image-container"></div>
-    <canvas id="canvas"></canvas>
+    <canvas id="gl-canvas"></canvas>
 
     <div id='left'>
         <p id="webgl-message">Powered by <span title='fragment shader'>WebGL<span></p>
@@ -31,20 +31,20 @@
         <p>❄️❄️❄️</p>
     </div>
     <div id='right'>
-        <p><a href='index.old.html'>404 Not Found</a></p>
+        <p><a id="contact-info" href='#'>Harry Chen</a></p>
         <p><a href='unlisted.html'>Quick link</a></p>
-        <p><a id="randlink" href='#' title='random link to my stuff' target="_blank"
-                onclick="setTimeout(setRandomLink,100);return true;">&nbsp;</a></p>
+        <p><a id="randlink" href='#' title='random link to my stuff' target="_blank">&nbsp;</a></p>
     </div>
     <div id='bottom'></div>
 
-    <canvas id='easter-egg-canvas'></canvas>
+    <canvas id='falling-snowflake-canvas'></canvas>
 
     <script>
         window.addEventListener("load", function (event) {
 
             animateQuotes();
-            setRandomLink();
+            initRandomLink();
+            setContactInfo();
             resetWordStyle();
             window.addEventListener("resize", resetWordStyle);
 

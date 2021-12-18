@@ -108,14 +108,23 @@ function animateQuotes() {
     req.send();
 }
 
-function setRandomLink() {
+// call this function to initialize random link
+function initRandomLink() {
     function onload(links_json) {
         const links = flattenItemList(links_json);
-        var random = vanDerCorput(Math.floor(Date.now() / 400), 2);
-        var link = getRandomItemByWeight(links, random);
-        let container = document.getElementById("randlink");
-        container.innerHTML = link.alt;
-        container.href = link.text;
+        var seed = Math.floor(Date.now() / 400);
+        function setLink() {
+            var random = vanDerCorput(seed++, 2);
+            var link = getRandomItemByWeight(links, random);
+            let container = document.getElementById("randlink");
+            container.innerHTML = link.alt;
+            container.href = link.text;
+        }
+        setLink();
+        document.getElementById("randlink").addEventListener("click", function (e) {
+            setTimeout(setLink, 100);
+            return true;
+        });
     }
     function onerror(message) {
         document.getElementById("randlink").innerHTML = "<span style='color:red;'>" + message + "</span>";
@@ -131,6 +140,23 @@ function setRandomLink() {
         onerror("Error")
     };
     req.send();
+}
+
+// call this function to initialize contact information
+function setContactInfo() {
+    const element = document.getElementById("contact-info");
+    const infos = [
+        "<span title='Preferred name'>Harry Chen<span>",
+        "<span title='Email'>harry7557558@gmail.com<span>",
+        "<span title='Instagram'>@harry7557558</span>",
+        "<span title='Discord'>harry7557558#2125</span>"
+    ];
+    var infoIndex = 0;
+    element.innerHTML = infos[infoIndex];
+    element.addEventListener("click", function (e) {
+        infoIndex = (infoIndex + 1) % infos.length;
+        element.innerHTML = infos[infoIndex];
+    })
 }
 
 // responsible text size

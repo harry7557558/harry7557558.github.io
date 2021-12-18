@@ -4,7 +4,7 @@
 function setSofakeClick() {
     const sofake = document.getElementById('sofake');
 
-    const canvas = document.getElementById('easter-egg-canvas');
+    const canvas = document.getElementById('falling-snowflake-canvas');
     canvas.style.width = canvas.style.height = '100%';
     var resizeCanvas = function (e) {
         canvas.width = window.innerWidth;

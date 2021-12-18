@@ -7,7 +7,7 @@ function setupSnowflakeRenderer() {
     };
 
     // load WebGL
-    const canvas = document.getElementById("canvas");
+    const canvas = document.getElementById("gl-canvas");
     const gl = canvas.getContext("webgl");
     if (gl == null) {
         webgl_failed(gl);
