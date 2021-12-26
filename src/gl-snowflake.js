@@ -13,6 +13,9 @@ function setupSnowflakeRenderer() {
         webgl_failed(gl);
         return;
     }
+    canvas.addEventListener("webglcontextlost", function (e) {
+        webgl_failed("WebGL Context Lost");
+    });
 
     // vertex and fragment shader code
     var vsSource = "attribute vec4 aVertexPosition;void main(void){gl_Position=aVertexPosition;}";
