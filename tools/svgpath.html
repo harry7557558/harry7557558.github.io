@@ -101,14 +101,20 @@
                     markerWidth="10" markerHeight="10">
                     <ellipse cx="5" cy="5" rx="3" ry="3" style="stroke:black;stroke-width:1px;fill:black"></ellipse>
                 </marker>
+                <marker id="sample-dot" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="strokeWidth" markerWidth="10"
+                    markerHeight="10">
+                    <ellipse cx="5" cy="5" rx="2" ry="2" style="stroke:none;fill:#222"></ellipse>
+                </marker>
             </defs>
             <g id="transfm" transform="matrix(1,0,0,1,0,0)">
                 <g id="path-transform">
+                    <g id="grid"></g>
                     <g id="anchors" style='fill:none;'>
                         <g id="anchor-lines" style="stroke-width:1px;stroke:gray"></g>
                         <g id="middle-arrows" style="stroke-width:1px;stroke:gray"></g>
                         <g id="error-cross"></g>
                     </g>
+                    <g id="svg-fourier" style='fill:none;'></g>
                     <path id="path" style="fill:none;stroke:black;" vector-effect="non-scaling-stroke" d="M 0,0" />
                 </g>
             </g>
@@ -117,6 +123,7 @@
             <span>
                 anchors<input id="anchor-checkbox" type="checkbox" />
                 arrows<input id="arrow-checkbox" type="checkbox" />
+                <!--grid<input id="grid-checkbox" type="checkbox" />-->
             </span>
             <br />
             <span id="coord">(0.000, 0.000)</span>
@@ -124,6 +131,9 @@
     </div>
 
     <script>
+        /* SVG path calculations */
+        "use strict";
+        let sin = Math.sin, cos = Math.cos, abs = Math.abs, PI = Math.PI, sqrt = Math.sqrt;
 
         String.prototype.count = function (s) {
             var cnt = 0;
@@ -133,12 +143,15 @@
             return cnt;
         };
 
+        function clonePoint(p) { return [p[0], p[1]]; }
         function addPoint(p, q) { return [p[0] + q[0], p[1] + q[1]]; }
         function subPoint(p, q) { return [p[0] - q[0], p[1] - q[1]]; }
         function mulPoint(p, k) { return [p[0] * k, p[1] * k]; }
-        function normalizePoint(p) { return mulPoint(p, 1.0 / Math.sqrt(p[0] * p[0] + p[1] * p[1])); }
-        function lengthPoint(p) { return Math.sqrt(p[0] * p[0] + p[1] * p[1]); }
+        function normalizePoint(p) { return mulPoint(p, 1.0 / sqrt(p[0] * p[0] + p[1] * p[1])); }
+        function lengthPoint(p) { return sqrt(p[0] * p[0] + p[1] * p[1]); }
+        function mulComplex(p, q) { return [p[0] * q[0] - p[1] * q[1], p[0] * q[1] + p[1] * q[0]]; }
 
+        // parse SVG path string
         function parsePath(s) {
             // official documentation: https://www.w3.org/TR/SVG/paths.html#DProperty
             var cmd = '';  // MZLHVCSQTA
@@ -273,7 +286,7 @@
                         var laf_sf = readPoint();
                         var p = readPoint();
                         if (cmd == 'a') p = addPoint(p0, p);
-                        r[0] = Math.abs(r[0]), r[1] = Math.abs(r[1]);
+                        r[0] = abs(r[0]), r[1] = abs(r[1]);
                         if (r[0] * r[1] == 0.0) res_tmp.push(['L', p0, p]);
                         else res_tmp.push(['A', p0, r, [theta], laf_sf, p]);
                         p0 = p;
@@ -300,30 +313,536 @@
             return res;
         }
 
-        function countPieces(parsed) {
-            var count = 0;
+        // normalize a parsed path to cubic Bezier spline
+        function normalizeToCubicBezier(parsed) {
+            var result = [];
             for (var i = 0; i < parsed.length; i++) {
                 var seg = parsed[i];
                 if (seg[0][0] == 'X')
-                    return count;
-                else if (/[LCQA]/.test(seg[0][0]))
-                    count += 1;
-                else if (seg[0][0] == 'Z')
-                    count += lengthPoint(subPoint(seg[2], seg[1])) == 0.0 ? 0 : 1;
+                    return result;
+                if (seg[0][0] == 'Z') {
+                    var p1 = clonePoint(seg[1]);
+                    var p4 = clonePoint(seg[2]);
+                    if (lengthPoint(subPoint(p4, p1)) != 0.0) {
+                        var p2 = addPoint(mulPoint(p1, 2. / 3.), mulPoint(p4, 1. / 3.));
+                        var p3 = addPoint(mulPoint(p1, 1. / 3.), mulPoint(p4, 2. / 3.));
+                        result.push(['C', p1, p2, p3, p4]);
+                    }
+                }
+                if (seg[0][0] == 'L') {
+                    var p1 = clonePoint(seg[1]);
+                    var p4 = clonePoint(seg[2]);
+                    var p2 = addPoint(mulPoint(p1, 2. / 3.), mulPoint(p4, 1. / 3.));
+                    var p3 = addPoint(mulPoint(p1, 1. / 3.), mulPoint(p4, 2. / 3.));
+                    result.push(['C', p1, p2, p3, p4]);
+                }
+                if (seg[0][0] == 'C') {
+                    var p1 = clonePoint(seg[1]);
+                    var p2 = clonePoint(seg[2]);
+                    var p3 = clonePoint(seg[3]);
+                    var p4 = clonePoint(seg[4]);
+                    result.push(['C', p1, p2, p3, p4]);
+                }
+                if (seg[0][0] == 'Q') {
+                    var p1 = clonePoint(seg[1]);
+                    var pc = clonePoint(seg[2]);
+                    var p4 = clonePoint(seg[3]);
+                    var p2 = addPoint(mulPoint(p1, 1. / 3.), mulPoint(pc, 2. / 3.));
+                    var p3 = addPoint(mulPoint(p4, 1. / 3.), mulPoint(pc, 2. / 3.));
+                    result.push(['C', p1, p2, p3, p4]);
+                }
+                if (seg[0][0] == 'A') {
+                    result.push(seg);  // just lazy
+                }
             }
-            return count;
+            return result;
+        }
+
+        // evaluate a cubic Bezier curve
+        function evalCubicBezier(p1, p2, p3, p4, t) {
+            var w1 = (1.0 - t) * (1.0 - t) * (1.0 - t);
+            var w2 = 3.0 * (1.0 - t) * (1.0 - t) * t;
+            var w3 = 3.0 * (1.0 - t) * t * t;
+            var w4 = t * t * t;
+            return [
+                w1 * p1[0] + w2 * p2[0] + w3 * p3[0] + w4 * p4[0],
+                w1 * p1[1] + w2 * p2[1] + w3 * p3[1] + w4 * p4[1]
+            ];
+        }
+
+        // convert SVG elliptic arc format to a format that is more suitable for math
+        function getEllipticArcInfo(p0, p1, rx, ry, theta, laf, sf) {
+            // arrows: is my formula correct??
+            var dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+            var R = [[rx * cos(theta), -ry * sin(theta)], [rx * sin(theta), ry * cos(theta)]];
+            var detR = R[0][0] * R[1][1] - R[0][1] * R[1][0];
+            var invR = [[R[1][1] / detR, -R[0][1] / detR], [-R[1][0] / detR, R[0][0] / detR]];
+            var dcos = invR[0][0] * dx + invR[0][1] * dy;
+            var dsin = invR[1][0] * dx + invR[1][1] * dy;
+            var sc = (2.0 - 1e-12) / Math.hypot(dcos, dsin);
+            if (sc < 1.0) {
+                // formula is guessed, no guarantee to work
+                // https://www.w3.org/TR/SVG/paths.html#ArcOutOfRangeParameters
+                // https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii
+                rx /= sc, ry /= sc, detR /= sc * sc;
+                for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) R[i][j] /= sc, invR[i][j] *= sc;
+                dcos *= sc, dsin *= sc;
+            }
+            var avr_t = Math.atan2(-dcos, dsin);
+            var amp_t = Math.asin(0.5 * Math.hypot(dcos, dsin));
+            if (cos(avr_t) * sin(amp_t) * dsin < 0.0) amp_t = -amp_t;
+            // laf: abs(t1-t0)>PI; sf: t1>t0
+            var t0 = avr_t - amp_t, t1 = avr_t + amp_t;
+            if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - amp_t + 2.0 * PI, t1 = avr_t + amp_t;
+            if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t), t1 = avr_t + (PI - amp_t);
+            if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t) + 2.0 * PI, t1 = avr_t + (PI - amp_t);
+            var cx = p0[0] - (R[0][0] * cos(t0) + R[0][1] * sin(t0));
+            var cy = p0[1] - (R[1][0] * cos(t0) + R[1][1] * sin(t0));
+            // return
+            return {
+                matrix: [[R[0][0], R[0][1], cx], [R[1][0], R[1][1], cy]],
+                t0: t0,
+                t1: t1
+            };
+        }
+
+        // evaluate an ellipse object with an object returned by getEllipticArcInfo() and a parameter between 0 and 1
+        function evalEllipticArc(arcInfo, t) {
+            var ta = arcInfo.t0 * (1.0 - t) + arcInfo.t1 * t;
+            var mat = arcInfo.matrix;
+            return [
+                mat[0][0] * cos(ta) + mat[0][1] * sin(ta) + mat[0][2],
+                mat[1][0] * cos(ta) + mat[1][1] * sin(ta) + mat[1][2]
+            ];
+        }
+
+        // get the axes-aligned bounding box of a cubic Bezier curve
+        function cubicBezierAABB(p1, p2, p3, p4) {
+            function getOptimum(a, b, c, d) {
+                var ans = [
+                    d,
+                    a + 3. * (b + c) + d
+                ];
+                if (abs(a) < 1e-8) {
+                    if (abs(b) < 1e-8);
+                    else {
+                        var t = -c / (2.0 * b), x;
+                        if (t > 0 && t < 1) {
+                            x = ((a * t + 3.0 * b) * t + 3.0 * c) * t + d;
+                            ans.push(x);
+                        }
+                    }
+                }
+                var delta = b * b - a * c;
+                if (delta >= 0) {
+                    delta = sqrt(delta);
+                    var t = (-b - delta) / a, x;
+                    if (t > 0 && t < 1) {
+                        x = ((a * t + 3.0 * b) * t + 3.0 * c) * t + d;
+                        ans.push(x);
+                    }
+                    t = (-b + delta) / a;
+                    if (t > 0 && t < 1) {
+                        x = ((a * t + 3.0 * b) * t + 3.0 * c) * t + d;
+                        ans.push(x);
+                    }
+                }
+                return ans;
+            };
+            var e0 = p1;
+            var e1 = subPoint(p2, p1);
+            var e2 = subPoint(addPoint(p1, p3), mulPoint(p2, 2.));
+            var e3 = addPoint(subPoint(p4, p1), mulPoint(subPoint(p2, p3), 3.));
+            var optx = getOptimum(e3[0], e2[0], e1[0], e0[0]);
+            var opty = getOptimum(e3[1], e2[1], e1[1], e0[1]);
+            var minx = Math.min.apply(null, optx);
+            var maxx = Math.max.apply(null, optx);
+            var miny = Math.min.apply(null, opty);
+            var maxy = Math.max.apply(null, opty);
+            return {
+                minx: minx, maxx: maxx, miny: miny, maxy: maxy
+            };
+        }
+
+        // get the axes-aligned bounding box of an elliptic arc
+        function ellipticArcAABB(mat, t0, t1) {
+            throw "Not Implemented";
+        }
+
+        // get the bounding box of a path
+        function calcPathAABB(parsed) {
+            var aabb = {
+                minx: Infinity,
+                maxx: -Infinity,
+                miny: Infinity,
+                maxy: -Infinity
+            };
+            for (var i = 0; i < parsed.length; i++) {
+                var seg = parsed[i];
+                var aabb1 = aabb;
+                if (seg[0] == 'C') {
+                    aabb1 = cubicBezierAABB(seg[1], seg[2], seg[3], seg[4]);
+                }
+                else if (seg[0] == 'A') {
+                    console.error("Elliptic arc AABB not implemented");
+                }
+                aabb.minx = Math.min(aabb.minx, aabb1.minx);
+                aabb.maxx = Math.max(aabb.maxx, aabb1.maxx);
+                aabb.miny = Math.min(aabb.miny, aabb1.miny);
+                aabb.maxy = Math.max(aabb.maxy, aabb1.maxy);
+            }
+            return aabb;
         }
 
         // debug
         if (0) {
-            var s = "M50,350 l 50,-25 a25,25 -30 0,1 50,-25 l 50,-25 a25,50 -30 0,1 50,-25 l 50,-25 a25,75 -30 0,1 50,-25 l 50,-25 a25,100 -30 0,1 50,-25 l 50,-25";
-            document.getElementById("input").innerText = s;
+            var s = "M86.0376,21.6152 C198.177,7.90925 243.731,83.7155 215.621,162.412 C209.391,179.856 319.038,257.108 345.204,283.274 C371.37,309.44 367.632,336.851 350.188,354.295 C332.744,371.739 307.824,376.723 282.905,350.557 C258.334,324.753 178.241,219.728 165.781,220.974 C66.1017,239.664 21.246,215.99 20,87.6528 L91.0216,157.428 C124.663,149.952 150.829,127.525 157.059,93.8828 C155.813,92.6368 84.7916,21.6152 86.0376,21.6152";
+            //var s = "M300,200 h-150 a150,150 0 1,0 150,-150 z";
+            //document.getElementById("input").innerText = s;
             document.getElementById("transform").value = "scale(1.0)"
-            document.getElementById("anchor-checkbox").checked = true, document.getElementById("arrow-checkbox").checked = true;
+            document.getElementById("anchor-checkbox").checked = true;
+            document.getElementById("arrow-checkbox").checked = true;
+            //document.getElementById("grid-checkbox").checked = true;
         }
     </script>
 
     <script>
+        /* Fourier series fitting */
+        "use strict";
+
+        // numerical integration
+        function nIntegrate(fun, x0, x1) {
+            const GL16T = [.00529953250417503370, .02771248846338371196, .06718439880608412805, .12229779582249848305, .19106187779867812577, .27099161117138630682, .35919822461037054338, .45249374508118127990, .54750625491881872009, .64080177538962945661, .72900838882861369317, .80893812220132187422, .87770220417750151694, .93281560119391587194, .97228751153661628803, .99470046749582496629];
+            const GL16W = [.01357622970587704742, .03112676196932394643, .04757925584124639240, .06231448562776693602, .07479799440828836604, .08457825969750126909, .09130170752246179443, .09472530522753424814, .09472530522753424814, .09130170752246179443, .08457825969750126909, .07479799440828836604, .06231448562776693602, .04757925584124639240, .03112676196932394643, .01357622970587704742];
+            var s = 0.0;
+            for (var i = 0; i < 16; i++) {
+                var x = x0 + (x1 - x0) * GL16T[i];
+                s += GL16W[i] * fun(x);
+            }
+            return s * (x1 - x0);
+        }
+
+        // numerical root solving in (0, 1)
+        function nRoot(fun) {
+            var x0 = 0.0, x1 = 1.0;
+            var fx0 = fun(x0), fx1 = fun(x1);
+            for (var step = 0; step < 64 && abs(x1 - x0) > 1e-6; step++) {
+                var x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+                var fx2 = fun(x2);
+                x0 = x1, fx0 = fx1;
+                x1 = x2, fx1 = fx2;
+            }
+            return x2;
+        }
+
+        // convert path to discrete points
+        function pathToPoints(spline, n) {
+            var result = new Array(n);
+            for (var i = 0; i < n; i++) {
+                var it = spline.length * (i / n);
+                var ti = Math.floor(it);
+                var t = it - ti;
+                let seg = spline[ti];
+                if (seg[0] == 'C') {
+                    result[i] = evalCubicBezier(seg[1], seg[2], seg[3], seg[4], t);
+                }
+                if (seg[0] == 'A') {
+                    var arc = getEllipticArcInfo(
+                        seg[1], seg[5],
+                        seg[2][0], seg[2][1],
+                        seg[3][0] * (PI / 180),
+                        seg[4][0], seg[4][1]);
+                    result[i] = evalEllipticArc(arc, t);
+                }
+            }
+            return result;
+        }
+
+        // convert path to points, split by even arc lengths
+        function pathToPointsALP(spline, n) {
+            var result = new Array(n);
+            // calculate the lengths of each piece
+            function cubicBezierDs(t, p1, p2, p3, p4) {
+                var w1 = -t * t + 2 * t - 1;
+                var w2 = 3 * t * t - 4 * t + 1;
+                var w3 = -3 * t * t + 2 * t;
+                var w4 = t * t;
+                var dp = [
+                    w1 * p1[0] + w2 * p2[0] + w3 * p3[0] + w4 * p4[0],
+                    w1 * p1[1] + w2 * p2[1] + w3 * p3[1] + w4 * p4[1]
+                ];
+                return 3.0 * lengthPoint(dp);
+            }
+            function ellipticArcDs(t, mat, t0, t1) {
+                var a = t0 + (t1 - t0) * t;
+                var dp = [
+                    mat[0][0] * -sin(a) + mat[0][1] * cos(a),
+                    mat[1][0] * -sin(a) + mat[1][1] * cos(a)
+                ];
+                return Math.abs(t1 - t0) * lengthPoint(dp);
+            }
+            var arcLengths = new Array(spline.length);
+            var arcLengthPsa = new Array(spline.length + 1);
+            arcLengthPsa[0] = 0.0;
+            for (var i = 0; i < spline.length; i++) {
+                let seg = spline[i];
+                if (seg[0] == 'C') {
+                    arcLengths[i] = nIntegrate(function (t) {
+                        return cubicBezierDs(t, seg[1], seg[2], seg[3], seg[4]);
+                    }, 0.0, 1.0);
+                }
+                if (seg[0] == 'A') {
+                    var arc = getEllipticArcInfo(seg[1], seg[5], seg[2][0], seg[2][1], seg[3][0] * (PI / 180), seg[4][0], seg[4][1]);
+                    arcLengths[i] = nIntegrate(function (t) {
+                        return ellipticArcDs(t, arc.matrix, arc.t0, arc.t1);
+                    }, 0.0, 1.0);
+                }
+                arcLengthPsa[i + 1] = arcLengthPsa[i] + arcLengths[i];
+            }
+            for (var i = 0; i < n; i++) {
+                var tn = arcLengthPsa[spline.length] * (i / n);
+                // find the curve that tn belongs to
+                var ti0 = 0, ti1 = spline.length, ti = 0;
+                while (ti1 - ti0 > 1) {
+                    ti = Math.floor((ti0 + ti1) / 2);
+                    if (arcLengthPsa[ti] >= tn) ti1 = ti;
+                    else ti0 = ti;
+                }
+                ti -= 1;
+                while (arcLengthPsa[ti + 1] < tn) ti++;
+                // parameter
+                var tf = tn - arcLengthPsa[ti];
+                var t = tf / arcLengths[ti];
+                // sample
+                let seg = spline[ti];
+                if (seg[0] == 'C') {
+                    t = nRoot(function (tc) {
+                        var l1 = nIntegrate(function (t) {
+                            return cubicBezierDs(t, seg[1], seg[2], seg[3], seg[4]);
+                        }, 0.0, tc);
+                        var l2 = nIntegrate(function (t) {
+                            return cubicBezierDs(t, seg[1], seg[2], seg[3], seg[4]);
+                        }, tc, 1.0);
+                        return l1 / (l1 + l2) - (tf / arcLengths[ti]);
+                    });
+                    result[i] = evalCubicBezier(seg[1], seg[2], seg[3], seg[4], t);
+                }
+                if (seg[0] == 'A') {
+                    var arc = getEllipticArcInfo(
+                        seg[1], seg[5],
+                        seg[2][0], seg[2][1],
+                        seg[3][0] * (PI / 180),
+                        seg[4][0], seg[4][1]);
+                    t = nRoot(function (tc) {
+                        var l1 = nIntegrate(function (t) {
+                            return ellipticArcDs(t, arc.matrix, arc.t0, arc.t1);
+                        }, 0.0, tc);
+                        var l2 = nIntegrate(function (t) {
+                            return ellipticArcDs(t, arc.matrix, arc.t0, arc.t1);
+                        }, tc, 1.0);
+                        return l1 / (l1 + l2) - (tf / arcLengths[ti]);
+                    });
+                    result[i] = evalEllipticArc(arc, t);
+                }
+            }
+            return result;
+        }
+
+        // O(N^2) discrete fourier transform
+        function DFT(arr, inverse) {
+            let N = arr.length;
+            let _2Pi = inverse ? 2.0 * PI : -2.0 * PI;
+            let inv_N = 1.0 / N;
+            var res = new Array(N);
+            for (var k = 0; k < N; k++) {
+                var s = [0, 0];
+                var c = [1, 0];
+                var e = [cos(_2Pi * k * inv_N), sin(_2Pi * k * inv_N)];
+                for (var n = 0; n < N; n++) {
+                    s = addPoint(s, mulComplex(arr[n], c));
+                    c = mulComplex(c, e);
+                }
+                if (!inverse) s = mulPoint(s, inv_N);
+                res[k] = s;
+            }
+            return res;
+        }
+
+        // O(NlogN) FFT for radix-2
+        function FFT(arr, inverse) {
+            let N = arr.length;
+            if (N < 2) {
+                return [[arr[0][0], arr[0][1]]];
+            }
+            let M = N >> 1;
+            var even = Array(M);
+            var odd = Array(M);
+            for (var k = 0; k < M; k++) {
+                even[k] = arr[2 * k];
+                odd[k] = arr[2 * k + 1];
+            }
+            even = FFT(even, inverse);
+            odd = FFT(odd, inverse);
+            let _2Pi = inverse ? 2.0 * PI : -2.0 * PI;
+            let inv_N = 1.0 / N;
+            var c = [1, 0];
+            var e = [cos(_2Pi * inv_N), sin(_2Pi * inv_N)];
+            var res = new Array(N);
+            for (var k = 0; k < M; k++) {
+                res[k] = addPoint(even[k], mulComplex(odd[k], c));
+                res[k + M] = subPoint(even[k], mulComplex(odd[k], c));
+                c = mulComplex(c, e);
+            }
+            if (!inverse) {
+                for (var k = 0; k < N; k++) res[k] = mulPoint(res[k], inv_N);
+            }
+            return res;
+        }
+
+        // get the amplitudes of frequencies of a list of points component-wise
+        function fourierTransformPoints(points) {
+            let N = points.length;
+            var points_x = new Array(N);
+            for (var i = 0; i < N; i++) points_x[i] = [points[i][0], 0];
+            var transform_x = DFT(points_x, false);
+            var points_y = new Array(N);
+            for (var i = 0; i < N; i++) points_y[i] = [points[i][1], 0];
+            var transform_y = DFT(points_y, false);
+            var res = { x: [], y: [] };
+            for (var i = 0; i < N / 2; i++) {
+                var m = i == 0 ? 1.0 : 2.0;
+                res.x.push({ k: i, a: m * transform_x[i][0], b: m * transform_x[i][1] });
+                res.y.push({ k: i, a: m * transform_y[i][0], b: m * transform_y[i][1] });
+            }
+            return res;
+        }
+
+        // filtering frequencies
+        function fourierFilterFront(fitted, n) {
+            var res = new Array(fitted.length);
+            for (var i = 0; i < fitted.length; i++) {
+                res[i] = { k: fitted[i].k, a: fitted[i].a, b: fitted[i].b };
+            }
+            res = res.sort(function (f1, f2) { return f1.k - f2.k; });
+            return res.slice(0, n);
+        }
+        function fourierFilterHeaviestFreqs(fitted, n) {
+            var res = new Array(fitted.length);
+            for (var i = 0; i < fitted.length; i++) {
+                res[i] = { k: fitted[i].k, a: fitted[i].a, b: fitted[i].b };
+            }
+            res = res.sort(function (f1, f2) {
+                var w1 = f1.a * f1.a + f1.b * f1.b;
+                var w2 = f2.a * f2.a + f2.b * f2.b;
+                return w2 - w1;
+            });
+            return res.slice(0, n);
+        }
+        function fourierFilterHeaviestWaves(fitted, n) {
+            var res = new Array(2 * fitted.length);
+            for (var i = 0; i < fitted.length; i++) {
+                res[2 * i] = { k: fitted[i].k, a: fitted[i].a, b: 0.0 };
+                res[2 * i + 1] = { k: fitted[i].k, a: 0.0, b: fitted[i].b };
+            }
+            res = res.sort(function (f1, f2) {
+                var w1 = f1.a * f1.a + f1.b * f1.b;
+                var w2 = f2.a * f2.a + f2.b * f2.b;
+                return w2 - w1;
+            });
+            return res.slice(0, n);
+        }
+
+        // evaluate the curve at one t value
+        function fourierEval(fitted, t) {
+            var x = 0.0;
+            for (var i = 0; i < fitted.x.length; i++) {
+                var k = fitted.x[i].k;
+                x += fitted.x[i].a * cos(k * t) + fitted.x[i].b * sin(k * t);
+            }
+            var y = 0.0;
+            for (var i = 0; i < fitted.y.length; i++) {
+                var k = fitted.y[i].k;
+                y += fitted.y[i].a * cos(k * t) + fitted.y[i].b * sin(k * t);
+            }
+            return [x, y];
+        }
+
+        // evaluate the curve at N even-spaced t values
+        function fourierEvalN(fitted, N) {
+            var maxk = 0;
+            for (var i = 0; i < fitted.x.length; i++)
+                maxk = Math.max(maxk, fitted.x[i].k + 1);
+            for (var i = 0; i < fitted.y.length; i++)
+                maxk = Math.max(maxk, fitted.y[i].k + 1);
+            if ((fitted.x.length + fitted.y.length) * N < 65536 || maxk > N) {
+                var points = new Array(N);
+                for (var i = 0; i < N; i++) {
+                    var t = 2.0 * PI * i / N;
+                    points[i] = fourierEval(fitted, t);
+                }
+                return points;
+            }
+            var x0s = new Array(N);
+            for (var i = 0; i < N; i++) x0s[i] = [0, 0];
+            for (var i = 0; i < fitted.x.length; i++)
+                x0s[fitted.x[i].k] = addPoint(x0s[fitted.x[i].k], [fitted.x[i].a, fitted.x[i].b]);
+            var xs = FFT(x0s, true);
+            var y0s = new Array(N);
+            for (var i = 0; i < N; i++) y0s[i] = [0, 0];
+            for (var i = 0; i < fitted.y.length; i++)
+                y0s[fitted.y[i].k] = addPoint(y0s[fitted.y[i].k], [fitted.y[i].a, fitted.y[i].b]);
+            var ys = FFT(y0s, true);
+            var ps = new Array(N);
+            for (var i = 0; i < N; i++)
+                ps[i] = [xs[i][0], ys[i][0]];
+            return ps;
+        }
+
+        // export a filtered path to LaTeX, designed for Desmos
+        function fourierToLatex(filtered, decimals, reverse, optimize) {
+            function floatToStr(n) {
+                if (!isFinite(n)) n = 0.0;
+                var s = n.toFixed(decimals);
+                if (s[0] != '-') s = '+' + s;
+                if (optimize) {
+                    s = s.replace(/(\.\d*)0+$/, '$1').replace(/\.$/, '').replace(/([+-])0\./, '$1.');
+                }
+                if (s === "+") s = "+0";
+                if (s === "-0") s = "+0";
+                return s;
+            }
+            let bracket_l = optimize ? "(" : "\\left(";
+            let bracket_r = optimize ? ")" : "\\right)";
+            if ('x' in filtered) {
+                var x = fourierToLatex(filtered.x, decimals, false, optimize);
+                var y = fourierToLatex(filtered.y, decimals, reverse, optimize);
+                return bracket_l + x + "," + y + bracket_r;
+            }
+            var s = "";
+            for (var i = 0; i < filtered.length; i++) {
+                var kt = filtered[i].k + "t";
+                var a = floatToStr((reverse ? -1.0 : 1.0) * filtered[i].a);
+                var b = floatToStr((reverse ? -1.0 : 1.0) * filtered[i].b);
+                if (kt == "0t") {
+                    if (a != "+0") s += a;
+                }
+                else {
+                    if (kt == "1t") kt = "t";
+                    if (a === "+1" || a === "-1") a = a[0];
+                    if (b === "+1" || b === "-1") b = b[0];
+                    if (Number(a) != 0) s += a + "\\cos" + bracket_l + kt + bracket_r;
+                    if (Number(b) != 0) s += b + "\\sin" + bracket_l + kt + bracket_r;
+                }
+            }
+            s = s.replace(/^\+/, '');
+            return s;
+        }
+    </script>
+
+    <script>
+        /* User interface */
+        "use strict";
+
         const input = document.getElementById("input");
         const path = document.getElementById("path");
         const anchors = document.getElementById("anchors");
@@ -349,15 +868,23 @@
             ];
         }
 
-        var pathString = "";
-        var pathParsed = [];
+        var pathString = "";  // input
+        var pathParsed = [];  // parsed
+        var pathCubic = [];  // parsed and normalized to cubic Bezier curves
+        var pathAABB = [];  // axes-aligned bounding box
 
+        var fourierPoints = [];  // discrete points to be fitted
+        var fourierFitted = { x: [], y: [] };  // amplitudes of frequencies
+        var fourierFiltered = { x: [], y: [] };  // filtered amplitudes of frequencies
+        var fourierSvgPath = "";  // rendered svg path
+
+        // general drawing function
         function render() {
             input.style.borderColor = "#555";
             transform_input.style.color = "black";
 
             // update path
-            input.setAttribute("title", pathString.length + " chars, " + countPieces(pathParsed) + " pieces");
+            input.setAttribute("title", pathString.length + " chars, " + pathCubic.length + " pieces");
             try {
                 path.setAttribute('d', pathString);
             } catch (e) {  // doesn't work
@@ -376,22 +903,36 @@
             // anchor
             input.style.color = "black";
             renderAnchor(pathParsed);
+
+            // grid?? AABB
+            if (0) {
+                var aabbSvg = "<rect x='" + pathAABB.minx + "' y='" + pathAABB.miny +
+                    "' width='" + (pathAABB.maxx - pathAABB.minx) + "' height='" + (pathAABB.maxy - pathAABB.miny) +
+                    "' stroke='none' fill='rgba(0,0,0,0.05'></rect>";
+                document.getElementById("grid").innerHTML = aabbSvg;
+            }
+
+            // Fourier
+            //renderTrigonometricSeries(fourierPoints, fourierFiltered);
         }
 
+        // SVG elements
+        function svgLine(p, q, markerStart, markerEnd) {
+            if (isNaN(p[0] * q[0] + p[1] * q[1])) return "";
+            var line = "<line x1='" + p[0] + "' y1='" + p[1] + "' x2='" + q[0] + "' y2='" + q[1] + "' "
+                + (markerStart.length > 0 ? "marker-start='url(#" + markerStart + ")' " : "")
+                + (markerEnd.length > 0 ? "marker-end='url(#" + markerEnd + ")' " : " ")
+                + " vector-effect='non-scaling-stroke'></line>";
+            return line.replace(/\s+/g, ' ');
+        }
+        function svgArrow(p, dp, markerEnd = "end-arrow") {
+            dp = mulPoint(normalizePoint(dp), 1e-4);
+            return svgLine(subPoint(p, dp), addPoint(p, dp), "", markerEnd);
+        }
+
+        // drawing anchor and arrows for splines
         function renderAnchor(parsed) {
             var anchorLines = "", middleArrows = "", errorCross = "";
-
-            var line = function (p, q, markerStart, markerEnd) {
-                if (isNaN(p[0] * q[0] + p[1] * q[1])) return "";
-                return "<line x1='" + p[0] + "' y1='" + p[1] + "' x2='" + q[0] + "' y2='" + q[1] + "' "
-                    + (markerStart.length > 0 ? "marker-start='url(#" + markerStart + ")' " : "")
-                    + (markerEnd.length > 0 ? "marker-end='url(#" + markerEnd + ")' " : " ")
-                    + " vector-effect='non-scaling-stroke'></line>";
-            };
-            var arrow = function (p, dp, markerEnd = "end-arrow") {
-                dp = mulPoint(normalizePoint(dp), 1e-4);
-                return line(subPoint(p, dp), addPoint(p, dp), "", markerEnd);
-            };
 
             //var transfm = fromCanvas;
             var transfm = function transfm(x) { return x; };
@@ -401,7 +942,7 @@
                 switch (seg[0]) {  // MZLCQA
                     case 'M': {
                         var p0 = transfm(seg[1]);
-                        middleArrows += line(p0, p0, "start-circle", "");
+                        middleArrows += svgLine(p0, p0, "start-circle", "");
                         break;
                     }
                     case 'Z': {
@@ -409,7 +950,6 @@
                         var p1 = transfm(seg[2]);
                         var pc = mulPoint(addPoint(p0, p1), 0.5);
                         var dp = subPoint(p1, p0);
-                        //middleArrows += arrow(pc, dp);
                         break;
                     }
                     case 'L': {
@@ -417,7 +957,7 @@
                         var p1 = transfm(seg[2]);
                         var pc = mulPoint(addPoint(p0, p1), 0.5);
                         var dp = subPoint(p1, p0);
-                        middleArrows += arrow(pc, dp);
+                        middleArrows += svgArrow(pc, dp);
                         break;
                     }
                     case 'C': {
@@ -425,72 +965,46 @@
                         var p1 = transfm(seg[2]);
                         var p2 = transfm(seg[3]);
                         var p3 = transfm(seg[4]);
-                        anchorLines += line(p0, p1, "anchor-square", "anchor-circle");
-                        anchorLines += line(p3, p2, "anchor-square", "anchor-circle");
+                        anchorLines += svgLine(p0, p1, "anchor-square", "anchor-circle");
+                        anchorLines += svgLine(p3, p2, "anchor-square", "anchor-circle");
                         var pc = addPoint(mulPoint(addPoint(p0, p3), 0.125), mulPoint(addPoint(p1, p2), 0.375));
                         var dp = subPoint(addPoint(p2, p3), addPoint(p0, p1));
-                        middleArrows += arrow(pc, dp);
+                        middleArrows += svgArrow(pc, dp);
                         break;
                     }
                     case 'Q': {
                         var p0 = transfm(seg[1]);
                         var p1 = transfm(seg[2]);
                         var p2 = transfm(seg[3]);
-                        anchorLines += line(p0, p1, "anchor-square", "anchor-circle");
-                        anchorLines += line(p2, p2, "anchor-square", "anchor-square");
+                        anchorLines += svgLine(p0, p1, "anchor-square", "anchor-circle");
+                        anchorLines += svgLine(p2, p2, "anchor-square", "anchor-square");
                         var pc = addPoint(mulPoint(addPoint(p0, p2), 0.25), mulPoint(p1, 0.5));
                         var dp = subPoint(p2, p0);
-                        middleArrows += arrow(pc, dp);
+                        middleArrows += svgArrow(pc, dp);
                         break;
                     }
                     case 'A': {
-                        const sin = Math.sin, cos = Math.cos, PI = Math.PI, abs = Math.abs;
                         var p0 = seg[1], p1 = seg[5],
                             rx = seg[2][0], ry = seg[2][1],
                             theta = seg[3][0] * (PI / 180),
                             laf = seg[4][0], sf = seg[4][1];
-                        anchorLines += line(p0, p0, "anchor-square", "anchor-square");
-                        anchorLines += line(p1, p1, "anchor-square", "anchor-square");
-                        // arrows: is my formula correct??
-                        var dx = p1[0] - p0[0], dy = p1[1] - p0[1];
-                        var R = [[rx * cos(theta), -ry * sin(theta)], [rx * sin(theta), ry * cos(theta)]];
-                        var detR = R[0][0] * R[1][1] - R[0][1] * R[1][0];
-                        var invR = [[R[1][1] / detR, -R[0][1] / detR], [-R[1][0] / detR, R[0][0] / detR]];
-                        var dcos = invR[0][0] * dx + invR[0][1] * dy;
-                        var dsin = invR[1][0] * dx + invR[1][1] * dy;
-                        var sc = (2.0 - 1e-12) / Math.hypot(dcos, dsin);
-                        if (sc < 1.0) {
-                            // formula is guessed, no guarantee to work
-                            // https://www.w3.org/TR/SVG/paths.html#ArcOutOfRangeParameters
-                            // https://www.w3.org/TR/SVG/implnote.html#ArcCorrectionOutOfRangeRadii
-                            rx /= sc, ry /= sc, detR /= sc * sc;
-                            for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) R[i][j] /= sc, invR[i][j] *= sc;
-                            dcos *= sc, dsin *= sc;
-                        }
-                        var avr_t = Math.atan2(-dcos, dsin);
-                        var amp_t = Math.asin(0.5 * Math.hypot(dcos, dsin));
-                        if (cos(avr_t) * sin(amp_t) * dsin < 0.0) amp_t = -amp_t;
-                        // laf: abs(t1-t0)>PI; sf: t1>t0
-                        var t0 = avr_t - amp_t, t1 = avr_t + amp_t;
-                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - amp_t + 2.0 * PI, t1 = avr_t + amp_t;
-                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t), t1 = avr_t + (PI - amp_t);
-                        if (((abs(t1 - t0) > PI) != (laf != 0)) || ((t1 > t0) != (sf != 0))) t0 = avr_t - (PI - amp_t) + 2.0 * PI, t1 = avr_t + (PI - amp_t);
-                        var cx = p0[0] - (R[0][0] * cos(t0) + R[0][1] * sin(t0));
-                        var cy = p0[1] - (R[1][0] * cos(t0) + R[1][1] * sin(t0));
-                        // formula: [x(t),y(t)] = [cx,cy] + R·[cos(t),sin(t)]
+                        anchorLines += svgLine(p0, p0, "anchor-square", "anchor-square");
+                        anchorLines += svgLine(p1, p1, "anchor-square", "anchor-square");
+                        var arc_info = getEllipticArcInfo(p0, p1, rx, ry, theta, laf, sf);
+                        var t0 = arc_info.t0, t1 = arc_info.t1, mat = arc_info.matrix;
                         var t = 0.5 * (t0 + t1);
-                        var x = cx + R[0][0] * cos(t) + R[0][1] * sin(t);
-                        var y = cy + R[1][0] * cos(t) + R[1][1] * sin(t);
-                        var dxdt = R[0][0] * (-sin(t)) + R[0][1] * cos(t);
-                        var dydt = R[1][0] * (-sin(t)) + R[1][1] * cos(t);
+                        var x = mat[0][0] * cos(t) + mat[0][1] * sin(t) + mat[0][2];
+                        var y = mat[1][0] * cos(t) + mat[1][1] * sin(t) + mat[1][2];
+                        var dxdt = mat[0][0] * (-sin(t)) + mat[0][1] * cos(t);
+                        var dydt = mat[1][0] * (-sin(t)) + mat[1][1] * cos(t);
                         if (t0 > t1) dxdt = -dxdt, dydt = -dydt;
-                        middleArrows += arrow([x, y], [dxdt, dydt]);
+                        middleArrows += svgArrow([x, y], [dxdt, dydt]);
                         break;
                     }
                     case 'X': {
                         input.style.color = "red";
                         var p0 = transfm(seg[1]);
-                        errorCross += arrow(p0, [1, 0], "red-cross");
+                        errorCross += svgArrow(p0, [1, 0], "red-cross");
                         break;
                     }
                 }
@@ -500,11 +1014,41 @@
             document.getElementById("error-cross").innerHTML = errorCross;
         }
 
+        // drawing fitted Fourier series
+        function renderTrigonometricSeries(points, fitted) {
+            var svg = "";
+            for (var i = 0; i < points.length; i++) {
+                svg += svgLine(points[i], points[i], "sample-dot", "");
+            }
+            if (fourierSvgPath == "") {
+                let N = 4096;
+                var points = fourierEvalN(fitted, N);
+                fourierSvgPath = "<path d='";
+                for (var i = 0; i < N; i++) {
+                    fourierSvgPath += (i == 0 ? 'M' : 'L') + points[i][0] + ',' + points[i][1];
+                }
+                fourierSvgPath += "Z' stroke='black' vector-effect='non-scaling-stroke'></path>";
+            }
+            svg += fourierSvgPath;
+            document.getElementById("svg-fourier").innerHTML = svg;
+        }
+
+        // call this when input parameters change
         function updateInput() {
-            pathString = input.value;
-            pathString = pathString.replace(/\s/g, " ");
-            pathString = pathString.replace(/^[\s\"\'\=]*/, "").replace(/[\"\'\,\;\s]*$/, "");  // copy-pasted string
+            pathString = input.value.replace(/\s+/g, " ");
+            pathString = pathString.replace(/^[\s\"\'\=]+/, "").replace(/[\"\'\,\;\s]+$/, "");  // copy-pasted string
             pathParsed = parsePath(pathString);
+            pathCubic = normalizeToCubicBezier(pathParsed);
+            pathAABB = calcPathAABB(pathCubic);
+            fourierPoints = pathToPointsALP(pathCubic, 512);
+            fourierFitted = fourierTransformPoints(fourierPoints);
+            fourierFiltered = {
+                x: fourierFilterHeaviestWaves(fourierFitted.x, 18),
+                y: fourierFilterHeaviestWaves(fourierFitted.y, 18)
+            };
+            fourierSvgPath = "";
+            //console.log(fourierFiltered);
+            //console.log(fourierToLatex(fourierFiltered, 0, true, true));
             render();
         }
 
@@ -512,7 +1056,7 @@
 
             function onResize() {
                 var bodyStyle = window.getComputedStyle(document.body);
-                var w = Math.min(parseFloat(bodyStyle.width), 1000), h = Math.max(parseFloat(bodyStyle.height), 400);
+                var w = Math.min(parseFloat(bodyStyle.width), 1000), h = Math.min(Math.max(parseFloat(bodyStyle.height), 400), 800);
                 svg.setAttribute("width", w), svgcontainer.style.width = w + "px";
                 svg.setAttribute("height", h), svgcontainer.style.height = h + "px";  // should overflow
             }
