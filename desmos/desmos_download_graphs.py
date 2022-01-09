@@ -63,12 +63,12 @@ index = """<!DOCTYPE html>
 
     <script id="mathjax-config-script" type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax:{inlineMath:[["$","$"]],preview:"none"},"fast-preview":{disabled:true},AssistiveMML:{disabled:true},menuSettings:{inTabOrder:false},messageStyle:"simple",positionToHash: false});</script>
     <script type="text/javascript" id="MathJax_src" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <style>.graph{display:block;margin:10px;padding:10px;border-bottom:1px solid gray}img{height:240px;display:inline-block;margin:0 30px 0 0}.description{display:inline-block;vertical-align:top;margin:0}h2{margin:16px 0 10px;font-size:28px}.created{margin:0;font-size:16px;color:#222}.equation{margin:24px 0;font-size:20px}a{font-size:16px;padding:0 2px;text-decoration:none}a:hover{text-decoration:underline}</style>
+    <style>.graph{display:block;margin:10px;padding:10px;border-bottom:1px solid gray}img{height:240px;display:inline-block;margin:0 30px 0 0}.description{display:inline-block;vertical-align:top;margin:0}h1{margin:16px 0 10px;font-size:32px}h2{margin:16px 0 10px;font-size:28px}.created{margin:0;font-size:16px;color:#222}.equation{margin:24px 0;font-size:20px}a{font-size:16px;padding:0 2px;text-decoration:none}a:hover{text-decoration:underline}</style>
 </head>
 <body>
     <div style="margin:20px;">
         <h1>List of my saved Desmos graphs</h1>
-        <p class="time">Updated {%CURRENT_DATE%}</p>
+        <p class="created">Harry Chen - Updated {%CURRENT_DATE%}</p>
         <div><br/></div>
         <hr/>
     </div>""".replace('{%CURRENT_DATE%}', datetime.datetime.now().strftime("%Y/%m/%d"))
@@ -104,6 +104,10 @@ for graph_id in graphs:
     print('complete', end='\n')
 
 
-index += """<div><br></div><div><br></div><div><br></div><div><br></div></body></html>"""
+index += """
+<div style="margin:10px"><br/>
+    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+<br/><br/><br/></div>
+</body></html>"""
 
 open('desmos/index.html', "wb").write(bytearray(index, 'utf-8'))

@@ -6,9 +6,9 @@ root = os.path.dirname(__file__)
 
 def getFileSize(path):
     n = os.path.getsize(path)
-    if n<1000: return str(n)+'bytes'
-    if n<1000000: return ("%.1f"%(n/2**10)).rstrip('.0')+'KB'
-    return ("%.1f"%(n/2**20)).rstrip('.0')+'MB'
+    if n<1000: return str(n)+'&nbsp;bytes'
+    if n<1000000: return ("%.1f"%(n/2**10)).rstrip('.0')+'&nbsp;kB'
+    return ("%.1f"%(n/2**20)).rstrip('.0')+'&nbsp;MB'
 
 def getExtension(path):
     ext = os.path.splitext(path)[1]
