@@ -3,7 +3,9 @@
 from requests_html import HTMLSession
 import html
 import json
+import latex_parser
 import datetime
+import os
 
 
 def download_graph(graph_id: str):
@@ -17,31 +19,16 @@ def download_graph(graph_id: str):
     return data['graph']
 
 
-def get_latex_width(latex: str):
-    """Acceptable if less than 1"""
-    return len(latex) / 256
-
-
-def get_representative_equation(obj: dict):
+def get_representative_equation(expressions: dict):
+    latex_list = latex_parser.get_all_latex(expressions)
     longest = ""
-    if type(obj) is not dict:
-        return longest
-    for s in obj:
-        if type(obj[s]) is dict:
-            l = get_representative_equation(obj[s])
-            if len(l) > len(longest):
-                longest = l
-        if type(obj[s]) is list:
-            for t in obj[s]:
-                l = get_representative_equation(t)
-                if len(l) > len(longest):
-                    longest = l
-        if s == 'latex':
-            latex = obj[s]
-            if len(latex) > len(longest):
-                if get_latex_width(latex) <= 1.0:
-                    longest = latex
-    return longest
+    max_value = -float('inf')
+    for latex in latex_list:
+        value = latex_parser.rank_latex(latex)
+        if value > max_value:
+            longest = latex
+            max_value = value
+    return longest.strip('$')
 
 
 # a list of my Desmos graphs obtained using desmos_get_id.js
@@ -76,15 +63,21 @@ index = """<!DOCTYPE html>
 
 # go through the list to download graphs
 for graph_id in graphs:
-
-    # download graph
     print(graph_id, end=' - ')
-    graph = download_graph(graph_id)
-    equation = html.escape(get_representative_equation(graph))
 
-    # save state
-    with open(f"desmos/graphs/{graph_id}.json", 'w') as fp:
-        json.dump(graph, fp)
+    # load graph
+    filename = f"desmos/graphs/{graph_id}.json"
+    if os.path.isfile(filename):
+        with open(filename, 'r') as fp:
+            graph = json.load(fp)
+        print("loaded from file", end=' - ')
+    else:
+        graph = download_graph(graph_id)
+        with open(filename, 'w') as fp:
+            json.dump(graph, fp)
+        print("downloaded", end=' - ')
+
+    equation = html.escape(get_representative_equation(graph))
 
     # add graph to the index
     content = f"""<div class="graph">
@@ -92,7 +85,7 @@ for graph_id in graphs:
         <div class="description">
             <h2>{graph['title']}</h2>
             <p class="created">{graph['created']}</p>
-            <p class="equation">$${equation}$$</p>
+            <p class="equation" title="This equation is automatically selected from the list of expressions.">$${equation}$$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/{graph_id}">Desmos</a>
                 <a href="./graphs/{graph_id}.json">JSON</a>
@@ -101,12 +94,12 @@ for graph_id in graphs:
     </div>"""
     index += content
 
-    print('complete', end='\n')
+    print("complete", end='\n')
 
 
 index += """
 <div style="margin:10px"><br/>
-    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
 <br/><br/><br/></div>
 </body></html>"""
 

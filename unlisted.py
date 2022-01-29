@@ -7,7 +7,7 @@ root = os.path.dirname(__file__)
 def getFileSize(path):
     n = os.path.getsize(path)
     if n<1000: return str(n)+'&nbsp;bytes'
-    if n<1000000: return ("%.1f"%(n/2**10)).rstrip('.0')+'&nbsp;kB'
+    if n<1000000: return ("%.1f"%(n/2**10)).rstrip('.0')+'&nbsp;KB'
     return ("%.1f"%(n/2**20)).rstrip('.0')+'&nbsp;MB'
 
 def getExtension(path):
@@ -37,7 +37,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1,name=''):
         html += "<table>\n"
         for fn in files:
             ext = getExtension(fn)
-            if web_only and ['htm','html','js','css','svg','pdf'].count(ext)==0:
+            if web_only and ['htm','html','js','css','svg','mp4'].count(ext)==0:
                 continue
             html += "    <tr>"
             html += "<td class='file' type='"+ext+"'>"+name+fn[trunc:]+"</td>"
@@ -55,7 +55,7 @@ additional_repos = [
     ['miscellaneous','../miscellaneous'],
     ['AVI3M-CPT','../AVI3M-CPT'],
     ['AVI4M-ISP','../AVI4M-ISP'],
-    ]
+]
 
 site_content = indexDirectory(root)
 additional_contents = ["<div class='dirname'><i>/"+s[0]+"</i></div>"
@@ -70,7 +70,7 @@ content = """<!doctype html>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
     <link rel="icon" href="./logo.png" />
-    <style>body{margin:10px 10px 40px 10px}div,table{margin-left:40px}td{padding-right:16px}span{padding-left:20px}a{color:#000}.htm,.html{color:blue}.js{color:#ff4500}.css{color:#006400}.png,.jpg,.svg,.ico,.webp{color:#8b008b}.md,.txt{text-decoration:none}</style>
+    <style>body{margin:10px 10px 40px 10px}div,table{margin-left:40px}td{padding-right:16px}span{padding-left:20px}a{color:#000}.htm,.html{color:blue}.js{color:#ff4500}.css{color:#006400}.png,.jpg,.svg,.ico,.webp,.gif,.mp4{color:#8b008b}.md,.txt{text-decoration:none}</style>
     <script>
         window.onload = function () {
             var root = String(document.URL);
@@ -78,7 +78,7 @@ content = """<!doctype html>
             var paths = document.getElementsByClassName('file');
             for (let f of paths) {
                 if (f.innerHTML == '/unlisted.html') continue;
-                f.innerHTML = "<a href='" + root + f.innerHTML.replace('<i>','').replace('</i>','') + "'>" + f.innerHTML + "</a>";
+                f.innerHTML = "<a href='" + f.innerHTML.replace('<i>','').replace('</i>','') + "'>" + f.innerHTML + "</a>";
                 f.children[0].setAttribute('class', f.getAttribute('type'));
             }
             var f = document.getElementById('root');
