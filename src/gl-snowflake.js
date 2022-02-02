@@ -1,3 +1,5 @@
+"use strict";
+
 function setupSnowflakeRenderer() {
     var webgl_failed = function (error) {
         console.error(error);
@@ -17,18 +19,46 @@ function setupSnowflakeRenderer() {
         webgl_failed("WebGL Context Lost");
     });
 
+    const glowEffects = [
+        [0, 0, -1, -1],  // pink
+        [1, 0, -1, -1],  // pink + glow
+        [1, 1, -1, -1],  // hue + glow
+    ];
+    var glowEffectI = 0;
+
+    var renderer = {
+        canvas: canvas,
+        gl: gl,
+        extentions: {},
+        programs: {
+            renderProgram: null
+        },
+        uniforms: {
+            iResolution: [0, 0],
+            iTime: 0.0,
+            iMouse: { x: 0, y: 0, z: -1 },
+            glowEffect: glowEffects[glowEffectI]
+        },
+        buffers: {
+            positionBuffer: null,
+        },
+        textures: {},
+        framebuffers: {},
+        renderNeeded: true
+    };
+
     // vertex and fragment shader code
-    var vsSource = "attribute vec4 aVertexPosition;void main(void){gl_Position=aVertexPosition;}";
+    const vsSource = "attribute vec4 aVertexPosition;void main(void){gl_Position=aVertexPosition;}";
     var request = new XMLHttpRequest();
     request.open("GET", "./src/gl-snowflake.glsl", false);
     request.send(null);
     var fsSource = request.responseText;
 
-    var iTime = 0.0, t0 = 100.0 * (2000 * Math.random() - 1000);
-    var iMouse = [0, 0, -1];
+    // start time
+    var start_time = 100.0 * (2000 * Math.random() - 1000);
 
-    // initialize a shader program
-    function initShaderProgram(gl, vsSource, fsSource) {
+    // create shader program(s)
+    function initShaderProgram(vsSource, fsSource) {
         function loadShader(gl, type, source) {
             var shader = gl.createShader(type);  // create a new shader
             gl.shaderSource(shader, source);  // send the source code to the shader
@@ -49,53 +79,35 @@ function setupSnowflakeRenderer() {
             throw new Error(gl.getProgramInfoLog(shaderProgram));
         return shaderProgram;
     }
-    var shaderProgram = null;
     try {
         console.time("compile shader");
-        shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-        if (shaderProgram == null) throw (shaderProgram);
+        renderer.programs.renderProgram = initShaderProgram(vsSource, fsSource);
+        if (renderer.programs.renderProgram == null)
+            throw renderer.programs.renderProgram;
         console.timeEnd("compile shader");
     } catch (e) {
         webgl_failed(e);
         return;
     }
 
-    // look up the locations that WebGL assigned to inputs
-    const programInfo = {
-        program: shaderProgram,
-        attribLocations: {  // attribute variables, receive values from buffers
-            vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-        },
-        uniformLocations: {  // uniform variables, similar to JS global variables
-            iResolution: gl.getUniformLocation(shaderProgram, "iResolution"),
-            iTime: gl.getUniformLocation(shaderProgram, "iTime"),
-            iMouse: gl.getUniformLocation(shaderProgram, "iMouse"),
-        },
-    };
-
     // initialize buffers
-    function initBuffers(gl) {
+    try {
         var positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-        // vec2[4], coordinates from -1 to 1
         var positions = [-1, 1, 1, 1, -1, -1, 1, -1];
-
-        // pass the list of positions into WebGL to build the shape
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-        return { position: positionBuffer, };
-    }
-    var buffers = {};
-    try {
-        buffers = initBuffers(gl);
+        renderer.buffers.positionBuffer = positionBuffer;
     } catch (e) {
         webgl_failed(e);
         return;
     }
 
     // rendering
-    function drawScene(gl, programInfo, buffers) {
+    function drawScene() {
+
+        /* Render Pass */
+        var program = renderer.programs.renderProgram;
+        gl.useProgram(program);
 
         // clear the canvas
         gl.viewport(0, 0, canvas.width, canvas.height);
@@ -105,28 +117,38 @@ function setupSnowflakeRenderer() {
         gl.depthFunc(gl.LEQUAL);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        // setup position buffer
         {
-            const numComponents = 2;  // pull out 2 values per iteration
-            const type = gl.FLOAT;  // the data in the buffer is 32bit floats
-            const normalize = false;  // don't normalize
-            const stride = 0; // how many bytes to get from one set of values to the next
-            const offset = 0; // how many bytes inside the buffer to start from
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+            const numComponents = 2;
+            const type = gl.FLOAT;
+            const normalize = false;
+            const stride = 0;
+            const offset = 0;
+            gl.bindBuffer(gl.ARRAY_BUFFER, renderer.buffers.positionBuffer);
+            var vertexPosition = gl.getAttribLocation(program, "aVertexPosition");
             gl.vertexAttribPointer(
-                programInfo.attribLocations.vertexPosition,
+                vertexPosition,
                 numComponents, type, normalize, stride, offset);
-            gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+            gl.enableVertexAttribArray(vertexPosition);
         }
 
-        // make sure it uses the program
-        gl.useProgram(programInfo.program);
+        // setup uniforms
+        gl.uniform2f(gl.getUniformLocation(program, "iResolution"),
+            renderer.uniforms.iResolution[0] = canvas.clientWidth,
+            renderer.uniforms.iResolution[1] = canvas.clientHeight);
+        gl.uniform1f(gl.getUniformLocation(program, "iTime"),
+            renderer.uniforms.iTime = 0.001 * (performance.now() - start_time));
+        gl.uniform3f(gl.getUniformLocation(program, "iMouse"),
+            renderer.uniforms.iMouse[0],
+            renderer.uniforms.iMouse[1],
+            renderer.uniforms.iMouse[2]);
+        gl.uniform4i(gl.getUniformLocation(program, "glowEffect"),
+            renderer.uniforms.glowEffect[0],
+            renderer.uniforms.glowEffect[1],
+            renderer.uniforms.glowEffect[2],
+            renderer.uniforms.glowEffect[3]);
 
-        // set shader uniforms
-        gl.uniform2f(programInfo.uniformLocations.iResolution, canvas.clientWidth, canvas.clientHeight);
-        gl.uniform1f(programInfo.uniformLocations.iTime, iTime = 0.001 * (performance.now() - t0));
-        gl.uniform3f(programInfo.uniformLocations.iMouse, iMouse[0], iMouse[1], iMouse[2]);
-
-        // render
+        // draw
         {
             const offset = 0;
             const vertexCount = 4;
@@ -135,38 +157,47 @@ function setupSnowflakeRenderer() {
     }
 
     function render_main(now) {
-
         var w = window.innerWidth, h = window.innerHeight;
         canvas.width = w, canvas.style.width = w + "px";
         canvas.height = h, canvas.style.height = h + "px";
-
         try {
-            drawScene(gl, programInfo, buffers);
+            drawScene();
         } catch (e) {
             webgl_failed(e);
             return;
         }
-
         requestAnimationFrame(render_main);
     }
-
     requestAnimationFrame(render_main);
-
 
     // interactions
     var mouseDown = false;
     canvas.addEventListener('mousedown', function (event) {
         mouseDown = true;
-        iMouse[2] = 1.0;
+        renderer.uniforms.iMouse[0] = event.clientX;
+        renderer.uniforms.iMouse[1] = canvas.height - event.clientY;
+        renderer.uniforms.iMouse[2] = 1.0;
     });
     window.addEventListener('mouseup', function (event) {
         mouseDown = false;
-        iMouse[2] = -1.0;
+        renderer.uniforms.iMouse[2] = -1.0;
     });
-    canvas.addEventListener('mousemove', function (e) {
+    canvas.addEventListener('mousemove', function (event) {
         if (mouseDown) {
-            iMouse[0] = e.clientX;
-            iMouse[1] = canvas.height - e.clientY;
+            renderer.uniforms.iMouse[0] = event.clientX;
+            renderer.uniforms.iMouse[1] = canvas.height - event.clientY;
         }
     });
+
+    // click "WebGL"
+    document.getElementById("glow-effect-button").addEventListener("click", function (event) {
+        let n = glowEffects.length;
+        if (event.shiftKey) glowEffectI = (glowEffectI + n - 1) % n;
+        else glowEffectI = (glowEffectI + 1) % n;
+        renderer.uniforms.glowEffect = glowEffects[glowEffectI];
+    });
+
+    // set emoji
+    let container = document.getElementById("snowflake-emoji");
+    container.innerHTML = container.innerHTML.replaceAll('❄️', '<img src="https://twemoji.maxcdn.com/v/13.1.0/svg/2744.svg" alt="❄️" style="height:1.2em;padding-top:0.15em"/>&nbsp;')
 }

@@ -3,6 +3,7 @@ precision highp float;
 uniform vec2 iResolution;
 uniform float iTime;
 uniform vec3 iMouse;
+uniform bvec4 glowEffect;  // outer glow, color
 
 #define PI 3.14159265368979
 
@@ -22,9 +23,9 @@ float hexagon(vec2 p, float r) {
 }
 
 float map(vec2 p0) {
-	float a = abs(mod(3.0*atan(p0.y, p0.x) + 0.5*PI, PI) - 0.5*PI) / 3.0;
+	float a = abs(asin(sin(3.0*atan(p0.y,p0.x)))) / 3.0;
 	vec2 p = length(p0.xy)*vec2(cos(a), sin(a));
-	a = abs(mod(3.0*atan(p0.x, p0.y) + 0.5*PI, PI) - 0.5*PI) / 3.0;;
+	a = abs(asin(sin(3.0*atan(p0.x,p0.y)))) / 3.0;
 	vec2 q = length(p0.xy)*vec2(sin(a), cos(a));
 
 	float d = 1e+12;
@@ -57,11 +58,20 @@ vec3 get_background(vec3 rd) {
     return clamp(col * 0.8*vec3(0.2,0.2,1.0), 0.0, 1.0);
 }
 
+vec3 hsv2rgb(vec3 hsv) {
+    // https://github.com/hughsk/glsl-hsv2rgb
+    vec4 k = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(hsv.xxx + k.xyz) * 6.0 - k.www);
+    return hsv.z * mix(k.xxx, clamp(p - k.xxx, 0.0, 1.0), hsv.y);
+}
+
 void main() {
+
+    // setup camera
     float iDist = 6.0;
 
     float rx = iMouse.z>0.?1.57+1.0*(2.0*iMouse.y/iResolution.y-1.0):1.4+0.5*sin(0.1*iTime);
-    float rz = iMouse.z>0.?-iMouse.x/iResolution.x*4.0*3.14:0.2*iTime-2.0;
+    float rz = iMouse.z>0.?-iMouse.x/iResolution.x*2.0*3.14:0.2*iTime-2.0;
 
     vec3 w = vec3(cos(rx)*vec2(cos(rz),sin(rz)), sin(rx));
     vec3 u = vec3(-sin(rz),cos(rz),0);
@@ -71,24 +81,27 @@ void main() {
     vec3 rd = normalize(mat3(u,v,-w)*vec3(uv*iResolution.xy,4.0*min(iResolution.x,iResolution.y)));
     vec3 ro = iDist*w + (iDist-2.0)*rd;
 
+    // sample snowflake
     float t = -ro.z / rd.z;
     ro += rd*t;
     float sd = map(ro.xy);
-    vec3 col = get_background(rd);
 
-    if (sd < 0.0) {
-        vec3 col1 = vec3(0.0);
-        vec3 n = vec3(0, 0, 1);
-        col1 += 0.6 * get_background(rd);
-        col1 += 0.15 * get_background(reflect(rd, n));
+    // shade snowflake
+    vec3 col = glowEffect.y ?
+        0.4 * pow(hsv2rgb(vec3(iTime,1.0,1.0)), vec3(0.5)) :
+        0.8 * vec3(0.8,0.4,0.6);
 
-        float y = pow(0.3656*abs(sin(0.5*iTime)+2.0*sin(iTime)),20.0);
-        vec3 c = 0.8*vec3(0.8,0.4,0.6) + y * 0.2*vec3(0.8,0.6,0.2);
-        col1 += c * exp(30.0 * sd / dot(rd, n));
+    float spark = pow(0.3656*abs(sin(0.5*iTime)+2.0*sin(iTime)),20.0);
+    col += spark * 0.2*vec3(0.8,0.6,0.2);
 
-        float t = clamp(-1.4*min(iResolution.x,iResolution.y)*sd, 0.0, 1.0);
-        col = mix(col, col1, t);
-    }
+    float mask = clamp(-1.4*min(iResolution.x,iResolution.y)*sd, 0.0, 1.0);
+    if (glowEffect.x) mask += (glowEffect.y?1.2:0.5)*exp(-6.0*max(sd,0.));
+    mask *= exp(30.0 * sd / rd.z);
 
-    gl_FragColor = vec4(col,1.0);
+    // color output
+    vec3 background = get_background(rd);
+    vec3 snowflake = col * mask;
+    vec3 color = background + snowflake;
+    color += vec3(1.5/255.)*fract(0.13*gl_FragCoord.x*gl_FragCoord.y);  // reduce "stripes"
+    gl_FragColor = vec4(color, 1.0);
 }

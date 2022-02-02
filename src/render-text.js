@@ -153,7 +153,8 @@ function setContactInfo() {
     ];
     var infoIndex = 0;
     element.innerHTML = infos[infoIndex];
-    element.addEventListener("click", function (e) {
+    element.addEventListener("click", function (event) {
+        event.preventDefault();
         infoIndex = (infoIndex + 1) % infos.length;
         element.innerHTML = infos[infoIndex];
     })
