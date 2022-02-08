@@ -1,5 +1,4 @@
 import json
-from multiprocessing.sharedctypes import Value
 
 
 def split_latex(latex: str) -> list[str]:
