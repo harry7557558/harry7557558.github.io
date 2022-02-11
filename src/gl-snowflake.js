@@ -191,6 +191,7 @@ function setupSnowflakeRenderer() {
 
     // click "WebGL"
     document.getElementById("glow-effect-button").addEventListener("click", function (event) {
+        event.preventDefault();
         let n = glowEffects.length;
         if (event.shiftKey) glowEffectI = (glowEffectI + n - 1) % n;
         else glowEffectI = (glowEffectI + 1) % n;
