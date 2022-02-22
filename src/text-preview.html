@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>text-preview.html</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+    <pre id="pre"></pre>
+    <script>
+        function onerror(message) {
+            pre.style.color = "red";
+            pre.style.fontWeight = 800;
+            pre.textContent = message;
+        }
+        function init() {
+            let pre = document.getElementById("pre");
+            var path = document.location.hash.replace('#', '');
+            if (path.length == 0) return onerror("empty hash");
+            if (path[0] != '/') path = '/' + path;
+
+            var req = new XMLHttpRequest();
+            req.open("GET", path);
+            req.onload = function () {
+                if (req.status != 200) return onerror("error " + req.status);
+                pre.textContent = req.responseText;
+            }
+            req.onerror = function (error) { return onerror("error"); }
+            req.send(null);
+        }
+        document.body.onload = init;
+    </script>
+</body>
+
+</html>

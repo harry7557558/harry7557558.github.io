@@ -5,35 +5,31 @@
     <title>Harry Chen - unlisted</title>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1" />-->
     <link rel="icon" href="./logo.png" />
-    <style>body{margin:10px 10px 40px 10px}div,table{margin-left:40px}td{padding-right:16px}span{padding-left:20px}a{color:#000}.htm,.html{color:blue}.js{color:#ff4500}.css{color:#006400}.png,.jpg,.svg,.ico,.webp,.gif,.mp4{color:#8b008b}.md,.txt{text-decoration:none}</style>
-    <script>
-        window.onload = function () {
-            var root = String(document.URL);
-            root = root.replace(/\/unlisted.html$/, '');
-            var paths = document.getElementsByClassName('file');
-            for (let f of paths) {
-                if (f.innerHTML == '/unlisted.html') continue;
-                f.innerHTML = "<a href='" + f.innerHTML.replace('<i>','').replace('</i>','') + "'>" + f.innerHTML + "</a>";
-                f.children[0].setAttribute('class', f.getAttribute('type'));
-            }
-            var f = document.getElementById('root');
-            f.innerHTML = "<a href='" + root + "/index.html'>" + root + "</a>";
-        }
-    </script>
+    <style>
+        body{margin:0.5em}
+        div>div,table{margin-left:2em}td{padding-right:1em}span{padding-left:1em}
+        a{color:#aaa}
+        .htm,.html{color:blue}
+        .js{color:#ff4500}
+        .css{color:#006400}
+        .png,.jpg,.svg,.ico,.gif,.webp,.webm,.mp4{color:#8b008b}
+        .json{color:#565}
+        .md,.txt{color:#222}
+    </style>
 </head>
 <body>
-    <div id="root" style="margin-left:0;font-size:20px;margin-bottom:5px;"></div>
     <div class='dirname'>/art</div>
 <div class='dir'>
 <div class='dirname'>/art/dyed-egg</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='glsl'>/art/dyed-egg/egg-texture.glsl</td><td>5.2&nbsp;KB</td><td>glsl</td></tr>
-            <tr><td class='file' type='glsl'>/art/dyed-egg/fs-source.glsl</td><td>5.5&nbsp;KB</td><td>glsl</td></tr>
-            <tr><td class='file' type='html'>/art/dyed-egg/index.html</td><td>1.4&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/art/dyed-egg/script.js</td><td>17.2&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='glsl'>/art/dyed-egg/vs-source.glsl</td><td>858&nbsp;bytes</td><td>glsl</td></tr>
+        <table>
+            <tr><td class='file'><a href='src/text-preview.html#/art/dyed-egg/egg-texture.glsl' class='glsl'>/art/dyed-egg/egg-texture.glsl</a></td><td>5.2&nbsp;KB</td><td>glsl</td></tr>
+            <tr><td class='file'><a href='src/text-preview.html#/art/dyed-egg/fs-source.glsl' class='glsl'>/art/dyed-egg/fs-source.glsl</a></td><td>5.5&nbsp;KB</td><td>glsl</td></tr>
+            <tr><td class='file'><a href='./art/dyed-egg/index.html' class='html'>/art/dyed-egg/index.html</a></td><td>1.4&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./art/dyed-egg/script.js' class='js'>/art/dyed-egg/script.js</a></td><td>17.2&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='src/text-preview.html#/art/dyed-egg/vs-source.glsl' class='glsl'>/art/dyed-egg/vs-source.glsl</a></td><td>858&nbsp;bytes</td><td>glsl</td></tr>
         </table>
     </div>
     
@@ -42,69 +38,69 @@
 <div class='dir'>
 <div class='dirname'>/desmos/graphs</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='json'>/desmos/graphs/1z17yc5djh.json</td><td>7.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/4vo8ccfuvp.json</td><td>6.6&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/59x14hqpt3.json</td><td>12.2&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/7lr5htcel6.json</td><td>2.5&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/af8foz89fc.json</td><td>6.4&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ar8trp3g9s.json</td><td>2.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/bq5nc43zfh.json</td><td>11.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/btal70uvxv.json</td><td>7.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/bzecuo9xix.json</td><td>12.7&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/cs4faizltl.json</td><td>9.4&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ddyum0rkgw.json</td><td>3.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/diuy6hrgw6.json</td><td>2.7&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/f9vwgan2ip.json</td><td>13.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/fa7mwvpxb3.json</td><td>16&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ftuogjzprg.json</td><td>18.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/gbji3acmwp.json</td><td>1.5&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/hsp3ccmdhw.json</td><td>2.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/hvtbjw6rue.json</td><td>4.5&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/hznnunxnx6.json</td><td>1.2&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ivasvrustk.json</td><td>14.2&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/j0eqqzsj7v.json</td><td>5.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/jk1okdxoks.json</td><td>4.1&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/kmkcgt5eld.json</td><td>3.2&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ktnucw466t.json</td><td>3.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/l99tjopqcx.json</td><td>5.1&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/nn29zfpyiq.json</td><td>2.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/nwoctkrg80.json</td><td>1.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/otaly31kry.json</td><td>7.4&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/oz6pwrslel.json</td><td>6.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/ozmnil3v00.json</td><td>10.6&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/pav2l1kzte.json</td><td>3.4&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/pqgezgxk0l.json</td><td>15.9&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/pv4gxyyckx.json</td><td>3.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/raeuahskxm.json</td><td>5.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/sctxdxh1td.json</td><td>3.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/vfizuknvjq.json</td><td>2.3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/vu4xm0n9ir.json</td><td>17.2&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/w4thzt4ofr.json</td><td>10.7&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/wrxe3cbpyz.json</td><td>7.4&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/x0gicefgnp.json</td><td>17&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/z7zooq9zsh.json</td><td>36.6&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/zccocbuygk.json</td><td>13.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/zn9d68fqzt.json</td><td>5.8&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/zsp6rgqjev.json</td><td>3&nbsp;KB</td><td>json</td></tr>
-            <tr><td class='file' type='json'>/desmos/graphs/zyxas5zy8w.json</td><td>3&nbsp;KB</td><td>json</td></tr>
+        <table>
+            <tr><td class='file'><a href='./desmos/graphs/1z17yc5djh.json' class='json'>/desmos/graphs/1z17yc5djh.json</a></td><td>7.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/4vo8ccfuvp.json' class='json'>/desmos/graphs/4vo8ccfuvp.json</a></td><td>6.6&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/59x14hqpt3.json' class='json'>/desmos/graphs/59x14hqpt3.json</a></td><td>12.2&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/7lr5htcel6.json' class='json'>/desmos/graphs/7lr5htcel6.json</a></td><td>2.5&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/af8foz89fc.json' class='json'>/desmos/graphs/af8foz89fc.json</a></td><td>6.4&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ar8trp3g9s.json' class='json'>/desmos/graphs/ar8trp3g9s.json</a></td><td>2.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/bq5nc43zfh.json' class='json'>/desmos/graphs/bq5nc43zfh.json</a></td><td>11.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/btal70uvxv.json' class='json'>/desmos/graphs/btal70uvxv.json</a></td><td>7.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/bzecuo9xix.json' class='json'>/desmos/graphs/bzecuo9xix.json</a></td><td>12.7&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/cs4faizltl.json' class='json'>/desmos/graphs/cs4faizltl.json</a></td><td>9.4&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ddyum0rkgw.json' class='json'>/desmos/graphs/ddyum0rkgw.json</a></td><td>3.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/diuy6hrgw6.json' class='json'>/desmos/graphs/diuy6hrgw6.json</a></td><td>2.7&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/f9vwgan2ip.json' class='json'>/desmos/graphs/f9vwgan2ip.json</a></td><td>13.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/fa7mwvpxb3.json' class='json'>/desmos/graphs/fa7mwvpxb3.json</a></td><td>16&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ftuogjzprg.json' class='json'>/desmos/graphs/ftuogjzprg.json</a></td><td>18.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/gbji3acmwp.json' class='json'>/desmos/graphs/gbji3acmwp.json</a></td><td>1.5&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/hsp3ccmdhw.json' class='json'>/desmos/graphs/hsp3ccmdhw.json</a></td><td>2.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/hvtbjw6rue.json' class='json'>/desmos/graphs/hvtbjw6rue.json</a></td><td>4.5&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/hznnunxnx6.json' class='json'>/desmos/graphs/hznnunxnx6.json</a></td><td>1.2&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ivasvrustk.json' class='json'>/desmos/graphs/ivasvrustk.json</a></td><td>14.2&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/j0eqqzsj7v.json' class='json'>/desmos/graphs/j0eqqzsj7v.json</a></td><td>5.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/jk1okdxoks.json' class='json'>/desmos/graphs/jk1okdxoks.json</a></td><td>4.1&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/kmkcgt5eld.json' class='json'>/desmos/graphs/kmkcgt5eld.json</a></td><td>3.2&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ktnucw466t.json' class='json'>/desmos/graphs/ktnucw466t.json</a></td><td>3.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/l99tjopqcx.json' class='json'>/desmos/graphs/l99tjopqcx.json</a></td><td>5.1&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/nn29zfpyiq.json' class='json'>/desmos/graphs/nn29zfpyiq.json</a></td><td>2.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/nwoctkrg80.json' class='json'>/desmos/graphs/nwoctkrg80.json</a></td><td>1.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/otaly31kry.json' class='json'>/desmos/graphs/otaly31kry.json</a></td><td>7.4&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/oz6pwrslel.json' class='json'>/desmos/graphs/oz6pwrslel.json</a></td><td>6.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/ozmnil3v00.json' class='json'>/desmos/graphs/ozmnil3v00.json</a></td><td>10.6&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/pav2l1kzte.json' class='json'>/desmos/graphs/pav2l1kzte.json</a></td><td>3.4&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/pqgezgxk0l.json' class='json'>/desmos/graphs/pqgezgxk0l.json</a></td><td>15.9&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/pv4gxyyckx.json' class='json'>/desmos/graphs/pv4gxyyckx.json</a></td><td>3.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/raeuahskxm.json' class='json'>/desmos/graphs/raeuahskxm.json</a></td><td>5.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/sctxdxh1td.json' class='json'>/desmos/graphs/sctxdxh1td.json</a></td><td>3.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/vfizuknvjq.json' class='json'>/desmos/graphs/vfizuknvjq.json</a></td><td>2.3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/vu4xm0n9ir.json' class='json'>/desmos/graphs/vu4xm0n9ir.json</a></td><td>17.2&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/w4thzt4ofr.json' class='json'>/desmos/graphs/w4thzt4ofr.json</a></td><td>10.7&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/wrxe3cbpyz.json' class='json'>/desmos/graphs/wrxe3cbpyz.json</a></td><td>7.4&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/x0gicefgnp.json' class='json'>/desmos/graphs/x0gicefgnp.json</a></td><td>17&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/z7zooq9zsh.json' class='json'>/desmos/graphs/z7zooq9zsh.json</a></td><td>36.6&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/zccocbuygk.json' class='json'>/desmos/graphs/zccocbuygk.json</a></td><td>13.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/zn9d68fqzt.json' class='json'>/desmos/graphs/zn9d68fqzt.json</a></td><td>5.8&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/zsp6rgqjev.json' class='json'>/desmos/graphs/zsp6rgqjev.json</a></td><td>3&nbsp;KB</td><td>json</td></tr>
+            <tr><td class='file'><a href='./desmos/graphs/zyxas5zy8w.json' class='json'>/desmos/graphs/zyxas5zy8w.json</a></td><td>3&nbsp;KB</td><td>json</td></tr>
         </table>
     </div>
-    <table>
-        <tr><td class='file' type='py'>/desmos/desmos_download_graphs.py</td><td>4.3&nbsp;KB</td><td>py</td></tr>
-        <tr><td class='file' type='js'>/desmos/desmos_get_id.js</td><td>847&nbsp;bytes</td><td>js</td></tr>
-        <tr><td class='file' type='json'>/desmos/graphs_id.json</td><td>586&nbsp;bytes</td><td>json</td></tr>
-        <tr><td class='file' type='html'>/desmos/index.html</td><td>32.2&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='py'>/desmos/latex_parser.py</td><td>10.8&nbsp;KB</td><td>py</td></tr>
-        <tr><td class='file' type='md'>/desmos/README.md</td><td>37&nbsp;bytes</td><td>md</td></tr>
+        <table>
+        <tr><td class='file'><a href='src/text-preview.html#/desmos/desmos_download_graphs.py' class='py'>/desmos/desmos_download_graphs.py</a></td><td>4.3&nbsp;KB</td><td>py</td></tr>
+        <tr><td class='file'><a href='./desmos/desmos_get_id.js' class='js'>/desmos/desmos_get_id.js</a></td><td>847&nbsp;bytes</td><td>js</td></tr>
+        <tr><td class='file'><a href='./desmos/graphs_id.json' class='json'>/desmos/graphs_id.json</a></td><td>586&nbsp;bytes</td><td>json</td></tr>
+        <tr><td class='file'><a href='./desmos/index.html' class='html'>/desmos/index.html</a></td><td>32.2&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='src/text-preview.html#/desmos/latex_parser.py' class='py'>/desmos/latex_parser.py</a></td><td>10.8&nbsp;KB</td><td>py</td></tr>
+        <tr><td class='file'><a href='src/text-preview.html#/desmos/README.md' class='md'>/desmos/README.md</a></td><td>37&nbsp;bytes</td><td>md</td></tr>
     </table>
 </div>
 <div class='dirname'>/graph_backup</div>
 <div class='dir'>
 <div class='dirname'>/graph_backup/desmos</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/graph_backup/desmos/index.html</td><td>443&nbsp;bytes</td><td>html</td></tr>
+        <table>
+            <tr><td class='file'><a href='./graph_backup/desmos/index.html' class='html'>/graph_backup/desmos/index.html</a></td><td>443&nbsp;bytes</td><td>html</td></tr>
         </table>
     </div>
     
@@ -113,34 +109,35 @@
 <div class='dir'>
 <div class='dirname'>/notes/unlisted</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='js'>/notes/unlisted/csh.js</td><td>8.2&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='html'>/notes/unlisted/Equations.html</td><td>139.9&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/notes/unlisted/Inertia.html</td><td>85.2&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/notes/unlisted/latex_desmos.js</td><td>2.1&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='html'>/notes/unlisted/Physics.html</td><td>18.4&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='md'>/notes/unlisted/README.md</td><td>83&nbsp;bytes</td><td>md</td></tr>
-            <tr><td class='file' type='html'>/notes/unlisted/Substitution.html</td><td>36.1&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='txt'>/notes/unlisted/UnicodeTable.txt</td><td>302.7&nbsp;KB</td><td>txt</td></tr>
+        <table>
+            <tr><td class='file'><a href='./notes/unlisted/csh.js' class='js'>/notes/unlisted/csh.js</a></td><td>8.2&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/Equations.html' class='html'>/notes/unlisted/Equations.html</a></td><td>139.9&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/Inertia.html' class='html'>/notes/unlisted/Inertia.html</a></td><td>85.2&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/latex_desmos.js' class='js'>/notes/unlisted/latex_desmos.js</a></td><td>2.1&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/Physics.html' class='html'>/notes/unlisted/Physics.html</a></td><td>18.4&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='src/text-preview.html#/notes/unlisted/README.md' class='md'>/notes/unlisted/README.md</a></td><td>83&nbsp;bytes</td><td>md</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/Substitution.html' class='html'>/notes/unlisted/Substitution.html</a></td><td>36.1&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./notes/unlisted/UnicodeTable.txt' class='txt'>/notes/unlisted/UnicodeTable.txt</a></td><td>302.7&nbsp;KB</td><td>txt</td></tr>
         </table>
     </div>
-    <table>
-        <tr><td class='file' type='html'>/notes/equations.html</td><td>1.8&nbsp;MB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/notes/substitution.html</td><td>244.1&nbsp;KB</td><td>html</td></tr>
+        <table>
+        <tr><td class='file'><a href='./notes/equations.html' class='html'>/notes/equations.html</a></td><td>1.8&nbsp;MB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./notes/substitution.html' class='html'>/notes/substitution.html</a></td><td>244.1&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/src</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='glsl'>/src/gl-snowflake.glsl</td><td>4.1&nbsp;KB</td><td>glsl</td></tr>
-        <tr><td class='file' type='js'>/src/gl-snowflake.js</td><td>7.3&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='json'>/src/links.json</td><td>3.5&nbsp;KB</td><td>json</td></tr>
-        <tr><td class='file' type='json'>/src/quotes.json</td><td>4.8&nbsp;KB</td><td>json</td></tr>
-        <tr><td class='file' type='js'>/src/render-text.js</td><td>6.4&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='jpg'>/src/snowflake.jpg</td><td>104.1&nbsp;KB</td><td>jpg</td></tr>
-        <tr><td class='file' type='js'>/src/snowflakes.js</td><td>3.7&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='css'>/src/style.css</td><td>1.3&nbsp;KB</td><td>css</td></tr>
-        <tr><td class='file' type='py'>/src/tojson-quotes.py</td><td>8&nbsp;KB</td><td>py</td></tr>
+    <table>
+        <tr><td class='file'><a href='src/text-preview.html#/src/gl-snowflake.glsl' class='glsl'>/src/gl-snowflake.glsl</a></td><td>4.1&nbsp;KB</td><td>glsl</td></tr>
+        <tr><td class='file'><a href='./src/gl-snowflake.js' class='js'>/src/gl-snowflake.js</a></td><td>7.3&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='./src/links.json' class='json'>/src/links.json</a></td><td>3.5&nbsp;KB</td><td>json</td></tr>
+        <tr><td class='file'><a href='./src/quotes.json' class='json'>/src/quotes.json</a></td><td>4.8&nbsp;KB</td><td>json</td></tr>
+        <tr><td class='file'><a href='./src/render-text.js' class='js'>/src/render-text.js</a></td><td>6.4&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='./src/snowflake.jpg' class='jpg'>/src/snowflake.jpg</a></td><td>104.1&nbsp;KB</td><td>jpg</td></tr>
+        <tr><td class='file'><a href='./src/snowflakes.js' class='js'>/src/snowflakes.js</a></td><td>3.7&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='./src/style.css' class='css'>/src/style.css</a></td><td>1.3&nbsp;KB</td><td>css</td></tr>
+        <tr><td class='file'><a href='./src/text-preview.html' class='html'>/src/text-preview.html</a></td><td>1.1&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='src/text-preview.html#/src/tojson-quotes.py' class='py'>/src/tojson-quotes.py</a></td><td>8&nbsp;KB</td><td>py</td></tr>
     </table>
 </div>
 <div class='dirname'>/tools</div>
@@ -149,156 +146,156 @@
     <div class='dir'>
     <div class='dirname'>/tools/unlisted/Contour Grapher (newer)</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.js</td><td>26.9&nbsp;KB</td><td>js</td></tr>
-                <tr><td class='file' type='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.old.js</td><td>45&nbsp;KB</td><td>js</td></tr>
-                <tr><td class='file' type='html'>/tools/unlisted/Contour Grapher (newer)/Contour Grapher.html</td><td>44.6&nbsp;KB</td><td>html</td></tr>
+            <table>
+                <tr><td class='file'><a href='./tools/unlisted/Contour%20Grapher%20%28newer%29/ColorFunctions.js' class='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.js</a></td><td>26.9&nbsp;KB</td><td>js</td></tr>
+                <tr><td class='file'><a href='./tools/unlisted/Contour%20Grapher%20%28newer%29/ColorFunctions.old.js' class='js'>/tools/unlisted/Contour Grapher (newer)/ColorFunctions.old.js</a></td><td>45&nbsp;KB</td><td>js</td></tr>
+                <tr><td class='file'><a href='./tools/unlisted/Contour%20Grapher%20%28newer%29/Contour%20Grapher.html' class='html'>/tools/unlisted/Contour Grapher (newer)/Contour Grapher.html</a></td><td>44.6&nbsp;KB</td><td>html</td></tr>
             </table>
         </div>
-        <table>
-            <tr><td class='file' type='txt'>/tools/unlisted/chemequ_testcases.txt</td><td>2.7&nbsp;KB</td><td>txt</td></tr>
-            <tr><td class='file' type='glsl'>/tools/unlisted/complex_webgl.glsl</td><td>4.5&nbsp;KB</td><td>glsl</td></tr>
-            <tr><td class='file' type='html'>/tools/unlisted/Contour Grapher.html</td><td>44.6&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/tools/unlisted/funplot.html</td><td>10.6&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='png'>/tools/unlisted/Matrix Visualizer.png</td><td>189.6&nbsp;KB</td><td>png</td></tr>
-            <tr><td class='file' type='html'>/tools/unlisted/scatterplot.html</td><td>22.8&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='txt'>/tools/unlisted/svgpath_tests.txt</td><td>57.3&nbsp;KB</td><td>txt</td></tr>
-            <tr><td class='file' type='js'>/tools/unlisted/temp.js</td><td>2.9&nbsp;KB</td><td>js</td></tr>
+            <table>
+            <tr><td class='file'><a href='./tools/unlisted/chemequ_testcases.txt' class='txt'>/tools/unlisted/chemequ_testcases.txt</a></td><td>2.7&nbsp;KB</td><td>txt</td></tr>
+            <tr><td class='file'><a href='src/text-preview.html#/tools/unlisted/complex_webgl.glsl' class='glsl'>/tools/unlisted/complex_webgl.glsl</a></td><td>4.5&nbsp;KB</td><td>glsl</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/Contour%20Grapher.html' class='html'>/tools/unlisted/Contour Grapher.html</a></td><td>44.6&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/funplot.html' class='html'>/tools/unlisted/funplot.html</a></td><td>10.6&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/Matrix%20Visualizer.png' class='png'>/tools/unlisted/Matrix Visualizer.png</a></td><td>189.6&nbsp;KB</td><td>png</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/scatterplot.html' class='html'>/tools/unlisted/scatterplot.html</a></td><td>22.8&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/svgpath_tests.txt' class='txt'>/tools/unlisted/svgpath_tests.txt</a></td><td>57.3&nbsp;KB</td><td>txt</td></tr>
+            <tr><td class='file'><a href='./tools/unlisted/temp.js' class='js'>/tools/unlisted/temp.js</a></td><td>2.9&nbsp;KB</td><td>js</td></tr>
         </table>
     </div>
-    <table>
-        <tr><td class='file' type='html'>/tools/chemequ.html</td><td>27.5&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/colorpicker.html</td><td>27.5&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/complex.html</td><td>38.5&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/complex_webgl.html</td><td>44.8&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/mathjaxt.html</td><td>14.7&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/matrixv.html</td><td>30.4&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/tools/svgpath.html</td><td>47.8&nbsp;KB</td><td>html</td></tr>
+        <table>
+        <tr><td class='file'><a href='./tools/chemequ.html' class='html'>/tools/chemequ.html</a></td><td>27.5&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/colorpicker.html' class='html'>/tools/colorpicker.html</a></td><td>27.5&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/complex.html' class='html'>/tools/complex.html</a></td><td>38.5&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/complex_webgl.html' class='html'>/tools/complex_webgl.html</a></td><td>44.8&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/mathjaxt.html' class='html'>/tools/mathjaxt.html</a></td><td>14.7&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/matrixv.html' class='html'>/tools/matrixv.html</a></td><td>30.4&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='./tools/svgpath.html' class='html'>/tools/svgpath.html</a></td><td>47.8&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
-<table>
-    <tr><td class='file' type='html'>/googlec5449bf4606b5faa.html</td><td>53&nbsp;bytes</td><td>html</td></tr>
-    <tr><td class='file' type='html'>/index.html</td><td>1.9&nbsp;KB</td><td>html</td></tr>
-    <tr><td class='file' type='png'>/logo.png</td><td>8.3&nbsp;KB</td><td>png</td></tr>
-    <tr><td class='file' type='svg'>/logo.svg</td><td>1.2&nbsp;KB</td><td>svg</td></tr>
-    <tr><td class='file' type='md'>/README.md</td><td>58&nbsp;bytes</td><td>md</td></tr>
-    <tr><td class='file' type='html'>/unlisted.html</td><td>29&nbsp;KB</td><td>html</td></tr>
-    <tr><td class='file' type='py'>/unlisted.py</td><td>3.8&nbsp;KB</td><td>py</td></tr>
-    <tr><td class='file' type='yml'>/_config.yml</td><td>26&nbsp;bytes</td><td>yml</td></tr>
+    <table>
+    <tr><td class='file'><a href='./googlec5449bf4606b5faa.html' class='html'>/googlec5449bf4606b5faa.html</a></td><td>53&nbsp;bytes</td><td>html</td></tr>
+    <tr><td class='file'><a href='./index.html' class='html'>/index.html</a></td><td>1.9&nbsp;KB</td><td>html</td></tr>
+    <tr><td class='file'><a href='./logo.png' class='png'>/logo.png</a></td><td>8.3&nbsp;KB</td><td>png</td></tr>
+    <tr><td class='file'><a href='./logo.svg' class='svg'>/logo.svg</a></td><td>1.2&nbsp;KB</td><td>svg</td></tr>
+    <tr><td class='file'><a href='src/text-preview.html#/README.md' class='md'>/README.md</a></td><td>58&nbsp;bytes</td><td>md</td></tr>
+    <tr><td class='file'><a href='./unlisted.html' class='html'>/unlisted.html</a></td><td>38.2&nbsp;KB</td><td>html</td></tr>
+    <tr><td class='file'><a href='src/text-preview.html#/unlisted.py' class='py'>/unlisted.py</a></td><td>3.8&nbsp;KB</td><td>py</td></tr>
+    <tr><td class='file'><a href='src/text-preview.html#/_config.yml' class='yml'>/_config.yml</a></td><td>26&nbsp;bytes</td><td>yml</td></tr>
 </table><div class='dirname'><i>/Graphics</i></div><div class='dir'><div class='dirname'>/<i>Graphics</i>/fitting</div>
 <div class='dir'>
 <div class='dirname'>/<i>Graphics</i>/fitting/parametric2bezier</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/fitting/parametric2bezier/parametric2bezier.svg</td><td>1.3&nbsp;MB</td><td>svg</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/fitting/parametric2bezier/parametric2bezier.svg' class='svg'>/<i>Graphics</i>/fitting/parametric2bezier/parametric2bezier.svg</a></td><td>1.3&nbsp;MB</td><td>svg</td></tr>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/image</div>
 <div class='dir'>
 <div class='dirname'>/<i>Graphics</i>/image/triangulation</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-baboon.svg</td><td>345.5&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-lenna.svg</td><td>234.7&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-peppers.svg</td><td>287.4&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-baboon.svg</td><td>33&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-lenna.svg</td><td>131.4&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/image/triangulation/delaunay-peppers.svg</td><td>130.6&nbsp;KB</td><td>svg</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-adaptive-baboon.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-baboon.svg</a></td><td>345.5&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-adaptive-lenna.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-lenna.svg</a></td><td>234.7&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-adaptive-peppers.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-adaptive-peppers.svg</a></td><td>287.4&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-baboon.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-baboon.svg</a></td><td>33&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-lenna.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-lenna.svg</a></td><td>131.4&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/image/triangulation/delaunay-peppers.svg' class='svg'>/<i>Graphics</i>/image/triangulation/delaunay-peppers.svg</a></td><td>130.6&nbsp;KB</td><td>svg</td></tr>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/modeling</div>
 <div class='dir'>
 <div class='dirname'>/<i>Graphics</i>/modeling/generators</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/modeling/generators/eggs_traced.svg</td><td>5.2&nbsp;KB</td><td>svg</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/modeling/generators/eggs_traced.svg' class='svg'>/<i>Graphics</i>/modeling/generators/eggs_traced.svg</a></td><td>5.2&nbsp;KB</td><td>svg</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>Graphics</i>/modeling/procedural</div>
     <div class='dir'>
     <div class='dirname'>/<i>Graphics</i>/modeling/procedural/webgl_terrain</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/modeling/procedural/webgl_terrain/index.html</td><td>641&nbsp;bytes</td><td>html</td></tr>
-                <tr><td class='file' type='js'>/<i>Graphics</i>/modeling/procedural/webgl_terrain/script.js</td><td>9.3&nbsp;KB</td><td>js</td></tr>
+            <table>
+                <tr><td class='file'><a href='.Graphics/modeling/procedural/webgl_terrain/index.html' class='html'>/<i>Graphics</i>/modeling/procedural/webgl_terrain/index.html</a></td><td>641&nbsp;bytes</td><td>html</td></tr>
+                <tr><td class='file'><a href='.Graphics/modeling/procedural/webgl_terrain/script.js' class='js'>/<i>Graphics</i>/modeling/procedural/webgl_terrain/script.js</a></td><td>9.3&nbsp;KB</td><td>js</td></tr>
             </table>
         </div>
-        <table>
+            <table>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/path</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>Graphics</i>/path/torus_projection.html</td><td>37.2&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.Graphics/path/torus_projection.html' class='html'>/<i>Graphics</i>/path/torus_projection.html</a></td><td>37.2&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/raytracing</div>
 <div class='dir'>
 <div class='dirname'>/<i>Graphics</i>/raytracing/webgl_volume</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>Graphics</i>/raytracing/webgl_volume/index.html</td><td>3.4&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/<i>Graphics</i>/raytracing/webgl_volume/script.js</td><td>21.3&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='css'>/<i>Graphics</i>/raytracing/webgl_volume/style.css</td><td>929&nbsp;bytes</td><td>css</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/raytracing/webgl_volume/index.html' class='html'>/<i>Graphics</i>/raytracing/webgl_volume/index.html</a></td><td>3.4&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.Graphics/raytracing/webgl_volume/script.js' class='js'>/<i>Graphics</i>/raytracing/webgl_volume/script.js</a></td><td>21.3&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='.Graphics/raytracing/webgl_volume/style.css' class='css'>/<i>Graphics</i>/raytracing/webgl_volume/style.css</a></td><td>929&nbsp;bytes</td><td>css</td></tr>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/simulation</div>
 <div class='dir'>
 <div class='dirname'>/<i>Graphics</i>/simulation/balance</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/balance/balance_2d.svg</td><td>73.6&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_c.svg</td><td>98.8&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_tests.svg</td><td>3.5&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_tests_c.svg</td><td>6.1&nbsp;KB</td><td>svg</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/simulation/balance/balance_2d.svg' class='svg'>/<i>Graphics</i>/simulation/balance/balance_2d.svg</a></td><td>73.6&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/balance/balance_2d_c.svg' class='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_c.svg</a></td><td>98.8&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/balance/balance_2d_tests.svg' class='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_tests.svg</a></td><td>3.5&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/balance/balance_2d_tests_c.svg' class='svg'>/<i>Graphics</i>/simulation/balance/balance_2d_tests_c.svg</a></td><td>6.1&nbsp;KB</td><td>svg</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>Graphics</i>/simulation/collision</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dball.0.svg</td><td>17.4&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dball.1.svg</td><td>17.5&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dballs.0.svg</td><td>71&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dballs.1.svg</td><td>70.7&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dpoly.svg</td><td>296.5&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dpolys.AnalyticPath.svg</td><td>409.5&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/2dpolys.IntPath.svg</td><td>494&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/test_shapes.svg</td><td>1.6&nbsp;KB</td><td>svg</td></tr>
-            <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/collision/test_shapes_1.svg</td><td>2.6&nbsp;KB</td><td>svg</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dball.0.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dball.0.svg</a></td><td>17.4&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dball.1.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dball.1.svg</a></td><td>17.5&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dballs.0.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dballs.0.svg</a></td><td>71&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dballs.1.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dballs.1.svg</a></td><td>70.7&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dpoly.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dpoly.svg</a></td><td>296.5&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dpolys.AnalyticPath.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dpolys.AnalyticPath.svg</a></td><td>409.5&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/2dpolys.IntPath.svg' class='svg'>/<i>Graphics</i>/simulation/collision/2dpolys.IntPath.svg</a></td><td>494&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/test_shapes.svg' class='svg'>/<i>Graphics</i>/simulation/collision/test_shapes.svg</a></td><td>1.6&nbsp;KB</td><td>svg</td></tr>
+            <tr><td class='file'><a href='.Graphics/simulation/collision/test_shapes_1.svg' class='svg'>/<i>Graphics</i>/simulation/collision/test_shapes_1.svg</a></td><td>2.6&nbsp;KB</td><td>svg</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>Graphics</i>/simulation/experiment</div>
     <div class='dir'>
     <div class='dirname'>/<i>Graphics</i>/simulation/experiment/frictest</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='svg'>/<i>Graphics</i>/simulation/experiment/frictest/frictest.svg</td><td>250.7&nbsp;KB</td><td>svg</td></tr>
+            <table>
+                <tr><td class='file'><a href='.Graphics/simulation/experiment/frictest/frictest.svg' class='svg'>/<i>Graphics</i>/simulation/experiment/frictest/frictest.svg</a></td><td>250.7&nbsp;KB</td><td>svg</td></tr>
             </table>
         </div>
         <div class='dirname'>/<i>Graphics</i>/simulation/experiment/problems</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP001.html</td><td>129.4&nbsp;KB</td><td>html</td></tr>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP002.html</td><td>18&nbsp;KB</td><td>html</td></tr>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP003.html</td><td>72.3&nbsp;KB</td><td>html</td></tr>
+            <table>
+                <tr><td class='file'><a href='.Graphics/simulation/experiment/problems/EXP001.html' class='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP001.html</a></td><td>129.4&nbsp;KB</td><td>html</td></tr>
+                <tr><td class='file'><a href='.Graphics/simulation/experiment/problems/EXP002.html' class='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP002.html</a></td><td>18&nbsp;KB</td><td>html</td></tr>
+                <tr><td class='file'><a href='.Graphics/simulation/experiment/problems/EXP003.html' class='html'>/<i>Graphics</i>/simulation/experiment/problems/EXP003.html</a></td><td>72.3&nbsp;KB</td><td>html</td></tr>
             </table>
         </div>
-        <table>
+            <table>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>Graphics</i>/UI</div>
@@ -307,159 +304,160 @@
     <div class='dir'>
     <div class='dirname'>/<i>Graphics</i>/UI/color_functions/img</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/UI/color_functions/img/index.html</td><td>7.9&nbsp;KB</td><td>html</td></tr>
+            <table>
+                <tr><td class='file'><a href='.Graphics/UI/color_functions/img/index.html' class='html'>/<i>Graphics</i>/UI/color_functions/img/index.html</a></td><td>7.9&nbsp;KB</td><td>html</td></tr>
             </table>
         </div>
-        <table>
-            <tr><td class='file' type='js'>/<i>Graphics</i>/UI/color_functions/colors.min.js</td><td>36.7&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='js'>/<i>Graphics</i>/UI/color_functions/cosine.js</td><td>11.5&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='html'>/<i>Graphics</i>/UI/color_functions/index.html</td><td>2.6&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/<i>Graphics</i>/UI/color_functions/poly.js</td><td>14.4&nbsp;KB</td><td>js</td></tr>
-            <tr><td class='file' type='js'>/<i>Graphics</i>/UI/color_functions/trig.js</td><td>16.2&nbsp;KB</td><td>js</td></tr>
+            <table>
+            <tr><td class='file'><a href='.Graphics/UI/color_functions/colors.min.js' class='js'>/<i>Graphics</i>/UI/color_functions/colors.min.js</a></td><td>36.7&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/color_functions/cosine.js' class='js'>/<i>Graphics</i>/UI/color_functions/cosine.js</a></td><td>11.5&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/color_functions/index.html' class='html'>/<i>Graphics</i>/UI/color_functions/index.html</a></td><td>2.6&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/color_functions/poly.js' class='js'>/<i>Graphics</i>/UI/color_functions/poly.js</a></td><td>14.4&nbsp;KB</td><td>js</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/color_functions/trig.js' class='js'>/<i>Graphics</i>/UI/color_functions/trig.js</a></td><td>16.2&nbsp;KB</td><td>js</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>Graphics</i>/UI/Homework</div>
     <div class='dir'>
     <div class='dirname'>/<i>Graphics</i>/UI/Homework/AVI3M</div>
         <div class='dir'>
-        <table>
-                <tr><td class='file' type='html'>/<i>Graphics</i>/UI/Homework/AVI3M/index.html</td><td>8.5&nbsp;KB</td><td>html</td></tr>
+            <table>
+                <tr><td class='file'><a href='.Graphics/UI/Homework/AVI3M/index.html' class='html'>/<i>Graphics</i>/UI/Homework/AVI3M/index.html</a></td><td>8.5&nbsp;KB</td><td>html</td></tr>
             </table>
         </div>
-        <table>
+            <table>
         </table>
     </div>
     <div class='dirname'>/<i>Graphics</i>/UI/webgl_test</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_01.html</td><td>9&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_02.html</td><td>13.9&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_03.html</td><td>13.7&nbsp;KB</td><td>html</td></tr>
+        <table>
+            <tr><td class='file'><a href='.Graphics/UI/webgl_test/webgl_test_01.html' class='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_01.html</a></td><td>9&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/webgl_test/webgl_test_02.html' class='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_02.html</a></td><td>13.9&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.Graphics/UI/webgl_test/webgl_test_03.html' class='html'>/<i>Graphics</i>/UI/webgl_test/webgl_test_03.html</a></td><td>13.7&nbsp;KB</td><td>html</td></tr>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
-<table>
+    <table>
 </table></div><div class='dirname'><i>/miscellaneous</i></div><div class='dir'><div class='dirname'>/<i>miscellaneous</i>/desmos-to-gif</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/desmos-to-gif/desmos-gif.js</td><td>4.1&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='mp4'>/<i>miscellaneous</i>/desmos-to-gif/wrxe3cbpyz.mp4</td><td>59&nbsp;KB</td><td>mp4</td></tr>
-        <tr><td class='file' type='mp4'>/<i>miscellaneous</i>/desmos-to-gif/z7zooq9zsh.mp4</td><td>166.7&nbsp;KB</td><td>mp4</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/desmos-to-gif/desmos-gif.js' class='js'>/<i>miscellaneous</i>/desmos-to-gif/desmos-gif.js</a></td><td>4.1&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/desmos-to-gif/wrxe3cbpyz.mp4' class='mp4'>/<i>miscellaneous</i>/desmos-to-gif/wrxe3cbpyz.mp4</a></td><td>59&nbsp;KB</td><td>mp4</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/desmos-to-gif/z7zooq9zsh.mp4' class='mp4'>/<i>miscellaneous</i>/desmos-to-gif/z7zooq9zsh.mp4</a></td><td>166.7&nbsp;KB</td><td>mp4</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/explore</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/explore/Google Docs Anonymous Animals.html</td><td>8.7&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/explore/Google Docs Anonymous Animals.js</td><td>932&nbsp;bytes</td><td>js</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/explore/web_safe_colors.html</td><td>15.7&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/explore/web_safe_fonts.html</td><td>4&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/explore/Google%20Docs%20Anonymous%20Animals.html' class='html'>/<i>miscellaneous</i>/explore/Google Docs Anonymous Animals.html</a></td><td>8.7&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/explore/Google%20Docs%20Anonymous%20Animals.js' class='js'>/<i>miscellaneous</i>/explore/Google Docs Anonymous Animals.js</a></td><td>932&nbsp;bytes</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/explore/web_safe_colors.html' class='html'>/<i>miscellaneous</i>/explore/web_safe_colors.html</a></td><td>15.7&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/explore/web_safe_fonts.html' class='html'>/<i>miscellaneous</i>/explore/web_safe_fonts.html</a></td><td>4&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/identicon-generator</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/identicon-generator/identicon.js</td><td>9.9&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/identicon-generator/index.html</td><td>2.5&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/identicon-generator/test.html</td><td>1.3&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/identicon-generator/identicon.js' class='js'>/<i>miscellaneous</i>/identicon-generator/identicon.js</a></td><td>9.9&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/identicon-generator/index.html' class='html'>/<i>miscellaneous</i>/identicon-generator/index.html</a></td><td>2.5&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/identicon-generator/test.html' class='html'>/<i>miscellaneous</i>/identicon-generator/test.html</a></td><td>1.3&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/learning</div>
 <div class='dir'>
 <div class='dirname'>/<i>miscellaneous</i>/learning/webgl</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>miscellaneous</i>/learning/webgl/rotating_cube.html</td><td>13&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/<i>miscellaneous</i>/learning/webgl/rotating_square.html</td><td>9.5&nbsp;KB</td><td>html</td></tr>
-            <tr><td class='file' type='html'>/<i>miscellaneous</i>/learning/webgl/textured_torus.html</td><td>15.2&nbsp;KB</td><td>html</td></tr>
+        <table>
+            <tr><td class='file'><a href='.miscellaneous/learning/webgl/rotating_cube.html' class='html'>/<i>miscellaneous</i>/learning/webgl/rotating_cube.html</a></td><td>13&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.miscellaneous/learning/webgl/rotating_square.html' class='html'>/<i>miscellaneous</i>/learning/webgl/rotating_square.html</a></td><td>9.5&nbsp;KB</td><td>html</td></tr>
+            <tr><td class='file'><a href='.miscellaneous/learning/webgl/textured_torus.html' class='html'>/<i>miscellaneous</i>/learning/webgl/textured_torus.html</a></td><td>15.2&nbsp;KB</td><td>html</td></tr>
         </table>
     </div>
-    <table>
+        <table>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/math</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/math/sumpow.html</td><td>5.5&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/math/sumpow.html' class='html'>/<i>miscellaneous</i>/math/sumpow.html</a></td><td>5.5&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/snippets</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/snippets/instagram-get-post-images.js</td><td>2.5&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/snippets/shadertoy-download-shaders.js</td><td>1&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/snippets/sth_uses_to_hack_Google_Classroom.js</td><td>1.6&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/snippets/sth_uses_to_hack_Google_Meet.js</td><td>3.1&nbsp;KB</td><td>js</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/snippets/instagram-get-post-images.js' class='js'>/<i>miscellaneous</i>/snippets/instagram-get-post-images.js</a></td><td>2.5&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/snippets/shadertoy-download-shaders.js' class='js'>/<i>miscellaneous</i>/snippets/shadertoy-download-shaders.js</a></td><td>1&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/snippets/sth_uses_to_hack_Google_Classroom.js' class='js'>/<i>miscellaneous</i>/snippets/sth_uses_to_hack_Google_Classroom.js</a></td><td>1.6&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/snippets/sth_uses_to_hack_Google_Meet.js' class='js'>/<i>miscellaneous</i>/snippets/sth_uses_to_hack_Google_Meet.js</a></td><td>3.1&nbsp;KB</td><td>js</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/tools</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/tools/compare.html</td><td>5.1&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/tools/plaintext.html</td><td>1.2&nbsp;KB</td><td>html</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/tools/plaintext.js</td><td>14.5&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='html'>/<i>miscellaneous</i>/tools/presentation.html</td><td>795&nbsp;bytes</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/tools/compare.html' class='html'>/<i>miscellaneous</i>/tools/compare.html</a></td><td>5.1&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/tools/plaintext.html' class='html'>/<i>miscellaneous</i>/tools/plaintext.html</a></td><td>1.2&nbsp;KB</td><td>html</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/tools/plaintext.js' class='js'>/<i>miscellaneous</i>/tools/plaintext.js</a></td><td>14.5&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/tools/presentation.html' class='html'>/<i>miscellaneous</i>/tools/presentation.html</a></td><td>795&nbsp;bytes</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>miscellaneous</i>/user scripts</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/user scripts/dmoj.js</td><td>17.3&nbsp;KB</td><td>js</td></tr>
-        <tr><td class='file' type='js'>/<i>miscellaneous</i>/user scripts/shadertoy.js</td><td>4.6&nbsp;KB</td><td>js</td></tr>
+    <table>
+        <tr><td class='file'><a href='.miscellaneous/user%20scripts/dmoj.js' class='js'>/<i>miscellaneous</i>/user scripts/dmoj.js</a></td><td>17.3&nbsp;KB</td><td>js</td></tr>
+        <tr><td class='file'><a href='.miscellaneous/user%20scripts/shadertoy.js' class='js'>/<i>miscellaneous</i>/user scripts/shadertoy.js</a></td><td>4.6&nbsp;KB</td><td>js</td></tr>
     </table>
 </div>
-<table>
+    <table>
 </table></div><div class='dirname'><i>/AVI3M-CPT</i></div><div class='dir'><div class='dirname'>/<i>AVI3M-CPT</i>/results</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>AVI3M-CPT</i>/results/index.html</td><td>2.2&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.AVI3M-CPT/results/index.html' class='html'>/<i>AVI3M-CPT</i>/results/index.html</a></td><td>2.2&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>AVI3M-CPT</i>/screenshots</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>AVI3M-CPT</i>/screenshots/index.html</td><td>5.5&nbsp;KB</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.AVI3M-CPT/screenshots/index.html' class='html'>/<i>AVI3M-CPT</i>/screenshots/index.html</a></td><td>5.5&nbsp;KB</td><td>html</td></tr>
     </table>
 </div>
-<table>
+    <table>
 </table></div><div class='dirname'><i>/AVI4M-ISP</i></div><div class='dir'><div class='dirname'>/<i>AVI4M-ISP</i>/models</div>
 <div class='dir'>
-<table>
-        <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/models/bird-nest.html</td><td>904&nbsp;bytes</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/models/paper-boat.html</td><td>891&nbsp;bytes</td><td>html</td></tr>
-        <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/models/preliminary.html</td><td>902&nbsp;bytes</td><td>html</td></tr>
+    <table>
+        <tr><td class='file'><a href='.AVI4M-ISP/models/bird-nest.html' class='html'>/<i>AVI4M-ISP</i>/models/bird-nest.html</a></td><td>904&nbsp;bytes</td><td>html</td></tr>
+        <tr><td class='file'><a href='.AVI4M-ISP/models/paper-boat.html' class='html'>/<i>AVI4M-ISP</i>/models/paper-boat.html</a></td><td>891&nbsp;bytes</td><td>html</td></tr>
+        <tr><td class='file'><a href='.AVI4M-ISP/models/preliminary.html' class='html'>/<i>AVI4M-ISP</i>/models/preliminary.html</a></td><td>902&nbsp;bytes</td><td>html</td></tr>
     </table>
 </div>
 <div class='dirname'>/<i>AVI4M-ISP</i>/webgl-test</div>
 <div class='dir'>
 <div class='dirname'>/<i>AVI4M-ISP</i>/webgl-test/octatree</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/webgl-test/octatree/index.html</td><td>730&nbsp;bytes</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/<i>AVI4M-ISP</i>/webgl-test/octatree/script.js</td><td>10.9&nbsp;KB</td><td>js</td></tr>
+        <table>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/octatree/index.html' class='html'>/<i>AVI4M-ISP</i>/webgl-test/octatree/index.html</a></td><td>730&nbsp;bytes</td><td>html</td></tr>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/octatree/script.js' class='js'>/<i>AVI4M-ISP</i>/webgl-test/octatree/script.js</a></td><td>10.9&nbsp;KB</td><td>js</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>AVI4M-ISP</i>/webgl-test/octree-pt</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/webgl-test/octree-pt/index.html</td><td>820&nbsp;bytes</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/<i>AVI4M-ISP</i>/webgl-test/octree-pt/script.js</td><td>16&nbsp;KB</td><td>js</td></tr>
+        <table>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/octree-pt/index.html' class='html'>/<i>AVI4M-ISP</i>/webgl-test/octree-pt/index.html</a></td><td>820&nbsp;bytes</td><td>html</td></tr>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/octree-pt/script.js' class='js'>/<i>AVI4M-ISP</i>/webgl-test/octree-pt/script.js</a></td><td>16&nbsp;KB</td><td>js</td></tr>
         </table>
     </div>
     <div class='dirname'>/<i>AVI4M-ISP</i>/webgl-test/pt</div>
     <div class='dir'>
-    <table>
-            <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/webgl-test/pt/index.html</td><td>734&nbsp;bytes</td><td>html</td></tr>
-            <tr><td class='file' type='js'>/<i>AVI4M-ISP</i>/webgl-test/pt/script.js</td><td>10.9&nbsp;KB</td><td>js</td></tr>
+        <table>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/pt/index.html' class='html'>/<i>AVI4M-ISP</i>/webgl-test/pt/index.html</a></td><td>734&nbsp;bytes</td><td>html</td></tr>
+            <tr><td class='file'><a href='.AVI4M-ISP/webgl-test/pt/script.js' class='js'>/<i>AVI4M-ISP</i>/webgl-test/pt/script.js</a></td><td>10.9&nbsp;KB</td><td>js</td></tr>
         </table>
     </div>
     
 </div>
-<table>
-    <tr><td class='file' type='html'>/<i>AVI4M-ISP</i>/index.html</td><td>6.1&nbsp;KB</td><td>html</td></tr>
+    <table>
+    <tr><td class='file'><a href='.AVI4M-ISP/index.html' class='html'>/<i>AVI4M-ISP</i>/index.html</a></td><td>6.1&nbsp;KB</td><td>html</td></tr>
 </table></div>
+    <div><br/><div>
 </body>
 </html>
