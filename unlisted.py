@@ -55,8 +55,6 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
             displaypath = f"/<i>{name}</i>"*(name != "") + f"{fn[trunc:]}"
             if ext in ['py', 'cpp', 'h', 'hpp', 'glsl', 'md', 'yml']:
                 path = "src/text-preview.html#" + path
-            else:
-                path = '.' + path
             content += f"<td class='file'><a href='{path}' class='{ext}'>{displaypath}</a></td>"
             content += f"<td>{getFileSize(fn)}</td>"
             content += f"<td>{ext}</td>"
