@@ -105,10 +105,14 @@ function mat4ToFloat32Array(m) {
 }
 
 function calcTransformMatrix(viewport) {
-    var transformMatrix = mat4Perspective(0.25 * Math.PI, canvas.width / canvas.height, 0.5, 20.0);
-    transformMatrix = mat4Translate(transformMatrix, [0, 0, -3.0 / viewport.iSc]);
-    transformMatrix = mat4Rotate(transformMatrix, viewport.iRx, [1, 0, 0]);
-    transformMatrix = mat4Rotate(transformMatrix, viewport.iRz, [0, 0, 1]);
+    var sc = 1.0 / viewport.scale;
+    var transformMatrix = mat4Perspective(
+        0.25 * Math.PI,
+        canvas.width / canvas.height,
+        0.5 * sc, 10.0 * sc);
+    transformMatrix = mat4Translate(transformMatrix, [0, 0, -3.0 * sc]);
+    transformMatrix = mat4Rotate(transformMatrix, viewport.rx, [1, 0, 0]);
+    transformMatrix = mat4Rotate(transformMatrix, viewport.rz, [0, 0, 1]);
     transformMatrix = mat4Translate(transformMatrix, [-0, -0, -0]);
     // return transformMatrix;
     return mat4Inverse(transformMatrix);
@@ -198,17 +202,17 @@ function main() {
     if (gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
 
     var viewport = {
-        iRz: -0.4*Math.PI,
-        iRx: -0.4*Math.PI,
-        iRy: 0.0,
-        iSc: 0.8,
+        rz: -0.4 * Math.PI,
+        rx: -0.4 * Math.PI,
+        scale: 0.8,
         renderNeeded: true
     };
 
-    console.time("request glsl code");
-    var vsSource = loadShaderSource("vs-source.glsl");
+    console.time("load glsl code");
+    var vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 vXy;" +
+        "void main(){vXy=vertexPosition.xy;gl_Position=vertexPosition;}";
     var fsSource = loadShaderSource("fs-source.glsl");
-    console.timeEnd("request glsl code");
+    console.timeEnd("load glsl code");
 
     console.time("compile shader");
     var shaderProgram = createShaderProgram(gl, vsSource, fsSource);
@@ -246,7 +250,7 @@ function main() {
     canvas.addEventListener("wheel", function (e) {
         e.preventDefault();
         var sc = Math.exp(0.0002 * e.wheelDeltaY);
-        viewport.iSc *= sc;
+        viewport.scale *= sc;
         viewport.renderNeeded = true;
     }, { passive: false });
     var mouseDown = false;
@@ -265,8 +269,8 @@ function main() {
     });
     canvas.addEventListener("pointermove", function (e) {
         if (mouseDown) {
-            viewport.iRx += 0.01 * e.movementY;
-            viewport.iRz += 0.01 * e.movementX;
+            viewport.rx += 0.01 * e.movementY;
+            viewport.rz += 0.01 * e.movementX;
             viewport.renderNeeded = true;
         }
     });
