@@ -9,6 +9,11 @@ in vec2 vXy;
 #define ZERO min(uIso, 0.)
 #define PI 3.1415926
 
+vec3 screenToWorld(vec3 p) {
+    vec4 q = transformMatrix * vec4(p, 1);
+    return q.xyz / q.w;
+}
+
 
 float fun_sdf(vec3 p) {
     float v1 = length(p)-0.6;
@@ -40,7 +45,7 @@ float fun_torus(vec3 p) {  // 4th degree
     float k = dot(p,p)+3.;
     return k*k - 16.*dot(p.xy,p.xy);
 }
-float fun_wineglass(vec3 p) {
+float fun_wineglass(vec3 p) {  // contains NAN
     return p.x*p.x+p.y*p.y-log(p.z+1.)*log(p.z+1.)-0.02;
 }
 float fun_radicalheart(vec3 p) {
@@ -57,7 +62,7 @@ float fun0(vec3 p) {
 }
 
 vec3 funNGradT(vec3 p, float e) {
-    vec4 q = transformMatrix*vec4(p,1.0); p=q.xyz/q.w;
+    p = screenToWorld(p);
     return vec3(
         fun0(p+vec3(e,0,0)) - fun0(p-vec3(e,0,0)),
         fun0(p+vec3(0,e,0)) - fun0(p-vec3(0,e,0)),
@@ -65,10 +70,7 @@ vec3 funNGradT(vec3 p, float e) {
     ) / (2.0*e);
 }
 float funT(vec3 p) {
-    vec4 q = transformMatrix*vec4(p,1.0);
-    return fun0(q.xyz/q.w);
-    mat3 m = (mat3(transformMatrix)*q.w - outerProduct(q.xyz, transpose(transformMatrix)[3].xyz)) / (q.w*q.w);
-    return fun0(q.xyz/q.w) / length(m*funNGradT(p, 0.001));
+    return fun0(screenToWorld(p));
 }
 vec3 funTNGrad(vec3 p, float e) {
     return vec3(
@@ -93,7 +95,8 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
     // raymarching
     float t = 0.0, dt = step_size;
     float v_old = fun(ro, rd), v;
-    for (t = dt; t < 1.0; t += dt) {
+    int i = 0;
+    for (t = dt; i < 240 && t < 1.0; t += dt, i++) {
         v = fun(ro+rd*t, rd);
         if (v*v_old < 0.0) break;
         v_old = v;
@@ -111,10 +114,13 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
         else t0 = t, v0 = v;
         if (abs(t1-t0) < 0.001*step_size) break;
     }
-    vec3 n = normalize(funNGradT(ro+rd*t, 0.001));
-    float col = 0.2+0.1*n.y+0.6*max(dot(n, normalize(vec3(0.5,0.5,1.0))),0.0);
+    vec3 n = normalize(funNGradT(ro+rd*t, 0.001));  // normal
+    rd = normalize(screenToWorld(ro+rd)-screenToWorld(ro));
+    if (dot(n,rd)>0.) n=-n;
+    vec3 ldir = normalize(vec3(0.5,0.5,1.0));  // light
+    float col = 0.2+0.1*n.y+0.6*max(dot(n,ldir),0.0)+0.1*pow(max(dot(reflect(rd,n),ldir),0.0),40.0);
     col *= smoothstep(0., 1., 5.0*(clamp(1.0-t, 0., 1.)));
-    return vec3(col);
+    return vec3(0.95+0.05*n)*col;
 }
 
 
@@ -127,6 +133,6 @@ void main(void) {
     vec3 rd = p1.xyz/p1.w - ro;  // don't normalize
     vec3 col = vIsosurf(ro, rd);
     col -= vec3(1.5/255.)*fract(0.13*gl_FragCoord.x*gl_FragCoord.y);  // reduce "stripes"
-    // col.x = float(callCount) / 255.0;
+    //col = vec3(callCount) / 255.0;
     fragColor = vec4(clamp(col,0.,1.), 1.0);
 }
