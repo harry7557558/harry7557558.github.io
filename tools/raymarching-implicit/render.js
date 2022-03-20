@@ -105,7 +105,7 @@ function mat4ToFloat32Array(m) {
 }
 
 function calcTransformMatrix(viewport) {
-    var sc = 1.0 / viewport.scale;
+    var sc = (viewport.height / Math.min(viewport.width, viewport.height)) / viewport.scale;
     var transformMatrix = mat4Perspective(
         0.25 * Math.PI,
         canvas.width / canvas.height,
@@ -153,18 +153,42 @@ function createShaderProgram(gl, vsSource, fsSource) {
     return shaderProgram;
 }
 
+// create texture/framebuffer
+function createSampleTexture(gl, width, height) {
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    const level = 0;
+    const internalFormat = gl.RGBA8;
+    const border = 0;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    const data = null;
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+        width, height, border,
+        format, type, data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    return tex;
+}
+function createRenderTarget(gl, width, height) {
+    const tex = createSampleTexture(gl, width, height);
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    return {
+        texture: tex,
+        framebuffer: framebuffer
+    };
+}
+
+
+
 // call this function to re-render
-function drawScene(gl, shaderProgram, positionBuffer, transformMatrix) {
+function drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAliaser) {
 
-    // clear the canvas
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(shaderProgram);
-
-    // tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute
-    {
-        var vpLocation = gl.getAttribLocation(shaderProgram, "vertexPosition");
+    // set position buffer for vertex shader
+    function setPositionBuffer(program) {
+        var vpLocation = gl.getAttribLocation(program, "vertexPosition");
         const numComponents = 2; // pull out 2 values per iteration
         const type = gl.FLOAT; // the data in the buffer is 32bit floats
         const normalize = false; // don't normalize
@@ -177,19 +201,48 @@ function drawScene(gl, shaderProgram, positionBuffer, transformMatrix) {
         gl.enableVertexAttribArray(vpLocation);
     }
 
-    // set shader uniforms
-    // https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html
-    gl.uniformMatrix4fv(
-        gl.getUniformLocation(shaderProgram, "transformMatrix"),
-        false,
-        mat4ToFloat32Array(transformMatrix));
-
-    // render
-    {
+    // render to target
+    function renderPass() {
         const offset = 0;
         const vertexCount = 4;
         gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
     }
+
+    // clear the canvas
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // render image
+    gl.useProgram(shaderProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, antiAliaser.renderFramebuffer);
+    setPositionBuffer(shaderProgram);
+    gl.uniformMatrix4fv(
+        gl.getUniformLocation(shaderProgram, "transformMatrix"),
+        false,
+        mat4ToFloat32Array(transformMatrix));
+    renderPass();
+
+    // render image gradient
+    gl.useProgram(antiAliaser.imgGradProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, antiAliaser.imgGradFramebuffer);
+    setPositionBuffer(antiAliaser.imgGradProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, antiAliaser.renderTexture);
+    gl.uniform1i(gl.getUniformLocation(antiAliaser.imgGradProgram, "iChannel0"), 0);
+    renderPass();
+
+    // render anti-aliasing
+    gl.useProgram(antiAliaser.aaProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    setPositionBuffer(antiAliaser.aaProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, antiAliaser.renderTexture);
+    gl.uniform1i(gl.getUniformLocation(antiAliaser.aaProgram, "iChannel0"), 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, antiAliaser.imgGradTexture);
+    gl.uniform1i(gl.getUniformLocation(antiAliaser.aaProgram, "iChannel1"), 1);
+    renderPass();
 }
 
 
@@ -202,21 +255,44 @@ function main() {
     if (gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
 
     var viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight,
         rz: -0.4 * Math.PI,
         rx: -0.4 * Math.PI,
-        scale: 0.8,
+        scale: 0.5,
         renderNeeded: true
     };
 
+    // load GLSL source
     console.time("load glsl code");
     var vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 vXy;" +
         "void main(){vXy=vertexPosition.xy;gl_Position=vertexPosition;}";
     var fsSource = loadShaderSource("fs-source.glsl");
+    var imgGradSource = loadShaderSource("img-grad.glsl");
+    var aaSource = loadShaderSource("aa.glsl");
     console.timeEnd("load glsl code");
 
+    // compile rendering shader
     console.time("compile shader");
     var shaderProgram = createShaderProgram(gl, vsSource, fsSource);
     console.timeEnd("compile shader");
+
+    // create anti-aliasing object
+    function createAntiAliaser() {
+        var renderTarget = createRenderTarget(gl, viewport.width, viewport.height);
+        var imgGradProgram = createShaderProgram(gl, vsSource, imgGradSource);
+        var imgGradTarget = createRenderTarget(gl, viewport.width, viewport.height);
+        var aaProgram = createShaderProgram(gl, vsSource, aaSource);
+        return {
+            renderTexture: renderTarget.texture,
+            renderFramebuffer: renderTarget.framebuffer,
+            imgGradProgram: imgGradProgram,
+            imgGradTexture: imgGradTarget.texture,
+            imgGradFramebuffer: imgGradTarget.framebuffer,
+            aaProgram: aaProgram
+        }
+    };
+    var antiAliaser = createAntiAliaser();
 
     // position buffer
     var positionBuffer = gl.createBuffer();
@@ -235,11 +311,10 @@ function main() {
             if (time_delta != 0) {
                 document.getElementById("fps").textContent = (1.0 / time_delta).toFixed(1) + " fps";
             }
-
-            canvas.width = canvas.style.width = window.innerWidth;
-            canvas.height = canvas.style.height = window.innerHeight;
-            drawScene(gl, shaderProgram, positionBuffer, calcTransformMatrix(viewport));
-
+            viewport.width = canvas.width = canvas.style.width = window.innerWidth;
+            viewport.height = canvas.height = canvas.style.height = window.innerHeight;
+            var transformMatrix = calcTransformMatrix(viewport);
+            drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAliaser);
             viewport.renderNeeded = false;
         }
         requestAnimationFrame(render);
@@ -262,17 +337,25 @@ function main() {
         event.preventDefault();
         mouseDown = false;
     });
-    window.addEventListener("resize", function (event) {
-        canvas.width = canvas.style.width = window.innerWidth;
-        canvas.height = canvas.style.height = window.innerHeight;
-        viewport.renderNeeded = true;
-    });
-    canvas.addEventListener("pointermove", function (e) {
+    canvas.addEventListener("pointermove", function (event) {
         if (mouseDown) {
-            viewport.rx += 0.01 * e.movementY;
-            viewport.rz += 0.01 * e.movementX;
+            var dx = event.movementX, dy = event.movementY;
+            viewport.rx += 0.01 * dy;
+            viewport.rz += 0.01 * dx;
             viewport.renderNeeded = true;
         }
+    });
+    window.addEventListener("resize", function (event) {
+        viewport.width = canvas.width = canvas.style.width = window.innerWidth;
+        viewport.height = canvas.height = canvas.style.height = window.innerHeight;
+        gl.deleteFramebuffer(antiAliaser.renderFramebuffer);
+        gl.deleteTexture(antiAliaser.renderTexture);
+        gl.deleteProgram(antiAliaser.imgGradProgram);
+        gl.deleteFramebuffer(antiAliaser.imgGradFramebuffer);
+        gl.deleteTexture(antiAliaser.imgGradTexture);
+        gl.deleteProgram(antiAliaser.aaProgram);
+        antiAliaser = createAntiAliaser();
+        viewport.renderNeeded = true;
     });
 }
 

@@ -47,9 +47,13 @@ float fun_radicalheart(vec3 p) {
     float z1 = 1.15*p.z - 0.6*pow(2.*pow(p.x*p.x+0.05*p.y*p.y+0.001,0.7)+p.y*p.y,0.3) + 0.3;
     return p.x*p.x + 4.*p.y*p.y + z1*z1 - 1.0;
 }
+float fun_displaced_plane(vec3 p) {
+    float h = .1*sin(10.*p.x)+.1*sin(10.*p.y);
+    return p.z-h;
+}
 
 float fun0(vec3 p) {
-    return fun_star(p);
+    return fun_genus2(p);
 }
 
 vec3 funNGradT(vec3 p, float e) {
@@ -88,19 +92,14 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
     const float step_size = 0.01;
     // raymarching
     float t = 0.0, dt = step_size;
-    float v_old = fun(ro, rd), v_min = 1e12, v;
+    float v_old = fun(ro, rd), v;
     for (t = dt; t < 1.0; t += dt) {
         v = fun(ro+rd*t, rd);
         if (v*v_old < 0.0) break;
         v_old = v;
-        v_min = min(v_min, v);
         dt = isnan(v) ? step_size : clamp(abs(v)-step_size, 0.1*step_size, step_size);
     }
-    if (v*v_old >= 0.0) {
-        float k = max(1.0 - 500.0*abs(v_min), 0.0);
-        // return vec3(0.5*k);
-        return vec3(0.0);
-    }
+    if (v*v_old >= 0.0) return vec3(0);
     // finding root
     float t0 = t-dt, t1 = t;
     float v0 = v_old, v1 = v;
@@ -129,5 +128,5 @@ void main(void) {
     vec3 col = vIsosurf(ro, rd);
     col -= vec3(1.5/255.)*fract(0.13*gl_FragCoord.x*gl_FragCoord.y);  // reduce "stripes"
     // col.x = float(callCount) / 255.0;
-    fragColor = vec4(col, 1.0);
+    fragColor = vec4(clamp(col,0.,1.), 1.0);
 }
