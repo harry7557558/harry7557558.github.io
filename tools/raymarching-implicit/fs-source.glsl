@@ -58,7 +58,8 @@ float fun_displaced_plane(vec3 p) {
 }
 
 float fun0(vec3 p) {
-    return fun_genus2(p);
+    float x=p.x, y=p.y, z=p.z;
+    return {%FUN%};
 }
 
 vec3 funNGradT(vec3 p, float e) {

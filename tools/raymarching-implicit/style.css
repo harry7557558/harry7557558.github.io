@@ -4,6 +4,7 @@
     top: 0;
     width: 100%;
     height: 100%;
+    background-color: black;
     touch-action: none;
 }
 
@@ -31,28 +32,4 @@
 
 p {
     white-space: nowrap;
-}
-
-#iso-slider {
-    width: 220px;
-}
-
-#volume-title, #volume-title a {
-    display: inline-block;
-    margin: 0px 0px 5px 0px;
-    font-size: 20px;
-    color: white;
-    text-decoration: underline;
-}
-
-#links {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-}
-
-#links a {
-    color: rgba(173, 216, 230, 0.7);
-    text-decoration: underline;
-    font-size: 14px;
 }

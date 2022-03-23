@@ -104,15 +104,15 @@ function mat4ToFloat32Array(m) {
     return new Float32Array(arr);
 }
 
-function calcTransformMatrix(viewport) {
-    var sc = (viewport.height / Math.min(viewport.width, viewport.height)) / viewport.scale;
+function calcTransformMatrix(state) {
+    var sc = (state.height / Math.min(state.width, state.height)) / state.scale;
     var transformMatrix = mat4Perspective(
         0.25 * Math.PI,
         canvas.width / canvas.height,
         0.5 * sc, 10.0 * sc);
     transformMatrix = mat4Translate(transformMatrix, [0, 0, -3.0 * sc]);
-    transformMatrix = mat4Rotate(transformMatrix, viewport.rx, [1, 0, 0]);
-    transformMatrix = mat4Rotate(transformMatrix, viewport.rz, [0, 0, 1]);
+    transformMatrix = mat4Rotate(transformMatrix, state.rx, [1, 0, 0]);
+    transformMatrix = mat4Rotate(transformMatrix, state.rz, [0, 0, 1]);
     transformMatrix = mat4Translate(transformMatrix, [-0, -0, -0]);
     // return transformMatrix;
     return mat4Inverse(transformMatrix);
@@ -248,41 +248,58 @@ function drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAlias
 
 // ============================ MAIN ==============================
 
+var renderer = {
+    canvas: null,
+    gl: null,
+    vsSource: "",
+    fsSource: "",
+    fsSourceFun: "",
+    imgGradSource: "",
+    aaSource: "",
+    shaderProgram: null,
+    antiAliaser: null,
+};
+var state = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    rz: -0.4 * Math.PI,
+    rx: -0.4 * Math.PI,
+    scale: 0.5,
+    renderNeeded: true
+};
 
-function main() {
-    const canvas = document.getElementById("canvas");
-    const gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2");
-    if (gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
-
-    var viewport = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        rz: -0.4 * Math.PI,
-        rx: -0.4 * Math.PI,
-        scale: 0.5,
-        renderNeeded: true
-    };
+function initWebGL() {
+    // get context
+    renderer.canvas = document.getElementById("canvas");
+    renderer.gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2");
+    if (renderer.gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
 
     // load GLSL source
     console.time("load glsl code");
-    var vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 vXy;" +
+    renderer.vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 vXy;" +
         "void main(){vXy=vertexPosition.xy;gl_Position=vertexPosition;}";
-    var fsSource = loadShaderSource("fs-source.glsl");
-    var imgGradSource = loadShaderSource("img-grad.glsl");
-    var aaSource = loadShaderSource("aa.glsl");
+    renderer.fsSource = loadShaderSource("fs-source.glsl");
+    renderer.imgGradSource = loadShaderSource("img-grad.glsl");
+    renderer.aaSource = loadShaderSource("aa.glsl");
     console.timeEnd("load glsl code");
+}
+
+function mainRenderer() {
+    let canvas = renderer.canvas;
+    let gl = renderer.gl;
 
     // compile rendering shader
     console.time("compile shader");
-    var shaderProgram = createShaderProgram(gl, vsSource, fsSource);
+    var fsSource = renderer.fsSource.replaceAll("{%FUN%}", renderer.fsSourceFun);
+    renderer.shaderProgram = createShaderProgram(gl, renderer.vsSource, fsSource);
     console.timeEnd("compile shader");
 
     // create anti-aliasing object
     function createAntiAliaser() {
-        var renderTarget = createRenderTarget(gl, viewport.width, viewport.height);
-        var imgGradProgram = createShaderProgram(gl, vsSource, imgGradSource);
-        var imgGradTarget = createRenderTarget(gl, viewport.width, viewport.height);
-        var aaProgram = createShaderProgram(gl, vsSource, aaSource);
+        var renderTarget = createRenderTarget(gl, state.width, state.height);
+        var imgGradProgram = createShaderProgram(gl, renderer.vsSource, renderer.imgGradSource);
+        var imgGradTarget = createRenderTarget(gl, state.width, state.height);
+        var aaProgram = createShaderProgram(gl, renderer.vsSource, renderer.aaSource);
         return {
             renderTexture: renderTarget.texture,
             renderFramebuffer: renderTarget.framebuffer,
@@ -293,6 +310,7 @@ function main() {
         }
     };
     var antiAliaser = createAntiAliaser();
+    renderer.antiAliaser = antiAliaser;
 
     // position buffer
     var positionBuffer = gl.createBuffer();
@@ -303,7 +321,7 @@ function main() {
     // rendering
     let then = 0;
     function render(now) {
-        if (viewport.renderNeeded) {
+        if (state.renderNeeded) {
             // display fps
             now *= 0.001;
             var time_delta = now - then;
@@ -311,11 +329,11 @@ function main() {
             if (time_delta != 0) {
                 document.getElementById("fps").textContent = (1.0 / time_delta).toFixed(1) + " fps";
             }
-            viewport.width = canvas.width = canvas.style.width = window.innerWidth;
-            viewport.height = canvas.height = canvas.style.height = window.innerHeight;
-            var transformMatrix = calcTransformMatrix(viewport);
-            drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAliaser);
-            viewport.renderNeeded = false;
+            state.width = canvas.width = canvas.style.width = window.innerWidth;
+            state.height = canvas.height = canvas.style.height = window.innerHeight;
+            var transformMatrix = calcTransformMatrix(state);
+            drawScene(gl, renderer.shaderProgram, positionBuffer, transformMatrix, antiAliaser);
+            state.renderNeeded = false;
         }
         requestAnimationFrame(render);
     }
@@ -325,8 +343,8 @@ function main() {
     canvas.addEventListener("wheel", function (e) {
         e.preventDefault();
         var sc = Math.exp(0.0002 * e.wheelDeltaY);
-        viewport.scale *= sc;
-        viewport.renderNeeded = true;
+        state.scale *= sc;
+        state.renderNeeded = true;
     }, { passive: false });
     var mouseDown = false;
     canvas.addEventListener("pointerdown", function (event) {
@@ -340,14 +358,14 @@ function main() {
     canvas.addEventListener("pointermove", function (event) {
         if (mouseDown) {
             var dx = event.movementX, dy = event.movementY;
-            viewport.rx += 0.01 * dy;
-            viewport.rz += 0.01 * dx;
-            viewport.renderNeeded = true;
+            state.rx += 0.01 * dy;
+            state.rz += 0.01 * dx;
+            state.renderNeeded = true;
         }
     });
     window.addEventListener("resize", function (event) {
-        viewport.width = canvas.width = canvas.style.width = window.innerWidth;
-        viewport.height = canvas.height = canvas.style.height = window.innerHeight;
+        state.width = canvas.width = canvas.style.width = window.innerWidth;
+        state.height = canvas.height = canvas.style.height = window.innerHeight;
         gl.deleteFramebuffer(antiAliaser.renderFramebuffer);
         gl.deleteTexture(antiAliaser.renderTexture);
         gl.deleteProgram(antiAliaser.imgGradProgram);
@@ -355,15 +373,18 @@ function main() {
         gl.deleteTexture(antiAliaser.imgGradTexture);
         gl.deleteProgram(antiAliaser.aaProgram);
         antiAliaser = createAntiAliaser();
-        viewport.renderNeeded = true;
+        state.renderNeeded = true;
     });
 }
 
-window.onload = async function (event) {
-    try {
-        main();
-    } catch (e) {
-        console.error(e);
-        document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";
+function updateFunction(funCode) {
+    renderer.fsSourceFun = funCode;
+    if (renderer.shaderProgram != null) {
+        renderer.gl.deleteProgram(renderer.shaderProgram);
     }
-};
+    console.time("compile shader");
+    var fsSource = renderer.fsSource.replaceAll("{%FUN%}", renderer.fsSourceFun);
+    renderer.shaderProgram = createShaderProgram(renderer.gl, renderer.vsSource, fsSource);
+    console.timeEnd("compile shader");
+    state.renderNeeded = true;
+}

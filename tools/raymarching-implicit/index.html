@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="style.css" />
+    <script src="parser.js"></script>
     <script src="render.js"></script>
 
 </head>
@@ -19,10 +20,40 @@
 
     <div id="fps">fps</div>
 
-    <!-- <div id="control">
-        <div id="links">
-        </div>
-    </div> -->
+    <div id="control">
+        <select id="builtin-functions">
+        </select>
+    </div>
+
+    <script>
+        function initBuiltinFunctions() {
+            var select = document.querySelector("#builtin-functions");
+            for (var i = 0; i < builtinFunctions.length; i++) {
+                let expr = builtinFunctions[i];
+                select.innerHTML += "<option value=" + expr + ">" + expr + "</option>"
+            }
+            select.addEventListener("input", function (event) {
+                updateFunction(getSelectedFunctionGlsl());
+            });
+        }
+        function getSelectedFunctionGlsl() {
+            let select = document.querySelector("#builtin-functions");
+            var expr = select.value;
+            var postfix = exprToPostfix(expr);
+            return postfixToGlsl(postfix);
+        }
+        window.addEventListener("load", async function (event) {
+            initBuiltinFunctions();
+            initWebGL();
+            updateFunction(getSelectedFunctionGlsl());
+            try {
+                mainRenderer();
+            } catch (e) {
+                console.error(e);
+                document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";
+            }
+        });
+    </script>
 
 </body>
 
