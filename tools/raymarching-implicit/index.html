@@ -21,31 +21,42 @@
     <div id="fps">fps</div>
 
     <div id="control">
-        <select id="builtin-functions">
-        </select>
+        <select id="builtin-functions"></select>
+        <br />
+        <textarea id="equation-input" style="width:100%;height:8em"></textarea>
     </div>
 
     <script>
-        function initBuiltinFunctions() {
-            var select = document.querySelector("#builtin-functions");
+        window.addEventListener("load", async function (event) {
+            // init built-in functions
+            let select = document.querySelector("#builtin-functions");
+            let input = document.querySelector("#equation-input");
             for (var i = 0; i < builtinFunctions.length; i++) {
                 let expr = builtinFunctions[i];
                 select.innerHTML += "<option value=" + expr + ">" + expr + "</option>"
             }
+
+            // called when update selected function
+            function updateFunctionInput() {
+                var expr = input.value;
+                var postfix = exprToPostfix(expr);
+                var glsl = postfixToGlsl(postfix);
+                console.log(glsl);
+                updateShaderFunction(glsl);
+            }
+
             select.addEventListener("input", function (event) {
-                updateFunction(getSelectedFunctionGlsl());
+                input.value = select.value;
+                updateFunctionInput();
             });
-        }
-        function getSelectedFunctionGlsl() {
-            let select = document.querySelector("#builtin-functions");
-            var expr = select.value;
-            var postfix = exprToPostfix(expr);
-            return postfixToGlsl(postfix);
-        }
-        window.addEventListener("load", async function (event) {
-            initBuiltinFunctions();
+            input.addEventListener("input", function (event) {
+                updateFunctionInput();
+            });
+            input.value = select.value;
+
+            // main
             initWebGL();
-            updateFunction(getSelectedFunctionGlsl());
+            updateFunctionInput();
             try {
                 mainRenderer();
             } catch (e) {

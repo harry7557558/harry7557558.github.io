@@ -377,14 +377,14 @@ function mainRenderer() {
     });
 }
 
-function updateFunction(funCode) {
+function updateShaderFunction(funCode) {
     renderer.fsSourceFun = funCode;
-    if (renderer.shaderProgram != null) {
-        renderer.gl.deleteProgram(renderer.shaderProgram);
-    }
     console.time("compile shader");
     var fsSource = renderer.fsSource.replaceAll("{%FUN%}", renderer.fsSourceFun);
-    renderer.shaderProgram = createShaderProgram(renderer.gl, renderer.vsSource, fsSource);
+    var shaderProgram = createShaderProgram(renderer.gl, renderer.vsSource, fsSource);
+    if (renderer.shaderProgram != null)
+        renderer.gl.deleteProgram(renderer.shaderProgram);
+    renderer.shaderProgram = shaderProgram;
     console.timeEnd("compile shader");
     state.renderNeeded = true;
 }

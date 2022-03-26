@@ -53,8 +53,43 @@ function exprToPostfix(expr) {
     for (var i = 0; i < db; i++) expr += ")";
     if (expr == "") console.error("empty expression");
 
+    // subtraction sign
+    var expr1s = [{ s: "", pc: 0 }];
+    var prev_c = null;
+    for (var i = 0; i < expr.length; i++) {
+        let eb = expr1s[expr1s.length - 1];
+        if (expr[i] == "-" && (prev_c == null || /[\(\+\-\*\/\^]/.test(prev_c))) {
+            expr1s.push({
+                s: expr[i],
+                pc: 0
+            });
+        }
+        else if (/[A-Za-z_\d\.\(\)\^]/.test(expr[i]) || eb.pc > 0) {
+            eb.s += expr[i];
+            if (expr[i] == '(') eb.pc += 1;
+            if (expr[i] == ')') eb.pc -= 1;
+        }
+        else if (/^\-/.test(eb.s)) {
+            var e1 = "(0" + eb.s + ")" + expr[i];
+            expr1s.pop();
+            expr1s[expr1s.length - 1].s += e1;
+        }
+        else {
+            eb.s += expr[i];
+        }
+        if (!/\s/.test(expr[i])) prev_c = expr[i];
+    }
+    while (expr1s.length > 1) {
+        var eb = expr1s[expr1s.length - 1];
+        expr1s.pop();
+        console.assert(eb.pc == 0);
+        if (/^\-/.test(eb.s)) eb.s = "(0" + eb.s + ")";
+        expr1s[expr1s.length - 1].s += eb.s;
+    }
+    expr = expr1s[0].s;
+
     // multiplication sign
-    var expr1 = "";
+    expr1 = "";
     for (var i = 0; i < expr.length;) {
         var v = "";
         while (i < expr.length && /[A-Za-z_\d\.\(\)]/.test(expr[i])) {
@@ -207,6 +242,8 @@ function postfixToGlsl(queue) {
             var v2 = stack[stack.length - 1];
             stack.pop(); stack.pop();
             var v = "pow(" + v1 + "," + v2 + ")";
+            if (v2 == "2." && v1.length < 10) v = "(" + v1 + "*" + v1 + ")";
+            if (v2 == "3." && v1.length < 7) v = "(" + v1 + "*" + v1 + "*" + v1 + ")";
             stack.push(v);
         }
         else console.error(token);
@@ -242,5 +279,7 @@ builtinFunctions = builtinFunctions.concat([
     "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2",
     "(x^2(x^2-1)+y^2)^2+(y^2(y^2-1)+z^2)^2-0.1y^2(y^2+1)",
     "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+12xyz-4(x^2+y^2+z^2)+4",
-    "(x^2+y^2+z^2-2)^3+1000(x^2y^2+x^2z^2+y^2z^2)",
+    "(x^2+y^2+z^2-2)^3+10000(x^2y^2+x^2z^2+y^2z^2)-10",
+    "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2",
+    "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2",
 ]);

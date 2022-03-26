@@ -15,6 +15,7 @@ vec3 screenToWorld(vec3 p) {
 }
 
 
+// test function
 float fun_sdf(vec3 p) {
     float v1 = length(p)-0.6;
     float v2 = max(max(abs(p.x),abs(p.y)),abs(p.z))-0.6;
@@ -23,38 +24,6 @@ float fun_sdf(vec3 p) {
     float by = length(p-vec3(0,1.2,0))-0.1;
     float bz = length(p-vec3(0,0,1.5))-0.1;
     return min(min(bx, by), min(bz, o));
-}
-float fun_heart(vec3 p) {  // 6th degree
-    float e = p.x*p.x + 2.25*p.y*p.y + p.z*p.z - 1.0;
-	return e*e*e - (p.x*p.x + 0.1125*p.y*p.y)*p.z*p.z*p.z;
-}
-float fun_fox(vec3 p) {  // 6th degree
-    float e = p.x*p.x+2.*p.y*p.y+p.z*p.z;
-	return e*e*e-(9.*p.x*p.x+p.y*p.y)*p.z*p.z*p.z-.5;
-}
-float fun_star(vec3 p) {  // 5th degree
-    vec3 u = p*p;
-    float d = u.x+2.0*u.y+u.z-1.0;
-    return 4.0*d*d-p.z*(5.*u.x*u.x-10.*u.x*u.z+u.z*u.z)-1.0;
-}
-float fun_genus2(vec3 p) {  // 7th degree
-    vec3 u = p*p;
-    return 2.*p.y*(u.y-3.*u.x)*(1.-u.z)+(u.x+u.y)*(u.x+u.y)-(9.*u.z-1.)*(1.-u.z);
-}
-float fun_torus(vec3 p) {  // 4th degree
-    float k = dot(p,p)+3.;
-    return k*k - 16.*dot(p.xy,p.xy);
-}
-float fun_wineglass(vec3 p) {  // contains NAN
-    return p.x*p.x+p.y*p.y-log(p.z+1.)*log(p.z+1.)-0.02;
-}
-float fun_radicalheart(vec3 p) {
-    float z1 = 1.15*p.z - 0.6*pow(2.*pow(p.x*p.x+0.05*p.y*p.y+0.001,0.7)+p.y*p.y,0.3) + 0.3;
-    return p.x*p.x + 4.*p.y*p.y + z1*z1 - 1.0;
-}
-float fun_displaced_plane(vec3 p) {
-    float h = .1*sin(10.*p.x)+.1*sin(10.*p.y);
-    return p.z-h;
 }
 
 float fun0(vec3 p) {
