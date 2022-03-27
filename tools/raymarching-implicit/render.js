@@ -262,7 +262,7 @@ var renderer = {
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
-    rz: -0.4 * Math.PI,
+    rz: -0.9 * Math.PI,
     rx: -0.4 * Math.PI,
     scale: 0.5,
     renderNeeded: true

@@ -15,22 +15,12 @@ vec3 screenToWorld(vec3 p) {
 }
 
 
-// test function
-float fun_sdf(vec3 p) {
-    float v1 = length(p)-0.6;
-    float v2 = max(max(abs(p.x),abs(p.y)),abs(p.z))-0.6;
-    float o = mix(v1, v2, 1.2);
-    float bx = length(p-vec3(1,0,0))-0.1;
-    float by = length(p-vec3(0,1.2,0))-0.1;
-    float bz = length(p-vec3(0,0,1.5))-0.1;
-    return min(min(bx, by), min(bz, o));
-}
-
 float fun0(vec3 p) {
     float x=p.x, y=p.y, z=p.z;
     return {%FUN%};
 }
 
+int callCount = 0;
 vec3 funNGradT(vec3 p, float e) {
     p = screenToWorld(p);
     return vec3(
@@ -40,6 +30,7 @@ vec3 funNGradT(vec3 p, float e) {
     ) / (2.0*e);
 }
 float funT(vec3 p) {
+    callCount += 1;
     return fun0(screenToWorld(p));
 }
 vec3 funTNGrad(vec3 p, float e) {
@@ -49,9 +40,7 @@ vec3 funTNGrad(vec3 p, float e) {
         funT(p+vec3(0,0,e)) - funT(p-vec3(0,0,e))
     ) / (2.0*e);
 }
-int callCount = 0;
 float fun(vec3 p, vec3 rd) {
-    callCount += 1;
     // return funT(p);
     // return funT(p) / length(funNGradT(p, 0.001));
     // return funT(p) / length(funTNGrad(p, 0.001));
@@ -79,7 +68,8 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
     for (int s = 0; s < 8; s += 1) {
         // t = t1 - (t1-t0) * v1/(v1-v0);
         t = 0.5 * (t0 + t1);
-        v = fun(ro+rd*t, rd);
+        // v = fun(ro+rd*t, rd);
+        v = funT(ro+rd*t);
         if (v*v0 < 0.0) t1 = t, v1 = v;
         else t0 = t, v0 = v;
         if (abs(t1-t0) < 0.001*step_size) break;

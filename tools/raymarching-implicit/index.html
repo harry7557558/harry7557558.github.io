@@ -24,6 +24,8 @@
         <select id="builtin-functions"></select>
         <br />
         <textarea id="equation-input" style="width:100%;height:8em"></textarea>
+        <br />
+        <p id="error-message" style="color:red"></p>
     </div>
 
     <script>
@@ -38,11 +40,18 @@
 
             // called when update selected function
             function updateFunctionInput() {
+                let errorMessage = document.querySelector("#error-message");
                 var expr = input.value;
-                var postfix = exprToPostfix(expr);
-                var glsl = postfixToGlsl(postfix);
-                console.log(glsl);
-                updateShaderFunction(glsl);
+                try {
+                    var postfix = exprToPostfix(expr);
+                    var glsl = postfixToGlsl(postfix);
+                    updateShaderFunction(glsl);
+                    console.log(glsl);
+                    errorMessage.style.display = "none";
+                } catch (e) {
+                    errorMessage.style.display = "inline-block";
+                    errorMessage.innerHTML = e;
+                }
             }
 
             select.addEventListener("input", function (event) {

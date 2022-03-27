@@ -1,45 +1,102 @@
+"use strict";
+
 // parse math equations, generate LaTeX and GLSL code
 
-function MathFunction(names, latex, glsl) {
+function MathFunction(names, minArgs, maxArgs, latex, glsl) {
     this.names = names;
+    this.minArgs = minArgs;
+    this.maxArgs = maxArgs;
     this.latex = latex;
     this.glsl = glsl;
-    this.subLatex = function (arg1) {
-        return this.latex.replaceAll("%1", arg1);
+    this.subLatex = function (args) {
+        if (args.length < this.minArgs || (this.maxArgs > 0 && args.length > this.maxArgs))
+            throw "Incorrect number of arguments for function " + this.names[0];
+        var s = args.join(',');
+        return this.latex.replaceAll("%1", s);
     };
-    this.subGlsl = function (arg1) {
-        return this.glsl.replaceAll("%1", arg1);
+    this.subGlsl = function (args) {
+        if (args.length < this.minArgs || (this.maxArgs > 0 && args.length > this.maxArgs))
+            throw "Incorrect number of arguments for function " + this.names[0];
+        var s = args.join(',');
+        return this.glsl.replaceAll("%1", s);
     };
 }
 const mathFunctions = (function () {
-    const funs = [
-        new MathFunction(['abs'], '\\left|%1\\right|', 'abs(%1)'),
-        new MathFunction(['sqrt'], '\\sqrt{%1}', 'sqrt(%1)'),
-        new MathFunction(['exp'], '\\exp\\left(%1\\right)', 'exp(%1)'),
-        new MathFunction(['log', 'ln'], '\\ln\\left(%1\\right)', 'log(%1)'),
-        new MathFunction(['sin'], '\\sin\\left(%1\\right)', 'sin(%1)'),
-        new MathFunction(['cos'], '\\cos\\left(%1\\right)', 'cos(%1)'),
-        new MathFunction(['tan'], '\\tan\\left(%1\\right)', 'tan(%1)'),
+    const funs0 = [
+        new MathFunction(['mod'], 2, 2, '\\mod\\left(%1\\right)', 'mod(%1)'),
+        new MathFunction(['fract'], 1, 1, '\\left\\{%1\\right\\}', 'fract(%1)'),
+        new MathFunction(['floor'], 1, 1, '\\lfloor%1\\rfloor', 'floor(%1)'),
+        new MathFunction(['ceil'], 1, 1, '\\lceil%1\\rceil', 'ceil(%1)'),
+        new MathFunction(['round'], 1, 1, '\\round\\left(%1\\right)', 'round(%1)'),
+        new MathFunction(['abs'], 1, 1, '\\left|%1\\right|', 'abs(%1)'),
+        new MathFunction(['sign', 'sgn'], 1, 1, '\\sign\\left(%1\\right)', 'sign(%1)'),
+        new MathFunction(['max'], 2, -1, '\\max\\left(%1\\right)', 'max(%1)'),
+        new MathFunction(['min'], 2, -1, '\\min\\left(%1\\right)', 'min(%1)'),
+        new MathFunction(['clamp'], 3, 3, '\\operatorname{clamp}\\left(%1\\right)', 'clamp(%1)'),
+        new MathFunction(['mix', 'lerp'], 3, 3, '\\operatorname{mix}\\left(%1\\right)', 'mix(%1)'),
+        new MathFunction(['sqrt'], 1, 1, '\\sqrt{%1}', 'sqrt(%1)'),
+        new MathFunction(['cbrt'], 1, 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))'),
+        new MathFunction(['exp'], 1, 1, '\\exp\\left(%1\\right)', 'exp(%1)'),
+        new MathFunction(['log', 'ln'], 1, 2, '\\ln\\left(%1\\right)', 'log(%1)'),
+        new MathFunction(['sin'], 1, 1, '\\sin\\left(%1\\right)', 'sin(%1)'),
+        new MathFunction(['cos'], 1, 1, '\\cos\\left(%1\\right)', 'cos(%1)'),
+        new MathFunction(['tan'], 1, 1, '\\tan\\left(%1\\right)', 'tan(%1)'),
+        new MathFunction(['csc'], 1, 1, '\\csc\\left(%1\\right)', '(1.0/sin(%1))'),
+        new MathFunction(['sec'], 1, 1, '\\sec\\left(%1\\right)', '(1.0/cos(%1))'),
+        new MathFunction(['cot'], 1, 1, '\\cot\\left(%1\\right)', '(1.0/tan(%1))'),
+        new MathFunction(['sinh'], 1, 1, '\\sinh\\left(%1\\right)', 'sinh(%1)'),
+        new MathFunction(['cosh'], 1, 1, '\\cosh\\left(%1\\right)', 'cosh(%1)'),
+        new MathFunction(['tanh'], 1, 1, '\\tanh\\left(%1\\right)', 'tanh(%1)'),
+        new MathFunction(['csch'], 1, 1, '\\csch\\left(%1\\right)', '(1.0/sinh(%1))'),
+        new MathFunction(['sech'], 1, 1, '\\sech\\left(%1\\right)', '(1.0/cosh(%1))'),
+        new MathFunction(['coth'], 1, 1, '\\coth\\left(%1\\right)', '(1.0/tanh(%1))'),
+        new MathFunction(['arcsin', 'arsin', 'asin'], 1, 1, '\\arcsin\\left(%1\\right)', 'asin(%1)'),
+        new MathFunction(['arccos', 'arcos', 'acos'], 1, 1, '\\arccos\\left(%1\\right)', 'acos(%1)'),
+        new MathFunction(['arctan', 'artan', 'atan'], 1, 2, '\\arctan\\left(%1\\right)', 'atan(%1)'),
+        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)'),
+        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)'),
+        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)'),
     ];
+    var funs = {};
+    for (var i = 0; i < funs0.length; i++) {
+        for (var j = 0; j < funs0[i].names.length; j++) {
+            funs[funs0[i].names[j]] = funs0[i];
+        }
+    }
+    funs['max'].subGlsl = funs['min'].subGlsl = function (args) {
+        if (args.length < 2)
+            throw "To few argument for function " + this.names[0];
+        while (args.length >= 2) {
+            var args1 = [];
+            for (var i = 0; i + 1 < args.length; i += 2) {
+                args1.push(this.glsl.replaceAll("%1", [args[i], args[i + 1]].join(',')));
+            }
+            if (args.length % 2 == 1) args1.push(args[args.length - 1]);
+            args = args1;
+        }
+        return args[0];
+    };
+    funs['log'].subGlsl = funs['ln'].subGlsl = function (args) {
+        if (args.length == 1) {
+            return this.glsl.replaceAll("%1", args[0]);
+        }
+        else if (args.length == 2) {
+            var lv = this.glsl.replaceAll("%1", args[1]);
+            var lb = this.glsl.replaceAll("%1", args[0]);
+            return "(" + lv + "/" + lb + ")";
+        }
+        else throw "Incorrect number of arguments for function " + this.names[0];
+    };
     return funs;
 })();
-function isMathFunction(s) {
-    for (var i = 0; i < mathFunctions.length; i++) {
-        for (var j = 0; j < mathFunctions[i].names.length; j++) {
-            if (s == mathFunctions[i].names[j])
-                return true;
-        }
-    }
-    return false;
-}
-function indexMathFunction(s) {
-    for (var i = 0; i < mathFunctions.length; i++) {
-        for (var j = 0; j < mathFunctions[i].names.length; j++) {
-            if (s == mathFunctions[i].names[j])
-                return mathFunctions[i];
-        }
-    }
-    return undefined;
+
+
+function Token(type, str) {
+    console.assert(type == 'number' || type == 'variable' ||
+        type == 'operator' || type == 'function' || type == null);
+    this.type = type;  // type of the token
+    this.str = str;  // name of the token represented as a string
+    this.numArgs = 0;  // number of arguments for functions
 }
 
 
@@ -58,7 +115,7 @@ function exprToPostfix(expr) {
     var prev_c = null;
     for (var i = 0; i < expr.length; i++) {
         let eb = expr1s[expr1s.length - 1];
-        if (expr[i] == "-" && (prev_c == null || /[\(\+\-\*\/\^]/.test(prev_c))) {
+        if (expr[i] == "-" && (prev_c == null || /[\(\+\-\*\/\^\,]/.test(prev_c))) {
             expr1s.push({
                 s: expr[i],
                 pc: 0
@@ -89,7 +146,7 @@ function exprToPostfix(expr) {
     expr = expr1s[0].s;
 
     // multiplication sign
-    expr1 = "";
+    var expr1 = "";
     for (var i = 0; i < expr.length;) {
         var v = "";
         while (i < expr.length && /[A-Za-z_\d\.\(\)]/.test(expr[i])) {
@@ -109,7 +166,7 @@ function exprToPostfix(expr) {
             var next_lp = v.substring(j, v.length).search(/\(/);
             if (next_lp != -1) {
                 var funName = v.substring(j, j + next_lp);
-                if (isMathFunction(funName)) {
+                if (mathFunctions[funName] != undefined) {
                     expr1 += funName;
                     j += funName.length;
                 }
@@ -146,7 +203,7 @@ function exprToPostfix(expr) {
     console.log("preprocessed", expr);
 
     // shunting-yard algorithm
-    var queue = [], stack = [];
+    var queue = [], stack = [];  // Token objects
     for (var i = 0; i < expr.length;) {
         // get token
         var token = "";
@@ -160,40 +217,59 @@ function exprToPostfix(expr) {
         }
         // number
         if (/^[0-9]*\.{0,1}[0-9]*$/.test(token) || /^[0-9]*\.{0,1}[0-9]+$/.test(token)) {
-            queue.push(token);
+            var number = new Token("number", token);
+            queue.push(number);
         }
         // variable name
         else if (/^[A-Za-z](_[A-Za-z0-9]+)?$/.test(token)) {
-            queue.push(token);
+            var variable = new Token("variable", token);
+            queue.push(variable);
         }
         // function
-        else if (isMathFunction(token)) {
-            stack.push(token);
+        else if (mathFunctions[token] != undefined) {
+            var fun = new Token("function", token);
+            stack.push(fun);
+        }
+        // comma to separate function arguments
+        else if (token == ",") {
+            while (stack[stack.length - 1].str != '(') {
+                queue.push(stack[stack.length - 1]);
+                stack.pop();
+                if (stack.length == 0)
+                    throw ("Comma encountered without a function.");
+            }
+            stack.pop();
+            if (stack.length == 0 || stack[stack.length - 1].type != "function")
+                throw ("Comma encountered without a function.");
+            stack[stack.length - 1].numArgs += 1;
+            stack.push(new Token(null, '('));
         }
         // operator
         else if (operators[token] != undefined) {
-            while (stack.length != 0 && operators[stack[stack.length - 1]] != undefined &&
-                (operators[stack[stack.length - 1]] > operators[token] ||
-                    (isLeftAssociative[token] && operators[stack[stack.length - 1]] == operators[token]))) {
+            while (stack.length != 0 && stack[stack.length - 1].type == "operator" &&
+                (operators[stack[stack.length - 1].str] > operators[token] ||
+                    (isLeftAssociative[token] && operators[stack[stack.length - 1].str] == operators[token]))) {
                 queue.push(stack[stack.length - 1]);
                 stack.pop();
             }
-            stack.push(token);
+            stack.push(new Token("operator", token));
         }
         // parenthesis
         else if (token == "(") {
-            stack.push(token);
+            stack.push(new Token(null, token));
         }
         else if (token == ")") {
-            while (stack[stack.length - 1] != '(') {
+            while (stack[stack.length - 1].str != '(') {
                 queue.push(stack[stack.length - 1]);
                 stack.pop();
                 console.assert(stack.length != 0);
             }
             stack.pop();
-            if (stack.length != 0 && isMathFunction(stack[stack.length - 1])) {
-                queue.push(stack[stack.length - 1]);
+            if (stack.length != 0 && stack[stack.length - 1].type == "function") {
+                var fun = stack[stack.length - 1];
                 stack.pop();
+                fun.numArgs += 1;
+                queue.push(fun);
             }
         }
         else {
@@ -201,8 +277,7 @@ function exprToPostfix(expr) {
         }
     }
     while (stack.length != 0) {
-        var token = stack[stack.length - 1];
-        queue.push(token);
+        queue.push(stack[stack.length - 1]);
         stack.pop();
     }
     return queue;
@@ -214,36 +289,41 @@ function postfixToGlsl(queue) {
     for (var i = 0; i < queue.length; i++) {
         var token = queue[i];
         // number
-        if (/[\d\.]+/.test(token)) {
-            if (!/\./.test(token)) token += '.';
-            stack.push(token);
+        if (token.type == 'number') {
+            var s = token.str;
+            if (!/\./.test(s)) s += '.';
+            stack.push(s);
         }
         // function
-        else if (isMathFunction(token)) {
-            var obj = stack[stack.length - 1];
-            var fun = indexMathFunction(token);
-            stack.pop();
-            stack.push(fun.subGlsl(obj));
+        else if (token.type == 'function') {
+            var fun = mathFunctions[token.str];
+            var args = [];
+            for (var j = token.numArgs; j > 0; j--)
+                args.push(stack[stack.length - j]);
+            for (var j = 0; j < token.numArgs; j++)
+                stack.pop();
+            stack.push(fun.subGlsl(args));
         }
         // variable
-        else if (/[A-Za-z](_[A-Za-z\d]+)?/.test(token)) {
-            stack.push(token);
+        else if (token.type == "variable") {
+            stack.push(token.str);
         }
         // operators
-        else if (/^[\+\-\*\/]$/.test(token)) {
+        else if (/^[\+\-\*\/]$/.test(token.str)) {
             var v1 = stack[stack.length - 2];
             var v2 = stack[stack.length - 1];
             stack.pop(); stack.pop();
-            var v = "(" + v1 + token + v2 + ")";
+            var v = "(" + v1 + token.str + v2 + ")";
             stack.push(v);
         }
-        else if (token == "^") {
+        else if (token.str == "^") {
             var v1 = stack[stack.length - 2];
             var v2 = stack[stack.length - 1];
             stack.pop(); stack.pop();
             var v = "pow(" + v1 + "," + v2 + ")";
-            if (v2 == "2." && v1.length < 10) v = "(" + v1 + "*" + v1 + ")";
-            if (v2 == "3." && v1.length < 7) v = "(" + v1 + "*" + v1 + "*" + v1 + ")";
+            if (v1 == "e") v = "exp(" + v2 + ")";
+            else if (v2 == "2." && v1.length < 10) v = "(" + v1 + "*" + v1 + ")";
+            else if (v2 == "3." && v1.length < 7) v = "(" + v1 + "*" + v1 + "*" + v1 + ")";
             stack.push(v);
         }
         else console.error(token);
@@ -254,32 +334,32 @@ function postfixToGlsl(queue) {
 
 
 var builtinFunctions = [
-    "(2x^2+2y^2+4z^2+x+3)^2-32(x^2+y^2)",
     "(x^2+9/4*y^2+z^2-1)^3-(x^2+9/80*y^2)*z^3",
     "2(x^2+2y^2+z^2)^3-2(9x^2+y^2)z^3-1",
     "4(x^2+2y^2+z^2-1)^2-z(5x^4-10x^2z^2+z^4)-1",
     "2y(y^2-3x^2)(1-z^2)+(x^2+y^2)^2-(9z^2-1)(1-z^2)",
+    "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2",
+    "(x^2(x^2-1)+y^2)^2+(y^2(y^2-1)+z^2)^2-0.1y^2(y^2+1)",
+    "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)",
+    "(2x^2+2y^2+4z^2+x+3)^2-32(x^2+y^2)",
+    "(x^2+y^2+z^2-2)^3+10000(x^2y^2+x^2z^2+y^2z^2)-10",
+    "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2",
+    "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2",
+    "x^2+y^2-(1-z)z^2",
     "x^2+4y^2+(1.15z-0.6(2(x^2+.05y^2+.001)^0.7+y^2)^0.3+0.3)^2-1",
     "x^2+y^2-ln(z+1)^2-0.02",
-    ".1sin(10.x)+.1sin(10.y)-z",
     "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)",
     "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01cos(50x)cos(50y)cos(50z)",
+    "0.25round(4sin(x)sin(y))-z",
+    ".2asin(cos(5.x)cos(5.y))-z",
+    "1/((tan(x)tan(y))^2+1)-z-1/2",
+    "100sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)-z",
+    "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-4z-6-sin(4z)",
+    "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4z-6-4sin(8z)",
+    "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-0.2)-1",
 ];
 for (var i = 0; i < builtinFunctions.length; i++) {
     let expr = builtinFunctions[i];
     let pf = exprToPostfix(expr);
     postfixToGlsl(pf);
 }
-
-// https://math.stackexchange.com/questions/46212/interesting-implicit-surfaces-in-mathbbr3
-// https://mathworld.wolfram.com/AlgebraicSurface.html
-// http://paulbourke.net/geometry/
-builtinFunctions = builtinFunctions.concat([
-    "x^2+y^2-(1-z)z^2",
-    "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2",
-    "(x^2(x^2-1)+y^2)^2+(y^2(y^2-1)+z^2)^2-0.1y^2(y^2+1)",
-    "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+12xyz-4(x^2+y^2+z^2)+4",
-    "(x^2+y^2+z^2-2)^3+10000(x^2y^2+x^2z^2+y^2z^2)-10",
-    "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2",
-    "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2",
-]);
