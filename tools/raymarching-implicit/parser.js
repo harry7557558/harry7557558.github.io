@@ -2,93 +2,9 @@
 
 // parse math equations, generate LaTeX and GLSL code
 
-function MathFunction(names, minArgs, maxArgs, latex, glsl) {
-    this.names = names;
-    this.minArgs = minArgs;
-    this.maxArgs = maxArgs;
-    this.latex = latex;
-    this.glsl = glsl;
-    this.subLatex = function (args) {
-        if (args.length < this.minArgs || (this.maxArgs > 0 && args.length > this.maxArgs))
-            throw "Incorrect number of arguments for function " + this.names[0];
-        var s = args.join(',');
-        return this.latex.replaceAll("%1", s);
-    };
-    this.subGlsl = function (args) {
-        if (args.length < this.minArgs || (this.maxArgs > 0 && args.length > this.maxArgs))
-            throw "Incorrect number of arguments for function " + this.names[0];
-        var s = args.join(',');
-        return this.glsl.replaceAll("%1", s);
-    };
-}
-const mathFunctions = (function () {
-    const funs0 = [
-        new MathFunction(['mod'], 2, 2, '\\mod\\left(%1\\right)', 'mod(%1)'),
-        new MathFunction(['fract'], 1, 1, '\\left\\{%1\\right\\}', 'fract(%1)'),
-        new MathFunction(['floor'], 1, 1, '\\lfloor%1\\rfloor', 'floor(%1)'),
-        new MathFunction(['ceil'], 1, 1, '\\lceil%1\\rceil', 'ceil(%1)'),
-        new MathFunction(['round'], 1, 1, '\\round\\left(%1\\right)', 'round(%1)'),
-        new MathFunction(['abs'], 1, 1, '\\left|%1\\right|', 'abs(%1)'),
-        new MathFunction(['sign', 'sgn'], 1, 1, '\\sign\\left(%1\\right)', 'sign(%1)'),
-        new MathFunction(['max'], 2, -1, '\\max\\left(%1\\right)', 'max(%1)'),
-        new MathFunction(['min'], 2, -1, '\\min\\left(%1\\right)', 'min(%1)'),
-        new MathFunction(['clamp'], 3, 3, '\\operatorname{clamp}\\left(%1\\right)', 'clamp(%1)'),
-        new MathFunction(['mix', 'lerp'], 3, 3, '\\operatorname{mix}\\left(%1\\right)', 'mix(%1)'),
-        new MathFunction(['sqrt'], 1, 1, '\\sqrt{%1}', 'sqrt(%1)'),
-        new MathFunction(['cbrt'], 1, 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))'),
-        new MathFunction(['exp'], 1, 1, '\\exp\\left(%1\\right)', 'exp(%1)'),
-        new MathFunction(['log', 'ln'], 1, 2, '\\ln\\left(%1\\right)', 'log(%1)'),
-        new MathFunction(['sin'], 1, 1, '\\sin\\left(%1\\right)', 'sin(%1)'),
-        new MathFunction(['cos'], 1, 1, '\\cos\\left(%1\\right)', 'cos(%1)'),
-        new MathFunction(['tan'], 1, 1, '\\tan\\left(%1\\right)', 'tan(%1)'),
-        new MathFunction(['csc'], 1, 1, '\\csc\\left(%1\\right)', '(1.0/sin(%1))'),
-        new MathFunction(['sec'], 1, 1, '\\sec\\left(%1\\right)', '(1.0/cos(%1))'),
-        new MathFunction(['cot'], 1, 1, '\\cot\\left(%1\\right)', '(1.0/tan(%1))'),
-        new MathFunction(['sinh'], 1, 1, '\\sinh\\left(%1\\right)', 'sinh(%1)'),
-        new MathFunction(['cosh'], 1, 1, '\\cosh\\left(%1\\right)', 'cosh(%1)'),
-        new MathFunction(['tanh'], 1, 1, '\\tanh\\left(%1\\right)', 'tanh(%1)'),
-        new MathFunction(['csch'], 1, 1, '\\csch\\left(%1\\right)', '(1.0/sinh(%1))'),
-        new MathFunction(['sech'], 1, 1, '\\sech\\left(%1\\right)', '(1.0/cosh(%1))'),
-        new MathFunction(['coth'], 1, 1, '\\coth\\left(%1\\right)', '(1.0/tanh(%1))'),
-        new MathFunction(['arcsin', 'arsin', 'asin'], 1, 1, '\\arcsin\\left(%1\\right)', 'asin(%1)'),
-        new MathFunction(['arccos', 'arcos', 'acos'], 1, 1, '\\arccos\\left(%1\\right)', 'acos(%1)'),
-        new MathFunction(['arctan', 'artan', 'atan'], 1, 2, '\\arctan\\left(%1\\right)', 'atan(%1)'),
-        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)'),
-        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)'),
-        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)'),
-    ];
-    var funs = {};
-    for (var i = 0; i < funs0.length; i++) {
-        for (var j = 0; j < funs0[i].names.length; j++) {
-            funs[funs0[i].names[j]] = funs0[i];
-        }
-    }
-    funs['max'].subGlsl = funs['min'].subGlsl = function (args) {
-        if (args.length < 2)
-            throw "To few argument for function " + this.names[0];
-        while (args.length >= 2) {
-            var args1 = [];
-            for (var i = 0; i + 1 < args.length; i += 2) {
-                args1.push(this.glsl.replaceAll("%1", [args[i], args[i + 1]].join(',')));
-            }
-            if (args.length % 2 == 1) args1.push(args[args.length - 1]);
-            args = args1;
-        }
-        return args[0];
-    };
-    funs['log'].subGlsl = funs['ln'].subGlsl = function (args) {
-        if (args.length == 1) {
-            return this.glsl.replaceAll("%1", args[0]);
-        }
-        else if (args.length == 2) {
-            var lv = this.glsl.replaceAll("%1", args[1]);
-            var lb = this.glsl.replaceAll("%1", args[0]);
-            return "(" + lv + "/" + lb + ")";
-        }
-        else throw "Incorrect number of arguments for function " + this.names[0];
-    };
-    return funs;
-})();
+
+
+// ============================ DEFINITIONS ==============================
 
 
 function Token(type, str) {
@@ -98,6 +14,105 @@ function Token(type, str) {
     this.str = str;  // name of the token represented as a string
     this.numArgs = 0;  // number of arguments for functions
 }
+
+function EvalObject(glsl, glslgrad, isNumeric) {
+    this.glsl = glsl;
+    this.glslgrad = glslgrad;
+    this.isNumeric = isNumeric;  // zero gradient
+}
+
+function MathFunction(names, numArgs, latex, glsl, glslgrad) {
+    this.names = names;
+    this.numArgs = numArgs;
+    this.latex = latex;
+    this.glsl = glsl;
+    this.glslgrad = glslgrad;
+    this.subGlsl = function (args) {
+        if (args.length != this.numArgs)
+            throw "Incorrect number of arguments for function " + this.names[0];
+        var glsl = this.glsl, glslgrad = this.glslgrad;
+        var isNumeric = glslgrad == "vec3(0)";
+        for (var i = 0; i < args.length; i++) {
+            var repv = "%" + (i + 1), repg = "$" + (i + 1);
+            glsl = glsl.replaceAll(repv, args[i].glsl);
+            glslgrad = glslgrad.replaceAll(repv, args[i].glsl).replaceAll(repg, args[i].glslgrad);
+            isNumeric &= args[i].isNumeric;
+        }
+        return new EvalObject(glsl, glslgrad, isNumeric);
+    };
+}
+const mathFunctions = (function () {
+    const funs0 = [
+        new MathFunction(['mod'], 2, '\\mod\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
+        new MathFunction(['fract'], 1, '\\left\\{%1\\right\\}', 'fract(%1)', '$1'),
+        new MathFunction(['floor'], 1, '\\lfloor%1\\rfloor', 'floor(%1)', 'vec3(0)'),
+        new MathFunction(['ceil'], 1, '\\lceil%1\\rceil', 'ceil(%1)', 'vec3(0)'),
+        new MathFunction(['round'], 1, '\\round\\left(%1\\right)', 'round(%1)', 'vec3(0)'),
+        new MathFunction(['abs'], 1, '\\left|%1\\right|', 'abs(%1)', '($1*sign(%1))'),
+        new MathFunction(['sign', 'sgn'], 1, '\\sign\\left(%1\\right)', 'sign(%1)', 'vec3(0)'),
+        new MathFunction(['max'], 0, '\\max\\left(%0\\right)', 'max(%1,%2)', "(%1>%2?$1:$2)"),
+        new MathFunction(['min'], 0, '\\min\\left(%0\\right)', 'min(%1,%2)', "(%1<%2?$1:$2)"),
+        new MathFunction(['clamp'], 3, '\\operatorname{clamp}\\left(%1,%2,%3\\right)', 'clamp(%1,%2,%3)', '(%1>%3?$3:%1>%2?$1:$2)'),
+        new MathFunction(['lerp', 'mix'], 3, '\\operatorname{lerp}\\left(%1,%2,%3\\right)', 'mix(%1,%2,%3)', '((1.-%3)*$1+(%2-%1)*$3+%3*$2)'),
+        new MathFunction(['sqrt'], 1, '\\sqrt{%1}', 'sqrt(%1)', '(.5*$1/sqrt(%1))'),
+        new MathFunction(['cbrt'], 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))', '($1/(3.*pow(abs(%1),2./3.)))'),
+        new MathFunction(['pow'], 2, '\\left(%1\\right)^{%2}', 'pow(%1,%2)', null),
+        new MathFunction(['exp'], 1, '\\exp\\left(%1\\right)', 'exp(%1)', '($1*exp(%1))'),
+        new MathFunction(['log', 'ln'], 1, '\\ln\\left(%1\\right)', 'log(%1)', '$1/%1'),
+        new MathFunction(['log', 'ln'], 2, '\\log_{%1}\\left(%2\\right)', '(log(%2)/log(%1))', '((log(%1)*$2/%2-log(%2)*$1/%1)/(log(%1)*log(%1)))'),
+        new MathFunction(['sin'], 1, '\\sin\\left(%1\\right)', 'sin(%1)', '($1*cos(%1))'),
+        new MathFunction(['cos'], 1, '\\cos\\left(%1\\right)', 'cos(%1)', '(-$1*sin(%1))'),
+        new MathFunction(['tan'], 1, '\\tan\\left(%1\\right)', 'tan(%1)', '($1/(cos(%1)*cos(%1)))'),
+        new MathFunction(['csc'], 1, '\\csc\\left(%1\\right)', '(1.0/sin(%1))', '(-$1/(sin(%1)*tan(%1)))'),
+        new MathFunction(['sec'], 1, '\\sec\\left(%1\\right)', '(1.0/cos(%1))', '($1*tan(%1)/cos(%1))'),
+        new MathFunction(['cot'], 1, '\\cot\\left(%1\\right)', '(1.0/tan(%1))', '(-$1/(sin(%1)*sin(%1)))'),
+        new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))'),
+        new MathFunction(['cosh'], 1, '\\cosh\\left(%1\\right)', 'cosh(%1)', '($1*sinh(%1))'),
+        new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))'),
+        new MathFunction(['csch'], 1, '\\csch\\left(%1\\right)', '(1.0/sinh(%1))', '(-$1/(sinh(%1)*tanh(%1)))'),
+        new MathFunction(['sech'], 1, '\\sech\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))'),
+        new MathFunction(['coth'], 1, '\\coth\\left(%1\\right)', '(1.0/tanh(%1))', '(-$1/(sinh(%1)*sinh(%1)))'),
+        new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))'),
+        new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))'),
+        new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))'),
+        new MathFunction(['arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', null),
+        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
+        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
+        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
+    ];
+    var funs = {};
+    for (var i = 0; i < funs0.length; i++) {
+        for (var j = 0; j < funs0[i].names.length; j++) {
+            var name = funs0[i].names[j];
+            if (funs[name] == undefined) funs[name] = {};
+            funs[name]['' + funs0[i].numArgs] = funs0[i];
+        }
+    }
+    funs['pow']['2'].subGlsl = function (args) {
+        if (args.length != 2)
+            throw "Incorrect number of arguments for function " + this.names[0];
+        return powEvalObjects(args[0], args[1]);
+    };
+    funs['max']['0'].subGlsl = funs['min']['0'].subGlsl = function (args) {
+        if (args.length < 2)
+            throw "To few argument for function " + this.names[0];
+        while (args.length >= 2) {
+            var args1 = [];
+            for (var i = 0; i + 1 < args.length; i += 2) {
+                var glsl = this.glsl.replaceAll("%1", args[i].glsl).replaceAll("%2", args[i + 1].glsl);
+                var glslgrad = this.glslgrad.replaceAll("$1", args[i].glslgrad).replaceAll("$2", args[i + 1].glslgrad).replaceAll("%1", args[i].glsl).replaceAll("%2", args[i + 1].glsl);
+                args1.push(new EvalObject(glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric));
+            }
+            if (args.length % 2 == 1) args1.push(args[args.length - 1]);
+            args = args1;
+        }
+        return args[0];
+    };
+    return funs;
+})();
+
+
+// ============================ PARSING ==============================
 
 
 // Parse a human math expression to postfix notation
@@ -283,54 +298,140 @@ function exprToPostfix(expr) {
     return queue;
 }
 
+
+// ============================ EVALUATION ==============================
+
+function addEvalObjects(a, b) {
+    return new EvalObject(
+        "(" + a.glsl + "+" + b.glsl + ")",
+        a.isNumeric ? b.glslgrad : b.isNumeric ? a.glslgrad :
+            "(" + a.glslgrad + "+" + b.glslgrad + ")",
+        a.isNumeric && b.isNumeric
+    );
+}
+function subEvalObjects(a, b) {
+    return new EvalObject(
+        "(" + a.glsl + "-" + b.glsl + ")",
+        b.isNumeric ? a.glslgrad : a.isNumeric ? "(-" + b.glslgrad + ")" :
+            "(" + a.glslgrad + "-" + b.glslgrad + ")",
+        a.isNumeric && b.isNumeric
+    );
+}
+function mulEvalObjects(a, b) {
+    return new EvalObject(
+        "(" + a.glsl + "*" + b.glsl + ")",
+        a.isNumeric ? "(" + a.glsl + "*" + b.glslgrad + ")" :
+            b.isNumeric ? "(" + a.glslgrad + "*" + b.glsl + ")" :
+                "(" + a.glslgrad + "*" + b.glsl + "+" + a.glsl + "*" + b.glslgrad + ")",
+        a.isNumeric && b.isNumeric
+    );
+}
+function divEvalObjects(a, b) {
+    return new EvalObject(
+        "(" + a.glsl + "/" + b.glsl + ")",
+        a.isNumeric && b.isNumeric ? "vec3(0)" :
+            b.isNumeric ? "(" + a.glslgrad + "/" + b.glsl + ")" :
+                a.isNumeric ? "(-" + a.glsl + "*" + b.glslgrad + "/(" + b.glsl + "*" + b.glsl + "))" :
+                    "((" + a.glslgrad + "*" + b.glsl + "-" + a.glsl + "*" + b.glslgrad + ")/(" + b.glsl + "*" + b.glsl + "))",
+        a.isNumeric && b.isNumeric
+    );
+}
+function powEvalObjects(a, b) {
+    if (a.glsl == 'e') {
+        return new EvalObject(
+            "exp(" + b.glsl + ")",
+            "(" + b.glslgrad + "*exp(" + b.glsl + "))",
+            b.isNumeric
+        )
+    }
+    var n = Number(b.glsl);
+    if (n == 0) return new EvalObject("0", "vec3(0)", true);
+    if (n == 1) return a;
+    if (n == 2 || n == 3 || n == 4 || n == 5 || n == 6 || n == 7 || n == 8) {
+        var arr = [];
+        for (var i = 0; i < n; i++) arr.push(a.glsl);
+        var glsl = "(" + arr.join('*') + ")";
+        arr[0] = a.glslgrad;
+        var glslgrad = a.isNumeric ? "vec3(0)" : "(" + n + ".*" + arr.join('*') + ")";
+        return new EvalObject(
+            glsl, glslgrad,
+            a.isNumeric
+        )
+    }
+    return new EvalObject(
+        "pow(" + a.glsl + "," + b.glsl + ")",
+        a.isNumeric && b.isNumeric ? "vec3(0)" :
+            a.isNumeric ? "(pow(" + a.glsl + "," + b.glsl + ")*log(" + a.glsl + ")*" + b.glslgrad + ")" :
+                b.isNumeric ? "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad + ")" :
+                    "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad +
+                    "+pow(" + a.glsl + "," + b.glsl + ")*log(" + a.glsl + ")*" + b.glslgrad + ")",
+        a.isNumeric && b.isNumeric
+    )
+}
+
 // Convert a post-polish math expression to GLSL code
 function postfixToGlsl(queue) {
-    var stack = [];
+    var stack = [];  // EvalObject objects
     for (var i = 0; i < queue.length; i++) {
         var token = queue[i];
         // number
         if (token.type == 'number') {
             var s = token.str;
             if (!/\./.test(s)) s += '.';
-            stack.push(s);
+            stack.push(new EvalObject(s, "vec3(0)", true));
         }
         // function
         else if (token.type == 'function') {
             var fun = mathFunctions[token.str];
+            var numArgs = token.numArgs;
             var args = [];
-            for (var j = token.numArgs; j > 0; j--)
+            for (var j = numArgs; j > 0; j--)
                 args.push(stack[stack.length - j]);
-            for (var j = 0; j < token.numArgs; j++)
+            for (var j = 0; j < numArgs; j++)
                 stack.pop();
+            if (fun['' + numArgs] == undefined) fun = fun['0'];
+            else fun = fun['' + numArgs];
+            if (fun == undefined)
+                throw "Incorrect number of arguments for function " + token.str;
             stack.push(fun.subGlsl(args));
         }
         // variable
         else if (token.type == "variable") {
-            stack.push(token.str);
+            var s = token.str;
+            var grad = "vec3(0)";
+            if (token.str == 'x') grad = "vec3(1,0,0)";
+            if (token.str == 'y') grad = "vec3(0,1,0)";
+            if (token.str == 'z') grad = "vec3(0,0,1)";
+            stack.push(new EvalObject(s, grad, grad == "0"));
         }
         // operators
         else if (/^[\+\-\*\/]$/.test(token.str)) {
             var v1 = stack[stack.length - 2];
             var v2 = stack[stack.length - 1];
             stack.pop(); stack.pop();
-            var v = "(" + v1 + token.str + v2 + ")";
+            var v = null;
+            if (token.str == "+") v = addEvalObjects(v1, v2);
+            if (token.str == "-") v = subEvalObjects(v1, v2);
+            if (token.str == "*") v = mulEvalObjects(v1, v2);
+            if (token.str == "/") v = divEvalObjects(v1, v2);
             stack.push(v);
         }
         else if (token.str == "^") {
             var v1 = stack[stack.length - 2];
             var v2 = stack[stack.length - 1];
             stack.pop(); stack.pop();
-            var v = "pow(" + v1 + "," + v2 + ")";
-            if (v1 == "e") v = "exp(" + v2 + ")";
-            else if (v2 == "2." && v1.length < 10) v = "(" + v1 + "*" + v1 + ")";
-            else if (v2 == "3." && v1.length < 7) v = "(" + v1 + "*" + v1 + "*" + v1 + ")";
-            stack.push(v);
+            stack.push(powEvalObjects(v1, v2));
         }
         else console.error(token);
     }
     console.assert(stack.length == 1);
+    console.log("glsl", stack[0].glsl);
+    console.log("glslgrad", stack[0].glslgrad);
     return stack[0];
 }
+
+
+// ============================ BUILT-IN ==============================
 
 
 var builtinFunctions = [
@@ -351,12 +452,14 @@ var builtinFunctions = [
     "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)",
     "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01cos(50x)cos(50y)cos(50z)",
     "0.25round(4sin(x)sin(y))-z",
-    ".2asin(cos(5.x)cos(5.y))-z",
     "1/((tan(x)tan(y))^2+1)-z-1/2",
+    ".2tan(asin(cos(5x)cos(5y)))-z+.5sin(10z)",
     "100sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)-z",
     "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-4z-6-sin(4z)",
     "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4z-6-4sin(8z)",
-    "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-0.2)-1",
+    "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3",
+    "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5",
+    //"(6-y)/15+((8x^2+4(y-3)^2)/200)^3+cos(max((x+y)cos(y-x),(y-x)cos(x+y)))-sin(min((x+y)sin(y-x),(y-x)sin(x+y)))+20z^2"
 ];
 for (var i = 0; i < builtinFunctions.length; i++) {
     let expr = builtinFunctions[i];

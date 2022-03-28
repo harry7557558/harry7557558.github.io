@@ -22,7 +22,7 @@
     top: 10px;
     right: 10px;
     width: 240px;
-    height: 200px;
+    height: min-content;
     background-color: rgba(14, 14, 101, 0.5);
     padding: 15px 20px;
     color: white;

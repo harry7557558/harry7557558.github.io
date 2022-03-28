@@ -15,36 +15,40 @@ vec3 screenToWorld(vec3 p) {
 }
 
 
-float fun0(vec3 p) {
+// function and its gradient in world space
+int callCount = 0;
+float fun(vec3 p) {  // function
+    callCount += 1;
     float x=p.x, y=p.y, z=p.z;
     return {%FUN%};
 }
-
-int callCount = 0;
-vec3 funNGradT(vec3 p, float e) {
-    p = screenToWorld(p);
-    return vec3(
-        fun0(p+vec3(e,0,0)) - fun0(p-vec3(e,0,0)),
-        fun0(p+vec3(0,e,0)) - fun0(p-vec3(0,e,0)),
-        fun0(p+vec3(0,0,e)) - fun0(p-vec3(0,0,e))
-    ) / (2.0*e);
-}
-float funT(vec3 p) {
+vec3 funGrad(vec3 p) {  // analytical gradient
     callCount += 1;
-    return fun0(screenToWorld(p));
+    float x=p.x, y=p.y, z=p.z;
+    return {%FUNGRAD%};
 }
-vec3 funTNGrad(vec3 p, float e) {
+vec3 funGradN(vec3 p) {  // numerical gradient
+    float h = 0.002*max(pow(length(p),1./3.),1.);  // error term O(h²)
     return vec3(
-        funT(p+vec3(e,0,0)) - funT(p-vec3(e,0,0)),
-        funT(p+vec3(0,e,0)) - funT(p-vec3(0,e,0)),
-        funT(p+vec3(0,0,e)) - funT(p-vec3(0,0,e))
-    ) / (2.0*e);
+        fun(p+vec3(h,0,0)) - fun(p-vec3(h,0,0)),
+        fun(p+vec3(0,h,0)) - fun(p-vec3(0,h,0)),
+        fun(p+vec3(0,0,h)) - fun(p-vec3(0,0,h))
+    ) / (2.0*h);
 }
-float fun(vec3 p, vec3 rd) {
-    // return funT(p);
-    // return funT(p) / length(funNGradT(p, 0.001));
-    // return funT(p) / length(funTNGrad(p, 0.001));
-    return funT(p) / (abs(funT(p+0.001*rd)-funT(p-0.001*rd))/0.002);
+
+// function and its gradient in screen space
+float funS(vec3 p) {
+    return fun(screenToWorld(p));
+}
+vec3 funGradS(vec3 x) {
+    mat3 R = mat3(transformMatrix);
+    vec3 T = transformMatrix[3].xyz;
+    vec3 P = vec3(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3]);
+    float S = transformMatrix[3][3];
+    float pers = dot(P, x) + S;
+    mat3 M = (R * pers - outerProduct(R*x+T, P)) / (pers*pers);
+    return funGrad(screenToWorld(x)) * M;
+    // return funGradN(screenToWorld(x)) * M;
 }
 
 
@@ -53,10 +57,12 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
     const float step_size = 0.01;
     // raymarching
     float t = 0.0, dt = step_size;
-    float v_old = fun(ro, rd), v;
+    float v_old = funS(ro), v;
     int i = 0;
     for (t = dt; i < 240 && t < 1.0; t += dt, i++) {
-        v = fun(ro+rd*t, rd);
+        vec3 p = ro + rd * t;
+        v = funS(p) / abs(dot(funGradS(p), rd));  // usually but not always faster
+        //v = funS(p) / abs((funS(p+0.001*dt)-funS(p-0.001*dt))/0.002);
         if (v*v_old < 0.0) break;
         v_old = v;
         dt = isnan(v) ? step_size : clamp(abs(v)-step_size, 0.1*step_size, step_size);
@@ -66,15 +72,24 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
     float t0 = t-dt, t1 = t;
     float v0 = v_old, v1 = v;
     for (int s = 0; s < 8; s += 1) {
-        // t = t1 - (t1-t0) * v1/(v1-v0);
         t = 0.5 * (t0 + t1);
-        // v = fun(ro+rd*t, rd);
-        v = funT(ro+rd*t);
+        vec3 p = ro + rd * t;
+        v = funS(p);
         if (v*v0 < 0.0) t1 = t, v1 = v;
         else t0 = t, v0 = v;
         if (abs(t1-t0) < 0.001*step_size) break;
     }
-    vec3 n = normalize(funNGradT(ro+rd*t, 0.001));  // normal
+#if 0
+    {  // debug analytical gradient
+        vec3 p = screenToWorld(ro+rd*t);
+        vec3 nn = funGradN(p);
+        vec3 na = funGrad(p);
+        //return vec3(100.*length(normalize(nn)-normalize(na)));
+        //return vec3(100.*abs(length(nn)-length(na)));
+        return vec3(100.*length(nn-na));
+    }
+#endif
+    vec3 n = normalize(funGrad(screenToWorld(ro+rd*t)));
     rd = normalize(screenToWorld(ro+rd)-screenToWorld(ro));
     if (dot(n,rd)>0.) n=-n;
     vec3 ldir = normalize(vec3(0.5,0.5,1.0));  // light

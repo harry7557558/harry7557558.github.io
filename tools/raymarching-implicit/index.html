@@ -45,8 +45,8 @@
                 try {
                     var postfix = exprToPostfix(expr);
                     var glsl = postfixToGlsl(postfix);
-                    updateShaderFunction(glsl);
-                    console.log(glsl);
+                    // console.log(glsl);
+                    updateShaderFunction(glsl.glsl, glsl.glslgrad);
                     errorMessage.style.display = "none";
                 } catch (e) {
                     errorMessage.style.display = "inline-block";

@@ -137,7 +137,7 @@ function createShaderProgram(gl, vsSource, fsSource) {
         gl.shaderSource(shader, source); // send the source code to the shader
         gl.compileShader(shader); // compile shader
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) // check if compiled succeed
-            throw new Error(gl.getShaderInfoLog(shader)); // compile error message
+            throw "Shader compile error: " + gl.getShaderInfoLog(shader);
         return shader;
     }
     var vShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
@@ -253,7 +253,6 @@ var renderer = {
     gl: null,
     vsSource: "",
     fsSource: "",
-    fsSourceFun: "",
     imgGradSource: "",
     aaSource: "",
     shaderProgram: null,
@@ -287,12 +286,6 @@ function initWebGL() {
 function mainRenderer() {
     let canvas = renderer.canvas;
     let gl = renderer.gl;
-
-    // compile rendering shader
-    console.time("compile shader");
-    var fsSource = renderer.fsSource.replaceAll("{%FUN%}", renderer.fsSourceFun);
-    renderer.shaderProgram = createShaderProgram(gl, renderer.vsSource, fsSource);
-    console.timeEnd("compile shader");
 
     // create anti-aliasing object
     function createAntiAliaser() {
@@ -377,10 +370,11 @@ function mainRenderer() {
     });
 }
 
-function updateShaderFunction(funCode) {
-    renderer.fsSourceFun = funCode;
+function updateShaderFunction(funCode, funGradCode) {
     console.time("compile shader");
-    var fsSource = renderer.fsSource.replaceAll("{%FUN%}", renderer.fsSourceFun);
+    var fsSource = renderer.fsSource;
+    fsSource = fsSource.replaceAll("{%FUN%}", funCode);
+    fsSource = fsSource.replaceAll("{%FUNGRAD%}", funGradCode);
     var shaderProgram = createShaderProgram(renderer.gl, renderer.vsSource, fsSource);
     if (renderer.shaderProgram != null)
         renderer.gl.deleteProgram(renderer.shaderProgram);
