@@ -34,8 +34,8 @@
             let select = document.querySelector("#builtin-functions");
             let input = document.querySelector("#equation-input");
             for (var i = 0; i < builtinFunctions.length; i++) {
-                let expr = builtinFunctions[i];
-                select.innerHTML += "<option value=" + expr + ">" + expr + "</option>"
+                let fun = builtinFunctions[i];
+                select.innerHTML += "<option value=" + fun[1] + ">" + fun[0] + "</option>"
             }
 
             // called when update selected function
@@ -43,7 +43,7 @@
                 let errorMessage = document.querySelector("#error-message");
                 var expr = input.value;
                 try {
-                    var postfix = exprToPostfix(expr);
+                    var postfix = inputToPostfix(expr);
                     var glsl = postfixToGlsl(postfix);
                     // console.log(glsl);
                     updateShaderFunction(glsl.glsl, glsl.glslgrad);
@@ -55,13 +55,13 @@
             }
 
             select.addEventListener("input", function (event) {
-                input.value = select.value;
+                input.value = select.value.replaceAll(";", "\n");
                 updateFunctionInput();
             });
             input.addEventListener("input", function (event) {
                 updateFunctionInput();
             });
-            input.value = select.value;
+            input.value = select.value.replaceAll(";", "\n");
 
             // main
             initWebGL();

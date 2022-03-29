@@ -75,7 +75,7 @@ const mathFunctions = (function () {
         new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))'),
         new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))'),
         new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))'),
-        new MathFunction(['arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', null),
+        new MathFunction(['arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
         new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
         new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
         new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
@@ -110,6 +110,11 @@ const mathFunctions = (function () {
     };
     return funs;
 })();
+
+// test if the variable name is an independent variable
+function isIndependentVariable(name) {
+    return name == 'x' || name == 'y' || name == 'z';
+}
 
 
 // ============================ PARSING ==============================
@@ -173,9 +178,9 @@ function exprToPostfix(expr) {
             if (expr1.length > 0) {
                 if ((/\)/.test(expr1[expr1.length - 1]) && /[A-Za-z_\d\.\(]/.test(v[j]))
                     || (j != 0 && /[A-Za-z_\d\.\)]/.test(v[j - 1]) && /\(/.test(v[j]))) expr1 += "*";
-                else if (!has_ && /[A-Za-z\d\.]/.test(expr1[expr1.length - 1]) && /[A-Za-z_]/.test(v[j]))
+                else if (!has_ && /[A-Za-z\d\.]/.test(expr1[expr1.length - 1]) && /[A-Za-z]/.test(v[j]) && v[j] != "_")
                     expr1 += "*";
-                else if (!has_ && /[A-Za-z]/.test(expr1[expr1.length - 1]) && /[\d\.]/.test(v[j]))
+                else if (!has_ && /[A-Za-z]/.test(expr1[expr1.length - 1]) && /\d/.test(v[j]))
                     expr1 += "_";
             }
             var next_lp = v.substring(j, v.length).search(/\(/);
@@ -187,6 +192,7 @@ function exprToPostfix(expr) {
                 }
             }
             if (v[j] == "_") has_ = true;
+            if (v[j] == ")" || v[j] == "(") has_ = false;
             expr1 += v[j];
             j++;
         }
@@ -298,6 +304,96 @@ function exprToPostfix(expr) {
     return queue;
 }
 
+// Get a list of variables from a postfix notation
+function getVariables(postfix, excludeIndependent) {
+    var vars = new Set();
+    for (var i = 0; i < postfix.length; i++) {
+        if (postfix[i].type == 'variable') {
+            if (excludeIndependent && isIndependentVariable(postfix[i].str))
+                continue;
+            vars.add(postfix[i].str);
+        }
+    }
+    return vars;
+}
+
+// Parse console input to postfix notation
+function inputToPostfix(input) {
+    // split to arrays
+    input = input.replaceAll('\r', ';').replaceAll('\n', ';');
+    input = input.trim().trim(';').trim().split(';');
+
+    // read each line of input
+    var variables = {};  // variables
+    var mainequ = null;  // main equation
+    for (var i = 0; i < input.length; i++) {
+        var line = input[i].trim();
+        if (line == '') continue;
+        if (/\=/.test(line)) {
+            var lr = line.split('=');
+            var left = lr[0].trim();
+            var right = lr[1].trim();
+            // definition
+            if (/^[A-Za-z](_[A-Za-z\d]+)?$/.test(left) || /^[A-Za-z](_?\d[A-Za-z\d]*)?$/.test(left)) {
+                if (left.length >= 2 && left[1] != "_") left = left[0] + "_" + left.substring(1, left.length);
+                // main equation
+                if (isIndependentVariable(left)) {
+                    if (mainequ != null) throw "Multiple main equations found.";
+                    mainequ = exprToPostfix(left + "-(" + right + ")");
+                }
+                // definition
+                else {
+                    if (variables[left] != undefined) throw "Multiple definitions of variable " + left;
+                    var postfix = exprToPostfix(right);
+                    variables[left] = {
+                        'postfix': postfix,
+                        'vars': getVariables(postfix, true),
+                        'resolving': false
+                    }
+                }
+            }
+            // main equation
+            else {
+                if (mainequ != null) throw "Multiple main equations found.";
+                if (Number(right) == '0') mainequ = exprToPostfix(left);
+                else mainequ = exprToPostfix("(" + left + ")-(" + right + ")");
+            }
+        }
+        // main equation
+        else {
+            if (mainequ != null) throw "Multiple main equations found.";
+            mainequ = exprToPostfix(line);
+        }
+    }
+    if (mainequ == null) throw "No equation to graph."
+
+    // resolve dependencies
+    function dfs(equ) {
+        var equ1 = [];
+        for (var i = 0; i < equ.length; i++) {
+            if (equ[i].type == 'variable') {
+                var variable = variables[equ[i].str];
+                if (variable != undefined) {
+                    if (variable.resolving) throw "Recursive definition is not supported.";
+                    variable.resolving = true;
+                    var res = dfs(variable.postfix);
+                    equ1 = equ1.concat(res);
+                    variable.resolving = false;
+                }
+                else {
+                    equ1.push(equ[i]);
+                }
+            }
+            else equ1.push(equ[i]);
+            if (equ1.length > 2000)
+                throw "Definitions are nested too deeply."
+        }
+        return equ1;
+    }
+    mainequ = dfs(mainequ);
+    return mainequ;
+}
+
 
 // ============================ EVALUATION ==============================
 
@@ -399,9 +495,11 @@ function postfixToGlsl(queue) {
         else if (token.type == "variable") {
             var s = token.str;
             var grad = "vec3(0)";
-            if (token.str == 'x') grad = "vec3(1,0,0)";
-            if (token.str == 'y') grad = "vec3(0,1,0)";
-            if (token.str == 'z') grad = "vec3(0,0,1)";
+            if (isIndependentVariable(token.str)) {
+                if (token.str == 'x') grad = "vec3(1,0,0)";
+                if (token.str == 'y') grad = "vec3(0,1,0)";
+                if (token.str == 'z') grad = "vec3(0,0,1)";
+            }
             stack.push(new EvalObject(s, grad, grad == "0"));
         }
         // operators
@@ -423,6 +521,8 @@ function postfixToGlsl(queue) {
             stack.push(powEvalObjects(v1, v2));
         }
         else console.error(token);
+        if (stack[stack.length - 1].glslgrad.length > 20000)
+            throw "Definitions are nested too deeply when calculating derivative.";
     }
     console.assert(stack.length == 1);
     console.log("glsl", stack[0].glsl);
@@ -435,34 +535,37 @@ function postfixToGlsl(queue) {
 
 
 var builtinFunctions = [
-    "(x^2+9/4*y^2+z^2-1)^3-(x^2+9/80*y^2)*z^3",
-    "2(x^2+2y^2+z^2)^3-2(9x^2+y^2)z^3-1",
-    "4(x^2+2y^2+z^2-1)^2-z(5x^4-10x^2z^2+z^4)-1",
-    "2y(y^2-3x^2)(1-z^2)+(x^2+y^2)^2-(9z^2-1)(1-z^2)",
-    "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2",
-    "(x^2(x^2-1)+y^2)^2+(y^2(y^2-1)+z^2)^2-0.1y^2(y^2+1)",
-    "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)",
-    "(2x^2+2y^2+4z^2+x+3)^2-32(x^2+y^2)",
-    "(x^2+y^2+z^2-2)^3+10000(x^2y^2+x^2z^2+y^2z^2)-10",
-    "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2",
-    "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2",
-    "x^2+y^2-(1-z)z^2",
-    "x^2+4y^2+(1.15z-0.6(2(x^2+.05y^2+.001)^0.7+y^2)^0.3+0.3)^2-1",
-    "x^2+y^2-ln(z+1)^2-0.02",
-    "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)",
-    "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01cos(50x)cos(50y)cos(50z)",
-    "0.25round(4sin(x)sin(y))-z",
-    "1/((tan(x)tan(y))^2+1)-z-1/2",
-    ".2tan(asin(cos(5x)cos(5y)))-z+.5sin(10z)",
-    "100sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)-z",
-    "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-4z-6-sin(4z)",
-    "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4z-6-4sin(8z)",
-    "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3",
-    "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5",
-    //"(6-y)/15+((8x^2+4(y-3)^2)/200)^3+cos(max((x+y)cos(y-x),(y-x)cos(x+y)))-sin(min((x+y)sin(y-x),(y-x)sin(x+y)))+20z^2"
+    ["A6 Heart", "(x^2+9/4*y^2+z^2-1)^3-(x^2+9/80*y^2)*z^3"],
+    ["A6 Fox", "2(x^2+2y^2+z^2)^3-2(9x^2+y^2)z^3-1"],
+    ["A5 Star", "4(x^2+2y^2+z^2-1)^2-z(5x^4-10x^2z^2+z^4)-1"],
+    ["A7 Genus 2", "2y(y^2-3x^2)(1-z^2)+(x^2+y^2)^2-(9z^2-1)(1-z^2)"],
+    ["A4 Goursat", "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2"],
+    ["A4 Genus 3", "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)"],
+    ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2-32(x^2+y^2)"],
+    ["A6 Spikey", "(x^2+y^2+z^2-2)^3+10000(x^2y^2+x^2z^2+y^2z^2)-10"],
+    ["A6 Barth 1", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
+    ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
+    ["A3 Ding-Dong", "x^2+y^2-(1-z)z^2"],
+    ["Radical Heart", "x^2+4y^2+(1.15z-0.6(2(x^2+.05y^2+.001)^0.7+y^2)^0.3+0.3)^2-1"],
+    ["Ln Wineglass", "x^2+y^2-ln(z+1)^2-0.02"],
+    ["Noisy Octahedron", "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)"],
+    ["Noisy Peanut", "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01(cos(30x)+cos(30y)cos(30z))"],
+    ["Sin Terrace", "0.25round(4sin(x)sin(y))-z"],
+    ["Tan Cells", "1/((tan(x)tan(y))^2+1)-z-1/2"],
+    ["Tan Forest", ".2tan(asin(cos(5x)cos(5y)))-z+.5sin(10z)"],
+    ["Sin Field", "sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)-.01z"],
+    ["Sin Tower 1", "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-4z-6-sin(4z)"],
+    ["Sin Tower 2", "1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4z-6-4sin(8z)"],
+    ["Lerp Spikey 1", "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3"],
+    ["Lerp Spikey 2", "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5"],
+    ["Variable", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
+    ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);r0=e^(k*(2pfloor(n)+a));r1=e^(k*(2pceil(n)+a));d=min(abs(r1-r),abs(r0-r));sqrt(d^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"]
 ];
+var t0 = performance.now();
 for (var i = 0; i < builtinFunctions.length; i++) {
-    let expr = builtinFunctions[i];
-    let pf = exprToPostfix(expr);
+    let expr = builtinFunctions[i][1];
+    let pf = inputToPostfix(expr);
     postfixToGlsl(pf);
 }
+var dt = performance.now() - t0;
+console.log("All built-in functions parsed in", dt, "ms");

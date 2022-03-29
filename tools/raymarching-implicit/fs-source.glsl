@@ -84,9 +84,7 @@ vec3 vIsosurf(in vec3 ro, in vec3 rd) {
         vec3 p = screenToWorld(ro+rd*t);
         vec3 nn = funGradN(p);
         vec3 na = funGrad(p);
-        //return vec3(100.*length(normalize(nn)-normalize(na)));
-        //return vec3(100.*abs(length(nn)-length(na)));
-        return vec3(100.*length(nn-na));
+        return vec3(tanh(100.*length(nn-na)));
     }
 #endif
     vec3 n = normalize(funGrad(screenToWorld(ro+rd*t)));
