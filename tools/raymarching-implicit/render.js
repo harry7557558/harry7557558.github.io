@@ -106,19 +106,43 @@ function mat4ToFloat32Array(m) {
 
 function calcTransformMatrix(state) {
     var sc = (state.height / Math.min(state.width, state.height)) / state.scale;
-    var transformMatrix = mat4Perspective(
+    var transformMatrix = mat4(1.0);
+    // move to center of mass
+    var control = document.getElementById("control");
+    var controlBl = [
+        Math.min(Math.max(1.0 - control.offsetLeft / state.width, 0.0), 1.0),
+        Math.min(Math.max((control.offsetTop + control.offsetHeight) / state.height, 0.0), 1.0)];
+    var controlA = controlBl[0] * controlBl[1];
+    var controlC = [
+        1.0 - (0.5 - 0.5 * controlA * controlBl[0]) / (1.0 - controlA),
+        1.0 - (0.5 - 0.5 * controlA * controlBl[1]) / (1.0 - controlA)];
+    transformMatrix = mat4Translate(transformMatrix,
+        [2.0 * (controlC[0] - 0.5), 2.0 * (controlC[1] - 0.5), 0.0]);
+    // projection
+    transformMatrix = mat4Mul(transformMatrix, mat4Perspective(
         0.25 * Math.PI,
         canvas.width / canvas.height,
-        0.5 * sc, 10.0 * sc);
+        0.5 * sc, 10.0 * sc));
     transformMatrix = mat4Translate(transformMatrix, [0, 0, -3.0 * sc]);
     transformMatrix = mat4Rotate(transformMatrix, state.rx, [1, 0, 0]);
     transformMatrix = mat4Rotate(transformMatrix, state.rz, [0, 0, 1]);
-    transformMatrix = mat4Translate(transformMatrix, [-0, -0, -0]);
     // return transformMatrix;
     return mat4Inverse(transformMatrix);
 }
 
 // ============================ WEBGL ==============================
+
+var renderer = {
+    canvas: null,
+    gl: null,
+    vsSource: "",
+    fsSource: "",
+    imgGradSource: "",
+    aaSource: "",
+    shaderProgram: null,
+    antiAliaser: null,
+    timerExt: null,
+};
 
 // request shader sources
 function loadShaderSource(path) {
@@ -184,7 +208,10 @@ function createRenderTarget(gl, width, height) {
 
 
 // call this function to re-render
-function drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAliaser) {
+async function drawScene(positionBuffer, transformMatrix) {
+    let gl = renderer.gl;
+    let shaderProgram = renderer.shaderProgram;
+    let antiAliaser = renderer.antiAliaser;
 
     // set position buffer for vertex shader
     function setPositionBuffer(program) {
@@ -202,10 +229,17 @@ function drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAlias
     }
 
     // render to target
+    var timerQueries = [];
     function renderPass() {
-        const offset = 0;
-        const vertexCount = 4;
-        gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+        let timer = renderer.timerExt;
+        if (timer != null) {
+            let query = gl.createQuery();
+            timerQueries.push(query);
+            gl.beginQuery(timer.TIME_ELAPSED_EXT, query);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            gl.endQuery(timer.TIME_ELAPSED_EXT);
+        }
+        else gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
     // clear the canvas
@@ -243,21 +277,31 @@ function drawScene(gl, shaderProgram, positionBuffer, transformMatrix, antiAlias
     gl.bindTexture(gl.TEXTURE_2D, antiAliaser.imgGradTexture);
     gl.uniform1i(gl.getUniformLocation(antiAliaser.aaProgram, "iChannel1"), 1);
     renderPass();
+
+    // check timer
+    function checkTime() {
+        var indivTime = [], totTime = 0.0;
+        for (var i = 0; i < timerQueries.length; i++) {
+            let query = timerQueries[i];
+            if (gl.getQueryParameter(query, gl.QUERY_RESULT_AVAILABLE)) {
+                let dt = 1e-6 * gl.getQueryParameter(query, gl.QUERY_RESULT);
+                indivTime.push(dt.toFixed(1) + "ms");
+                totTime += dt;
+                gl.deleteQuery(query);
+            }
+        }
+        if (totTime > 0.0) {
+            console.log(indivTime.join(' '));
+            document.getElementById("fps").textContent = Math.round(totTime) + " ms";
+        }
+        else setTimeout(checkTime, 40);
+    }
+    setTimeout(checkTime, 100);
 }
 
 
 // ============================ MAIN ==============================
 
-var renderer = {
-    canvas: null,
-    gl: null,
-    vsSource: "",
-    fsSource: "",
-    imgGradSource: "",
-    aaSource: "",
-    shaderProgram: null,
-    antiAliaser: null,
-};
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
@@ -281,6 +325,11 @@ function initWebGL() {
     renderer.imgGradSource = loadShaderSource("img-grad.glsl");
     renderer.aaSource = loadShaderSource("aa.glsl");
     console.timeEnd("load glsl code");
+
+    // timer
+    renderer.timerExt = renderer.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+    if (renderer.timerExt) document.querySelector("#fps").textContent = "Timer loaded.";
+    else console.warn("Timer unavailable.");
 }
 
 function mainRenderer() {
@@ -302,8 +351,7 @@ function mainRenderer() {
             aaProgram: aaProgram
         }
     };
-    var antiAliaser = createAntiAliaser();
-    renderer.antiAliaser = antiAliaser;
+    renderer.antiAliaser = createAntiAliaser();
 
     // position buffer
     var positionBuffer = gl.createBuffer();
@@ -315,17 +363,10 @@ function mainRenderer() {
     let then = 0;
     function render(now) {
         if (state.renderNeeded) {
-            // display fps
-            now *= 0.001;
-            var time_delta = now - then;
-            then = now;
-            if (time_delta != 0) {
-                document.getElementById("fps").textContent = (1.0 / time_delta).toFixed(1) + " fps";
-            }
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
             var transformMatrix = calcTransformMatrix(state);
-            drawScene(gl, renderer.shaderProgram, positionBuffer, transformMatrix, antiAliaser);
+            drawScene(positionBuffer, transformMatrix);
             state.renderNeeded = false;
         }
         requestAnimationFrame(render);
@@ -333,6 +374,7 @@ function mainRenderer() {
     requestAnimationFrame(render);
 
     // interactions
+    var fingerDist = -1;
     canvas.addEventListener("wheel", function (e) {
         e.preventDefault();
         var sc = Math.exp(0.0002 * e.wheelDeltaY);
@@ -351,21 +393,46 @@ function mainRenderer() {
     canvas.addEventListener("pointermove", function (event) {
         if (mouseDown) {
             var dx = event.movementX, dy = event.movementY;
-            state.rx += 0.01 * dy;
-            state.rz += 0.01 * dx;
+            var k = fingerDist > 0. ? 0.001 : 0.01;
+            state.rx += k * dy;
+            state.rz += k * dx;
+            state.renderNeeded = true;
+        }
+    });
+    canvas.addEventListener("touchstart", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            fingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+        }
+    });
+    canvas.addEventListener("touchend", function (event) {
+        fingerDist = -1.0;
+    });
+    canvas.addEventListener("touchmove", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            var newFingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+            if (fingerDist > 0. && newFingerDist > 0.) {
+                var sc = newFingerDist / fingerDist;
+                state.scale *= Math.max(Math.min(sc, 2.0), 0.5);
+            }
+            fingerDist = newFingerDist;
             state.renderNeeded = true;
         }
     });
     window.addEventListener("resize", function (event) {
         state.width = canvas.width = canvas.style.width = window.innerWidth;
         state.height = canvas.height = canvas.style.height = window.innerHeight;
-        gl.deleteFramebuffer(antiAliaser.renderFramebuffer);
-        gl.deleteTexture(antiAliaser.renderTexture);
-        gl.deleteProgram(antiAliaser.imgGradProgram);
-        gl.deleteFramebuffer(antiAliaser.imgGradFramebuffer);
-        gl.deleteTexture(antiAliaser.imgGradTexture);
-        gl.deleteProgram(antiAliaser.aaProgram);
-        antiAliaser = createAntiAliaser();
+        var oldAntiAliaser = renderer.antiAliaser;
+        renderer.antiAliaser = createAntiAliaser();
+        gl.deleteFramebuffer(oldAntiAliaser.renderFramebuffer);
+        gl.deleteTexture(oldAntiAliaser.renderTexture);
+        gl.deleteProgram(oldAntiAliaser.imgGradProgram);
+        gl.deleteFramebuffer(oldAntiAliaser.imgGradFramebuffer);
+        gl.deleteTexture(oldAntiAliaser.imgGradTexture);
+        gl.deleteProgram(oldAntiAliaser.aaProgram);
         state.renderNeeded = true;
     });
 }
