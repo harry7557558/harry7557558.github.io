@@ -25,11 +25,19 @@
         <br />
         <textarea id="equation-input" style="width:100%;height:8em"></textarea>
         <br />
+        <input type="checkbox" id="checkbox-color" checked>n-color</input>
+        <input type="checkbox" id="checkbox-transparency">transparency</input>
+        <input type="checkbox" id="checkbox-yup"><i>y</i>-up</input>
         <p id="error-message" style="color:red"></p>
     </div>
 
     <script>
         window.addEventListener("load", async function (event) {
+            var glsl = {};
+            let checkboxColor = document.querySelector("#checkbox-color");
+            let checkboxTransparency = document.querySelector("#checkbox-transparency");
+            let checkboxYup = document.querySelector("#checkbox-yup");
+
             // init built-in functions
             let select = document.querySelector("#builtin-functions");
             let input = document.querySelector("#equation-input");
@@ -44,16 +52,21 @@
                 var expr = input.value;
                 try {
                     var postfix = inputToPostfix(expr);
-                    var glsl = postfixToGlsl(postfix);
+                    glsl = postfixToGlsl(postfix);
                     // console.log(glsl);
-                    updateShaderFunction(glsl.glsl, glsl.glslgrad);
+                    updateShaderFunction(glsl.glsl, glsl.glslgrad,
+                        checkboxColor.checked, checkboxTransparency.checked, checkboxYup.checked);
                     errorMessage.style.display = "none";
                 } catch (e) {
+                    console.error(e);
                     errorMessage.style.display = "inline-block";
                     errorMessage.innerHTML = e;
                 }
             }
 
+            checkboxColor.addEventListener("input", updateFunctionInput);
+            checkboxTransparency.addEventListener("input", updateFunctionInput);
+            checkboxYup.addEventListener("input", updateFunctionInput);
             select.addEventListener("input", function (event) {
                 input.value = select.value.replaceAll(";", "\n");
                 updateFunctionInput();
@@ -67,7 +80,7 @@
             initWebGL();
             updateFunctionInput();
             try {
-                mainRenderer();
+                initRenderer();
             } catch (e) {
                 console.error(e);
                 document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";

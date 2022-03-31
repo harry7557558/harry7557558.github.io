@@ -136,10 +136,17 @@ var renderer = {
     canvas: null,
     gl: null,
     vsSource: "",
-    fsSource: "",
+    premarchSource: "",
+    poolSource: "",
+    raymarchSource: "",
     imgGradSource: "",
     aaSource: "",
-    shaderProgram: null,
+    positionBuffer: null,
+    premarchProgram: null,
+    premarchTarget: null,
+    poolProgram: null,
+    poolTarget: null,
+    raymarchProgram: null,
     antiAliaser: null,
     timerExt: null,
 };
@@ -155,7 +162,8 @@ function loadShaderSource(path) {
 }
 
 // compile shaders and create a shader program
-function createShaderProgram(gl, vsSource, fsSource) {
+function createShaderProgram(vsSource, fsSource) {
+    let gl = renderer.gl;
     function loadShader(gl, type, source) {
         var shader = gl.createShader(type); // create a new shader
         gl.shaderSource(shader, source); // send the source code to the shader
@@ -178,7 +186,8 @@ function createShaderProgram(gl, vsSource, fsSource) {
 }
 
 // create texture/framebuffer
-function createSampleTexture(gl, width, height) {
+function createSampleTexture(width, height) {
+    let gl = renderer.gl;
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     const level = 0;
@@ -190,12 +199,15 @@ function createSampleTexture(gl, width, height) {
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
         width, height, border,
         format, type, data);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     return tex;
 }
-function createRenderTarget(gl, width, height) {
-    const tex = createSampleTexture(gl, width, height);
+function createRenderTarget(width, height) {
+    let gl = renderer.gl;
+    const tex = createSampleTexture(width, height);
     const framebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
@@ -204,13 +216,42 @@ function createRenderTarget(gl, width, height) {
         framebuffer: framebuffer
     };
 }
+function destroyRenderTarget(target) {
+    let gl = renderer.gl;
+    gl.deleteTexture(target.texture);
+    gl.deleteFramebuffer(target.framebuffer);
+}
 
 
+// create anti-aliasing object
+function createAntiAliaser() {
+    let gl = renderer.gl;
+    var renderTarget = createRenderTarget(state.width, state.height);
+    var imgGradProgram = createShaderProgram(renderer.vsSource, renderer.imgGradSource);
+    var imgGradTarget = createRenderTarget(state.width, state.height);
+    var aaProgram = createShaderProgram(renderer.vsSource, renderer.aaSource);
+    return {
+        renderTexture: renderTarget.texture,
+        renderFramebuffer: renderTarget.framebuffer,
+        imgGradProgram: imgGradProgram,
+        imgGradTexture: imgGradTarget.texture,
+        imgGradFramebuffer: imgGradTarget.framebuffer,
+        aaProgram: aaProgram
+    };
+}
+function destroyAntiAliaser(antiAliaser) {
+    let gl = renderer.gl;
+    gl.deleteFramebuffer(antiAliaser.renderFramebuffer);
+    gl.deleteTexture(antiAliaser.renderTexture);
+    gl.deleteProgram(antiAliaser.imgGradProgram);
+    gl.deleteFramebuffer(antiAliaser.imgGradFramebuffer);
+    gl.deleteTexture(antiAliaser.imgGradTexture);
+    gl.deleteProgram(antiAliaser.aaProgram);
+}
 
 // call this function to re-render
-async function drawScene(positionBuffer, transformMatrix) {
+async function drawScene(transformMatrix) {
     let gl = renderer.gl;
-    let shaderProgram = renderer.shaderProgram;
     let antiAliaser = renderer.antiAliaser;
 
     // set position buffer for vertex shader
@@ -221,18 +262,19 @@ async function drawScene(positionBuffer, transformMatrix) {
         const normalize = false; // don't normalize
         const stride = 0; // how many bytes to get from one set of values to the next
         const offset = 0; // how many bytes inside the buffer to start from
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, renderer.positionBuffer);
         gl.vertexAttribPointer(
             vpLocation,
             numComponents, type, normalize, stride, offset);
         gl.enableVertexAttribArray(vpLocation);
     }
 
-    // render to target
+    // render to target + timer
     var timerQueries = [];
+    let timer = renderer.timerExt;
+    const countIndividualTime = false;
     function renderPass() {
-        let timer = renderer.timerExt;
-        if (timer != null) {
+        if (countIndividualTime && timer != null) {
             let query = gl.createQuery();
             timerQueries.push(query);
             gl.beginQuery(timer.TIME_ELAPSED_EXT, query);
@@ -241,18 +283,49 @@ async function drawScene(positionBuffer, transformMatrix) {
         }
         else gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
+    let query = null;
+    if (!countIndividualTime && timer != null) {
+        query = gl.createQuery();
+        timerQueries.push(query);
+        gl.beginQuery(timer.TIME_ELAPSED_EXT, query);
+    }
 
     // clear the canvas
-    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    // render image
-    gl.useProgram(shaderProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, antiAliaser.renderFramebuffer);
-    setPositionBuffer(shaderProgram);
+    // premarch
+    gl.viewport(0, 0, state.premarchWidth, state.premarchHeight);
+    gl.useProgram(renderer.premarchProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, renderer.premarchTarget.framebuffer);
+    setPositionBuffer(renderer.premarchProgram);
     gl.uniformMatrix4fv(
-        gl.getUniformLocation(shaderProgram, "transformMatrix"),
+        gl.getUniformLocation(renderer.premarchProgram, "transformMatrix"),
+        false,
+        mat4ToFloat32Array(transformMatrix));
+    renderPass();
+
+    // pooling
+    gl.useProgram(renderer.poolProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, renderer.poolTarget.framebuffer);
+    setPositionBuffer(renderer.poolProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.premarchTarget.texture);
+    gl.uniform1i(gl.getUniformLocation(renderer.poolProgram, "iChannel0"), 0);
+    gl.uniform2i(gl.getUniformLocation(renderer.poolProgram, "iResolution"),
+        state.premarchWidth, state.premarchHeight);
+    renderPass();
+
+    // render image
+    gl.viewport(0, 0, state.width, state.height);
+    gl.useProgram(renderer.raymarchProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, antiAliaser.renderFramebuffer);
+    setPositionBuffer(renderer.raymarchProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.poolTarget.texture);
+    gl.uniform1i(gl.getUniformLocation(renderer.raymarchProgram, "iChannel0"), 0);
+    gl.uniformMatrix4fv(
+        gl.getUniformLocation(renderer.raymarchProgram, "transformMatrix"),
         false,
         mat4ToFloat32Array(transformMatrix));
     renderPass();
@@ -278,8 +351,22 @@ async function drawScene(positionBuffer, transformMatrix) {
     gl.uniform1i(gl.getUniformLocation(antiAliaser.aaProgram, "iChannel1"), 1);
     renderPass();
 
+    if (!countIndividualTime && timer != null)
+        gl.endQuery(timer.TIME_ELAPSED_EXT);
+
     // check timer
     function checkTime() {
+        if (timerQueries.length == 0) return;
+        if (timer == null) {
+            for (var i = 0; i < timerQueries.length; i++)
+                gl.deleteQuery(timerQueries[i]);
+            return;
+        }
+        let query = timerQueries[timerQueries.length - 1];
+        if (!gl.getQueryParameter(query, gl.QUERY_RESULT_AVAILABLE)) {
+            setTimeout(checkTime, 40);
+            return;
+        }
         var indivTime = [], totTime = 0.0;
         for (var i = 0; i < timerQueries.length; i++) {
             let query = timerQueries[i];
@@ -287,14 +374,11 @@ async function drawScene(positionBuffer, transformMatrix) {
                 let dt = 1e-6 * gl.getQueryParameter(query, gl.QUERY_RESULT);
                 indivTime.push(dt.toFixed(1) + "ms");
                 totTime += dt;
-                gl.deleteQuery(query);
             }
+            gl.deleteQuery(query);
         }
-        if (totTime > 0.0) {
-            console.log(indivTime.join(' '));
-            document.getElementById("fps").textContent = Math.round(totTime) + " ms";
-        }
-        else setTimeout(checkTime, 40);
+        if (countIndividualTime) console.log(indivTime.join(' '));
+        document.getElementById("fps").textContent = (1000.0 / totTime).toFixed(1) + " fps";
     }
     setTimeout(checkTime, 100);
 }
@@ -321,10 +405,18 @@ function initWebGL() {
     console.time("load glsl code");
     renderer.vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 vXy;" +
         "void main(){vXy=vertexPosition.xy;gl_Position=vertexPosition;}";
-    renderer.fsSource = loadShaderSource("fs-source.glsl");
+    renderer.premarchSource = loadShaderSource("premarch.glsl");
+    renderer.poolSource = loadShaderSource("pool.glsl");
+    renderer.raymarchSource = loadShaderSource("raymarch.glsl");
     renderer.imgGradSource = loadShaderSource("img-grad.glsl");
     renderer.aaSource = loadShaderSource("aa.glsl");
     console.timeEnd("load glsl code");
+
+    // position buffer
+    renderer.positionBuffer = renderer.gl.createBuffer();
+    renderer.gl.bindBuffer(renderer.gl.ARRAY_BUFFER, renderer.positionBuffer);
+    var positions = [-1, 1, 1, 1, -1, -1, 1, -1];
+    renderer.gl.bufferData(renderer.gl.ARRAY_BUFFER, new Float32Array(positions), renderer.gl.STATIC_DRAW);
 
     // timer
     renderer.timerExt = renderer.gl.getExtension('EXT_disjoint_timer_query_webgl2');
@@ -332,41 +424,41 @@ function initWebGL() {
     else console.warn("Timer unavailable.");
 }
 
-function mainRenderer() {
+function updateBuffers() {
+    state.width = canvas.width = canvas.style.width = window.innerWidth;
+    state.height = canvas.height = canvas.style.height = window.innerHeight;
+    state.premarchWidth = Math.round(state.width / 4);
+    state.premarchHeight = Math.round(state.height / 4);
+
+    var oldPremarchTarget = renderer.premarchTarget;
+    renderer.premarchTarget = createRenderTarget(state.premarchWidth, state.premarchHeight);
+    if (oldPremarchTarget) destroyRenderTarget(oldPremarchTarget);
+
+    var oldPoolTarget = renderer.poolTarget;
+    renderer.poolTarget = createRenderTarget(state.premarchWidth, state.premarchHeight);
+    if (oldPoolTarget) destroyRenderTarget(oldPoolTarget);
+
+    var oldAntiAliaser = renderer.antiAliaser;
+    renderer.antiAliaser = createAntiAliaser();
+    if (oldAntiAliaser) destroyAntiAliaser(oldAntiAliaser);
+
+    state.renderNeeded = true;
+}
+
+// Initialize renderer, call updateShaderFunction() once before calling this
+function initRenderer() {
     let canvas = renderer.canvas;
     let gl = renderer.gl;
 
-    // create anti-aliasing object
-    function createAntiAliaser() {
-        var renderTarget = createRenderTarget(gl, state.width, state.height);
-        var imgGradProgram = createShaderProgram(gl, renderer.vsSource, renderer.imgGradSource);
-        var imgGradTarget = createRenderTarget(gl, state.width, state.height);
-        var aaProgram = createShaderProgram(gl, renderer.vsSource, renderer.aaSource);
-        return {
-            renderTexture: renderTarget.texture,
-            renderFramebuffer: renderTarget.framebuffer,
-            imgGradProgram: imgGradProgram,
-            imgGradTexture: imgGradTarget.texture,
-            imgGradFramebuffer: imgGradTarget.framebuffer,
-            aaProgram: aaProgram
-        }
-    };
-    renderer.antiAliaser = createAntiAliaser();
-
-    // position buffer
-    var positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    var positions = [-1, 1, 1, 1, -1, -1, 1, -1];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    updateBuffers();
 
     // rendering
-    let then = 0;
-    function render(now) {
+    function render() {
         if (state.renderNeeded) {
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
             var transformMatrix = calcTransformMatrix(state);
-            drawScene(positionBuffer, transformMatrix);
+            drawScene(transformMatrix);
             state.renderNeeded = false;
         }
         requestAnimationFrame(render);
@@ -422,30 +514,40 @@ function mainRenderer() {
             state.renderNeeded = true;
         }
     });
-    window.addEventListener("resize", function (event) {
-        state.width = canvas.width = canvas.style.width = window.innerWidth;
-        state.height = canvas.height = canvas.style.height = window.innerHeight;
-        var oldAntiAliaser = renderer.antiAliaser;
-        renderer.antiAliaser = createAntiAliaser();
-        gl.deleteFramebuffer(oldAntiAliaser.renderFramebuffer);
-        gl.deleteTexture(oldAntiAliaser.renderTexture);
-        gl.deleteProgram(oldAntiAliaser.imgGradProgram);
-        gl.deleteFramebuffer(oldAntiAliaser.imgGradFramebuffer);
-        gl.deleteTexture(oldAntiAliaser.imgGradTexture);
-        gl.deleteProgram(oldAntiAliaser.aaProgram);
-        state.renderNeeded = true;
-    });
+    window.addEventListener("resize", updateBuffers);
 }
 
-function updateShaderFunction(funCode, funGradCode) {
+function updateShaderFunction(funCode, funGradCode, bColorNormal, bTransparency, bYup) {
+    function sub(shaderSource) {
+        shaderSource = shaderSource.replaceAll("{%FUN%}", funCode);
+        shaderSource = shaderSource.replaceAll("{%FUNGRAD%}", funGradCode);
+        shaderSource = shaderSource.replaceAll("{%V_RENDER%}", bTransparency ? "vAlpha" : "vSolid");
+        shaderSource = shaderSource.replaceAll("{%NORMAL_COLOR_BLEND%}", bColorNormal ? "0.5" : "0.05");
+        shaderSource = shaderSource.replaceAll("{%Y_UP%}", bYup ? "1" : "0");
+        return shaderSource;
+    }
     console.time("compile shader");
-    var fsSource = renderer.fsSource;
-    fsSource = fsSource.replaceAll("{%FUN%}", funCode);
-    fsSource = fsSource.replaceAll("{%FUNGRAD%}", funGradCode);
-    var shaderProgram = createShaderProgram(renderer.gl, renderer.vsSource, fsSource);
-    if (renderer.shaderProgram != null)
-        renderer.gl.deleteProgram(renderer.shaderProgram);
-    renderer.shaderProgram = shaderProgram;
+
+    // premarching program
+    var premarchSource = sub(renderer.premarchSource, funCode, funGradCode);
+    var premarchProgram = createShaderProgram(renderer.vsSource, premarchSource);
+    if (renderer.premarchProgram != null)
+        renderer.gl.deleteProgram(renderer.premarchProgram);
+    renderer.premarchProgram = premarchProgram;
+
+    // pooling program
+    var poolProgram = createShaderProgram(renderer.vsSource, renderer.poolSource);
+    if (renderer.poolProgram != null)
+        renderer.gl.deleteProgram(renderer.poolProgram);
+    renderer.poolProgram = poolProgram;
+
+    // raymarching program
+    var raymarchSource = sub(renderer.raymarchSource, funCode, funGradCode);
+    var raymarchProgram = createShaderProgram(renderer.vsSource, raymarchSource);
+    if (renderer.raymarchProgram != null)
+        renderer.gl.deleteProgram(renderer.raymarchProgram);
+    renderer.raymarchProgram = raymarchProgram;
+
     console.timeEnd("compile shader");
     state.renderNeeded = true;
 }
