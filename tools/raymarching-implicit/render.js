@@ -104,10 +104,8 @@ function mat4ToFloat32Array(m) {
     return new Float32Array(arr);
 }
 
-function calcTransformMatrix(state) {
-    var sc = (state.height / Math.min(state.width, state.height)) / state.scale;
-    var transformMatrix = mat4(1.0);
-    // move to center of mass
+// calculate the center of mass of the screen excluding the control box
+function calcScreenCom() {
     var control = document.getElementById("control");
     var controlBl = [
         Math.min(Math.max(1.0 - control.offsetLeft / state.width, 0.0), 1.0),
@@ -116,18 +114,50 @@ function calcTransformMatrix(state) {
     var controlC = [
         1.0 - (0.5 - 0.5 * controlA * controlBl[0]) / (1.0 - controlA),
         1.0 - (0.5 - 0.5 * controlA * controlBl[1]) / (1.0 - controlA)];
-    transformMatrix = mat4Translate(transformMatrix,
-        [2.0 * (controlC[0] - 0.5), 2.0 * (controlC[1] - 0.5), 0.0]);
-    // projection
-    transformMatrix = mat4Mul(transformMatrix, mat4Perspective(
+    return [2.0 * (controlC[0] - 0.5), 2.0 * (controlC[1] - 0.5)];
+}
+
+function calcTransformMatrix(state) {
+    var sc = (state.height / Math.min(state.width, state.height)) / state.scale;
+    var transformMatrix = mat4Perspective(
         0.25 * Math.PI,
         canvas.width / canvas.height,
-        0.5 * sc, 10.0 * sc));
+        0.5 * sc, 10.0 * sc);
     transformMatrix = mat4Translate(transformMatrix, [0, 0, -3.0 * sc]);
     transformMatrix = mat4Rotate(transformMatrix, state.rx, [1, 0, 0]);
     transformMatrix = mat4Rotate(transformMatrix, state.rz, [0, 0, 1]);
     // return transformMatrix;
     return mat4Inverse(transformMatrix);
+}
+
+function calcLightDirection(transformMatrix, lightTheta, lightPhi) {
+    function dot(u, v) { return u[0] * v[0] + u[1] * v[1] + u[2] * v[2]; }
+    // get uvw vectors
+    var uvw = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 3; j++) {
+            uvw[i][j] = (transformMatrix[i][j] + transformMatrix[3][j]) / (transformMatrix[i][3] + transformMatrix[3][3]);
+        }
+    }
+    var u = uvw[0], v = uvw[1], w = uvw[2];
+    // orthogonalize and normalize the vectors
+    var d = dot(w, w);
+    for (var i = 0; i < 3; i++) w[i] /= Math.sqrt(d);
+    for (var i = 0; i < 2; i++) {
+        d = dot(uvw[i], w);
+        for (var j = 0; j < 3; j++) uvw[i][j] -= w[j] * d;
+        d = dot(uvw[i], uvw[i]);
+        for (var j = 0; j < 3; j++) uvw[i][j] /= Math.sqrt(d);
+        // note that u and v are not orthonogal due to translation of COM in the matrix
+    }
+    // calculate light direction
+    var ku = Math.cos(lightTheta) * Math.sin(lightPhi);
+    var kv = Math.sin(lightTheta) * Math.sin(lightPhi);
+    var kw = -Math.cos(lightPhi);
+    var l = [0, 0, 0];
+    for (var i = 0; i < 3; i++)
+        l[i] = ku * u[i] + kv * v[i] + kw * w[i];
+    return l;
 }
 
 // ============================ WEBGL ==============================
@@ -222,7 +252,6 @@ function destroyRenderTarget(target) {
     gl.deleteFramebuffer(target.framebuffer);
 }
 
-
 // create anti-aliasing object
 function createAntiAliaser() {
     let gl = renderer.gl;
@@ -250,7 +279,7 @@ function destroyAntiAliaser(antiAliaser) {
 }
 
 // call this function to re-render
-async function drawScene(transformMatrix) {
+async function drawScene(screenCom, transformMatrix, lightDir) {
     let gl = renderer.gl;
     let antiAliaser = renderer.antiAliaser;
 
@@ -299,10 +328,13 @@ async function drawScene(transformMatrix) {
     gl.useProgram(renderer.premarchProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, renderer.premarchTarget.framebuffer);
     setPositionBuffer(renderer.premarchProgram);
+    gl.uniform1f(gl.getUniformLocation(renderer.premarchProgram, "ZERO"), 0.0);
     gl.uniformMatrix4fv(
         gl.getUniformLocation(renderer.premarchProgram, "transformMatrix"),
         false,
         mat4ToFloat32Array(transformMatrix));
+    gl.uniform2f(gl.getUniformLocation(renderer.premarchProgram, "screenCom"),
+        screenCom[0], screenCom[1]);
     renderPass();
 
     // pooling
@@ -321,6 +353,7 @@ async function drawScene(transformMatrix) {
     gl.useProgram(renderer.raymarchProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, antiAliaser.renderFramebuffer);
     setPositionBuffer(renderer.raymarchProgram);
+    gl.uniform1f(gl.getUniformLocation(renderer.raymarchProgram, "ZERO"), 0.0);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, renderer.poolTarget.texture);
     gl.uniform1i(gl.getUniformLocation(renderer.raymarchProgram, "iChannel0"), 0);
@@ -328,6 +361,10 @@ async function drawScene(transformMatrix) {
         gl.getUniformLocation(renderer.raymarchProgram, "transformMatrix"),
         false,
         mat4ToFloat32Array(transformMatrix));
+    gl.uniform2f(gl.getUniformLocation(renderer.raymarchProgram, "screenCom"),
+        screenCom[0], screenCom[1]);
+    gl.uniform3f(gl.getUniformLocation(renderer.raymarchProgram, "LDIR"),
+        lightDir[0], lightDir[1], lightDir[2]);
     renderPass();
 
     // render image gradient
@@ -392,6 +429,8 @@ var state = {
     rz: -0.9 * Math.PI,
     rx: -0.4 * Math.PI,
     scale: 0.5,
+    lightTheta: null,
+    lightPhi: null,
     renderNeeded: true
 };
 
@@ -457,8 +496,10 @@ function initRenderer() {
         if (state.renderNeeded) {
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
+            var screenCom = calcScreenCom();
             var transformMatrix = calcTransformMatrix(state);
-            drawScene(transformMatrix);
+            var lightDir = calcLightDirection(transformMatrix, state.lightTheta, state.lightPhi);
+            drawScene(screenCom, transformMatrix, lightDir);
             state.renderNeeded = false;
         }
         requestAnimationFrame(render);
@@ -515,15 +556,31 @@ function initRenderer() {
         }
     });
     window.addEventListener("resize", updateBuffers);
+
+    let sliderTheta = document.querySelector("#slider-theta");
+    let sliderPhi = document.querySelector("#slider-phi");
+    function updateUniforms() {
+        state.lightTheta = sliderTheta.value * (Math.PI / 180.);
+        state.lightPhi = sliderPhi.value * (Math.PI / 180.);
+        state.renderNeeded = true;
+    }
+    sliderTheta.addEventListener("input", updateUniforms);
+    sliderPhi.addEventListener("input", updateUniforms);
+    updateUniforms();
 }
 
-function updateShaderFunction(funCode, funGradCode, bColorNormal, bTransparency, bYup) {
+function updateShaderFunction(funCode, funGradCode,
+    sStep, bColorNormal, bTransparency, bYup, bAnalyGrad, bDiscontinuity) {
+
     function sub(shaderSource) {
         shaderSource = shaderSource.replaceAll("{%FUN%}", funCode);
         shaderSource = shaderSource.replaceAll("{%FUNGRAD%}", funGradCode);
         shaderSource = shaderSource.replaceAll("{%V_RENDER%}", bTransparency ? "vAlpha" : "vSolid");
-        shaderSource = shaderSource.replaceAll("{%NORMAL_COLOR_BLEND%}", bColorNormal ? "0.5" : "0.05");
+        shaderSource = shaderSource.replaceAll("{%NORMAL_COLOR_BLEND%}", bColorNormal ? "0.45" : "0.05");
         shaderSource = shaderSource.replaceAll("{%Y_UP%}", bYup ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%ANALYTICAL_GRADIENT%}", bAnalyGrad ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%DISCONTINUITY%}", bDiscontinuity ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%STEP_SIZE%}", sStep);
         return shaderSource;
     }
     console.time("compile shader");

@@ -1,12 +1,13 @@
 #version 300 es
 precision highp float;
 
+in vec2 vXy;
 out vec4 fragColor;
 
 uniform mat4 transformMatrix;
-in vec2 vXy;
+uniform vec2 screenCom;
 
-#define ZERO min(uIso, 0.)
+uniform float ZERO;  // used in loops to reduce compilation time
 #define PI 3.1415926
 
 vec3 screenToWorld(vec3 p) {
@@ -26,7 +27,7 @@ float fun(vec3 p) {  // function
 #endif
     return {%FUN%};
 }
-vec3 funGrad(vec3 p) {  // analytical gradient
+vec3 funGradA(vec3 p) {  // analytical gradient
     callCount += 1;
 #if {%Y_UP%}
     float x=p.x, y=p.z, z=-p.y;
@@ -45,6 +46,11 @@ vec3 funGradN(vec3 p) {  // numerical gradient
         fun(p+vec3(0,0,h)) - fun(p-vec3(0,0,h))
     ) / (2.0*h);
 }
+#if {%ANALYTICAL_GRADIENT%}
+#define funGrad funGradA
+#else
+#define funGrad funGradN
+#endif
 
 // function and its gradient in screen space
 float funS(vec3 p) {
@@ -58,23 +64,30 @@ vec3 funGradS(vec3 x) {
     float pers = dot(P, x) + S;
     mat3 M = (R * pers - outerProduct(R*x+T, P)) / (pers*pers);
     return funGrad(screenToWorld(x)) * M;
-    // return funGradN(screenToWorld(x)) * M;
+}
+float sdfS(vec3 p, vec3 rd) {
+#if {%ANALYTICAL_GRADIENT%}
+    // usually but not always faster
+    return funS(p) / abs(dot(funGradS(p), rd));
+#else
+    return funS(p) / abs((funS(p+0.001*rd)-funS(p-0.001*rd))/0.002);
+#endif
 }
 
 
-#define STEP_SIZE 0.01
-#define MAX_STEP 1000
+#define STEP_SIZE {%STEP_SIZE%}
+#define MAX_STEP int(10.0/(STEP_SIZE))
 
 // returns the inverval to check for intersections
 vec2 premarch(in vec3 ro, in vec3 rd) {
-    float t = 0.0, dt = STEP_SIZE;
+    float t = ZERO, dt = STEP_SIZE;
     float v_old = funS(ro), v;
     float t0 = -1.0, t1 = -1.0;
     float min_t = 0.0, min_v = 1e12;
-    int i = 0;
-    for (t = dt; i < MAX_STEP && t < 1.0; t += dt, i++) {
+    int i = int(ZERO);
+    for (t += dt; i < MAX_STEP && t < 1.0; t += dt, i++) {
         vec3 p = ro + rd * t;
-        v = funS(p) / abs(dot(funGradS(p), rd));
+        v = sdfS(p, rd);
         if (abs(v) < min_v) min_t = t, min_v = abs(v);
         float dt1 = isnan(v) ? STEP_SIZE : clamp(abs(v)-STEP_SIZE, 0.1*STEP_SIZE, STEP_SIZE);
         if (v*v_old < 0.0) {
@@ -90,6 +103,6 @@ vec2 premarch(in vec3 ro, in vec3 rd) {
 
 
 void main(void) {
-    vec2 t = premarch(vec3(vXy,0), vec3(0,0,1));
+    vec2 t = premarch(vec3(vXy-screenCom,0), vec3(0,0,1));
     fragColor = vec4(t, 0.0, 1.0);
 }

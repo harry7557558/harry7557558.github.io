@@ -23,12 +23,34 @@
     <div id="control">
         <select id="builtin-functions"></select>
         <br />
-        <textarea id="equation-input" style="width:100%;height:8em"></textarea>
+        <textarea id="equation-input" style="width:100%;height:8em;resize:vertical" spellcheck="false"
+            autocapitalize="off" autocorrect="off"></textarea>
         <br />
-        <input type="checkbox" id="checkbox-color" checked>n-color</input>
-        <input type="checkbox" id="checkbox-transparency">transparency</input>
-        <input type="checkbox" id="checkbox-yup"><i>y</i>-up</input>
-        <p id="error-message" style="color:red"></p>
+        <span title="Use y-up coordinate system convension"><input type="checkbox"
+                id="checkbox-yup" /><i>y</i>-up</span>&ensp;
+        <span><select id="select-step">
+                <option value="0.04">low</option>
+                <option value="0.01" selected>medium</option>
+                <option value="0.004">high</option>
+                <option value="0.001">ultra high</option>
+            </select>&nbsp;quality</span>
+        <br />
+        <span title="Color surface based on normal"><input type="checkbox" id="checkbox-color"
+                checked />color</span>&ensp;
+        <span title="Display the surface as semi-transparent"><input type="checkbox"
+                id="checkbox-transparency" />transparency</span>
+        <br />
+        <span title="Analytical gradient usually makes rendering faster and compilation slower"><input type="checkbox"
+                id="checkbox-analygrad" checked />analytical&nbsp;grad</span>&ensp;
+        <span title="Red-highlight discontinuities with sign change for opaque surfaces"><input type="checkbox"
+                id="checkbox-discontinuity" />discontinuity</span>
+        <br />
+        <span><i>θ<sub>light</sub></i>&nbsp;<input type="range" id="slider-theta" min="-90" max="270" value="30"
+                style="width:100px" /></span>
+        <span><i>φ<sub>light</sub></i>&nbsp;<input type="range" id="slider-phi" min="0" max="180" value="30"
+                style="width:60px" /></span>
+        <br />
+        <p id="error-message" style="color:red;white-space:normal;margin-bottom:0"></p>
     </div>
 
     <script>
@@ -37,6 +59,9 @@
             let checkboxColor = document.querySelector("#checkbox-color");
             let checkboxTransparency = document.querySelector("#checkbox-transparency");
             let checkboxYup = document.querySelector("#checkbox-yup");
+            let checkboxAnalyGrad = document.querySelector("#checkbox-analygrad");
+            let checkboxDiscontinuity = document.querySelector("#checkbox-discontinuity");
+            let selectStep = document.querySelector("#select-step");
 
             // init built-in functions
             let select = document.querySelector("#builtin-functions");
@@ -55,7 +80,10 @@
                     glsl = postfixToGlsl(postfix);
                     // console.log(glsl);
                     updateShaderFunction(glsl.glsl, glsl.glslgrad,
-                        checkboxColor.checked, checkboxTransparency.checked, checkboxYup.checked);
+                        selectStep.value,
+                        checkboxColor.checked, checkboxTransparency.checked,
+                        checkboxYup.checked, checkboxAnalyGrad.checked,
+                        checkboxDiscontinuity.checked);
                     errorMessage.style.display = "none";
                 } catch (e) {
                     console.error(e);
@@ -67,6 +95,9 @@
             checkboxColor.addEventListener("input", updateFunctionInput);
             checkboxTransparency.addEventListener("input", updateFunctionInput);
             checkboxYup.addEventListener("input", updateFunctionInput);
+            checkboxAnalyGrad.addEventListener("input", updateFunctionInput);
+            checkboxDiscontinuity.addEventListener("input", updateFunctionInput);
+            selectStep.addEventListener("input", updateFunctionInput);
             select.addEventListener("input", function (event) {
                 input.value = select.value.replaceAll(";", "\n");
                 updateFunctionInput();
