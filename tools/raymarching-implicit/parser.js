@@ -121,7 +121,7 @@ function isIndependentVariable(name) {
 
 
 // Parse a human math expression to postfix notation
-function exprToPostfix(expr) {
+function exprToPostfix(expr, mathFunctions) {
 
     // parenthesis
     expr = expr.trim().replace(/\[/g, '(').replace(/\]/g, ')');
@@ -241,15 +241,15 @@ function exprToPostfix(expr) {
             var number = new Token("number", token);
             queue.push(number);
         }
-        // variable name
-        else if (/^[A-Za-z](_[A-Za-z0-9]+)?$/.test(token)) {
-            var variable = new Token("variable", token);
-            queue.push(variable);
-        }
         // function
         else if (mathFunctions[token] != undefined) {
             var fun = new Token("function", token);
             stack.push(fun);
+        }
+        // variable name
+        else if (/^[A-Za-z](_[A-Za-z0-9]+)?$/.test(token)) {
+            var variable = new Token("variable", token);
+            queue.push(variable);
         }
         // comma to separate function arguments
         else if (token == ",") {
@@ -324,8 +324,25 @@ function inputToPostfix(input) {
     input = input.trim().trim(';').trim().split(';');
 
     // read each line of input
-    var variables = {};  // variables
-    var mainequ = null;  // main equation
+    let reVarname = /^[A-Za-z]((_[A-Za-z\d]+)|(_?\d[A-Za-z\d]*))?$/;
+    var parseFunction = function (funstr) {
+        var match = /^([A-Za-z0-9_]+)\s*\(([A-Za-z0-9_\s\,]+)\)$/.exec(funstr);
+        if (match == null) return false;
+        if (!reVarname.test(match[1])) return false;
+        var matches = [match[1]];
+        match = match[2].split(',');
+        for (var i = 0; i < match.length; i++) {
+            var name = match[i];
+            if (!reVarname.test(name)) return false;
+            if (name.length >= 2 && name[1] != "_")
+                name = name[0] + "_" + name.substring(1, name.length);
+            matches.push(name);
+        }
+        return matches;
+    };
+    var functions_str = {};
+    var variables_str = {};
+    var mainequ_str = "";  // main equation
     for (var i = 0; i < input.length; i++) {
         var line = input[i].trim();
         if (line == '') continue;
@@ -333,64 +350,157 @@ function inputToPostfix(input) {
             var lr = line.split('=');
             var left = lr[0].trim();
             var right = lr[1].trim();
-            // definition
-            if (/^[A-Za-z](_[A-Za-z\d]+)?$/.test(left) || /^[A-Za-z](_?\d[A-Za-z\d]*)?$/.test(left)) {
+            // variable
+            if (reVarname.test(left)) {
                 if (left.length >= 2 && left[1] != "_") left = left[0] + "_" + left.substring(1, left.length);
                 // main equation
                 if (isIndependentVariable(left)) {
-                    if (mainequ != null) throw "Multiple main equations found.";
-                    mainequ = exprToPostfix(left + "-(" + right + ")");
+                    if (mainequ_str != "") throw "Multiple main equations found.";
+                    mainequ_str = "(" + left + ")-(" + right + ")";
                 }
                 // definition
                 else {
-                    if (variables[left] != undefined) throw "Multiple definitions of variable " + left;
-                    var postfix = exprToPostfix(right);
-                    variables[left] = {
-                        'postfix': postfix,
-                        'vars': getVariables(postfix, true),
-                        'resolving': false
-                    }
+                    if (variables_str[left] != undefined)
+                        throw "Multiple definitions of variable " + left;
+                    variables_str[left] = right;
+                }
+            }
+            // function
+            else if (parseFunction(left)) {
+                var fun = parseFunction(left);
+                // main equation
+                if (mathFunctions[fun[0]] != undefined) {
+                    if (mainequ_str != "") throw "Multiple main equations found.";
+                    mainequ_str = left + "-(" + right + ")";
+                }
+                // function definition
+                else {
+                    if (functions_str[fun[0]] != undefined)
+                        throw "Multiple definitions of function " + fun[0];
+                    functions_str[fun[0]] = {
+                        params: fun.slice(1),
+                        definition: right
+                    };
                 }
             }
             // main equation
             else {
-                if (mainequ != null) throw "Multiple main equations found.";
-                if (Number(right) == '0') mainequ = exprToPostfix(left);
-                else mainequ = exprToPostfix("(" + left + ")-(" + right + ")");
+                console.log(mainequ_str);
+                if (mainequ_str != "") throw "Multiple main equations found.";
+                if (Number(right) == '0') mainequ_str = left;
+                else mainequ_str = "(" + left + ")-(" + right + ")";
             }
         }
         // main equation
         else {
-            if (mainequ != null) throw "Multiple main equations found.";
-            mainequ = exprToPostfix(line);
+            console.log(mainequ_str);
+            if (mainequ_str != "") throw "Multiple main equations found.";
+            mainequ_str = line;
         }
     }
-    if (mainequ == null) throw "No equation to graph."
+
+    // parse expressions
+    var functions = {};
+    for (var funname in mathFunctions) functions[funname] = mathFunctions[funname];
+    for (var funname in functions_str) {
+        let fun = functions_str[funname];
+        functions[funname] = {
+            'args': fun.params,
+            'numArgs': fun.params.length,
+            'definition': fun.definition,
+            'postfix': null,
+            'resolving': false
+        }
+    }
+    for (var funname in functions_str) {
+        let fun = functions[funname];
+        fun.postfix = exprToPostfix(fun.definition, functions);
+    }
+    var variables = {};
+    for (var varname in variables_str) {
+        var postfix = exprToPostfix(variables_str[varname], functions);
+        variables[varname] = {
+            'postfix': postfix,
+            'isFunParam': false,
+            'resolving': false
+        };
+    }
+    if (mainequ_str == null) throw "No equation to graph."
+    var mainequ = exprToPostfix(mainequ_str, functions);
 
     // resolve dependencies
-    function dfs(equ) {
-        var equ1 = [];
+    function dfs(equ, variables) {
+        var stack = [];
         for (var i = 0; i < equ.length; i++) {
-            if (equ[i].type == 'variable') {
+            if (equ[i].type == 'number') {
+                stack.push([equ[i]]);
+            }
+            else if (equ[i].type == 'variable') {
                 var variable = variables[equ[i].str];
-                if (variable != undefined) {
-                    if (variable.resolving) throw "Recursive definition is not supported.";
-                    variable.resolving = true;
-                    var res = dfs(variable.postfix);
-                    equ1 = equ1.concat(res);
-                    variable.resolving = false;
+                if (variable == undefined) {
+                    stack.push([equ[i]]);
+                }
+                else if (variable.isFunParam) {
+                    stack.push(variable.postfix);  // ???
                 }
                 else {
-                    equ1.push(equ[i]);
+                    if (variable.resolving) throw "Recursive definition is not supported.";
+                    variable.resolving = true;
+                    var res = dfs(variable.postfix, variables)[0];
+                    stack.push(res);
+                    variable.resolving = false;
                 }
             }
-            else equ1.push(equ[i]);
-            if (equ1.length > 2000)
+            else if (equ[i].type == 'function') {
+                // get parameters
+                // custom function
+                if (mathFunctions[equ[i].str] == undefined) {
+                    let fun = functions[equ[i].str];
+                    var variables1 = {};
+                    for (var varname in variables)
+                        variables1[varname] = variables[varname];
+                    for (var j = 0; j < fun.numArgs; j++) {
+                        variables1[fun.args[j]] = {
+                            'postfix': stack[stack.length - fun.numArgs + j],
+                            'isFunParam': true,
+                            'resolving': false
+                        };
+                    }
+                    for (var j = 0; j < equ[i].numArgs; j++)
+                        stack.pop();
+                    var res = dfs(fun.postfix, variables1)[0];
+                    stack.push(res);
+                }
+                // built-in function
+                else {
+                    var params = [];
+                    for (var j = equ[i].numArgs; j > 0; j--)
+                        params = params.concat(stack[stack.length - j]);
+                    for (var j = 0; j < equ[i].numArgs; j++)
+                        stack.pop();
+                    params.push(equ[i]);
+                    stack.push(params);
+                }
+            }
+            else if (equ[i].type == 'operator') {
+                var expr = stack[stack.length - 2].concat(stack[stack.length - 1]);
+                expr.push(equ[i]);
+                stack.pop(); stack.pop();
+                stack.push(expr);
+            }
+            else {
+                console.log(equ[i]);
+                stack.push(equ[i]);
+            }
+            var totlength = 0;
+            for (var j = 0; j < stack.length; j++) totlength += stack[j].length;
+            if (totlength > 2000)
                 throw "Definitions are nested too deeply."
         }
-        return equ1;
+        console.assert(stack.length == 1);
+        return stack;
     }
-    mainequ = dfs(mainequ);
+    mainequ = dfs(mainequ, variables)[0];
     return mainequ;
 }
 
@@ -520,7 +630,9 @@ function postfixToGlsl(queue) {
             stack.pop(); stack.pop();
             stack.push(powEvalObjects(v1, v2));
         }
-        else console.error(token);
+        else {
+            throw "Unrecognized token " + token;
+        }
         if (stack[stack.length - 1].glslgrad.length > 20000)
             throw "Definitions are nested too deeply when calculating derivative.";
     }
@@ -542,7 +654,8 @@ var builtinFunctions = [
     ["A4 Goursat", "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2"],
     ["A4 Genus 3", "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)"],
     ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2=32(x^2+y^2)"],
-    ["A6 Spikey", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
+    ["A6 Spikey 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
+    ["A6 Spikey 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.1"],
     ["A6 Barth 1", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
     ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
     ["A3 Ding-Dong", "x^2+y^2=(1-z)z^2"],
@@ -561,8 +674,15 @@ var builtinFunctions = [
     ["Lerp Spikey 2", "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5"],
     ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
     ["Face", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
-    ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);r0=e^(k*(2pfloor(n)+a));r1=e^(k*(2pceil(n)+a));d=min(abs(r1-r),abs(r0-r));sqrt(d^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"]
+    ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
+    ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"]
 ];
+// builtinFunctions = [
+//     ['spiral', "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
+//     ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
+//     ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
+//     ["Atomic orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);r00(x,y,z)=0.28^2-r2(x,y,z);r10(x,y,z)=(-0.49y1(x,y,z))^2-r2(x,y,z);r11(x,y,z)=(0.49z1(x,y,z))^2-r2(x,y,z);r12(x,y,z)=(-0.49x1(x,y,z))^2-r2(x,y,z);r20(x,y,z)=(1.09x1(x,y,z)y1(x,y,z))^2-r2(x,y,z);r21(x,y,z)=(-1.09y1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r22(x,y,z)=(0.32(3z1(x,y,z)^2-1))^2-r2(x,y,z);r23(x,y,z)=(-1.09x1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r24(x,y,z)=(0.55(x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r30(x,y,z)=(-0.59y1(x,y,z)(3x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r31(x,y,z)=(2.89x1(x,y,z)y1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r32(x,y,z)=(-0.46y1(x,y,z)(5z1(x,y,z)^2-1))^2-r2(x,y,z);r33(x,y,z)=(0.37z1(x,y,z)(5z1(x,y,z)^2-3))^2-r2(x,y,z);r34(x,y,z)=(-0.46x1(x,y,z)(5z1(x,y,z)^2-1))^2-r2(x,y,z);r35(x,y,z)=(1.44z1(x,y,z)(x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r36(x,y,z)=(0.59x1(x,y,z)(x1(x,y,z)^2-3y1(x,y,z)^2))^2-r2(x,y,z);max(r00(x,y,z-2),r10(x+1,y,z-1),r11(x,y,z-1),r12(x-1,y,z-1),r20(x+2,y,z),r21(x+1,y,z),r22(x,y,z),r23(x-1,y,z),r24(x-2,y,z),r30(x-3,y,z+1),r31(x-2,y,z+1),r32(x-1,y,z+1),r33(x,y,z+1),r34(x+1,y,z+1),r35(x+2,y,z+1),r36(x+3,y,z+1))"]
+// ];
 var t0 = performance.now();
 for (var i = 0; i < builtinFunctions.length; i++) {
     let expr = builtinFunctions[i][1];
