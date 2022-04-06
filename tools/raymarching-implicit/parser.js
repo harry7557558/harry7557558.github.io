@@ -128,7 +128,7 @@ function exprToPostfix(expr, mathFunctions) {
     var db = (expr.match(/\(/g) || []).length - (expr.match(/\)/g) || []).length;
     if (db < 0) throw "Mismatched parenthesis."
     for (var i = 0; i < db; i++) expr += ")";
-    if (expr == "") console.error("empty expression");
+    if (expr == "") throw "Empty expression";
 
     // subtraction sign
     var expr1s = [{ s: "", pc: 0 }];
@@ -633,8 +633,10 @@ function postfixToGlsl(queue) {
         else {
             throw "Unrecognized token " + token;
         }
-        if (stack[stack.length - 1].glslgrad.length > 20000)
+        let deriLength = stack[stack.length - 1].glslgrad.length;
+        if (deriLength > 200000) {
             throw "Definitions are nested too deeply when calculating derivative.";
+        }
     }
     console.assert(stack.length == 1);
     console.log("glsl", stack[0].glsl);
@@ -654,8 +656,8 @@ var builtinFunctions = [
     ["A4 Goursat", "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2"],
     ["A4 Genus 3", "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)"],
     ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2=32(x^2+y^2)"],
-    ["A6 Spikey 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
-    ["A6 Spikey 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.1"],
+    ["A6 Spiky 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
+    ["A6 Spiky 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.1"],
     ["A6 Barth 1", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
     ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
     ["A3 Ding-Dong", "x^2+y^2=(1-z)z^2"],
@@ -670,19 +672,24 @@ var builtinFunctions = [
     ["Sin Tower 1", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-sin(4z)"],
     ["Sin Tower 2", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
     ["Atan2 Drill", "max(cos(atan(y,x)-20e^((z-1)/4)),x^2+y^2+z/2-1)"],
-    ["Lerp Spikey 1", "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3"],
-    ["Lerp Spikey 2", "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5"],
-    ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
-    ["Face", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
+    ["Lerp Spiky 1", "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3"],
+    ["Lerp Spiky 2", "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5"],
+    ["Eyes", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
     ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
-    ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"]
+    ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
+    ["Value Noise", "h(x,y)=fract(126sin(12x+33y+98))-0.5;s(x)=3x^2-2x^3;v00=h(floor(x),floor(y));v01=h(floor(x),floor(y)+1);v10=h(floor(x)+1,floor(y));v11=h(floor(x)+1,floor(y)+1);f(x,y)=mix(mix(v00,v01,s(fract(y))),mix(v10,v11,s(fract(y))),s(fract(x)));v(x,y)=f(x,y)+f(2x,2y)/2+f(4x,4y)/4+f(8x,8y)/8+f(16x,16y)/16;z=ln(1+exp(40(v(x,y)-(0.05(x^2+y^2))^2)))/40"],
+    ["Spiky Fractal", "u(x,y,z)=yz;v(x,y,z)=xz;w(x,y,z)=xy;u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2=0.01"],
 ];
-// builtinFunctions = [
-//     ['spiral', "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
-//     ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
-//     ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
-//     ["Atomic orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);r00(x,y,z)=0.28^2-r2(x,y,z);r10(x,y,z)=(-0.49y1(x,y,z))^2-r2(x,y,z);r11(x,y,z)=(0.49z1(x,y,z))^2-r2(x,y,z);r12(x,y,z)=(-0.49x1(x,y,z))^2-r2(x,y,z);r20(x,y,z)=(1.09x1(x,y,z)y1(x,y,z))^2-r2(x,y,z);r21(x,y,z)=(-1.09y1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r22(x,y,z)=(0.32(3z1(x,y,z)^2-1))^2-r2(x,y,z);r23(x,y,z)=(-1.09x1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r24(x,y,z)=(0.55(x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r30(x,y,z)=(-0.59y1(x,y,z)(3x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r31(x,y,z)=(2.89x1(x,y,z)y1(x,y,z)z1(x,y,z))^2-r2(x,y,z);r32(x,y,z)=(-0.46y1(x,y,z)(5z1(x,y,z)^2-1))^2-r2(x,y,z);r33(x,y,z)=(0.37z1(x,y,z)(5z1(x,y,z)^2-3))^2-r2(x,y,z);r34(x,y,z)=(-0.46x1(x,y,z)(5z1(x,y,z)^2-1))^2-r2(x,y,z);r35(x,y,z)=(1.44z1(x,y,z)(x1(x,y,z)^2-y1(x,y,z)^2))^2-r2(x,y,z);r36(x,y,z)=(0.59x1(x,y,z)(x1(x,y,z)^2-3y1(x,y,z)^2))^2-r2(x,y,z);max(r00(x,y,z-2),r10(x+1,y,z-1),r11(x,y,z-1),r12(x-1,y,z-1),r20(x+2,y,z),r21(x+1,y,z),r22(x,y,z),r23(x-1,y,z),r24(x-2,y,z),r30(x-3,y,z+1),r31(x-2,y,z+1),r32(x-1,y,z+1),r33(x,y,z+1),r34(x+1,y,z+1),r35(x+2,y,z+1),r36(x+3,y,z+1))"]
-// ];
+if (0) builtinFunctions = [ // debug
+    ['bridge', "x^2+y^2z+z^2=0"],
+    ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
+    ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
+    ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
+    ["Atomic Orbitals f", "r2=x^2+y^2+z^2;r=sqrt(r2);x1=x/r;y1=y/r;z1=z/r;d(r0)=r0^2-r2;r00(x,y,z)=d(0.28);r10(x,y,z)=d(-0.49y1);r11(x,y,z)=d(0.49z1);r12(x,y,z)=d(-0.49x1);r20(x,y,z)=d(1.09x1y1);r21(x,y,z)=d(-1.09y1z1);r22(x,y,z)=d(0.32(3z1^2-1));r23(x,y,z)=d(-1.09x1z1);r24(x,y,z)=d(0.55(x1^2-y1^2));r30(x,y,z)=d(-0.59y1(3x1^2-y1^2));r31(x,y,z)=d(2.89x1y1z1);r32(x,y,z)=d(-0.46y1(5z1^2-1));r33(x,y,z)=d(0.37z1(5z1^2-3));r34(x,y,z)=d(-0.46x1(5z1^2-1));r35(x,y,z)=d(1.44z1(x1^2-y1^2));r36(x,y,z)=d(0.59x1(x1^2-3y1^2));s(x,y,z)=max(r00(x,y,z-2.5),r10(x+1,y,z-1.5),r11(x,y,z-1.5),r12(x-1,y,z-1.5),r20(x+2,y,z-0.2),r21(x+1,y,z-0.2),r22(x,y,z-0.2),r23(x-1,y,z-0.2),r24(x-2,y,z-0.2),r30(x-3,y,z+1.3),r31(x-2,y,z+1.3),r32(x-1,y,z+1.3),r33(x,y,z+1.3),r34(x+1,y,z+1.3),r35(x+2,y,z+1.3),r36(x+3,y,z+1.3));s(1.4x,1.4y,1.4z)"],
+    ["Fractal roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u2(x,y)^2+v2(x,y)^2=1"],
+    ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1"],
+    ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u2(x,y,z)^2+v2(x,y,z)^2+w2(x,y,z)^2=1"],
+];
 var t0 = performance.now();
 for (var i = 0; i < builtinFunctions.length; i++) {
     let expr = builtinFunctions[i][1];

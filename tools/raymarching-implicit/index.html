@@ -54,6 +54,27 @@
     </div>
 
     <script>
+        function setCookie(value) {
+            if (!navigator.cookieEnabled) return false;
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 86400000));
+            var expires = " expires=" + date.toUTCString();
+            var base64 = window.btoa(value);
+            document.cookie = "raymarchImplicitInput=" + base64 + ";" + expires;
+        }
+        function getCookie() {
+            const name = "raymarchImplicitInput=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i].trim();
+                if (c.indexOf(name) == 0) {
+                    var base64 = c.substring(name.length, c.length);
+                    return window.atob(base64);
+                }
+            }
+            return "";
+        }
+
         window.addEventListener("load", async function (event) {
             var glsl = {};
             let checkboxColor = document.querySelector("#checkbox-color");
@@ -66,15 +87,23 @@
             // init built-in functions
             let select = document.querySelector("#builtin-functions");
             let input = document.querySelector("#equation-input");
+            select.innerHTML += "<option value=''>Load preset...</option>";
             for (var i = 0; i < builtinFunctions.length; i++) {
                 let fun = builtinFunctions[i];
                 select.innerHTML += "<option value=" + fun[1] + ">" + fun[0] + "</option>"
             }
+            let initialExpr = getCookie();
+            if (initialExpr != "") {
+                select.childNodes[0].setAttribute("value", initialExpr);
+                select.childNodes[0].selected = true;
+            }
+            else select.childNodes[1].selected = true;
 
             // called when update selected function
             function updateFunctionInput() {
                 let errorMessage = document.querySelector("#error-message");
                 var expr = input.value;
+                setCookie(expr);
                 try {
                     var postfix = inputToPostfix(expr);
                     glsl = postfixToGlsl(postfix);
@@ -103,6 +132,7 @@
                 updateFunctionInput();
             });
             input.addEventListener("input", function (event) {
+                select.value = initialExpr;
                 updateFunctionInput();
             });
             input.value = select.value.replaceAll(";", "\n");
