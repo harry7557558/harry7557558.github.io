@@ -15,7 +15,8 @@ function Token(type, str) {
     this.numArgs = 0;  // number of arguments for functions
 }
 
-function EvalObject(glsl, glslgrad, isNumeric) {
+function EvalObject(postfix, glsl, glslgrad, isNumeric) {
+    this.postfix = postfix;
     this.glsl = glsl;
     this.glslgrad = glslgrad;
     this.isNumeric = isNumeric;  // zero gradient
@@ -30,15 +31,18 @@ function MathFunction(names, numArgs, latex, glsl, glslgrad) {
     this.subGlsl = function (args) {
         if (args.length != this.numArgs)
             throw "Incorrect number of arguments for function " + this.names[0];
-        var glsl = this.glsl, glslgrad = this.glslgrad;
+        var glsl = this.glsl, glslgrad = this.glslgrad, postfix = [];
         var isNumeric = glslgrad == "vec3(0)";
         for (var i = 0; i < args.length; i++) {
             var repv = "%" + (i + 1), repg = "$" + (i + 1);
+            postfix = postfix.concat(args[i].postfix);
             glsl = glsl.replaceAll(repv, args[i].glsl);
             glslgrad = glslgrad.replaceAll(repv, args[i].glsl).replaceAll(repg, args[i].glslgrad);
             isNumeric &= args[i].isNumeric;
         }
-        return new EvalObject(glsl, glslgrad, isNumeric);
+        return new EvalObject(
+            postfix.concat([new Token('function', names[0])]),
+            glsl, glslgrad, isNumeric);
     };
 }
 const mathFunctions = (function () {
@@ -101,7 +105,9 @@ const mathFunctions = (function () {
             for (var i = 0; i + 1 < args.length; i += 2) {
                 var glsl = this.glsl.replaceAll("%1", args[i].glsl).replaceAll("%2", args[i + 1].glsl);
                 var glslgrad = this.glslgrad.replaceAll("$1", args[i].glslgrad).replaceAll("$2", args[i + 1].glslgrad).replaceAll("%1", args[i].glsl).replaceAll("%2", args[i + 1].glsl);
-                args1.push(new EvalObject(glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric));
+                args1.push(new EvalObject(
+                    args[i].postfix.concat(args[i + 1].postfix).concat([new Token('function', this.names[0])]),
+                    glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric));
             }
             if (args.length % 2 == 1) args1.push(args[args.length - 1]);
             args = args1;
@@ -159,7 +165,7 @@ function exprToPostfix(expr, mathFunctions) {
     while (expr1s.length > 1) {
         var eb = expr1s[expr1s.length - 1];
         expr1s.pop();
-        console.assert(eb.pc == 0);
+        //console.assert(eb.pc == 0);
         if (/^\-/.test(eb.s)) eb.s = "(0" + eb.s + ")";
         expr1s[expr1s.length - 1].s += eb.s;
     }
@@ -220,8 +226,7 @@ function exprToPostfix(expr, mathFunctions) {
         '^': false
     };
 
-    // preprocessing
-    console.log("preprocessed", expr);
+    //console.log("preprocessed", expr);
 
     // shunting-yard algorithm
     var queue = [], stack = [];  // Token objects
@@ -238,8 +243,12 @@ function exprToPostfix(expr, mathFunctions) {
         }
         // number
         if (/^[0-9]*\.{0,1}[0-9]*$/.test(token) || /^[0-9]*\.{0,1}[0-9]+$/.test(token)) {
-            var number = new Token("number", token);
-            queue.push(number);
+            if (!isFinite(Number(token))) throw "Failed to parse number " + token;
+            var num = token.trim('0');
+            if (num == "") num = "0.";
+            if (num[0] == '.') num = "0" + num;
+            if (!/\./.test(num)) num += ".";
+            queue.push(new Token("number", num));
         }
         // function
         else if (mathFunctions[token] != undefined) {
@@ -385,7 +394,6 @@ function inputToPostfix(input) {
             }
             // main equation
             else {
-                console.log(mainequ_str);
                 if (mainequ_str != "") throw "Multiple main equations found.";
                 if (Number(right) == '0') mainequ_str = left;
                 else mainequ_str = "(" + left + ")-(" + right + ")";
@@ -393,7 +401,6 @@ function inputToPostfix(input) {
         }
         // main equation
         else {
-            console.log(mainequ_str);
             if (mainequ_str != "") throw "Multiple main equations found.";
             mainequ_str = line;
         }
@@ -452,8 +459,7 @@ function inputToPostfix(input) {
                 }
             }
             else if (equ[i].type == 'function') {
-                // get parameters
-                // custom function
+                // user-defined function
                 if (mathFunctions[equ[i].str] == undefined) {
                     let fun = functions[equ[i].str];
                     var variables1 = {};
@@ -489,13 +495,13 @@ function inputToPostfix(input) {
                 stack.push(expr);
             }
             else {
-                console.log(equ[i]);
-                stack.push(equ[i]);
+                throw "Unrecognized token " + equ[i];
             }
             var totlength = 0;
             for (var j = 0; j < stack.length; j++) totlength += stack[j].length;
-            if (totlength > 2000)
-                throw "Definitions are nested too deeply."
+            if (totlength >= 65536) {
+                // throw "Definitions are nested too deeply."
+            }
         }
         console.assert(stack.length == 1);
         return stack;
@@ -507,8 +513,10 @@ function inputToPostfix(input) {
 
 // ============================ EVALUATION ==============================
 
+// operations of EvabObject
 function addEvalObjects(a, b) {
     return new EvalObject(
+        a.postfix.concat(b.postfix.concat([new Token('operator', '+')])),
         "(" + a.glsl + "+" + b.glsl + ")",
         a.isNumeric ? b.glslgrad : b.isNumeric ? a.glslgrad :
             "(" + a.glslgrad + "+" + b.glslgrad + ")",
@@ -517,6 +525,7 @@ function addEvalObjects(a, b) {
 }
 function subEvalObjects(a, b) {
     return new EvalObject(
+        a.postfix.concat(b.postfix.concat([new Token('operator', '-')])),
         "(" + a.glsl + "-" + b.glsl + ")",
         b.isNumeric ? a.glslgrad : a.isNumeric ? "(-" + b.glslgrad + ")" :
             "(" + a.glslgrad + "-" + b.glslgrad + ")",
@@ -525,6 +534,7 @@ function subEvalObjects(a, b) {
 }
 function mulEvalObjects(a, b) {
     return new EvalObject(
+        a.postfix.concat(b.postfix.concat([new Token('operator', '*')])),
         "(" + a.glsl + "*" + b.glsl + ")",
         a.isNumeric ? "(" + a.glsl + "*" + b.glslgrad + ")" :
             b.isNumeric ? "(" + a.glslgrad + "*" + b.glsl + ")" :
@@ -534,6 +544,7 @@ function mulEvalObjects(a, b) {
 }
 function divEvalObjects(a, b) {
     return new EvalObject(
+        a.postfix.concat(b.postfix.concat([new Token('operator', '/')])),
         "(" + a.glsl + "/" + b.glsl + ")",
         a.isNumeric && b.isNumeric ? "vec3(0)" :
             b.isNumeric ? "(" + a.glslgrad + "/" + b.glsl + ")" :
@@ -545,13 +556,14 @@ function divEvalObjects(a, b) {
 function powEvalObjects(a, b) {
     if (a.glsl == 'e') {
         return new EvalObject(
+            a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             "exp(" + b.glsl + ")",
             "(" + b.glslgrad + "*exp(" + b.glsl + "))",
             b.isNumeric
         )
     }
     var n = Number(b.glsl);
-    if (n == 0) return new EvalObject("0", "vec3(0)", true);
+    if (n == 0) return new EvalObject([new Token("number", '0.')], "0.", "vec3(0)", true);
     if (n == 1) return a;
     if (n == 2 || n == 3 || n == 4 || n == 5 || n == 6 || n == 7 || n == 8) {
         var arr = [];
@@ -560,11 +572,13 @@ function powEvalObjects(a, b) {
         arr[0] = a.glslgrad;
         var glslgrad = a.isNumeric ? "vec3(0)" : "(" + n + ".*" + arr.join('*') + ")";
         return new EvalObject(
+            a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             glsl, glslgrad,
             a.isNumeric
         )
     }
     return new EvalObject(
+        a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
         "pow(" + a.glsl + "," + b.glsl + ")",
         a.isNumeric && b.isNumeric ? "vec3(0)" :
             a.isNumeric ? "(pow(" + a.glsl + "," + b.glsl + ")*log(" + a.glsl + ")*" + b.glslgrad + ")" :
@@ -577,6 +591,32 @@ function powEvalObjects(a, b) {
 
 // Convert a post-polish math expression to GLSL code
 function postfixToGlsl(queue) {
+    // subtree counter
+    var subtreesLength = 0;
+    var subtrees = {};
+    var intermediates = [];
+    function addSubtree(evalobj) {
+        let postfix = evalobj.postfix;
+        var key = [];
+        for (var i = 0; i < postfix.length; i++) key.push(postfix[i].str);
+        key = key.join(',');
+        if (!subtrees.hasOwnProperty(key)) {
+            var id = '' + subtreesLength;
+            subtrees[key] = {
+                id: id,
+                length: postfix.length,
+                postfix: postfix,
+            };
+            intermediates.push({
+                id: id,
+                glsl: evalobj.glsl,
+                glslgrad: evalobj.glslgrad
+            });
+            subtreesLength += 1;
+        }
+        return subtrees[key].id;
+    }
+    // postfix evaluation
     var stack = [];  // EvalObject objects
     for (var i = 0; i < queue.length; i++) {
         var token = queue[i];
@@ -584,7 +624,42 @@ function postfixToGlsl(queue) {
         if (token.type == 'number') {
             var s = token.str;
             if (!/\./.test(s)) s += '.';
-            stack.push(new EvalObject(s, "vec3(0)", true));
+            stack.push(new EvalObject([token], s, "vec3(0)", true));
+        }
+        // variable
+        else if (token.type == "variable") {
+            var s = token.str;
+            var grad = "vec3(0)";
+            if (isIndependentVariable(token.str)) {
+                if (token.str == 'x') grad = "vec3(1,0,0)";
+                if (token.str == 'y') grad = "vec3(0,1,0)";
+                if (token.str == 'z') grad = "vec3(0,0,1)";
+            }
+            stack.push(new EvalObject([token], s, grad, grad == "0"));
+        }
+        // operators
+        else if (token.type == "operator") {
+            var v = null;
+            if (token.str == "^") {
+                var v1 = stack[stack.length - 2];
+                var v2 = stack[stack.length - 1];
+                stack.pop(); stack.pop();
+                v = powEvalObjects(v1, v2);
+            }
+            else {
+                var v1 = stack[stack.length - 2];
+                var v2 = stack[stack.length - 1];
+                stack.pop(); stack.pop();
+                if (token.str == "+") v = addEvalObjects(v1, v2);
+                if (token.str == "-") v = subEvalObjects(v1, v2);
+                if (token.str == "*") v = mulEvalObjects(v1, v2);
+                if (token.str == "/") v = divEvalObjects(v1, v2);
+            }
+            var id = addSubtree(v);
+            v.postfix = [new Token('variable', id)];
+            v.glsl = "v" + id;
+            v.glslgrad = "g" + id;
+            stack.push(v);
         }
         // function
         else if (token.type == 'function') {
@@ -599,49 +674,40 @@ function postfixToGlsl(queue) {
             else fun = fun['' + numArgs];
             if (fun == undefined)
                 throw "Incorrect number of arguments for function " + token.str;
-            stack.push(fun.subGlsl(args));
-        }
-        // variable
-        else if (token.type == "variable") {
-            var s = token.str;
-            var grad = "vec3(0)";
-            if (isIndependentVariable(token.str)) {
-                if (token.str == 'x') grad = "vec3(1,0,0)";
-                if (token.str == 'y') grad = "vec3(0,1,0)";
-                if (token.str == 'z') grad = "vec3(0,0,1)";
-            }
-            stack.push(new EvalObject(s, grad, grad == "0"));
-        }
-        // operators
-        else if (/^[\+\-\*\/]$/.test(token.str)) {
-            var v1 = stack[stack.length - 2];
-            var v2 = stack[stack.length - 1];
-            stack.pop(); stack.pop();
-            var v = null;
-            if (token.str == "+") v = addEvalObjects(v1, v2);
-            if (token.str == "-") v = subEvalObjects(v1, v2);
-            if (token.str == "*") v = mulEvalObjects(v1, v2);
-            if (token.str == "/") v = divEvalObjects(v1, v2);
+            var v = fun.subGlsl(args);
+            var id = addSubtree(v);
+            v.postfix = [new Token('variable', id)];
+            v.glsl = "v" + id;
+            v.glslgrad = "g" + id;
             stack.push(v);
         }
-        else if (token.str == "^") {
-            var v1 = stack[stack.length - 2];
-            var v2 = stack[stack.length - 1];
-            stack.pop(); stack.pop();
-            stack.push(powEvalObjects(v1, v2));
-        }
         else {
-            throw "Unrecognized token " + token;
+            throw "Unrecognized token " + equ[i];
         }
         let deriLength = stack[stack.length - 1].glslgrad.length;
         if (deriLength > 200000) {
-            throw "Definitions are nested too deeply when calculating derivative.";
+            //throw "Definitions are nested too deeply when calculating derivative.";
         }
     }
     console.assert(stack.length == 1);
-    console.log("glsl", stack[0].glsl);
-    console.log("glslgrad", stack[0].glslgrad);
-    return stack[0];
+    // get result
+    var result = {
+        glsl: [],
+        glslgrad: []
+    };
+    for (var i = 0; i < intermediates.length; i++) {
+        let intermediate = intermediates[i];
+        var v = "float v" + intermediate.id + " = " + intermediate.glsl + ";";
+        var g = "vec3 g" + intermediate.id + " = " + intermediate.glslgrad + ";";
+        result.glsl.push(v);
+        result.glslgrad.push(v);
+        result.glslgrad.push(g);
+    }
+    result.glsl.push("return " + stack[0].glsl + ";");
+    result.glsl = result.glsl.join('\n');
+    result.glslgrad.push("return " + stack[0].glslgrad + ";");
+    result.glslgrad = result.glslgrad.join('\n');
+    return result;
 }
 
 
@@ -658,11 +724,11 @@ var builtinFunctions = [
     ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2=32(x^2+y^2)"],
     ["A6 Spiky 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
     ["A6 Spiky 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.1"],
-    ["A6 Barth 1", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
-    ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
+    ["A6 Barth", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
     ["A3 Ding-Dong", "x^2+y^2=(1-z)z^2"],
     ["Radical Heart", "x^2+4y^2+(1.15z-0.6(2(x^2+.05y^2+.001)^0.7+y^2)^0.3+0.3)^2=1"],
     ["Ln Wineglass", "x^2+y^2-ln(z+1)^2-0.02"],
+    ["Spheres", "sin(2x)sin(2y)sin(2z)-0.9"],
     ["Noisy Octahedron", "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)"],
     ["Noisy Peanut", "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01(cos(30x)+cos(30y)cos(30z))"],
     ["Sin Terrace", "z=0.25round(4sin(x)sin(y))"],
@@ -679,22 +745,32 @@ var builtinFunctions = [
     ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
     ["Value Noise", "h(x,y)=fract(126sin(12x+33y+98))-0.5;s(x)=3x^2-2x^3;v00=h(floor(x),floor(y));v01=h(floor(x),floor(y)+1);v10=h(floor(x)+1,floor(y));v11=h(floor(x)+1,floor(y)+1);f(x,y)=mix(mix(v00,v01,s(fract(y))),mix(v10,v11,s(fract(y))),s(fract(x)));v(x,y)=f(x,y)+f(2x,2y)/2+f(4x,4y)/4+f(8x,8y)/8+f(16x,16y)/16;z=ln(1+exp(40(v(x,y)-(0.05(x^2+y^2))^2)))/40"],
     ["Spiky Fractal", "u(x,y,z)=yz;v(x,y,z)=xz;w(x,y,z)=xy;u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2=0.01"],
+    ["Fractal roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u2(x,y)^2+v2(x,y)^2=1"],
+    ["Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);u6(x-1/2,sqrt(y^2+z^2))^2+v6(x-1/2,sqrt(y^2+z^2))^2-1"],
+    ["Burning Ship", "u(x,y)=x^2-y^2;v(x,y)=2abs(xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);z=(u6((x-1)/1.5,(y-1)/1.5)^2+v6((x-1)/1.5,(y-1)/1.5)^2)^-0.1-1/2"],
+    ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u2(x/2,y/2,z/2)^2+v2(x/2,y/2,z/2)^2+w2(x/2,y/2,z/2)^2=1"],
 ];
 if (0) builtinFunctions = [ // debug
     ['bridge', "x^2+y^2z+z^2=0"],
     ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
     ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
+    ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
     ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
     ["Atomic Orbitals f", "r2=x^2+y^2+z^2;r=sqrt(r2);x1=x/r;y1=y/r;z1=z/r;d(r0)=r0^2-r2;r00(x,y,z)=d(0.28);r10(x,y,z)=d(-0.49y1);r11(x,y,z)=d(0.49z1);r12(x,y,z)=d(-0.49x1);r20(x,y,z)=d(1.09x1y1);r21(x,y,z)=d(-1.09y1z1);r22(x,y,z)=d(0.32(3z1^2-1));r23(x,y,z)=d(-1.09x1z1);r24(x,y,z)=d(0.55(x1^2-y1^2));r30(x,y,z)=d(-0.59y1(3x1^2-y1^2));r31(x,y,z)=d(2.89x1y1z1);r32(x,y,z)=d(-0.46y1(5z1^2-1));r33(x,y,z)=d(0.37z1(5z1^2-3));r34(x,y,z)=d(-0.46x1(5z1^2-1));r35(x,y,z)=d(1.44z1(x1^2-y1^2));r36(x,y,z)=d(0.59x1(x1^2-3y1^2));s(x,y,z)=max(r00(x,y,z-2.5),r10(x+1,y,z-1.5),r11(x,y,z-1.5),r12(x-1,y,z-1.5),r20(x+2,y,z-0.2),r21(x+1,y,z-0.2),r22(x,y,z-0.2),r23(x-1,y,z-0.2),r24(x-2,y,z-0.2),r30(x-3,y,z+1.3),r31(x-2,y,z+1.3),r32(x-1,y,z+1.3),r33(x,y,z+1.3),r34(x+1,y,z+1.3),r35(x+2,y,z+1.3),r36(x+3,y,z+1.3));s(1.4x,1.4y,1.4z)"],
-    ["Fractal roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u2(x,y)^2+v2(x,y)^2=1"],
-    ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1"],
-    ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u2(x,y,z)^2+v2(x,y,z)^2+w2(x,y,z)^2=1"],
+    ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1/2"],
+    ["Mandelbulb 3", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2=1"],
+    // ["Iteration", "f(t)=t^3-3t^2+3t-1;f(f(f(f(f(f(f(f(f(f(f(f(x)f(y)f(z)"]
 ];
 var t0 = performance.now();
 for (var i = 0; i < builtinFunctions.length; i++) {
+    let name = builtinFunctions[i][0];
     let expr = builtinFunctions[i][1];
+    var tt0 = performance.now();
     let pf = inputToPostfix(expr);
-    postfixToGlsl(pf);
+    let glsl = postfixToGlsl(pf);
+    console.log(glsl);
+    console.log(name, performance.now() - tt0);
+    console.log(pf.length);
 }
 var dt = performance.now() - t0;
 console.log("All built-in functions parsed in", dt, "ms");

@@ -25,18 +25,16 @@ float fun(vec3 p) {  // function
 #else
     float x=p.x, y=p.y, z=p.z;
 #endif
-    return {%FUN%};
+    {%FUN%}
 }
 vec3 funGradA(vec3 p) {  // analytical gradient
     callCount += 1;
 #if {%Y_UP%}
     float x=p.x, y=p.z, z=-p.y;
-    vec3 n = {%FUNGRAD%};
-    return vec3(n.x, -n.z, n.y);
 #else
     float x=p.x, y=p.y, z=p.z;
-    return {%FUNGRAD%};
 #endif
+    {%FUNGRAD%}
 }
 vec3 funGradN(vec3 p) {  // numerical gradient
     float h = 0.002*max(pow(length(p),1./3.),1.);  // error term O(h²)
@@ -47,7 +45,14 @@ vec3 funGradN(vec3 p) {  // numerical gradient
     ) / (2.0*h);
 }
 #if {%ANALYTICAL_GRADIENT%}
+#if {%Y_UP%}
+vec3 funGrad(vec3 p) {
+    vec3 n = funGradA(p);
+    return vec3(n.x, -n.z, n.y);
+}
+#else
 #define funGrad funGradA
+#endif  // {%Y_UP%}
 #else
 #define funGrad funGradN
 #endif

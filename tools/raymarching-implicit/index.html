@@ -107,7 +107,8 @@
                 try {
                     var postfix = inputToPostfix(expr);
                     glsl = postfixToGlsl(postfix);
-                    // console.log(glsl);
+                    console.log(glsl.glsl);
+                    console.log(glsl.glslgrad);
                     updateShaderFunction(glsl.glsl, glsl.glslgrad,
                         selectStep.value,
                         checkboxColor.checked, checkboxTransparency.checked,
