@@ -36,3 +36,54 @@ input {
     display: inline-block;
     vertical-align: middle;
 }
+
+#help-menu {
+    display: block;
+    position: fixed;
+    margin: 20px 5% auto;
+    left: 0;
+    right: 0;
+    width: 80%;
+    height: 80%;
+    max-width: 800px;
+    max-height: 800px;
+    background-color: rgba(64, 32, 64, 0.9);
+    padding: 20px 40px;
+    font-family: 'Times New Roman';
+    color: white;
+    overflow-y: scroll;
+}
+
+#help-menu-hide {
+    display: block;
+    position: absolute;
+    right: 40px;
+    top: 20px;
+    font-size: 2em;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#help-menu-hide:hover {
+    text-decoration: underline;
+}
+
+#help-menu h2 {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+}
+
+#help-menu h3 {
+    font-size: 1.3em;
+    margin: 0.8em 0 0.5em;
+}
+
+#help-menu p {
+    font-size: 1em;
+    margin: 0.5em 0;
+}
+
+a {
+    text-decoration: underline;
+    color: white;
+}

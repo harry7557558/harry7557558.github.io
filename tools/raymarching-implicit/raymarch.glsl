@@ -92,18 +92,36 @@ float fade(float t) {
     return smoothstep(0., 1., 5.0*(clamp(1.0-t, 0., 1.)));
 }
 vec4 calcColor(vec3 ro, vec3 rd, float t) {
-    vec3 n0 = normalize(funGrad(screenToWorld(ro+rd*t)));
+    vec3 n0 = funGrad(screenToWorld(ro+rd*t));
     rd = normalize(screenToWorld(ro+rd)-screenToWorld(ro));
-    vec3 n = dot(n0,rd)>0. ? -n0 : n0;
-    n0 = n;  // why?
+    vec3 n = normalize(dot(n0,rd)>0. ? -n0 : n0);
 #if {%Y_UP%}
     n0 = vec3(n0.x, n0.z, -n0.y);
 #endif
-    vec3 basecol = mix(vec3(1.0), n0, {%NORMAL_COLOR_BLEND%});
-    vec3 amb = vec3(0.2+0.1*n.y) * basecol;
-    vec3 dif = 0.6*max(dot(n,LDIR),0.0) * basecol;
-    vec3 spc = 0.1*pow(max(dot(reflect(rd,n),LDIR),0.0),40.0) * vec3(1.0);
+#if {%COLOR%} == 0
+    // porcelain-like shading
+    vec3 albedo = mix(vec3(1.0), normalize(n0), 0.05);
+    vec3 amb = vec3(0.2+0.1*n.y) * albedo;
+    vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
+    vec3 spc = min(1.2*pow(max(dot(reflect(rd,n),LDIR),0.0),100.0),1.) * vec3(10.);
+    vec3 rfl = mix(vec3(1.), vec3(4.), clamp(5.*dot(reflect(rd,n),LDIR),0.,1.));
+    vec3 col = mix(amb+dif, rfl+spc, mix(.01,.2,pow(clamp(1.+dot(rd,n),.0,.8),5.)));
+#else
+#if {%COLOR%} == 1
+    // color based on normal
+    vec3 albedo = mix(vec3(1.0), normalize(n0), 0.45);
+#elif {%COLOR%} == 2
+    // heatmap color based on gradient magnitude
+    float grad = 0.5-0.5*cos(PI*log(length(n0))/log(10.));
+    vec3 albedo = vec3(.372,.888,1.182) + vec3(.707,-2.123,-.943)*grad
+        + vec3(.265,1.556,.195)*cos(vec3(5.2,2.48,8.03)*grad-vec3(2.52,1.96,-2.88));
+#endif
+    // phong shading
+    vec3 amb = vec3(0.2+0.1*n.y) * albedo;
+    vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
+    vec3 spc = pow(max(dot(reflect(rd,n),LDIR),0.0),40.0) * vec3(0.1);
     vec3 col = amb + dif + spc;
+#endif
     return vec4(col*fade(t), 1.0-pow(1.0-OPACITY,abs(1.0/dot(rd,n))));
 }
 

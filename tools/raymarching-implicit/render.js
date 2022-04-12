@@ -570,13 +570,14 @@ function initRenderer() {
 }
 
 function updateShaderFunction(funCode, funGradCode,
-    sStep, bColorNormal, bTransparency, bYup, bAnalyGrad, bDiscontinuity) {
+    sStep, sColor, bTransparency, bYup, bAnalyGrad, bDiscontinuity) {
+        console.log(sColor);
 
     function sub(shaderSource) {
         shaderSource = shaderSource.replaceAll("{%FUN%}", funCode);
         shaderSource = shaderSource.replaceAll("{%FUNGRAD%}", funGradCode);
         shaderSource = shaderSource.replaceAll("{%V_RENDER%}", bTransparency ? "vAlpha" : "vSolid");
-        shaderSource = shaderSource.replaceAll("{%NORMAL_COLOR_BLEND%}", bColorNormal ? "0.45" : "0.05");
+        shaderSource = shaderSource.replaceAll("{%COLOR%}", "" + sColor);
         shaderSource = shaderSource.replaceAll("{%Y_UP%}", bYup ? "1" : "0");
         shaderSource = shaderSource.replaceAll("{%ANALYTICAL_GRADIENT%}", bAnalyGrad ? "1" : "0");
         shaderSource = shaderSource.replaceAll("{%DISCONTINUITY%}", bDiscontinuity ? "1" : "0");

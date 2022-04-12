@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Implicit Surface Rendering Demo</title>
-    <meta name="description" content="Explore raymarching-based implicit surface rendering in WebGL2." />
+    <title>Raymarching Implicit Surface Graphing Demo</title>
+    <meta name="description" content="Raymarching-based implicit surface plotting tool in WebGL2." />
     <meta name="keywords" content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, 3d" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,6 +22,8 @@
 
     <div id="control">
         <select id="builtin-functions"></select>
+        <a href='#' style="float:right"
+            onclick='javascript:event.preventDefault();document.getElementById("help-menu").style.visibility="visible";'>info</a>
         <br />
         <textarea id="equation-input" style="width:100%;height:8em;resize:vertical" spellcheck="false"
             autocapitalize="off" autocorrect="off"></textarea>
@@ -35,8 +37,11 @@
                 <option value="0.001">ultra high</option>
             </select>&nbsp;quality</span>
         <br />
-        <span title="Color surface based on normal"><input type="checkbox" id="checkbox-color"
-                checked />color</span>&ensp;
+        <span title="Color surface based on normal"><select id="select-color">
+                <option>default</option>
+                <option>normal</option>
+                <option selected>gradient</option>
+            </select>&nbsp;color</span>&ensp;
         <span title="Display the surface as semi-transparent"><input type="checkbox"
                 id="checkbox-transparency" />transparency</span>
         <br />
@@ -51,6 +56,86 @@
                 style="width:60px" /></span>
         <br />
         <p id="error-message" style="color:red;white-space:normal;margin-bottom:0"></p>
+    </div>
+
+    <div id="help-menu" style="visibility:hidden">
+        <div id="help-menu-hide" onclick='document.getElementById("help-menu").style.visibility="hidden"'>×</div>
+        <h2>Raymarching Implicit Surface Graphing Demo</h2>
+        <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one.</p>
+        <p>This tool uses the raymarching algorithm to render 3D implicit surfaces. Type equation in the input box, or
+            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Feel free to play with different
+            selectors, checkboxes, and sliders.</p>
+        <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL2</a> for
+            this tool to work properly.</p>
+        <h3>Entering equations</h3>
+        <p>Use <i>x, y, z</i> as independent variable. Write your equation in the form
+            <i>f(x,y,z)=0</i> or <i>f(x,y,z)=g(x,y,z)</i>. Use <code>^</code> for
+            power/exponentiation, <code>*/</code> for multiplication
+            and division. You can use functions like <code>abs()</code>, <code>sin()</code>, and <code>sqrt()</code>.
+        </p>
+        <p><b>Define variables</b>: A variable name starts with a letter, followed by an (optional) underscore and a
+            string of letters or numbers. Example variable names are <code>k</code>, <code>x0</code> (equivalent to
+            <code>x_0</code>), <code>x_t</code>
+            and <code>A_11</code>. For example, you can define <code>a=x+y</code> and plot <code>z=a*sin(a)</code> as
+            the main equation.
+        </p>
+        <p><b>Define functions</b>: A function name is similar to a variable name. Define functions like
+            <code>f(x)=sin(x)+cos(x)</code>, or <code>g(x,y)=sin(x)*cos(y)</code>.
+        </p>
+        <h3>Graphing parameters</h3>
+        <p><b><i>Y</i>-up</b>: Many math textbooks use the <i>z</i>-axis as the vertical axis. Check this if you prefer
+            <i>y</i> as the vertical axis.
+        </p>
+        <p><b>Quality</b>: A high quality means a smaller raymarching step, which is usually slower but produces a more
+            accurate image.</p>
+        <p><b>Transparency</b>: Check this if you want the surface to be semi-transparent so you can look through it to
+            see if there's anything inside. (Try the "A5 Star" example.) Warn that checking this may decrease the
+            accuracy of the image.</p>
+        <p><b>Analytical gradient</b>: This tool requires the gradient of the function to perform raymarching and
+            calculate normal. When this is checked, it calculates the analytical gradient of the function. Otherwise, it
+            uses the <a href="https://en.wikipedia.org/wiki/Symmetric_derivative" target="_blank">central difference</a>
+            method to approximate gradient, which is typically (but not always) slower.</p>
+        <p><b>Discontinuity</b>: This tool plots points where there are sign changes, which is either a zero or a
+            discontinuity. Check this to detect and red-highlight surface that is a discontinuity.
+            (Try the "Sin Terrace" example.)</p>
+        <p><b>Lighting angles</b>: As you drag the <i>θ<sub>light</sub></i> slider from left to right, the light moves
+            from bottom to bottom counter-clockwise. As you drag the <i>φ<sub>light</sub></i> slider from left to right,
+            the light moves from front to back. Note that the light goes with viewport rotation.</p>
+        <h3>Coloring modes</h3>
+        <p><b>Default</b>: This mode simulates the apperance of white porcelain when shading the surface. You may or may
+            not see some slight tint depending on the monitor you use.</p>
+        <p><b>Normal</b>: This mode chooses the base color of the surface based on the surface normal (normalized
+            gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>direction, blue corresponds
+            the <i>z</i>-direction. When the component of the normal is more positive along a direction, the
+            corresponding color component is stronger.</p>
+        <p><b>Gradient</b>: This mode colors the surface based on the magnitude of the gradient. The surface appears
+            blue when the magnitude of gradient is closed to an integer power of 100, like 0.01, 1, 100. The color
+            becomes orange when the magnitude of gradient is in between. For a perfect SDF, you should see a clean blue
+            color. For where the gradient approaches zero or infinity, there may be altenating blue and orange
+            "stripes."</p>
+        <h3>Technical details</h3>
+        <p>This tool implements the raymarching algorithm in a WebGL fragment shader. It casts ray from the camera and
+            numerically finds the first intersection with the surface. The raymarching step size is calculated from the
+            value of the scalar field divided by the magnitude of directional derivative along the ray (in screen
+            space), and clamped based on a given step size (can be set through the "quality" selector).</p>
+        <p>In the first pass, it marches along the ray to get an interval where intersections may exist. Then, the
+            result is pooled using the min/max function with adjacent pixels to avoid missing intersections. This is
+            done in a 0.25x resolution with a larger step size.</p>
+        <p>The main raymarching function checks intersections within the calculated intervals. For opaque surface, it
+            uses bisection search to find the zero when the first sign change is encountered, and calculates and returns
+            the color. For semi-transparent surface, it approximates intersection using linear interpolation and
+            calculates color each time a sign change is encountered.</p>
+        <p>The rendered image goes through an anti-aliasing pass. The pass uses a filter based on linear regression to
+            anti-aliase the image. A detail of the algorithm can be found <a
+                href="https://www.shadertoy.com/view/sllczM" target="_blank">here</a>.</p>
+        <p>The input is parsed in JavaScript, which is based on the <a
+                href="https://en.wikipedia.org/wiki/Shunting-yard_algorithm" target="_blank">shunting-yard algorithm</a>
+            with preprocessing. When generating GLSL code, a postfix notation is evaluated while being divided into
+            steps, and its analytical gradient can be calculated via automatic differentiation. Generated GLSL code is
+            logged to the console when the input is updated.</p>
+        <p>The source code of this tool can be found on <a
+                href="https://github.com/harry7557558/harry7557558.github.io/tree/master/tools/raymarching-implicit"
+                target="_blank">GitHub</a>.</p>
     </div>
 
     <script>
@@ -77,17 +162,17 @@
 
         window.addEventListener("load", async function (event) {
             var glsl = {};
-            let checkboxColor = document.querySelector("#checkbox-color");
             let checkboxTransparency = document.querySelector("#checkbox-transparency");
             let checkboxYup = document.querySelector("#checkbox-yup");
             let checkboxAnalyGrad = document.querySelector("#checkbox-analygrad");
             let checkboxDiscontinuity = document.querySelector("#checkbox-discontinuity");
             let selectStep = document.querySelector("#select-step");
+            let selectColor = document.querySelector("#select-color");
 
             // init built-in functions
             let select = document.querySelector("#builtin-functions");
             let input = document.querySelector("#equation-input");
-            select.innerHTML += "<option value=''>Load preset...</option>";
+            select.innerHTML += "<option value=''>Load example...</option>";
             for (var i = 0; i < builtinFunctions.length; i++) {
                 let fun = builtinFunctions[i];
                 select.innerHTML += "<option value=" + fun[1] + ">" + fun[0] + "</option>"
@@ -111,7 +196,7 @@
                     console.log(glsl.glslgrad);
                     updateShaderFunction(glsl.glsl, glsl.glslgrad,
                         selectStep.value,
-                        checkboxColor.checked, checkboxTransparency.checked,
+                        selectColor.selectedIndex, checkboxTransparency.checked,
                         checkboxYup.checked, checkboxAnalyGrad.checked,
                         checkboxDiscontinuity.checked);
                     errorMessage.style.display = "none";
@@ -122,12 +207,12 @@
                 }
             }
 
-            checkboxColor.addEventListener("input", updateFunctionInput);
             checkboxTransparency.addEventListener("input", updateFunctionInput);
             checkboxYup.addEventListener("input", updateFunctionInput);
             checkboxAnalyGrad.addEventListener("input", updateFunctionInput);
             checkboxDiscontinuity.addEventListener("input", updateFunctionInput);
             selectStep.addEventListener("input", updateFunctionInput);
+            selectColor.addEventListener("input", updateFunctionInput);
             select.addEventListener("input", function (event) {
                 input.value = select.value.replaceAll(";", "\n");
                 updateFunctionInput();
