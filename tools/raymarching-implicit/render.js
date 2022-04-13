@@ -363,6 +363,7 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
         mat4ToFloat32Array(transformMatrix));
     gl.uniform2f(gl.getUniformLocation(renderer.raymarchProgram, "screenCom"),
         screenCom[0], screenCom[1]);
+    gl.uniform1f(gl.getUniformLocation(renderer.raymarchProgram, "uScale"), state.scale);
     gl.uniform3f(gl.getUniformLocation(renderer.raymarchProgram, "LDIR"),
         lightDir[0], lightDir[1], lightDir[2]);
     renderPass();
@@ -517,6 +518,7 @@ function initRenderer() {
     var mouseDown = false;
     canvas.addEventListener("pointerdown", function (event) {
         //event.preventDefault();
+        document.getElementById("help-menu").style.visibility = "hidden";
         mouseDown = true;
     });
     window.addEventListener("pointerup", function (event) {
@@ -570,8 +572,8 @@ function initRenderer() {
 }
 
 function updateShaderFunction(funCode, funGradCode,
-    sStep, sColor, bTransparency, bYup, bAnalyGrad, bDiscontinuity) {
-        console.log(sColor);
+    sStep, sColor, bYup, bGrid, bTransparency, bAnalyGrad, bDiscontinuity) {
+    console.log(sColor);
 
     function sub(shaderSource) {
         shaderSource = shaderSource.replaceAll("{%FUN%}", funCode);
@@ -579,6 +581,7 @@ function updateShaderFunction(funCode, funGradCode,
         shaderSource = shaderSource.replaceAll("{%V_RENDER%}", bTransparency ? "vAlpha" : "vSolid");
         shaderSource = shaderSource.replaceAll("{%COLOR%}", "" + sColor);
         shaderSource = shaderSource.replaceAll("{%Y_UP%}", bYup ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%GRID%}", bGrid ? "1" : "0");
         shaderSource = shaderSource.replaceAll("{%ANALYTICAL_GRADIENT%}", bAnalyGrad ? "1" : "0");
         shaderSource = shaderSource.replaceAll("{%DISCONTINUITY%}", bDiscontinuity ? "1" : "0");
         shaderSource = shaderSource.replaceAll("{%STEP_SIZE%}", sStep);

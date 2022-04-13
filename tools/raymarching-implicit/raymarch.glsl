@@ -7,6 +7,7 @@ out vec4 fragColor;
 uniform sampler2D iChannel0;
 uniform mat4 transformMatrix;
 uniform vec2 screenCom;
+uniform float uScale;
 
 uniform float ZERO;  // used in loops to reduce compilation time
 #define PI 3.1415926
@@ -88,19 +89,43 @@ uniform vec3 LDIR;
 #define OPACITY 0.6
 
 // calculate the color at one point, parameters are in screen space
+float grid(vec3 p, vec3 n, float w) {
+    vec3 a = 1.0 - abs(1.0-2.0*fract(p));
+    a = clamp(2.*a/w-sqrt(1.-n*n), 0., 1.);
+    return min(min(a.x,a.y),a.z);
+}
 float fade(float t) {
     return smoothstep(0., 1., 5.0*(clamp(1.0-t, 0., 1.)));
 }
 vec4 calcColor(vec3 ro, vec3 rd, float t) {
-    vec3 n0 = funGrad(screenToWorld(ro+rd*t));
+    vec3 p = screenToWorld(ro+rd*t);
+    vec3 n0 = funGrad(p);
     rd = normalize(screenToWorld(ro+rd)-screenToWorld(ro));
     vec3 n = normalize(dot(n0,rd)>0. ? -n0 : n0);
 #if {%Y_UP%}
     n0 = vec3(n0.x, n0.z, -n0.y);
 #endif
+
+#if {%GRID%}
+    float ls = log(uScale) / log(10.);
+    float fs = pow(ls - floor(ls), 1.0);
+    float es = pow(10., floor(ls));
+    vec3 q0 = es*p;
+    vec3 q1 = 10.*q0;
+    vec3 q2 = 10.*q1;
+    float w0 = .05*es/uScale;
+    float w1 = mix(1.,10.,fs)*w0;
+    float g0 = grid(q0, n, w0);
+    float g1 = grid(q1, n, w1);
+    float g2 = grid(q2, n, w1);
+    float g = min(min(mix(0.65, 1.0, g0), mix(mix(0.8,0.65,fs), 1.0, g1)), mix(mix(1.0,0.8,fs), 1.0, g2));
+#else
+    float g = 1.0;
+#endif
+
 #if {%COLOR%} == 0
     // porcelain-like shading
-    vec3 albedo = mix(vec3(1.0), normalize(n0), 0.05);
+    vec3 albedo = g * mix(vec3(1.0), normalize(n0), 0.05);
     vec3 amb = vec3(0.2+0.1*n.y) * albedo;
     vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
     vec3 spc = min(1.2*pow(max(dot(reflect(rd,n),LDIR),0.0),100.0),1.) * vec3(10.);
@@ -116,6 +141,7 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     vec3 albedo = vec3(.372,.888,1.182) + vec3(.707,-2.123,-.943)*grad
         + vec3(.265,1.556,.195)*cos(vec3(5.2,2.48,8.03)*grad-vec3(2.52,1.96,-2.88));
 #endif
+    albedo *= g;
     // phong shading
     vec3 amb = vec3(0.2+0.1*n.y) * albedo;
     vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
@@ -204,5 +230,8 @@ void main(void) {
     vec3 col = {%V_RENDER%}(ro, rd, max(t01.x-pad, 0.0), min(t01.y+pad, 1.0));
     col -= vec3(1.5/255.)*fract(0.13*gl_FragCoord.x*gl_FragCoord.y);  // reduce "stripes"
     //col = vec3(callCount) / 255.0;
+#if {%GRID%}
+    col = pow(col, vec3(0.85));
+#endif
     fragColor = vec4(clamp(col,0.,1.), 1.0);
 }
