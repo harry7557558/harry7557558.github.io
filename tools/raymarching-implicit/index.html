@@ -23,7 +23,7 @@
     <div id="control">
         <select id="builtin-functions"></select>
         <a href='#' style="float:right"
-            onclick='javascript:event.preventDefault();document.getElementById("help-menu").style.visibility="visible";'>info</a>
+            onclick='javascript:event.preventDefault();document.getElementById("help-menu").style.visibility="visible";'>help</a>
         <br />
         <textarea id="equation-input" style="width:100%;height:8em;resize:vertical" spellcheck="false"
             autocapitalize="off" autocorrect="off"></textarea>
@@ -56,7 +56,7 @@
         <span><i>φ<sub>light</sub></i>&nbsp;<input type="range" id="slider-phi" min="0" max="180" value="30"
                 style="width:60px" /></span>
         <br />
-        <p id="error-message" style="color:red;white-space:normal;margin-bottom:0"></p>
+        <p id="error-message" style="display:none;white-space:normal;margin-bottom:0"></p>
     </div>
 
     <div id="help-menu" style="visibility:hidden">
@@ -73,6 +73,8 @@
             <i>f(x,y,z)=0</i> or <i>f(x,y,z)=g(x,y,z)</i>. Use <code>^</code> for
             power/exponentiation, <code>*/</code> for multiplication
             and division. You can use functions like <code>abs()</code>, <code>sin()</code>, and <code>sqrt()</code>.
+            Note that <code>log(x)</code> calculates the natural logarithm by default. For the common logarithm, type
+            <code>log(10,x)</code> instead.
         </p>
         <p><b>Define variables</b>: A variable name starts with a letter, followed by an (optional) underscore and a
             string of letters or numbers. Example variable names are <code>k</code>, <code>x0</code> (equivalent to
@@ -81,7 +83,7 @@
             the main equation.
         </p>
         <p><b>Define functions</b>: A function name is similar to a variable name. Define functions like
-            <code>f(x)=sin(x)+cos(x)</code>, or <code>g(x,y)=sin(x)*cos(y)</code>.
+            <code>f(x)=x*sin(x)</code>, or <code>g(x,y)=sin(x)*cos(y)</code>.
         </p>
         <h3>Graphing parameters</h3>
         <p><b>Quality</b>: A high quality means a smaller raymarching step, which is usually slower but produces a more
@@ -105,7 +107,7 @@
             from bottom to bottom counter-clockwise. As you drag the <i>φ<sub>light</sub></i> slider from left to right,
             the light moves from front to back. Note that the light goes with viewport rotation.</p>
         <h3>Coloring modes</h3>
-        <p><b>Default</b>: This mode simulates the apperance of white porcelain when shading the surface. You may or may
+        <p><b>Default</b>: This mode simulates the apperance of glazed ceramic when shading the surface. You may or may
             not see some slight tint depending on the monitor you use.</p>
         <p><b>Normal</b>: This mode chooses the base color of the surface based on the surface normal (normalized
             gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>direction, blue corresponds
@@ -191,6 +193,7 @@
             // called when update selected function
             function updateFunctionInput() {
                 let errorMessage = document.querySelector("#error-message");
+                errorMessage.style.display = "none";
                 var expr = input.value;
                 setCookie(expr);
                 try {
@@ -198,15 +201,21 @@
                     glsl = postfixToGlsl(postfix);
                     console.log(glsl.glsl);
                     console.log(glsl.glslgrad);
+                    console.log("isCompatible", glsl.isCompatible);
+                    if (!glsl.isCompatible) {
+                        errorMessage.style.display = "inline-block";
+                        errorMessage.style.color = "orange";
+                        errorMessage.innerHTML = "Image may be incorrect on some devices.";
+                    }
                     updateShaderFunction(glsl.glsl, glsl.glslgrad,
                         selectStep.value, selectColor.selectedIndex,
                         checkboxYup.checked, checkboxGrid.checked,
                         checkboxTransparency.checked, checkboxAnalyGrad.checked,
                         checkboxDiscontinuity.checked);
-                    errorMessage.style.display = "none";
                 } catch (e) {
                     console.error(e);
                     errorMessage.style.display = "inline-block";
+                    errorMessage.style.color = "red";
                     errorMessage.innerHTML = e;
                 }
             }

@@ -15,11 +15,13 @@ function Token(type, str) {
     this.numArgs = 0;  // number of arguments for functions
 }
 
-function EvalObject(postfix, glsl, glslgrad, isNumeric) {
+function EvalObject(postfix, glsl, glslgrad, isNumeric, isPositive = false, isCompatible = true) {
     this.postfix = postfix;
     this.glsl = glsl;
     this.glslgrad = glslgrad;
     this.isNumeric = isNumeric;  // zero gradient
+    this.isPositive = isPositive;
+    this.isCompatible = isCompatible;  // has no undefined
 }
 
 function MathFunction(names, numArgs, latex, glsl, glslgrad) {
@@ -33,16 +35,28 @@ function MathFunction(names, numArgs, latex, glsl, glslgrad) {
             throw "Incorrect number of arguments for function " + this.names[0];
         var glsl = this.glsl, glslgrad = this.glslgrad, postfix = [];
         var isNumeric = glslgrad == "vec3(0)";
+        var isCompatible = true;
         for (var i = 0; i < args.length; i++) {
             var repv = "%" + (i + 1), repg = "$" + (i + 1);
             postfix = postfix.concat(args[i].postfix);
             glsl = glsl.replaceAll(repv, args[i].glsl);
             glslgrad = glslgrad.replaceAll(repv, args[i].glsl).replaceAll(repg, args[i].glslgrad);
-            isNumeric &= args[i].isNumeric;
+            isNumeric = isNumeric && args[i].isNumeric;
+            isCompatible = isCompatible && args[i].isCompatible;
         }
-        return new EvalObject(
+        var result = new EvalObject(
             postfix.concat([new Token('function', names[0])]),
-            glsl, glslgrad, isNumeric);
+            glsl, glslgrad, isNumeric, false, isCompatible);
+        const positiveFunctions = new Set(['fract', 'abs', 'sqrt', 'exp', 'cosh', 'acos', 'acosh']);
+        if (positiveFunctions.has(this.names[this.names.length - 1]))
+            result.isPositive = true;
+        let incompatibleFunctions = new Set(['log', 'ln', 'sqrt']);
+        if (incompatibleFunctions.has(this.names[this.names.length - 1]) && !args[0].isPositive)
+            result.isCompatible = false;
+        incompatibleFunctions = new Set(['asin', 'acos', 'acosh', 'atanh', 'acoth']);
+        if (incompatibleFunctions.has(this.names[this.names.length - 1]))
+            result.isCompatible = false;
+        return result;
     };
 }
 const mathFunctions = (function () {
@@ -80,9 +94,11 @@ const mathFunctions = (function () {
         new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))'),
         new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))'),
         new MathFunction(['arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
+        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\arccot\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))'),
         new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
         new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
         new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
+        new MathFunction(['arccoth', 'arcoth', 'acoth'], 1, '\\arccoth\\left(%1\\right)', 'atanh(1./(%1))', '($1/(1.-%1*%1))'),
     ];
     var funs = {};
     for (var i = 0; i < funs0.length; i++) {
@@ -107,7 +123,9 @@ const mathFunctions = (function () {
                 var glslgrad = this.glslgrad.replaceAll("$1", args[i].glslgrad).replaceAll("$2", args[i + 1].glslgrad).replaceAll("%1", args[i].glsl).replaceAll("%2", args[i + 1].glsl);
                 args1.push(new EvalObject(
                     args[i].postfix.concat(args[i + 1].postfix).concat([new Token('function', this.names[0])]),
-                    glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric));
+                    glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric,
+                    this.names[0] == 'max' && (args[i].isPositive || args[i + 1].isPositive),
+                    args[i].isCompatible && args[i + 1].isCompatible));
             }
             if (args.length % 2 == 1) args1.push(args[args.length - 1]);
             args = args1;
@@ -126,15 +144,54 @@ function isIndependentVariable(name) {
 // ============================ PARSING ==============================
 
 
+
+// Balance parenthesis, used to be part of exprToPostfix()
+function balanceParenthesis(expr) {
+    expr = expr.trim().replace(/\[/g, '(').replace(/\]/g, ')');
+    if (expr == "") throw "Empty expression";
+    var exprs = [{ str: "", parenCount: 0, absCount: 0 }];
+    for (var i = 0; i < expr.length; i++) {
+        if (expr[i] == "(") {
+            exprs.push({ str: expr[i], parenCount: 1, absCount: 0 });
+        }
+        else if (expr[i] == ")") {
+            if (exprs[exprs.length - 1].parenCount <= 0) throw "Mismatched parenthesis";
+            //if (exprs[exprs.length - 1].absCount % 2 != 0) throw "Mismatched absolute value vertical bar";
+            var app = exprs[exprs.length - 1].str;
+            for (var j = 0; j < exprs[exprs.length - 1].parenCount; j++)
+                app += ")";
+            exprs.pop();
+            exprs[exprs.length - 1].str += app;
+        }
+        else if (expr[i] == "|") {
+            if (exprs[exprs.length - 1].absCount % 2 == 0) {
+                exprs[exprs.length - 1].str += "abs(";
+                exprs[exprs.length - 1].parenCount += 1;
+            }
+            else {
+                exprs[exprs.length - 1].str += ")";
+                exprs[exprs.length - 1].parenCount -= 1;
+            }
+            exprs[exprs.length - 1].absCount += 1;
+        }
+        else {
+            exprs[exprs.length - 1].str += expr[i];
+        }
+    }
+    while (exprs.length != 0) {
+        let back = exprs[exprs.length - 1];
+        if (back.parenCount < 0) throw "Mismatched parenthesis";
+        while (back.parenCount > 0)
+            back.str += ")", back.parenCount -= 1;
+        if (exprs.length <= 1) break;
+        exprs.pop(); exprs[exprs.length - 1].str += back.str;
+    }
+    return exprs[0].str;
+}
+
 // Parse a human math expression to postfix notation
 function exprToPostfix(expr, mathFunctions) {
-
-    // parenthesis
-    expr = expr.trim().replace(/\[/g, '(').replace(/\]/g, ')');
-    var db = (expr.match(/\(/g) || []).length - (expr.match(/\)/g) || []).length;
-    if (db < 0) throw "Mismatched parenthesis."
-    for (var i = 0; i < db; i++) expr += ")";
-    if (expr == "") throw "Empty expression";
+    expr = balanceParenthesis(expr);
 
     // subtraction sign
     var expr1s = [{ s: "", pc: 0 }];
@@ -302,8 +359,23 @@ function exprToPostfix(expr, mathFunctions) {
                 queue.push(fun);
             }
         }
+        // absolute value
+        else if (token == "|") {
+            var fun = new Token("function", "abs");
+            fun.numArgs = 1;
+            if (stack.length >= 2 && stack[stack.length - 1].str != "(" && stack[stack.length - 2].str == "|") {
+                queue.push(stack[stack.length - 1]);
+                stack.pop(); stack.pop();
+                queue.push(fun);
+            }
+            else if (stack.length >= 1 && stack[stack.length - 1].str == "|") {
+                stack.pop();
+                queue.push(fun);
+            }
+            else stack.push(new Token(null, token));
+        }
         else {
-            console.error(token);
+            throw "Unrecognized token " + token;
         }
     }
     while (stack.length != 0) {
@@ -365,7 +437,7 @@ function inputToPostfix(input) {
                 // main equation
                 if (isIndependentVariable(left)) {
                     if (mainequ_str != "") throw "Multiple main equations found.";
-                    mainequ_str = "(" + left + ")-(" + right + ")";
+                    mainequ_str = "(" + balanceParenthesis(left) + ")-(" + balanceParenthesis(right) + ")";
                 }
                 // definition
                 else {
@@ -380,7 +452,7 @@ function inputToPostfix(input) {
                 // main equation
                 if (mathFunctions[fun[0]] != undefined) {
                     if (mainequ_str != "") throw "Multiple main equations found.";
-                    mainequ_str = left + "-(" + right + ")";
+                    mainequ_str = left + "-(" + balanceParenthesis(right) + ")";
                 }
                 // function definition
                 else {
@@ -396,7 +468,7 @@ function inputToPostfix(input) {
             else {
                 if (mainequ_str != "") throw "Multiple main equations found.";
                 if (Number(right) == '0') mainequ_str = left;
-                else mainequ_str = "(" + left + ")-(" + right + ")";
+                else mainequ_str = "(" + balanceParenthesis(left) + ")-(" + balanceParenthesis(right) + ")";
             }
         }
         // main equation
@@ -489,6 +561,7 @@ function inputToPostfix(input) {
                 }
             }
             else if (equ[i].type == 'operator') {
+                if (stack.length < 2) throw "No enough tokens in the stack"
                 var expr = stack[stack.length - 2].concat(stack[stack.length - 1]);
                 expr.push(equ[i]);
                 stack.pop(); stack.pop();
@@ -520,7 +593,7 @@ function addEvalObjects(a, b) {
         "(" + a.glsl + "+" + b.glsl + ")",
         a.isNumeric ? b.glslgrad : b.isNumeric ? a.glslgrad :
             "(" + a.glslgrad + "+" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric
+        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
     );
 }
 function subEvalObjects(a, b) {
@@ -529,7 +602,7 @@ function subEvalObjects(a, b) {
         "(" + a.glsl + "-" + b.glsl + ")",
         b.isNumeric ? a.glslgrad : a.isNumeric ? "(-" + b.glslgrad + ")" :
             "(" + a.glslgrad + "-" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric
+        a.isNumeric && b.isNumeric, false, a.isCompatible && b.isCompatible
     );
 }
 function mulEvalObjects(a, b) {
@@ -539,7 +612,7 @@ function mulEvalObjects(a, b) {
         a.isNumeric ? "(" + a.glsl + "*" + b.glslgrad + ")" :
             b.isNumeric ? "(" + a.glslgrad + "*" + b.glsl + ")" :
                 "(" + a.glslgrad + "*" + b.glsl + "+" + a.glsl + "*" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric
+        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
     );
 }
 function divEvalObjects(a, b) {
@@ -550,7 +623,7 @@ function divEvalObjects(a, b) {
             b.isNumeric ? "(" + a.glslgrad + "/" + b.glsl + ")" :
                 a.isNumeric ? "(-" + a.glsl + "*" + b.glslgrad + "/(" + b.glsl + "*" + b.glsl + "))" :
                     "((" + a.glslgrad + "*" + b.glsl + "-" + a.glsl + "*" + b.glslgrad + ")/(" + b.glsl + "*" + b.glsl + "))",
-        a.isNumeric && b.isNumeric
+        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
     );
 }
 function powEvalObjects(a, b) {
@@ -559,11 +632,11 @@ function powEvalObjects(a, b) {
             a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             "exp(" + b.glsl + ")",
             "(" + b.glslgrad + "*exp(" + b.glsl + "))",
-            b.isNumeric
+            b.isNumeric, true, b.isCompatible
         )
     }
     var n = Number(b.glsl);
-    if (n == 0) return new EvalObject([new Token("number", '0.')], "0.", "vec3(0)", true);
+    if (n == 0) return new EvalObject([new Token("number", '1.')], "1.", "vec3(0)", true, true);
     if (n == 1) return a;
     if (n == 2 || n == 3 || n == 4 || n == 5 || n == 6 || n == 7 || n == 8) {
         var arr = [];
@@ -574,7 +647,7 @@ function powEvalObjects(a, b) {
         return new EvalObject(
             a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             glsl, glslgrad,
-            a.isNumeric
+            a.isNumeric, n % 2 == 0, a.isCompatible
         )
     }
     return new EvalObject(
@@ -585,7 +658,7 @@ function powEvalObjects(a, b) {
                 b.isNumeric ? "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad + ")" :
                     "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad +
                     "+pow(" + a.glsl + "," + b.glsl + ")*log(" + a.glsl + ")*" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric
+        a.isNumeric && b.isNumeric, a.isPositive, a.isPositive
     )
 }
 
@@ -624,7 +697,7 @@ function postfixToGlsl(queue) {
         if (token.type == 'number') {
             var s = token.str;
             if (!/\./.test(s)) s += '.';
-            stack.push(new EvalObject([token], s, "vec3(0)", true));
+            stack.push(new EvalObject([token], s, "vec3(0)", true, !/-/.test(s), true));
         }
         // variable
         else if (token.type == "variable") {
@@ -635,7 +708,10 @@ function postfixToGlsl(queue) {
                 if (token.str == 'y') grad = "vec3(0,1,0)";
                 if (token.str == 'z') grad = "vec3(0,0,1)";
             }
-            stack.push(new EvalObject([token], s, grad, grad == "0"));
+            else if (token.str != "e") {
+                throw "Undeclared variable " + token.str;
+            }
+            stack.push(new EvalObject([token], s, grad, grad == "0", token.str == 'e', true));
         }
         // operators
         else if (token.type == "operator") {
@@ -684,16 +760,13 @@ function postfixToGlsl(queue) {
         else {
             throw "Unrecognized token " + equ[i];
         }
-        let deriLength = stack[stack.length - 1].glslgrad.length;
-        if (deriLength > 200000) {
-            //throw "Definitions are nested too deeply when calculating derivative.";
-        }
     }
-    console.assert(stack.length == 1);
+    if (stack.length != 1) throw "Result stack length is not 1";
     // get result
     var result = {
         glsl: [],
-        glslgrad: []
+        glslgrad: [],
+        isCompatible: stack[0].isCompatible
     };
     for (var i = 0; i < intermediates.length; i++) {
         let intermediate = intermediates[i];
@@ -738,8 +811,8 @@ var builtinFunctions = [
     ["Sin Tower 1", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-sin(4z)"],
     ["Sin Tower 2", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
     ["Atan2 Drill", "max(cos(atan(y,x)-20e^((z-1)/4)),x^2+y^2+z/2-1)"],
-    ["Lerp Spiky 1", "lerp(max(abs(x),abs(y),abs(z)),sqrt(x^2+y^2+z^2),-1)-0.3"],
-    ["Lerp Spiky 2", "mix(abs(x)+abs(y)+abs(z),max(abs(x),abs(y),abs(z)),1.2)-0.5"],
+    ["Lerp Spiky 1", "lerp(max(|x|,|y|,|z|),sqrt(x^2+y^2+z^2),-1)-0.3"],
+    ["Lerp Spiky 2", "mix(|x|+|y|+|z|,max(|x|,|y|,|z|),1.2)-0.5"],
     ["Eyes", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
     ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
     ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
@@ -751,14 +824,15 @@ var builtinFunctions = [
     ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);log(u2(x/2,y/2,z/2)^2+v2(x/2,y/2,z/2)^2+w2(x/2,y/2,z/2)^2)=0"],
 ];
 if (0) builtinFunctions = [ // debug
-    ['bridge', "x^2+y^2z+z^2=0"],
+    ['test incompability', "x=|z-(|z"],
+    ['bridge', "x^2+y^2z+z^2=0.01"],
     ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
     ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
     ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
     ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
     ["Atomic Orbitals f", "r2=x^2+y^2+z^2;r=sqrt(r2);x1=x/r;y1=y/r;z1=z/r;d(r0)=r0^2-r2;r00(x,y,z)=d(0.28);r10(x,y,z)=d(-0.49y1);r11(x,y,z)=d(0.49z1);r12(x,y,z)=d(-0.49x1);r20(x,y,z)=d(1.09x1y1);r21(x,y,z)=d(-1.09y1z1);r22(x,y,z)=d(0.32(3z1^2-1));r23(x,y,z)=d(-1.09x1z1);r24(x,y,z)=d(0.55(x1^2-y1^2));r30(x,y,z)=d(-0.59y1(3x1^2-y1^2));r31(x,y,z)=d(2.89x1y1z1);r32(x,y,z)=d(-0.46y1(5z1^2-1));r33(x,y,z)=d(0.37z1(5z1^2-3));r34(x,y,z)=d(-0.46x1(5z1^2-1));r35(x,y,z)=d(1.44z1(x1^2-y1^2));r36(x,y,z)=d(0.59x1(x1^2-3y1^2));s(x,y,z)=max(r00(x,y,z-2.5),r10(x+1,y,z-1.5),r11(x,y,z-1.5),r12(x-1,y,z-1.5),r20(x+2,y,z-0.2),r21(x+1,y,z-0.2),r22(x,y,z-0.2),r23(x-1,y,z-0.2),r24(x-2,y,z-0.2),r30(x-3,y,z+1.3),r31(x-2,y,z+1.3),r32(x-1,y,z+1.3),r33(x,y,z+1.3),r34(x+1,y,z+1.3),r35(x+2,y,z+1.3),r36(x+3,y,z+1.3));s(1.4x,1.4y,1.4z)"],
     ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1/2"],
-    ["Mandelbulb 3", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2=1"],
+    ["Mandelbulb 3", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);log(u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2)=0"],
     // ["Iteration", "f(t)=t^3-3t^2+3t-1;f(f(f(f(f(f(f(f(f(f(f(f(x)f(y)f(z)"]
 ];
 var t0 = performance.now();

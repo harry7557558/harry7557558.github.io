@@ -89,10 +89,25 @@ uniform vec3 LDIR;
 #define OPACITY 0.6
 
 // calculate the color at one point, parameters are in screen space
-float grid(vec3 p, vec3 n, float w) {
+float grid1(vec3 p, vec3 n, float w) {
     vec3 a = 1.0 - abs(1.0-2.0*fract(p));
     a = clamp(2.*a/w-sqrt(1.-n*n), 0., 1.);
-    return min(min(a.x,a.y),a.z);
+    // return min(min(a.x,a.y),a.z);
+    return ((a.x+1.)*(a.y+1.)*(a.z+1.)-1.)/7.;
+}
+float grid(vec3 p, vec3 n) {
+    float ls = log(uScale) / log(10.);
+    float fs = pow(ls - floor(ls), 1.0);
+    float es = pow(10., floor(ls));
+    vec3 q0 = es*p;
+    vec3 q1 = 10.*q0;
+    vec3 q2 = 10.*q1;
+    float w0 = .05*es/uScale;
+    float w1 = mix(1.,10.,fs)*w0;
+    float g0 = grid1(q0, n, w0);
+    float g1 = grid1(q1, n, w1);
+    float g2 = grid1(q2, n, w1);
+    return min(min(mix(0.65, 1.0, g0), mix(mix(0.8,0.65,fs), 1.0, g1)), mix(mix(1.0,0.8,fs), 1.0, g2));
 }
 float fade(float t) {
     return smoothstep(0., 1., 5.0*(clamp(1.0-t, 0., 1.)));
@@ -105,24 +120,7 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
 #if {%Y_UP%}
     n0 = vec3(n0.x, n0.z, -n0.y);
 #endif
-
-#if {%GRID%}
-    float ls = log(uScale) / log(10.);
-    float fs = pow(ls - floor(ls), 1.0);
-    float es = pow(10., floor(ls));
-    vec3 q0 = es*p;
-    vec3 q1 = 10.*q0;
-    vec3 q2 = 10.*q1;
-    float w0 = .05*es/uScale;
-    float w1 = mix(1.,10.,fs)*w0;
-    float g0 = grid(q0, n, w0);
-    float g1 = grid(q1, n, w1);
-    float g2 = grid(q2, n, w1);
-    float g = min(min(mix(0.65, 1.0, g0), mix(mix(0.8,0.65,fs), 1.0, g1)), mix(mix(1.0,0.8,fs), 1.0, g2));
-#else
-    float g = 1.0;
-#endif
-
+    float g = bool({%GRID%}) ? grid(p, n) : 1.0;
 #if {%COLOR%} == 0
     // porcelain-like shading
     vec3 albedo = g * mix(vec3(1.0), normalize(n0), 0.05);
@@ -182,7 +180,11 @@ vec3 vSolid(in vec3 ro, in vec3 rd, float t0, float t1) {
         dvdt = abs((v1-v0)/(t1-t0));
 #if {%DISCONTINUITY%}
         if (abs(t1-t0) < 1e-4 && dvdt > 1.8*old_dvdt) {
-            return vec3(1,0,0) * fade(0.5*(t0+t1));
+            vec3 albedo = vec3(1,0,0);
+#if {%GRID%}
+            albedo *= grid(screenToWorld(p), vec3(sqrt(0.33)));
+#endif
+            return albedo * fade(0.5*(t0+t1));
         }
 #endif
         if (abs(t1-t0) < 0.001*STEP_SIZE) break;
