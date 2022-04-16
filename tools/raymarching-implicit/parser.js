@@ -20,8 +20,14 @@ function EvalObject(postfix, glsl, glslgrad, isNumeric, isPositive = false, isCo
     this.glsl = glsl;
     this.glslgrad = glslgrad;
     this.isNumeric = isNumeric;  // zero gradient
-    this.isPositive = isPositive;
-    this.isCompatible = isCompatible;  // has no undefined
+    this.isPositive = isPositive;  // non-negative
+    this.isCompatible = isCompatible;  // has no NAN
+}
+
+function EvalLatexObject(postfix, latex, precedence) {
+    this.postfix = postfix;
+    this.latex = latex;
+    this.precedence = precedence;
 }
 
 function MathFunction(names, numArgs, latex, glsl, glslgrad) {
@@ -58,16 +64,32 @@ function MathFunction(names, numArgs, latex, glsl, glslgrad) {
             result.isCompatible = false;
         return result;
     };
+    this.subLatex = function (args) {
+        if (/%0/.test(this.latex)) {
+            var latexes = [];
+            for (var i = 0; i < args.length; i++)
+                latexes.push(args[i].latex);
+            return this.latex.replaceAll("%0", latexes.join(','));
+        }
+        if (args.length != this.numArgs)
+            throw "Incorrect number of arguments for function " + this.names[0];
+        var latex = this.latex;
+        for (var i = 0; i < args.length; i++) {
+            var repv = "%" + (i + 1);
+            latex = latex.replaceAll(repv, args[i].latex);
+        }
+        return latex;
+    }
 }
 const mathFunctions = (function () {
     const funs0 = [
-        new MathFunction(['mod'], 2, '\\mod\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
-        new MathFunction(['fract'], 1, '\\left\\{%1\\right\\}', 'fract(%1)', '$1'),
-        new MathFunction(['floor'], 1, '\\lfloor%1\\rfloor', 'floor(%1)', 'vec3(0)'),
-        new MathFunction(['ceil'], 1, '\\lceil%1\\rceil', 'ceil(%1)', 'vec3(0)'),
-        new MathFunction(['round'], 1, '\\round\\left(%1\\right)', 'round(%1)', 'vec3(0)'),
+        new MathFunction(['mod'], 2, '\\operatorname{mod}\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
+        new MathFunction(['fract', 'frac'], 1, '\\operatorname{frac}\\left(%1\\right)', 'fract(%1)', '$1'),
+        new MathFunction(['floor'], 1, '\\lfloor{%1}\\rfloor', 'floor(%1)', 'vec3(0)'),
+        new MathFunction(['ceil'], 1, '\\lceil{%1}\\rceil', 'ceil(%1)', 'vec3(0)'),
+        new MathFunction(['round'], 1, '\\operatorname{round}\\left(%1\\right)', 'round(%1)', 'vec3(0)'),
         new MathFunction(['abs'], 1, '\\left|%1\\right|', 'abs(%1)', '($1*sign(%1))'),
-        new MathFunction(['sign', 'sgn'], 1, '\\sign\\left(%1\\right)', 'sign(%1)', 'vec3(0)'),
+        new MathFunction(['sign', 'sgn'], 1, '\\operatorname{sign}\\left(%1\\right)', 'sign(%1)', 'vec3(0)'),
         new MathFunction(['max'], 0, '\\max\\left(%0\\right)', 'max(%1,%2)', "(%1>%2?$1:$2)"),
         new MathFunction(['min'], 0, '\\min\\left(%0\\right)', 'min(%1,%2)', "(%1<%2?$1:$2)"),
         new MathFunction(['clamp'], 3, '\\operatorname{clamp}\\left(%1,%2,%3\\right)', 'clamp(%1,%2,%3)', '(%1>%3?$3:%1>%2?$1:$2)'),
@@ -87,18 +109,18 @@ const mathFunctions = (function () {
         new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))'),
         new MathFunction(['cosh'], 1, '\\cosh\\left(%1\\right)', 'cosh(%1)', '($1*sinh(%1))'),
         new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))'),
-        new MathFunction(['csch'], 1, '\\csch\\left(%1\\right)', '(1.0/sinh(%1))', '(-$1/(sinh(%1)*tanh(%1)))'),
-        new MathFunction(['sech'], 1, '\\sech\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))'),
-        new MathFunction(['coth'], 1, '\\coth\\left(%1\\right)', '(1.0/tanh(%1))', '(-$1/(sinh(%1)*sinh(%1)))'),
+        new MathFunction(['csch'], 1, '\\mathrm{csch}\\left(%1\\right)', '(1.0/sinh(%1))', '(-$1/(sinh(%1)*tanh(%1)))'),
+        new MathFunction(['sech'], 1, '\\mathrm{sech}\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))'),
+        new MathFunction(['coth'], 1, '\\mathrm{coth}\\left(%1\\right)', '(1.0/tanh(%1))', '(-$1/(sinh(%1)*sinh(%1)))'),
         new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))'),
         new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))'),
         new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))'),
-        new MathFunction(['arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
-        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\arccot\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))'),
-        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\arcsinh\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
-        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\arccosh\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
-        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\arctanh\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
-        new MathFunction(['arccoth', 'arcoth', 'acoth'], 1, '\\arccoth\\left(%1\\right)', 'atanh(1./(%1))', '($1/(1.-%1*%1))'),
+        new MathFunction(['atan2', 'arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
+        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\mathrm{arccot}\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))'),
+        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\mathrm{arcsinh}\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
+        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\mathrm{arccosh}\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
+        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\mathrm{arctanh}\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
+        new MathFunction(['arccoth', 'arcoth', 'acoth'], 1, '\\mathrm{arccoth}\\left(%1\\right)', 'atanh(1./(%1))', '($1/(1.-%1*%1))'),
     ];
     var funs = {};
     for (var i = 0; i < funs0.length; i++) {
@@ -142,8 +164,6 @@ function isIndependentVariable(name) {
 
 
 // ============================ PARSING ==============================
-
-
 
 // Balance parenthesis, used to be part of exprToPostfix()
 function balanceParenthesis(expr) {
@@ -273,12 +293,12 @@ function exprToPostfix(expr, mathFunctions) {
 
     // operators
     expr = expr.replace(/\*\*/g, "^");
-    var operators = {
+    const operators = {
         '+': 1, '-': 1,
         '*': 2, '/': 2,
         '^': 3
     };
-    var isLeftAssociative = {
+    const isLeftAssociative = {
         '+': true, '-': true, '*': true, '/': true,
         '^': false
     };
@@ -399,7 +419,7 @@ function getVariables(postfix, excludeIndependent) {
 }
 
 // Parse console input to postfix notation
-function inputToPostfix(input) {
+function parseInput(input) {
     // split to arrays
     input = input.replaceAll('\r', ';').replaceAll('\n', ';');
     input = input.trim().trim(';').trim().split(';');
@@ -573,14 +593,32 @@ function inputToPostfix(input) {
             var totlength = 0;
             for (var j = 0; j < stack.length; j++) totlength += stack[j].length;
             if (totlength >= 65536) {
-                // throw "Definitions are nested too deeply."
+                throw "Definitions are nested too deeply."
             }
         }
         console.assert(stack.length == 1);
         return stack;
     }
     mainequ = dfs(mainequ, variables)[0];
-    return mainequ;
+
+    // latex
+    var latexList = [];
+    for (var i = 0; i < input.length; i++) {
+        var line = input[i].trim();
+        if (line == '') continue;
+        var left = line, right = "0";
+        if (/\=/.test(line)) {
+            var lr = line.split('=');
+            left = lr[0].trim(), right = lr[1].trim();
+        }
+        left = postfixToLatex(exprToPostfix(left, functions));
+        right = postfixToLatex(exprToPostfix(right, functions));
+        latexList.push(left + "=" + right);
+    }
+    return {
+        postfix: mainequ,
+        latex: latexList
+    }
 }
 
 
@@ -783,6 +821,108 @@ function postfixToGlsl(queue) {
     return result;
 }
 
+// Convert a post-polish math expression to LaTeX code
+function postfixToLatex(queue) {
+    const operators = {
+        '-': 1, '+': 1,
+        '*': 2, '/': 2,
+        '^': 3
+    };
+    function varnameToLatex(varname) {
+        if (varname.length >= 2 && varname[1] != "_")
+            varname = varname[0] + "_" + varname.substring(1, varname.length);
+        if (/_/.test(varname)) {
+            var j = varname.search('_');
+            varname = varname.substring(0, j + 1) + "{" + varname.substring(j + 1, varname.length) + "}";
+        }
+        return varname;
+    }
+    var stack = [];
+    for (var i = 0; i < queue.length; i++) {
+        var token = queue[i];
+        // number
+        if (token.type == 'number') {
+            var s = token.str.replace(/\.$/, "");
+            if (s == "" || s[0] == ".") s = "0" + s;
+            stack.push(new EvalLatexObject([token], s, Infinity));
+        }
+        // variable
+        else if (token.type == "variable") {
+            var s = varnameToLatex(token.str);
+            if (s == "e") s = "\\operatorname{e}";
+            stack.push(new EvalLatexObject([token], s, Infinity));
+        }
+        // operators
+        else if (token.type == "operator") {
+            var precedence = operators[token.str];
+            var v1 = stack[stack.length - 2];
+            var v2 = stack[stack.length - 1];
+            stack.pop(); stack.pop();
+            var tex1 = v1.latex, tex2 = v2.latex;
+            if (token.str != "/" && !(token.str == "^" && tex1 == "\\operatorname{e}")) {
+                if (precedence > v1.precedence)
+                    tex1 = "\\left(" + tex1 + "\\right)";
+                if (precedence >= v2.precedence)
+                    tex2 = "\\left(" + tex2 + "\\right)";
+            }
+            var latex = "";
+            if (token.str == "-") {
+                if (v1.latex == "0") latex = "-" + tex2;
+                else latex = tex1 + "-" + tex2;
+            }
+            else if (token.str == "+") {
+                latex = tex1 + "+" + tex2;
+            }
+            else if (token.str == "*") {
+                // latex = tex1 + "\\cdot " + tex2;
+                latex = "{" + tex1 + "}{" + tex2 + "}";
+            }
+            else if (token.str == "/") {
+                latex = "\\frac{" + tex1 + "}{" + tex2 + "}";
+            }
+            else if (token.str == "^") {
+                latex = "{" + tex1 + "}^{" + tex2 + "}";
+            }
+            else throw "Unrecognized operator" + token.str;
+            var obj = new EvalLatexObject(
+                v1.postfix.concat(v2.postfix).concat([token]),
+                latex, precedence);
+            stack.push(obj);
+        }
+        // function
+        else if (token.type == 'function') {
+            var numArgs = token.numArgs;
+            var args = [];
+            for (var j = numArgs; j > 0; j--)
+                args.push(stack[stack.length - j]);
+            for (var j = 0; j < numArgs; j++)
+                stack.pop();
+            var fun = mathFunctions[token.str];
+            if (fun != undefined) {
+                if (fun['' + numArgs] == undefined) fun = fun['0'];
+                else fun = fun['' + numArgs];
+                if (fun == undefined) throw "Incorrect number of function arguments for " + token.str;
+                stack.push(new EvalLatexObject(
+                    args.concat([token]), fun.subLatex(args), Infinity));
+            }
+            else {
+                var argsLatex = [];
+                for (var j = 0; j < numArgs; j++) argsLatex.push(args[j].latex);
+                stack.push(new EvalLatexObject(
+                    args.concat([token]),
+                    varnameToLatex(token.str) + "\\left(" + argsLatex.join(',') + "\\right)",
+                    Infinity
+                ));
+            }
+        }
+        else {
+            throw "Unrecognized token " + equ[i];
+        }
+    }
+    if (stack.length != 1) throw "Result stack length is not 1";
+    return stack[0].latex;
+}
+
 
 // ============================ BUILT-IN ==============================
 
@@ -796,9 +936,10 @@ var builtinFunctions = [
     ["A4 Genus 3", "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)"],
     ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2=32(x^2+y^2)"],
     ["A6 Spiky 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
-    ["A6 Spiky 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.1"],
+    ["A6 Spiky 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.2"],
     ["A6 Barth", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
     ["A3 Ding-Dong", "x^2+y^2=(1-z)z^2"],
+    ['A3 Bridge', "x^2+y^2z+z^2=0.01"],
     ["Radical Heart", "x^2+4y^2+(1.15z-0.6(2(x^2+.05y^2+.001)^0.7+y^2)^0.3+0.3)^2=1"],
     ["Ln Wineglass", "x^2+y^2-ln(z+1)^2-0.02"],
     ["Spheres", "sin(2x)sin(2y)sin(2z)-0.9"],
@@ -817,22 +958,23 @@ var builtinFunctions = [
     ["Spiral", "k=0.15;p=3.1415926;r=2sqrt(x^2+y^2);a=atan(y,x);n=min((log(r)/k-a)/(2p),1);d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
     ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
     ["Value Noise", "h(x,y)=fract(126sin(12x+33y+98))-0.5;s(x)=3x^2-2x^3;v00=h(floor(x),floor(y));v01=h(floor(x),floor(y)+1);v10=h(floor(x)+1,floor(y));v11=h(floor(x)+1,floor(y)+1);f(x,y)=mix(mix(v00,v01,s(fract(y))),mix(v10,v11,s(fract(y))),s(fract(x)));v(x,y)=f(x,y)+f(2x,2y)/2+f(4x,4y)/4+f(8x,8y)/8+f(16x,16y)/16;z=ln(1+exp(40(v(x,y)-(0.05(x^2+y^2))^2)))/40"],
-    ["Fractal roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);log(u2(x,y)^2+v2(x,y)^2)=0"],
+    ["Fractal Roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);log(u2(x,y)^2+v2(x,y)^2)=0"],
     ["Spiky Fractal", "u(x,y,z)=yz;v(x,y,z)=xz;w(x,y,z)=xy;u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);log(u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2)=log(0.01)"],
     ["Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);log(u6(x-1/2,sqrt(y^2+z^2))^2+v6(x-1/2,sqrt(y^2+z^2))^2)=0"],
     ["Burning Ship", "u(x,y)=x^2-y^2;v(x,y)=2abs(xy);u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);z=(u6((x-1)/1.5,(y-1/2)/1.5)^2+v6((x-1)/1.5,(y-1/2)/1.5)^2)^-0.1-1"],
     ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);log(u2(x/2,y/2,z/2)^2+v2(x/2,y/2,z/2)^2+w2(x/2,y/2,z/2)^2)=0"],
 ];
 if (0) builtinFunctions = [ // debug
-    ['test incompability', "x=|z-(|z"],
+    //['test incompability', "x=|z-(|z"],
     ['bridge', "x^2+y^2z+z^2=0.01"],
-    ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
-    ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
-    ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
-    ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
-    ["Atomic Orbitals f", "r2=x^2+y^2+z^2;r=sqrt(r2);x1=x/r;y1=y/r;z1=z/r;d(r0)=r0^2-r2;r00(x,y,z)=d(0.28);r10(x,y,z)=d(-0.49y1);r11(x,y,z)=d(0.49z1);r12(x,y,z)=d(-0.49x1);r20(x,y,z)=d(1.09x1y1);r21(x,y,z)=d(-1.09y1z1);r22(x,y,z)=d(0.32(3z1^2-1));r23(x,y,z)=d(-1.09x1z1);r24(x,y,z)=d(0.55(x1^2-y1^2));r30(x,y,z)=d(-0.59y1(3x1^2-y1^2));r31(x,y,z)=d(2.89x1y1z1);r32(x,y,z)=d(-0.46y1(5z1^2-1));r33(x,y,z)=d(0.37z1(5z1^2-3));r34(x,y,z)=d(-0.46x1(5z1^2-1));r35(x,y,z)=d(1.44z1(x1^2-y1^2));r36(x,y,z)=d(0.59x1(x1^2-3y1^2));s(x,y,z)=max(r00(x,y,z-2.5),r10(x+1,y,z-1.5),r11(x,y,z-1.5),r12(x-1,y,z-1.5),r20(x+2,y,z-0.2),r21(x+1,y,z-0.2),r22(x,y,z-0.2),r23(x-1,y,z-0.2),r24(x-2,y,z-0.2),r30(x-3,y,z+1.3),r31(x-2,y,z+1.3),r32(x-1,y,z+1.3),r33(x,y,z+1.3),r34(x+1,y,z+1.3),r35(x+2,y,z+1.3),r36(x+3,y,z+1.3));s(1.4x,1.4y,1.4z)"],
-    ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1/2"],
-    ["Mandelbulb 3", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);log(u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2)=0"],
+    ["A6 Heart", "(x^2+9/4*y^2+z^2-1)^3=(x^2+9/80*y^2)*z^3"],
+    // ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
+    // ["test", "a=x^2+y^2;f(x)=sin(2x)+cos(2x);g(x,y)=tanh(x)*tanh(y);f(x)+f(y)=g(x+y,x-y)"],
+    // ["A6 Barth 2", "4(2x^2-y^2)(2y^2-z^2)(2z^2-x^2)-4(x^2+y^2+z^2-1)^2"],
+    // ["Globe", "a=atan(sqrt(x^2+y^2),z);t=atan(y,x);r=sqrt(x^2+y^2+z^2);1-0.01sin(a)(max(cos(12t)^2,cos(18a)^2)^40-1)=r"],
+    // ["Atomic Orbitals f", "r2=x^2+y^2+z^2;r=sqrt(r2);x1=x/r;y1=y/r;z1=z/r;d(r0)=r0^2-r2;r00(x,y,z)=d(0.28);r10(x,y,z)=d(-0.49y1);r11(x,y,z)=d(0.49z1);r12(x,y,z)=d(-0.49x1);r20(x,y,z)=d(1.09x1y1);r21(x,y,z)=d(-1.09y1z1);r22(x,y,z)=d(0.32(3z1^2-1));r23(x,y,z)=d(-1.09x1z1);r24(x,y,z)=d(0.55(x1^2-y1^2));r30(x,y,z)=d(-0.59y1(3x1^2-y1^2));r31(x,y,z)=d(2.89x1y1z1);r32(x,y,z)=d(-0.46y1(5z1^2-1));r33(x,y,z)=d(0.37z1(5z1^2-3));r34(x,y,z)=d(-0.46x1(5z1^2-1));r35(x,y,z)=d(1.44z1(x1^2-y1^2));r36(x,y,z)=d(0.59x1(x1^2-3y1^2));s(x,y,z)=max(r00(x,y,z-2.5),r10(x+1,y,z-1.5),r11(x,y,z-1.5),r12(x-1,y,z-1.5),r20(x+2,y,z-0.2),r21(x+1,y,z-0.2),r22(x,y,z-0.2),r23(x-1,y,z-0.2),r24(x-2,y,z-0.2),r30(x-3,y,z+1.3),r31(x-2,y,z+1.3),r32(x-1,y,z+1.3),r33(x,y,z+1.3),r34(x+1,y,z+1.3),r35(x+2,y,z+1.3),r36(x+3,y,z+1.3));s(1.4x,1.4y,1.4z)"],
+    // ["2D Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y);z=0.5(u4(x,y)^2+v4(x,y)^2)^-0.1-1/2"],
+    // ["Mandelbulb 3", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);u3(x,y,z)=u(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);v3(x,y,z)=v(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);w3(x,y,z)=w(u2(x,y,z)+x,v2(x,y,z)+y,w2(x,y,z)+z);log(u3(x,y,z)^2+v3(x,y,z)^2+w3(x,y,z)^2)=0"],
     // ["Iteration", "f(t)=t^3-3t^2+3t-1;f(f(f(f(f(f(f(f(f(f(f(f(x)f(y)f(z)"]
 ];
 var t0 = performance.now();
@@ -840,11 +982,11 @@ for (var i = 0; i < builtinFunctions.length; i++) {
     let name = builtinFunctions[i][0];
     let expr = builtinFunctions[i][1];
     var tt0 = performance.now();
-    let pf = inputToPostfix(expr);
-    let glsl = postfixToGlsl(pf);
+    let parsed = parseInput(expr);
+    let glsl = postfixToGlsl(parsed.postfix);
     console.log(glsl);
+    console.log(parsed.latex);
     console.log(name, performance.now() - tt0);
-    console.log(pf.length);
 }
 var dt = performance.now() - t0;
 console.log("All built-in functions parsed in", dt, "ms");

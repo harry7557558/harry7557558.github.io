@@ -3,11 +3,27 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Raymarching Implicit Surface Graphing Demo</title>
+    <title>Raymarching Implicit Surface Grapher</title>
     <meta name="description" content="Raymarching-based implicit surface plotting tool in WebGL2." />
     <meta name="keywords" content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, 3d" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']]
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <link rel="stylesheet" href="style.css" />
     <script src="parser.js"></script>
@@ -25,8 +41,7 @@
         <a href='#' style="float:right"
             onclick='javascript:event.preventDefault();document.getElementById("help-menu").style.visibility="visible";'>help</a>
         <br />
-        <textarea id="equation-input" style="width:100%;height:8em;resize:vertical" spellcheck="false"
-            autocapitalize="off" autocorrect="off"></textarea>
+        <textarea id="equation-input" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
         <br />
         <span><select id="select-step">
                 <option value="0.04">low</option>
@@ -59,18 +74,20 @@
         <p id="error-message" style="display:none;white-space:normal;margin-bottom:0"></p>
     </div>
 
+    <div id="mathjax-preview">$$</div>
+
     <div id="help-menu" style="visibility:hidden">
         <div id="help-menu-hide" onclick='document.getElementById("help-menu").style.visibility="hidden"'>×</div>
-        <h2>Raymarching Implicit Surface Graphing Demo</h2>
+        <h2>Raymarching Implicit Surface Grapher</h2>
         <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one.</p>
         <p>This tool uses the raymarching algorithm to render 3D implicit surfaces. Type equation in the input box, or
-            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Feel free to play with different
+            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Try to play with different
             selectors, checkboxes, and sliders.</p>
-        <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL2</a> for
-            this tool to work properly.</p>
+        <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL 2</a> to
+            run this tool.</p>
         <h3>Entering equations</h3>
-        <p>Use <i>x, y, z</i> as independent variable. Write your equation in the form
-            <i>f(x,y,z)=0</i> or <i>f(x,y,z)=g(x,y,z)</i>. Use <code>^</code> for
+        <p>Use $x, y, z$ as independent variables. Write your equation in the form
+            $f(x,y,z)=0$ or $f(x,y,z)=g(x,y,z)$. Use <code>^</code> for
             power/exponentiation, <code>*/</code> for multiplication
             and division. You can use functions like <code>abs()</code>, <code>sin()</code>, and <code>sqrt()</code>.
             Note that <code>log(x)</code> calculates the natural logarithm by default. For the common logarithm, type
@@ -107,7 +124,7 @@
             from bottom to bottom counter-clockwise. As you drag the <i>φ<sub>light</sub></i> slider from left to right,
             the light moves from front to back. Note that the light goes with viewport rotation.</p>
         <h3>Coloring modes</h3>
-        <p><b>Default</b>: This mode simulates the apperance of glazed ceramic when shading the surface. You may or may
+        <p><b>Default</b>: This mode simulates the apperance of glaze when shading the surface. You may or may
             not see some slight tint depending on the monitor you use.</p>
         <p><b>Normal</b>: This mode chooses the base color of the surface based on the surface normal (normalized
             gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>direction, blue corresponds
@@ -165,6 +182,36 @@
             return "";
         }
 
+        async function initMathjax() {
+            let container = document.querySelector("#mathjax-preview");
+            var mousePos = [-1, -1];
+            var left = 0.4 * window.innerWidth - 120;
+            var top = 0.85 * window.innerHeight - 20;
+            function applyPosition() {
+                left = Math.max(0, Math.min(left, window.innerWidth - container.clientWidth));
+                top = Math.max(0, Math.min(top, window.innerHeight - container.clientHeight));
+                container.style.left = left + "px";
+                container.style.top = top + "px";
+            }
+            applyPosition();
+            container.addEventListener("pointerdown", function (event) {
+                container.setPointerCapture(event.pointerId);
+                mousePos = [event.clientX, event.clientY];
+            });
+            container.addEventListener("pointerup", function (event) {
+                mousePos = [-1, -1];
+            });
+            container.addEventListener("pointermove", function (event) {
+                if (mousePos[0] >= 0) {
+                    left += event.clientX - mousePos[0];
+                    top += event.clientY - mousePos[1];
+                    applyPosition();
+                    mousePos = [event.clientX, event.clientY];
+                }
+            });
+            window.addEventListener("resize", applyPosition);
+        }
+
         window.addEventListener("load", async function (event) {
             var glsl = {};
             let checkboxYup = document.querySelector("#checkbox-yup");
@@ -186,7 +233,13 @@
             let initialExpr = getCookie();
             if (initialExpr != "") {
                 select.childNodes[0].setAttribute("value", initialExpr);
-                select.childNodes[0].selected = true;
+                var selectId = 0;
+                for (var i = 1; i < select.childNodes.length; i++) {
+                    if (select.childNodes[i].value == initialExpr) {
+                        selectId = i;
+                    }
+                }
+                select.childNodes[selectId].selected = true;
             }
             else select.childNodes[1].selected = true;
 
@@ -194,11 +247,23 @@
             function updateFunctionInput() {
                 let errorMessage = document.querySelector("#error-message");
                 errorMessage.style.display = "none";
+                let texContainer = document.getElementById("mathjax-preview");
+                texContainer.innerHTML = "";
                 var expr = input.value;
                 setCookie(expr);
                 try {
-                    var postfix = inputToPostfix(expr);
-                    glsl = postfixToGlsl(postfix);
+                    var parsed = parseInput(expr);
+                    // LaTeX
+                    for (var i = 0; i < parsed.latex.length; i++) {
+                        var container = document.createElement("div");
+                        var line = document.createElement("span");
+                        line.textContent = "$\\displaystyle{" + parsed.latex[i] + "}$";
+                        container.appendChild(line);
+                        texContainer.appendChild(container);
+                    }
+                    MathJax.typeset();
+                    // GLSL
+                    glsl = postfixToGlsl(parsed.postfix);
                     console.log(glsl.glsl);
                     console.log(glsl.glslgrad);
                     console.log("isCompatible", glsl.isCompatible);
@@ -246,6 +311,7 @@
                 console.error(e);
                 document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";
             }
+            initMathjax();
         });
     </script>
 

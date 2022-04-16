@@ -32,7 +32,14 @@
     white-space: nowrap;
 }
 
-input {
+#equation-input {
+    width: 100%;
+    height: 8em;
+    resize: vertical;
+    /* background-color: rgba(255, 255, 255, 0.9); */
+}
+
+input, select {
     display: inline-block;
     vertical-align: middle;
 }
@@ -86,4 +93,31 @@ input {
 a {
     text-decoration: underline;
     color: white;
+}
+
+#mathjax-preview {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    color: white;
+    cursor: move;
+    font-size: 1.1em;
+    pointer-events: none;
+    touch-action: none;
+}
+
+#mathjax-preview div {
+    display: block;
+    margin: 0;
+    width: min-content;
+    padding: 0em;
+    pointer-events: all;
+}
+
+#mathjax-preview span {
+    display: inline-block;
+    margin: 0.3em;
+    padding: 0em 0.3em;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0.35em 0.35em rgba(0, 0, 0, 0.5);
 }

@@ -123,8 +123,8 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     float g = bool({%GRID%}) ? grid(p, n) : 1.0;
 #if {%COLOR%} == 0
     // porcelain-like shading
-    vec3 albedo = g * mix(vec3(1.0), normalize(n0), 0.05);
-    vec3 amb = vec3(0.2+0.1*n.y) * albedo;
+    vec3 albedo = g * mix(vec3(0.9), normalize(n0), 0.05);
+    vec3 amb = vec3(0.2+0.0*n.y) * albedo;
     vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
     vec3 spc = min(1.2*pow(max(dot(reflect(rd,n),LDIR),0.0),100.0),1.) * vec3(10.);
     vec3 rfl = mix(vec3(1.), vec3(4.), clamp(5.*dot(reflect(rd,n),LDIR),0.,1.));
@@ -133,6 +133,8 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
 #if {%COLOR%} == 1
     // color based on normal
     vec3 albedo = mix(vec3(1.0), normalize(n0), 0.45);
+    //albedo = pow(albedo, vec3(0.8));
+    albedo /= 1.2*pow(dot(albedo, vec3(0.299,0.587,0.114)), 0.5);
 #elif {%COLOR%} == 2
     // heatmap color based on gradient magnitude
     float grad = 0.5-0.5*cos(PI*log(length(n0))/log(10.));
@@ -141,7 +143,7 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
 #endif
     albedo *= g;
     // phong shading
-    vec3 amb = vec3(0.2+0.1*n.y) * albedo;
+    vec3 amb = vec3(0.2+0.0*n.y) * albedo;
     vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
     vec3 spc = pow(max(dot(reflect(rd,n),LDIR),0.0),40.0) * vec3(0.1);
     vec3 col = amb + dif + spc;

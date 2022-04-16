@@ -106,15 +106,27 @@ function mat4ToFloat32Array(m) {
 
 // calculate the center of mass of the screen excluding the control box
 function calcScreenCom() {
+    var totArea = 1.0;
+    var totCom = [0.5, 0.5];
+    function subtractBox(element, weight) {
+        var rect = element.getBoundingClientRect();
+        var x0 = Math.max(rect.left / state.width, 0.0);
+        var y0 = Math.max(rect.top / state.height, 0.0);
+        var x1 = Math.min(rect.right / state.width, 1.0);
+        var y1 = Math.min(rect.bottom / state.height, 1.0);
+        var dA = weight * Math.max(x1 - x0, 0) * Math.max(y1 - y0, 0);
+        var dC = [0.5 * (x0 + x1), 0.5 * (y0 + y1)];
+        totArea -= dA;
+        totCom = [totCom[0] - dA * dC[0], totCom[1] - dA * dC[1]];
+    }
     var control = document.getElementById("control");
-    var controlBl = [
-        Math.min(Math.max(1.0 - control.offsetLeft / state.width, 0.0), 1.0),
-        Math.min(Math.max((control.offsetTop + control.offsetHeight) / state.height, 0.0), 1.0)];
-    var controlA = controlBl[0] * controlBl[1];
-    var controlC = [
-        1.0 - (0.5 - 0.5 * controlA * controlBl[0]) / (1.0 - controlA),
-        1.0 - (0.5 - 0.5 * controlA * controlBl[1]) / (1.0 - controlA)];
-    return [2.0 * (controlC[0] - 0.5), 2.0 * (controlC[1] - 0.5)];
+    subtractBox(control, 1.1);
+    var container = document.getElementById("mathjax-preview");
+    var equations = container.children;
+    for (var i = 0; i < equations.length; i++)
+        subtractBox(equations[i], 0.8);
+    var com = [totCom[0] / totArea, 1.0 - totCom[1] / totArea];
+    return [2.0 * (com[0] - 0.5), 2.0 * (com[1] - 0.5)];
 }
 
 function calcTransformMatrix(state) {
@@ -493,16 +505,19 @@ function initRenderer() {
     updateBuffers();
 
     // rendering
+    var oldScreenCom = [-1, -1];
     function render() {
-        if (state.renderNeeded) {
+        var screenCom = calcScreenCom();
+        if ((screenCom[0] != oldScreenCom[0] || screenCom[1] != oldScreenCom[1])
+            || state.renderNeeded) {
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
-            var screenCom = calcScreenCom();
             var transformMatrix = calcTransformMatrix(state);
             var lightDir = calcLightDirection(transformMatrix, state.lightTheta, state.lightPhi);
             drawScene(screenCom, transformMatrix, lightDir);
             state.renderNeeded = false;
         }
+        oldScreenCom = screenCom;
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
@@ -519,6 +534,7 @@ function initRenderer() {
     canvas.addEventListener("pointerdown", function (event) {
         //event.preventDefault();
         document.getElementById("help-menu").style.visibility = "hidden";
+        canvas.setPointerCapture(event.pointerId);
         mouseDown = true;
     });
     window.addEventListener("pointerup", function (event) {
@@ -540,10 +556,10 @@ function initRenderer() {
             var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
             fingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
         }
-    });
+    }, { passive: true });
     canvas.addEventListener("touchend", function (event) {
         fingerDist = -1.0;
-    });
+    }, { passive: true });
     canvas.addEventListener("touchmove", function (event) {
         if (event.touches.length == 2) {
             var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
@@ -556,7 +572,7 @@ function initRenderer() {
             fingerDist = newFingerDist;
             state.renderNeeded = true;
         }
-    });
+    }, { passive: true });
     window.addEventListener("resize", updateBuffers);
 
     let sliderTheta = document.querySelector("#slider-theta");
