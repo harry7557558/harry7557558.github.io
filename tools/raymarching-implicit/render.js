@@ -211,11 +211,19 @@ function createShaderProgram(vsSource, fsSource) {
         gl.shaderSource(shader, source); // send the source code to the shader
         gl.compileShader(shader); // compile shader
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) // check if compiled succeed
-            throw "Shader compile error: " + gl.getShaderInfoLog(shader);
+            throw new Error("Shader compile error: " + gl.getShaderInfoLog(shader));
         return shader;
     }
-    var vShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    var fShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    var vShader = null, fShader = null;
+    try {
+        vShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+        fShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    }
+    catch (e) {
+        if (vShader != null) gl.deleteShader(vShader);
+        if (fShader != null) gl.deleteShader(fShader);
+        throw e;
+    }
     // create the shader program
     var shaderProgram = gl.createProgram();
     gl.attachShader(shaderProgram, vShader);
@@ -292,6 +300,11 @@ function destroyAntiAliaser(antiAliaser) {
 
 // call this function to re-render
 async function drawScene(screenCom, transformMatrix, lightDir) {
+    if (renderer.raymarchProgram == null) {
+        renderer.canvas.style.cursor = "not-allowed";
+        return;
+    }
+    else renderer.canvas.style.cursor = "default";
     let gl = renderer.gl;
     let antiAliaser = renderer.antiAliaser;
 
@@ -439,6 +452,8 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
+    screenCom: [0.5, 0.5],
+    defaultScreenCom: true,
     rz: -0.9 * Math.PI,
     rx: -0.4 * Math.PI,
     scale: 0.5,
@@ -446,6 +461,18 @@ var state = {
     lightPhi: null,
     renderNeeded: true
 };
+function resetState() {
+    state.width = window.innerWidth;
+    state.height = window.innerHeight;
+    state.screenCom = calcScreenCom();
+    state.defaultScreenCom = true;
+    state.rz = -0.9 * Math.PI;
+    state.rx = -0.4 * Math.PI;
+    state.scale = 0.5;
+    state.lightTheta = document.querySelector("#slider-theta").value * (Math.PI / 180.);
+    state.lightPhi = document.querySelector("#slider-phi").value * (Math.PI / 180.);
+    state.renderNeeded = true;
+}
 
 function initWebGL() {
     // get context
@@ -474,6 +501,15 @@ function initWebGL() {
     renderer.timerExt = renderer.gl.getExtension('EXT_disjoint_timer_query_webgl2');
     if (renderer.timerExt) document.querySelector("#fps").textContent = "Timer loaded.";
     else console.warn("Timer unavailable.");
+
+    // state
+    try {
+        var initialState = localStorage.getItem("ri_State");
+        if (initialState != null) state = JSON.parse(initialState);
+    }
+    catch (e) {
+        try { localStorage.removeItem("ri_State"); } catch (e) { }
+    }
 }
 
 function updateBuffers() {
@@ -503,15 +539,20 @@ function initRenderer() {
     let gl = renderer.gl;
 
     updateBuffers();
+    //resetState();
 
     // rendering
     var oldScreenCom = [-1, -1];
     function render() {
-        var screenCom = calcScreenCom();
+        var screenCom = state.defaultScreenCom ? calcScreenCom() : state.screenCom;
+        state.screenCom = screenCom;
         if ((screenCom[0] != oldScreenCom[0] || screenCom[1] != oldScreenCom[1])
             || state.renderNeeded) {
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
+            try {
+                localStorage.setItem("ri_State", JSON.stringify(state));
+            } catch (e) { }
             var transformMatrix = calcTransformMatrix(state);
             var lightDir = calcLightDirection(transformMatrix, state.lightTheta, state.lightPhi);
             drawScene(screenCom, transformMatrix, lightDir);
@@ -524,13 +565,22 @@ function initRenderer() {
 
     // interactions
     var fingerDist = -1;
-    canvas.addEventListener("wheel", function (e) {
-        e.preventDefault();
-        var sc = Math.exp(0.0002 * e.wheelDeltaY);
+    canvas.addEventListener("wheel", function (event) {
+        if (renderer.raymarchProgram == null)
+            return;
+        var sc = Math.exp(0.0002 * event.wheelDeltaY);
         state.scale *= sc;
         state.renderNeeded = true;
-    }, { passive: false });
+    }, { passive: true });
     var mouseDown = false;
+    canvas.addEventListener("contextmenu", function (event) {
+        if (event.shiftKey) {
+            console.log("Shift");
+            event.preventDefault();
+            state.defaultScreenCom = true;
+            state.renderNeeded = true;
+        }
+    });
     canvas.addEventListener("pointerdown", function (event) {
         //event.preventDefault();
         document.getElementById("help-menu").style.visibility = "hidden";
@@ -542,11 +592,20 @@ function initRenderer() {
         mouseDown = false;
     });
     canvas.addEventListener("pointermove", function (event) {
+        if (renderer.raymarchProgram == null)
+            return;
         if (mouseDown) {
             var dx = event.movementX, dy = event.movementY;
-            var k = fingerDist > 0. ? 0.001 : 0.01;
-            state.rx += k * dy;
-            state.rz += k * dx;
+            if (event.shiftKey) { // center
+                state.defaultScreenCom = false;
+                state.screenCom[0] += dx / state.width;
+                state.screenCom[1] -= dy / state.height;
+            }
+            else {  // rotate
+                var k = fingerDist > 0. ? 0.001 : 0.01;
+                state.rx += k * dy;
+                state.rz += k * dx;
+            }
             state.renderNeeded = true;
         }
     });
@@ -561,6 +620,8 @@ function initRenderer() {
         fingerDist = -1.0;
     }, { passive: true });
     canvas.addEventListener("touchmove", function (event) {
+        if (renderer.raymarchProgram == null)
+            return;
         if (event.touches.length == 2) {
             var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
             var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
@@ -587,30 +648,21 @@ function initRenderer() {
     updateUniforms();
 }
 
-function updateShaderFunction(funCode, funGradCode,
-    sStep, sColor, bYup, bGrid, bTransparency, bAnalyGrad, bDiscontinuity) {
-    console.log(sColor);
+function updateShaderFunction(funCode, funGradCode, params) {
 
     function sub(shaderSource) {
         shaderSource = shaderSource.replaceAll("{%FUN%}", funCode);
         shaderSource = shaderSource.replaceAll("{%FUNGRAD%}", funGradCode);
-        shaderSource = shaderSource.replaceAll("{%V_RENDER%}", bTransparency ? "vAlpha" : "vSolid");
-        shaderSource = shaderSource.replaceAll("{%COLOR%}", "" + sColor);
-        shaderSource = shaderSource.replaceAll("{%Y_UP%}", bYup ? "1" : "0");
-        shaderSource = shaderSource.replaceAll("{%GRID%}", bGrid ? "1" : "0");
-        shaderSource = shaderSource.replaceAll("{%ANALYTICAL_GRADIENT%}", bAnalyGrad ? "1" : "0");
-        shaderSource = shaderSource.replaceAll("{%DISCONTINUITY%}", bDiscontinuity ? "1" : "0");
-        shaderSource = shaderSource.replaceAll("{%STEP_SIZE%}", sStep);
+        shaderSource = shaderSource.replaceAll("{%STEP_SIZE%}", params.sStep);
+        shaderSource = shaderSource.replaceAll("{%V_RENDER%}", params.bTransparency ? "vAlpha" : "vSolid");
+        shaderSource = shaderSource.replaceAll("{%COLOR%}", "" + params.sColor);
+        shaderSource = shaderSource.replaceAll("{%Y_UP%}", params.bYup ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%GRID%}", params.bGrid ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%ANALYTICAL_GRADIENT%}", params.bAnalyGrad ? "1" : "0");
+        shaderSource = shaderSource.replaceAll("{%DISCONTINUITY%}", params.bDiscontinuity ? "1" : "0");
         return shaderSource;
     }
     console.time("compile shader");
-
-    // premarching program
-    var premarchSource = sub(renderer.premarchSource, funCode, funGradCode);
-    var premarchProgram = createShaderProgram(renderer.vsSource, premarchSource);
-    if (renderer.premarchProgram != null)
-        renderer.gl.deleteProgram(renderer.premarchProgram);
-    renderer.premarchProgram = premarchProgram;
 
     // pooling program
     var poolProgram = createShaderProgram(renderer.vsSource, renderer.poolSource);
@@ -618,12 +670,26 @@ function updateShaderFunction(funCode, funGradCode,
         renderer.gl.deleteProgram(renderer.poolProgram);
     renderer.poolProgram = poolProgram;
 
-    // raymarching program
-    var raymarchSource = sub(renderer.raymarchSource, funCode, funGradCode);
-    var raymarchProgram = createShaderProgram(renderer.vsSource, raymarchSource);
+    if (renderer.premarchProgram != null)
+        renderer.gl.deleteProgram(renderer.premarchProgram);
     if (renderer.raymarchProgram != null)
         renderer.gl.deleteProgram(renderer.raymarchProgram);
-    renderer.raymarchProgram = raymarchProgram;
+    try {
+        // premarching program
+        var premarchSource = sub(renderer.premarchSource, funCode, funGradCode);
+        var premarchProgram = createShaderProgram(renderer.vsSource, premarchSource);
+        renderer.premarchProgram = premarchProgram;
+        // raymarching program
+        var raymarchSource = sub(renderer.raymarchSource, funCode, funGradCode);
+        var raymarchProgram = createShaderProgram(renderer.vsSource, raymarchSource);
+        renderer.raymarchProgram = raymarchProgram;
+    }
+    catch (e) {
+        console.error(e);
+        renderer.premarchProgram = null;
+        renderer.raymarchProgram = null;
+        if (funCode != null) throw e;
+    }
 
     console.timeEnd("compile shader");
     state.renderNeeded = true;

@@ -116,7 +116,8 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     vec3 p = screenToWorld(ro+rd*t);
     vec3 n0 = funGrad(p);
     rd = normalize(screenToWorld(ro+rd)-screenToWorld(ro));
-    vec3 n = normalize(dot(n0,rd)>0. ? -n0 : n0);
+    n0 = dot(n0,rd)>0. ? -n0 : n0;
+    vec3 n = normalize(n0);
 #if {%Y_UP%}
     n0 = vec3(n0.x, n0.z, -n0.y);
 #endif

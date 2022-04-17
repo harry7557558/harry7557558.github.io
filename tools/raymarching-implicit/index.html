@@ -4,26 +4,27 @@
 <head>
     <meta charset="utf-8" />
     <title>Raymarching Implicit Surface Grapher</title>
-    <meta name="description" content="Raymarching-based implicit surface plotting tool in WebGL2." />
-    <meta name="keywords" content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, 3d" />
+    <meta name="description" content="Raymarching based implicit surface graphing tool." />
+    <meta name="keywords"
+        content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, function, equation, 3d, webgl" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <script>
         window.MathJax = {
+            loader: { load: ['[tex]/color'] },
             tex: {
-                inlineMath: [['$', '$']]
+                inlineMath: [['$', '$']],
+                packages: { '[+]': ['color'] }
             },
             svg: {
                 fontCache: 'global'
             },
-            options: {
-                enableMenu: false
-            }
+            options: { enableMenu: false }
         };
     </script>
-    <script type="text/javascript" id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+        onerror="alert('Failed to load MathJax.')"></script>
 
     <link rel="stylesheet" href="style.css" />
     <script src="parser.js"></script>
@@ -38,8 +39,14 @@
 
     <div id="control">
         <select id="builtin-functions"></select>
+        <span title="Update equation (Alt+Enter)"><button id="button-update">update</button></span>
         <a href='#' style="float:right"
             onclick='javascript:event.preventDefault();document.getElementById("help-menu").style.visibility="visible";'>help</a>
+        <br />
+        <span title="Display a preview of the input equation"><input type="checkbox" id="checkbox-latex"
+                checked />equation preview</span>&ensp;
+        <span title="Automatically update the shader on input"><input type="checkbox" id="checkbox-auto-compile"
+                checked />auto update</span>&ensp;
         <br />
         <textarea id="equation-input" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
         <br />
@@ -48,16 +55,16 @@
                 <option value="0.01" selected>medium</option>
                 <option value="0.004">high</option>
                 <option value="0.001">ultra high</option>
-            </select>&nbsp;quality</span>&ensp;
+            </select>quality</span>&ensp;
         <span title="Use y-up coordinate system convension"><input type="checkbox"
-                id="checkbox-yup" /><i>y</i>-up</span>
+                id="checkbox-yup" /><i>y</i>-up</span>&ensp;
         <span title="Show grid on the surface"><input type="checkbox" id="checkbox-grid" />grid</span>
         <br />
         <span title="Color surface based on normal"><select id="select-color">
                 <option>default</option>
                 <option>normal</option>
                 <option selected>gradient</option>
-            </select>&nbsp;color</span>&ensp;
+            </select>color</span>&ensp;
         <span title="Display the surface as semi-transparent"><input type="checkbox"
                 id="checkbox-transparency" />transparency</span>
         <br />
@@ -74,37 +81,48 @@
         <p id="error-message" style="display:none;white-space:normal;margin-bottom:0"></p>
     </div>
 
-    <div id="mathjax-preview">$$</div>
+    <div id="mathjax-preview" style="left:0px;top:0px"></div>
 
     <div id="help-menu" style="visibility:hidden">
         <div id="help-menu-hide" onclick='document.getElementById("help-menu").style.visibility="hidden"'>×</div>
         <h2>Raymarching Implicit Surface Grapher</h2>
-        <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one.</p>
+        <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one. Inspired by
+            raymarching demos on <a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a>.</p>
         <p>This tool uses the raymarching algorithm to render 3D implicit surfaces. Type equation in the input box, or
-            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Try to play with different
-            selectors, checkboxes, and sliders.</p>
+            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Drag when holding Shift to
+            move the graph. Try to play with different selectors, checkboxes, and sliders.</p>
         <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL 2</a> to
-            run this tool.</p>
+            run this tool. An FPS counter will be available if your browser supports the
+            <code>EXT_disjoint_timer_query_webgl2</code> extension. If the shader takes too long to compile, try to
+            unckeck the "auto update" checkbox and update the shader by clicking the "update" button or pressing the
+            <code>Alt+Enter</code> shortcut.
+        </p>
+        <p>A preview of the equation is available via <a href="https://www.mathjax.org/" target="_blank">MathJax</a>.
+            You can drag and move the preview, or turn it off/on through the "equation preview" checkbox.</p>
         <h3>Entering equations</h3>
         <p>Use $x, y, z$ as independent variables. Write your equation in the form
             $f(x,y,z)=0$ or $f(x,y,z)=g(x,y,z)$. Use <code>^</code> for
-            power/exponentiation, <code>*/</code> for multiplication
-            and division. You can use functions like <code>abs()</code>, <code>sin()</code>, and <code>sqrt()</code>.
+            power/exponentiation, <code>*</code> for multiplication and <code>/</code>
+            for division. You can use functions like <code>abs()</code>, <code>sin()</code>, and <code>sqrt()</code>.
             Note that <code>log(x)</code> calculates the natural logarithm by default. For the common logarithm, type
             <code>log(10,x)</code> instead.
         </p>
         <p><b>Define variables</b>: A variable name starts with a letter, followed by an (optional) underscore and a
-            string of letters or numbers. Example variable names are <code>k</code>, <code>x0</code> (equivalent to
-            <code>x_0</code>), <code>x_t</code>
-            and <code>A_11</code>. For example, you can define <code>a=x+y</code> and plot <code>z=a*sin(a)</code> as
-            the main equation.
+            string of letters or numbers. Example variable names are <code>k</code>, <code>x0</code> ($x_0$, equivalent
+            to <code>x_0</code>), <code>x_t</code> ($x_t$)
+            and <code>A_11</code> ($A_{11}$). For example, you can define <code>a=x+y</code> and plot
+            <code>z=a*sin(a)</code> as the main equation.
         </p>
         <p><b>Define functions</b>: A function name is similar to a variable name. Define functions like
-            <code>f(x)=x*sin(x)</code>, or <code>g(x,y)=sin(x)*cos(y)</code>.
+            <code>f(t)=t*sin(t)</code> and use it like <code>z=f(x)*f(y)</code>, or <code>g(a,b)=sin(a)*cos(b)</code>
+            and use it like <code>z=g(x+y,x-y)</code>.
+        </p>
+        <p><b>Comments</b>: A comment can be a single line or after a line of expression, starting with the character
+            <code>#</code>. (Check the "Spiral" example)
         </p>
         <h3>Graphing parameters</h3>
-        <p><b>Quality</b>: A high quality means a smaller raymarching step, which is usually slower but produces a more
-            accurate image.</p>
+        <p><b>Quality</b>: A higher quality means a smaller raymarching step, which is usually slower but produces a
+            more accurate image.</p>
         <p><b><i>Y</i>-up</b>: Many math textbooks use the <i>z</i>-axis as the vertical axis. Check this if you prefer
             <i>y</i> as the vertical axis.
         </p>
@@ -114,86 +132,69 @@
             see if there's anything inside. (Try the "A5 Star" example.) Warn that checking this may decrease the
             accuracy of the image.</p>
         <p><b>Analytical gradient</b>: This tool requires the gradient of the function to perform raymarching and
-            calculate normal. When this is checked, it calculates the analytical gradient of the function. Otherwise, it
-            uses the <a href="https://en.wikipedia.org/wiki/Symmetric_derivative" target="_blank">central difference</a>
-            method to approximate gradient, which is typically (but not always) slower.</p>
+            calculating normal. When this is checked, this tool calculates the analytical gradient of the function.
+            Otherwise, it uses the <a href="https://en.wikipedia.org/wiki/Symmetric_derivative" target="_blank">central
+                difference</a> method to approximate gradient, which is typically (but not always) slower.</p>
         <p><b>Discontinuity</b>: This tool plots points where there are sign changes, which is either a zero or a
             discontinuity. Check this to detect and red-highlight surface that is a discontinuity.
             (Try the "Sin Terrace" example.)</p>
         <p><b>Lighting angles</b>: As you drag the <i>θ<sub>light</sub></i> slider from left to right, the light moves
             from bottom to bottom counter-clockwise. As you drag the <i>φ<sub>light</sub></i> slider from left to right,
-            the light moves from front to back. Note that the light goes with viewport rotation.</p>
+            the light moves from front to back. Light changes as you rotates the viewport.</p>
         <h3>Coloring modes</h3>
-        <p><b>Default</b>: This mode simulates the apperance of glaze when shading the surface. You may or may
-            not see some slight tint depending on the monitor you use.</p>
-        <p><b>Normal</b>: This mode chooses the base color of the surface based on the surface normal (normalized
+        <p><b>Default</b>: This mode displays a gray, glazed surface. You may or may
+            not see some slight tint depending on your device monitor.</p>
+        <p><b>Normal</b>: This mode calculates the albedo of the surface based on the surface normal (normalized
             gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>direction, blue corresponds
             the <i>z</i>-direction. When the component of the normal is more positive along a direction, the
-            corresponding color component is stronger.</p>
+            corresponding color component is stronger. Visually, the most green part has the most positive <i>y</i>
+            normal.</p>
         <p><b>Gradient</b>: This mode colors the surface based on the magnitude of the gradient. The surface appears
-            blue when the magnitude of gradient is closed to an integer power of 100, like 0.01, 1, 100. The color
-            becomes orange when the magnitude of gradient is in between. For a perfect SDF, you should see a clean blue
-            color. For where the gradient approaches zero or infinity, there may be altenating blue and orange
-            "stripes."</p>
+            blue when the magnitude of gradient is closed to an integer power of 100, like 0.01, 1, 100, and more orange
+            as it departs. For a perfect SDF, you should see a clean blue color. For where the gradient approaches zero
+            or infinity, there may be altenating blue and orange "stripes."</p>
         <h3>Technical details</h3>
         <p>This tool implements the raymarching algorithm in a WebGL fragment shader. It casts ray from the camera and
-            numerically finds the first intersection with the surface. The raymarching step size is calculated from the
-            value of the scalar field divided by the magnitude of directional derivative along the ray (in screen
+            numerically finds its intersections with the surface. The raymarching step size is calculated by dividing
+            the value of the scalar field by the magnitude of directional derivative along the ray (in screen
             space), and clamped based on a given step size (can be set through the "quality" selector).</p>
-        <p>In the first pass, it marches along the ray to get an interval where intersections may exist. Then, the
-            result is pooled using the min/max function with adjacent pixels to avoid missing intersections. This is
-            done in a 0.25x resolution with a larger step size.</p>
+        <p>In the first pass, it marches along the ray to determine an interval where intersections may exist. Then, the
+            result is pooled using min/max functions with adjacent pixels to avoid missing intersections. These passes
+            are done in 0.25x of the screen resolution.</p>
         <p>The main raymarching function checks intersections within the calculated intervals. For opaque surface, it
             uses bisection search to find the zero when the first sign change is encountered, and calculates and returns
             the color. For semi-transparent surface, it approximates intersection using linear interpolation and
             calculates color each time a sign change is encountered.</p>
         <p>The rendered image goes through an anti-aliasing pass. The pass uses a filter based on linear regression to
-            anti-aliase the image. A detail of the algorithm can be found <a
-                href="https://www.shadertoy.com/view/sllczM" target="_blank">here</a>.</p>
-        <p>The input is parsed in JavaScript, which is based on the <a
+            anti-alias the image. A detail of the algorithm can be found <a href="https://www.shadertoy.com/view/sllczM"
+                target="_blank">here</a>.</p>
+        <p>The input entered is parsed in JavaScript using the <a
                 href="https://en.wikipedia.org/wiki/Shunting-yard_algorithm" target="_blank">shunting-yard algorithm</a>
             with preprocessing. When generating GLSL code, a postfix notation is evaluated while being divided into
             steps, and its analytical gradient can be calculated via automatic differentiation. Generated GLSL code is
             logged to the console when the input is updated.</p>
-        <p>The source code of this tool can be found on <a
+        <p>The source code of this tool is available on <a
                 href="https://github.com/harry7557558/harry7557558.github.io/tree/master/tools/raymarching-implicit"
                 target="_blank">GitHub</a>.</p>
     </div>
 
     <script>
-        function setCookie(value) {
-            if (!navigator.cookieEnabled) return false;
-            var date = new Date();
-            date.setTime(date.getTime() + (365 * 86400000));
-            var expires = " expires=" + date.toUTCString();
-            var base64 = window.btoa(value);
-            document.cookie = "raymarchImplicitInput=" + base64 + ";" + expires;
-        }
-        function getCookie() {
-            const name = "raymarchImplicitInput=";
-            var ca = document.cookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i].trim();
-                if (c.indexOf(name) == 0) {
-                    var base64 = c.substring(name.length, c.length);
-                    return window.atob(base64);
-                }
-            }
-            return "";
-        }
 
+        function texPreviewPositionDelta(dx = 0, dy = 0) {
+            let container = document.querySelector("#mathjax-preview");
+            var left = Number(container.style.left.replace(/px$/, '')) + dx;
+            var top = Number(container.style.top.replace(/px$/, '')) + dy;
+            left = Math.max(0, Math.min(left, window.innerWidth - container.clientWidth));
+            top = Math.max(0, Math.min(top, window.innerHeight - container.clientHeight));
+            container.style.left = left + "px";
+            container.style.top = top + "px";
+        }
         async function initMathjax() {
             let container = document.querySelector("#mathjax-preview");
             var mousePos = [-1, -1];
-            var left = 0.4 * window.innerWidth - 120;
-            var top = 0.85 * window.innerHeight - 20;
-            function applyPosition() {
-                left = Math.max(0, Math.min(left, window.innerWidth - container.clientWidth));
-                top = Math.max(0, Math.min(top, window.innerHeight - container.clientHeight));
-                container.style.left = left + "px";
-                container.style.top = top + "px";
-            }
-            applyPosition();
+            var left = 0.2 * window.innerWidth - 200;
+            var top = 0.8 * window.innerHeight - 20;
+            texPreviewPositionDelta(left, top);
             container.addEventListener("pointerdown", function (event) {
                 container.setPointerCapture(event.pointerId);
                 mousePos = [event.clientX, event.clientY];
@@ -203,16 +204,33 @@
             });
             container.addEventListener("pointermove", function (event) {
                 if (mousePos[0] >= 0) {
-                    left += event.clientX - mousePos[0];
-                    top += event.clientY - mousePos[1];
-                    applyPosition();
+                    texPreviewPositionDelta(event.clientX - mousePos[0], event.clientY - mousePos[1]);
                     mousePos = [event.clientX, event.clientY];
                 }
             });
-            window.addEventListener("resize", applyPosition);
+            window.addEventListener("resize", texPreviewPositionDelta);
+        }
+        function updateLatex(latexList, color) {
+            let texContainer = document.getElementById("mathjax-preview");
+            texContainer.innerHTML = "";
+            texContainer.style.color = color;
+            for (var i = 0; i < latexList.length; i++) {
+                var container = document.createElement("div");
+                var line = document.createElement("span");
+                line.textContent = "$\\displaystyle{" + latexList[i] + "}$";
+                container.appendChild(line);
+                texContainer.appendChild(container);
+            }
+            try {
+                MathJax.typeset();
+                texPreviewPositionDelta(0, 0);
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        window.addEventListener("load", async function (event) {
+        document.body.onload = function (event) {
+            console.log("onload");
             var glsl = {};
             let checkboxYup = document.querySelector("#checkbox-yup");
             let checkboxGrid = document.querySelector("#checkbox-grid");
@@ -221,8 +239,42 @@
             let checkboxDiscontinuity = document.querySelector("#checkbox-discontinuity");
             let selectStep = document.querySelector("#select-step");
             let selectColor = document.querySelector("#select-color");
+            let checkboxLatex = document.getElementById("checkbox-latex");
+            let checkboxAutoCompile = document.getElementById("checkbox-auto-compile");
+            let buttonUpdate = document.getElementById("button-update");
+            function getParams() {
+                return {
+                    sStep: selectStep.value,
+                    sColor: selectColor.selectedIndex,
+                    bYup: checkboxYup.checked,
+                    bGrid: checkboxGrid.checked,
+                    bTransparency: checkboxTransparency.checked,
+                    bAnalyGrad: checkboxAnalyGrad.checked,
+                    bDiscontinuity: checkboxDiscontinuity.checked,
+                    cLatex: checkboxLatex.checked,
+                    cAutoCompile: checkboxAutoCompile.checked,
+                }
+            }
+            function setParams(params) {
+                selectStep.value = params.sStep;
+                selectColor.selectedIndex = params.sColor;
+                checkboxYup.checked = params.bYup;
+                checkboxGrid.checked = params.bGrid;
+                checkboxTransparency.checked = params.bTransparency;
+                checkboxAnalyGrad.checked = params.bAnalyGrad;
+                checkboxDiscontinuity.checked = params.bDiscontinuity;
+                checkboxLatex.checked = params.cLatex;
+                checkboxAutoCompile.checked = params.cAutoCompile;
+            }
 
-            // init built-in functions
+            // init parameters
+            try {
+                var params = JSON.parse(localStorage.getItem("ri_Params"));
+                if (params != null) setParams(params);
+            }
+            catch (e) { }
+
+            // init functions
             let select = document.querySelector("#builtin-functions");
             let input = document.querySelector("#equation-input");
             select.innerHTML += "<option value=''>Load example...</option>";
@@ -230,8 +282,10 @@
                 let fun = builtinFunctions[i];
                 select.innerHTML += "<option value=" + fun[1] + ">" + fun[0] + "</option>"
             }
-            let initialExpr = getCookie();
-            if (initialExpr != "") {
+            var initialExpr = "";
+            try {
+                initialExpr = localStorage.getItem("ri_Input");
+                if (initialExpr == null) throw initialExpr;
                 select.childNodes[0].setAttribute("value", initialExpr);
                 var selectId = 0;
                 for (var i = 1; i < select.childNodes.length; i++) {
@@ -241,50 +295,89 @@
                 }
                 select.childNodes[selectId].selected = true;
             }
-            else select.childNodes[1].selected = true;
+            catch (e) {
+                select.childNodes[1].selected = true;
+            }
 
-            // called when update selected function
-            function updateFunctionInput() {
+            // called when update function
+            function updateFunctionInput(forceRecompile) {
                 let errorMessage = document.querySelector("#error-message");
-                errorMessage.style.display = "none";
                 let texContainer = document.getElementById("mathjax-preview");
-                texContainer.innerHTML = "";
+                if (!checkboxLatex.checked) texContainer.innerHTML = "";
                 var expr = input.value;
-                setCookie(expr);
                 try {
-                    var parsed = parseInput(expr);
-                    // LaTeX
-                    for (var i = 0; i < parsed.latex.length; i++) {
-                        var container = document.createElement("div");
-                        var line = document.createElement("span");
-                        line.textContent = "$\\displaystyle{" + parsed.latex[i] + "}$";
-                        container.appendChild(line);
-                        texContainer.appendChild(container);
-                    }
-                    MathJax.typeset();
-                    // GLSL
-                    glsl = postfixToGlsl(parsed.postfix);
-                    console.log(glsl.glsl);
-                    console.log(glsl.glslgrad);
-                    console.log("isCompatible", glsl.isCompatible);
-                    if (!glsl.isCompatible) {
+                    localStorage.setItem("ri_Input", expr);
+                    localStorage.setItem("ri_Params", JSON.stringify(getParams()));
+                } catch (e) { }
+
+                // parse input
+                var parsed = null;
+                try {
+                    parsed = parseInput(expr);
+                    var errmsg = "";
+                    if (parsed.postfix.length == 0) errmsg = "No function to graph.";
+                    if (parsed.postfix.length > 1) errmsg = "Multiple main equations found.";
+                    parsed.postfix.push([]);
+                    parsed.postfix = parsed.postfix[0];
+                    var extraVariables = getVariables(parsed.postfix, true);
+                    extraVariables.delete('e');
+                    if (extraVariables.size != 0) errmsg = "Definition not found: " + Array.from(extraVariables);
+                    if (errmsg != "") {
                         errorMessage.style.display = "inline-block";
-                        errorMessage.style.color = "orange";
-                        errorMessage.innerHTML = "Image may be incorrect on some devices.";
+                        errorMessage.style.color = "red";
+                        errorMessage.innerHTML = errmsg;
+                        updateShaderFunction(null, null);
+                        if (checkboxLatex.checked)
+                            updateLatex(parsed.latex, "white");
+                        return;
                     }
-                    updateShaderFunction(glsl.glsl, glsl.glslgrad,
-                        selectStep.value, selectColor.selectedIndex,
-                        checkboxYup.checked, checkboxGrid.checked,
-                        checkboxTransparency.checked, checkboxAnalyGrad.checked,
-                        checkboxDiscontinuity.checked);
-                } catch (e) {
+                    if (checkboxLatex.checked)
+                        updateLatex(parsed.latex, "white");
+                }
+                catch (e) {
                     console.error(e);
                     errorMessage.style.display = "inline-block";
                     errorMessage.style.color = "red";
                     errorMessage.innerHTML = e;
+                    updateShaderFunction(null, null);
+                    if (parsed != null && checkboxLatex.checked)
+                        updateLatex(parsed.latex, "red");
+                    return;
+                }
+
+                // compile shader
+                if (!(checkboxAutoCompile.checked || forceRecompile === true)) {
+                    errorMessage.style.display = "inline-block";
+                    errorMessage.style.color = "white";
+                    errorMessage.innerHTML = "Parameters have been changed. Click \"update\" to recompile.";
+                    return;
+                }
+                try {
+                    errorMessage.style.display = "none";
+                    if (checkboxLatex.checked)
+                        updateLatex(parsed.latex, "white");
+                    glsl = postfixToGlsl(parsed.postfix);
+                    console.log(glsl.glsl);
+                    console.log(glsl.glslgrad);
+                    if (!glsl.isCompatible) {
+                        errorMessage.style.display = "inline-block";
+                        errorMessage.style.color = "orange";
+                        errorMessage.innerHTML = "Graph may be incorrect on some devices.";
+                    }
+                    updateShaderFunction(glsl.glsl, glsl.glslgrad, getParams());
+                } catch (e) {
+                    errorMessage.style.display = "inline-block";
+                    errorMessage.style.color = "red";
+                    errorMessage.innerHTML = e;
+                    updateShaderFunction(null, null);
+                    if (checkboxLatex.checked)
+                        updateLatex(parsed.latex, "red");
                 }
             }
 
+            buttonUpdate.addEventListener("click", function () { updateFunctionInput(true); });
+            checkboxLatex.addEventListener("input", updateFunctionInput);
+            checkboxAutoCompile.addEventListener("input", updateFunctionInput);
             checkboxYup.addEventListener("input", updateFunctionInput);
             checkboxGrid.addEventListener("input", updateFunctionInput);
             checkboxTransparency.addEventListener("input", updateFunctionInput);
@@ -293,18 +386,25 @@
             selectStep.addEventListener("input", updateFunctionInput);
             selectColor.addEventListener("input", updateFunctionInput);
             select.addEventListener("input", function (event) {
+                resetState();
                 input.value = select.value.replaceAll(";", "\n");
-                updateFunctionInput();
+                updateFunctionInput(true);
             });
             input.addEventListener("input", function (event) {
                 select.value = initialExpr;
                 updateFunctionInput();
             });
+            window.addEventListener("keydown", function (event) {
+                if (event.keyCode == 13 && (event.altKey || event.ctrlKey)) {
+                    event.preventDefault();
+                    updateFunctionInput(true);
+                }
+            })
             input.value = select.value.replaceAll(";", "\n");
 
             // main
             initWebGL();
-            updateFunctionInput();
+            updateFunctionInput(true);
             try {
                 initRenderer();
             } catch (e) {
@@ -312,7 +412,7 @@
                 document.body.innerHTML = "<h1 style='color:red;'>" + e + "</h1>";
             }
             initMathjax();
-        });
+        };
     </script>
 
 </body>
