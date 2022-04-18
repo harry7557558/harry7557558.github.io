@@ -123,8 +123,8 @@ function calcScreenCom() {
     subtractBox(control, 1.1);
     var container = document.getElementById("mathjax-preview");
     var equations = container.children;
-    for (var i = 0; i < equations.length; i++)
-        subtractBox(equations[i], 0.8);
+    // for (var i = 0; i < equations.length; i++)
+    //     subtractBox(equations[i], 0.8);
     var com = [totCom[0] / totArea, 1.0 - totCom[1] / totArea];
     com = [2.0 * (com[0] - 0.5), 2.0 * (com[1] - 0.5)];
     com[0] = Math.max(-0.6, Math.min(0.6, com[0]));

@@ -60,15 +60,15 @@ input, select, button {
 #help-menu {
     display: block;
     position: fixed;
-    margin: 20px 5% auto;
-    left: 0;
-    right: 0;
+    margin: 20px auto;
+    left: 50%;
+    transform: translateX(-50%);
     width: 80%;
     height: 80%;
     max-width: 800px;
     max-height: 800px;
     background-color: rgba(64, 32, 64, 0.9);
-    padding: 20px 40px;
+    padding: 20px 32px 40px 40px;
     font-family: 'Times New Roman';
     line-height: 1.2em;
     color: white;
@@ -90,6 +90,7 @@ input, select, button {
 }
 
 #help-menu h2 {
+    line-height: 1.2em;
     font-size: 1.5em;
     margin: 1.0em 0;
 }

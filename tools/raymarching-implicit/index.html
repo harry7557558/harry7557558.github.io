@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Raymarching Implicit Surface Grapher</title>
-    <meta name="description" content="Raymarching based implicit surface graphing tool." />
+    <meta name="description" content="Raymarching based 3D implicit surface graphing tool." />
     <meta name="keywords"
         content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, function, equation, 3d, webgl" />
 
@@ -90,14 +90,15 @@
         <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one. I was
             inspired by raymarching demos on <a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a>.</p>
         <p>This tool uses the raymarching algorithm to render 3D implicit surfaces. Type equation in the input box, or
-            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Drag when holding Shift to
-            move the graph. Reset viewport by switching to an example and switching back (don't forget to back up your
-            input). Try to play with different selectors, checkboxes, and sliders.</p>
+            look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Drag while holding
+            <code>Shift</code> to move the graph. Reset viewport by switching to an example and switching back (remember
+            to backup your input). Try to play with different selectors, checkboxes, and sliders.
+        </p>
         <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL 2</a> to
             run this tool. An FPS counter will be available if your browser supports the
             <code>EXT_disjoint_timer_query_webgl2</code> extension. If the shader takes too long to compile,
-            unckeck the "auto update" checkbox so the shader won't update unless you click the "update" button or press
-            the <code>Alt+Enter</code> shortcut.
+            unckeck the "auto update" checkbox so the shader won't recompile unless you click the "update" button or
+            press the <code>Alt+Enter</code> shortcut.
         </p>
         <p>A preview of the equation is available via <a href="https://www.mathjax.org/" target="_blank">MathJax</a>.
             You can drag and move the preview, or turn it off/on through the "equation preview" checkbox.</p>
@@ -131,7 +132,7 @@
         <p><b>Grid</b>: When checked, this tool will display an adaptive grid on the surface, making it easier to see
             the size of the object and read the coordinates of a point.</p>
         <p><b>Transparency</b>: Check this if you want the surface to be semi-transparent so you can look through it to
-            see if there's anything inside. (Try the "A5 Star" example.) Warn that checking this may decrease the
+            see if there's anything inside. (Try the "A5 Star" example.) Warn that this may decrease the
             accuracy of the image.</p>
         <p><b>Analytical gradient</b>: This tool requires the gradient of the function to perform raymarching and
             calculating normal. When this is checked, this tool calculates the analytical gradient of the function.
@@ -142,13 +143,13 @@
             (Try the "Sin Terrace" example.)</p>
         <p><b>Lighting angles</b>: As you drag the <i>θ<sub>light</sub></i> slider from left to right, the light moves
             from bottom to bottom counter-clockwise. As you drag the <i>φ<sub>light</sub></i> slider from left to right,
-            the light moves from front to back. Light changes as you rotates the viewport.</p>
+            the light moves from front to back. Light changes as you rotate the viewport.</p>
         <h3>Coloring modes</h3>
-        <p><b>Default</b>: This mode displays a gray, glazed surface. You may or may
+        <p><b>Default</b>: This mode displays a light gray, glazed surface. You may or may
             not see some slight tint depending on your device monitor.</p>
         <p><b>Normal</b>: This mode calculates the albedo of the surface based on the surface normal (normalized
-            gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>direction, blue corresponds
-            the <i>z</i>-direction. When the component of the normal is more positive along a direction, the
+            gradient). Red corresponds the <i>x</i>-direction, green corresponds the <i>y</i>-direction, blue
+            corresponds the <i>z</i>-direction. When the component of the normal is more positive along a direction, the
             corresponding color component is stronger. Visually, the most green part has the most positive <i>y</i>
             normal.</p>
         <p><b>Gradient</b>: This mode colors the surface based on the magnitude of the gradient. The surface appears
@@ -156,7 +157,7 @@
             as it departs. For a perfect SDF, you should see a clean blue color. For where the gradient approaches zero
             or infinity, there may be altenating blue and orange "stripes."</p>
         <h3>Technical details</h3>
-        <p>This tool implements the raymarching algorithm in a WebGL fragment shader. It casts ray from the camera and
+        <p>This tool implements the raymarching algorithm in WebGL fragment shaders. It casts rays from the camera and
             numerically finds its intersections with the surface. The raymarching step size is calculated by dividing
             the value of the scalar field by the magnitude of directional derivative along the ray (in screen
             space), and clamped based on a given step size (can be set through the "quality" selector).</p>
@@ -164,7 +165,7 @@
             result is pooled using min/max functions with adjacent pixels to avoid missing intersections. These passes
             are done in 0.25x of the screen resolution.</p>
         <p>The main raymarching function checks intersections within the calculated intervals. For opaque surface, it
-            uses bisection search to find the zero when the first sign change is encountered, and calculates and returns
+            uses bisection search to find the zero when the first sign change is encountered then calculates and returns
             the color. For semi-transparent surface, it approximates intersection using linear interpolation and
             calculates color each time a sign change is encountered.</p>
         <p>The rendered image goes through an anti-aliasing pass. The pass uses a filter based on linear regression to
@@ -174,7 +175,7 @@
                 href="https://en.wikipedia.org/wiki/Shunting-yard_algorithm" target="_blank">shunting-yard algorithm</a>
             with preprocessing. When generating GLSL code, a postfix notation is evaluated while being divided into
             steps, and its analytical gradient can be calculated via automatic differentiation. Generated GLSL code is
-            logged to the console when the input is updated.</p>
+            logged to the console when the input is updated, which can be found using the F12 developer tool.</p>
         <p>The source code of this tool is available on <a
                 href="https://github.com/harry7557558/harry7557558.github.io/tree/master/tools/raymarching-implicit"
                 target="_blank">GitHub</a>.</p>
@@ -356,7 +357,7 @@
                 if (!(checkboxAutoCompile.checked || forceRecompile === true)) {
                     errorMessage.style.display = "inline-block";
                     errorMessage.style.color = "white";
-                    errorMessage.innerHTML = "Parameters have been changed. Click \"update\" to recompile shader.";
+                    errorMessage.innerHTML = "Parameter(s) have been changed. Click \"update\" to recompile shader.";
                     return;
                 }
                 try {

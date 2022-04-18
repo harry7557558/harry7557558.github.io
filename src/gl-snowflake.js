@@ -172,17 +172,17 @@ function setupSnowflakeRenderer() {
 
     // interactions
     var mouseDown = false;
-    canvas.addEventListener('mousedown', function (event) {
+    canvas.addEventListener('pointerdown', function (event) {
         mouseDown = true;
         renderer.uniforms.iMouse[0] = event.clientX;
         renderer.uniforms.iMouse[1] = canvas.height - event.clientY;
         renderer.uniforms.iMouse[2] = 1.0;
     });
-    window.addEventListener('mouseup', function (event) {
+    window.addEventListener('pointerup', function (event) {
         mouseDown = false;
         renderer.uniforms.iMouse[2] = -1.0;
     });
-    canvas.addEventListener('mousemove', function (event) {
+    canvas.addEventListener('pointermove', function (event) {
         if (mouseDown) {
             renderer.uniforms.iMouse[0] = event.clientX;
             renderer.uniforms.iMouse[1] = canvas.height - event.clientY;

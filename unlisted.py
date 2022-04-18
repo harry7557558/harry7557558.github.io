@@ -3,7 +3,7 @@
 import os
 import urllib.parse
 
-root = os.path.dirname(__file__)
+root = os.path.dirname(__file__).replace('\\', '/')
 
 
 def getFileSize(path):
@@ -45,7 +45,8 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
         content += "<div class='dir'>\n" + \
             dirs_content[i].replace('\n', '\n    ')+"\n</div>\n"
     if len(files):
-        content += "    <table>\n"
+        is_root = root.strip('/') == _dir.strip('/')
+        content += "    <table" + " style='margin-left:0'"*is_root + ">\n"
         for fn in files:
             ext = getExtension(fn)
             if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'mp4']:
