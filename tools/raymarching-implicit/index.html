@@ -20,7 +20,7 @@
             svg: {
                 fontCache: 'global'
             },
-            options: { enableMenu: false }
+            // options: { enableMenu: false }
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
@@ -48,7 +48,8 @@
         <span title="Automatically update the shader on input"><input type="checkbox" id="checkbox-auto-compile"
                 checked />auto update</span>&ensp;
         <br />
-        <textarea id="equation-input" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+        <textarea id="equation-input" spellcheck="false" autocapitalize="off" autocorrect="off"
+            data-gramm="false"></textarea>
         <br />
         <span><select id="select-step">
                 <option value="0.04">low</option>
@@ -78,7 +79,7 @@
         <span><i>φ<sub>light</sub></i>&nbsp;<input type="range" id="slider-phi" min="0" max="180" value="30"
                 style="width:60px" /></span>
         <br />
-        <p id="error-message" style="display:none;white-space:normal;margin-bottom:0"></p>
+        <p id="error-message" style="display:none"></p>
     </div>
 
     <div id="mathjax-preview" style="left:0px;top:0px"></div>
@@ -86,16 +87,17 @@
     <div id="help-menu" style="visibility:hidden">
         <div id="help-menu-hide" onclick='document.getElementById("help-menu").style.visibility="hidden"'>×</div>
         <h2>Raymarching Implicit Surface Grapher</h2>
-        <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one. Inspired by
-            raymarching demos on <a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a>.</p>
+        <p>By Harry Chen (harry7557558) - I couldn't find a satisfying tool on the internet, so I made one. I was
+            inspired by raymarching demos on <a href="https://www.shadertoy.com/" target="_blank">Shadertoy</a>.</p>
         <p>This tool uses the raymarching algorithm to render 3D implicit surfaces. Type equation in the input box, or
             look at some examples. Drag the canvas to rotate, scroll to zoom in/out. Drag when holding Shift to
-            move the graph. Try to play with different selectors, checkboxes, and sliders.</p>
+            move the graph. Reset viewport by switching to an example and switching back (don't forget to back up your
+            input). Try to play with different selectors, checkboxes, and sliders.</p>
         <p>You need a device/browser that supports <a href="https://webglreport.com/?v=2" target="_blank">WebGL 2</a> to
             run this tool. An FPS counter will be available if your browser supports the
-            <code>EXT_disjoint_timer_query_webgl2</code> extension. If the shader takes too long to compile, try to
-            unckeck the "auto update" checkbox and update the shader by clicking the "update" button or pressing the
-            <code>Alt+Enter</code> shortcut.
+            <code>EXT_disjoint_timer_query_webgl2</code> extension. If the shader takes too long to compile,
+            unckeck the "auto update" checkbox so the shader won't update unless you click the "update" button or press
+            the <code>Alt+Enter</code> shortcut.
         </p>
         <p>A preview of the equation is available via <a href="https://www.mathjax.org/" target="_blank">MathJax</a>.
             You can drag and move the preview, or turn it off/on through the "equation preview" checkbox.</p>
@@ -184,8 +186,12 @@
             let container = document.querySelector("#mathjax-preview");
             var left = Number(container.style.left.replace(/px$/, '')) + dx;
             var top = Number(container.style.top.replace(/px$/, '')) + dy;
-            left = Math.max(0, Math.min(left, window.innerWidth - container.clientWidth));
-            top = Math.max(0, Math.min(top, window.innerHeight - container.clientHeight));
+            var minLeft = Math.min(0, window.innerWidth - container.clientWidth);
+            var maxRight = Math.max(window.innerWidth, container.clientWidth);
+            var minTop = Math.min(0, window.innerHeight - container.clientHeight);
+            var maxBottom = Math.max(window.innerHeight, container.clientHeight);
+            left = Math.max(minLeft, Math.min(left, maxRight - container.clientWidth));
+            top = Math.max(minTop, Math.min(top, maxBottom - container.clientHeight));
             container.style.left = left + "px";
             container.style.top = top + "px";
         }
@@ -218,6 +224,7 @@
                 var container = document.createElement("div");
                 var line = document.createElement("span");
                 line.textContent = "$\\displaystyle{" + latexList[i] + "}$";
+                line.innerHTML += "<!--" + latexList[i] + "-->";
                 container.appendChild(line);
                 texContainer.appendChild(container);
             }
@@ -349,7 +356,7 @@
                 if (!(checkboxAutoCompile.checked || forceRecompile === true)) {
                     errorMessage.style.display = "inline-block";
                     errorMessage.style.color = "white";
-                    errorMessage.innerHTML = "Parameters have been changed. Click \"update\" to recompile.";
+                    errorMessage.innerHTML = "Parameters have been changed. Click \"update\" to recompile shader.";
                     return;
                 }
                 try {
@@ -398,6 +405,12 @@
                 if (event.keyCode == 13 && (event.altKey || event.ctrlKey)) {
                     event.preventDefault();
                     updateFunctionInput(true);
+                }
+                else if (event.keyCode == 191 && event.ctrlKey) {
+                    let control = document.getElementById("control");
+                    if (control.style.display == "none")
+                        control.style.display = "block";
+                    else control.style.display = "none";
                 }
             })
             input.value = select.value.replaceAll(";", "\n");

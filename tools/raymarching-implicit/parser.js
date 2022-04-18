@@ -83,6 +83,7 @@ function MathFunction(names, numArgs, latex, glsl, glslgrad) {
 }
 const mathFunctions = (function () {
     const funs0 = [
+        new MathFunction(['if'], 3, '\\operatorname{if}\\left\\{%1>0:%2,%3\\right\\}', '((%1)>0.?%2:%3)', '((%1)>0.?$2:$3)'),  // not efficient in GLSL because all are evaluated
         new MathFunction(['mod'], 2, '\\operatorname{mod}\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
         new MathFunction(['fract', 'frac'], 1, '\\operatorname{frac}\\left(%1\\right)', 'fract(%1)', '$1'),
         new MathFunction(['floor'], 1, '\\lfloor{%1}\\rfloor', 'floor(%1)', 'vec3(0)'),
@@ -225,17 +226,22 @@ function exprToPostfix(expr, mathFunctions) {
             });
         }
         else if (/[A-Za-z_\d\.\(\)\^]/.test(expr[i]) || eb.pc > 0) {
-            eb.s += expr[i];
-            if (expr[i] == '(') eb.pc += 1;
-            if (expr[i] == ')') {
+            if (expr[i] == '(') {
+                eb.s += expr[i];
+                eb.pc += 1;
+            }
+            else if (expr[i] == ')') {
                 while (expr1s[expr1s.length - 1].pc == 0) {
                     var s1 = expr1s[expr1s.length - 1].s;
-                    if (/^\-/.test(s1)) s1 = "(0" + eb.s + ")";
+                    if (/^\-/.test(s1)) s1 = "(0" + s1 + ")";
                     expr1s.pop();
                     expr1s[expr1s.length - 1].s += s1;
                 }
+                eb = expr1s[expr1s.length - 1];
+                eb.s += expr[i];
                 eb.pc -= 1;
             }
+            else eb.s += expr[i];
         }
         else if (/^\-/.test(eb.s)) {
             var e1 = "(0" + eb.s + ")" + expr[i];
@@ -452,7 +458,7 @@ function parseInput(input) {
     };
     var functions_str = {};
     var variables_str = {};
-    var mainEqus = [];  // main equation
+    var mainEqusLr = [];  // main equation left/right
     for (var i = 0; i < input.length; i++) {
         var line = input[i].trim();
         if (/\#/.test(line)) line = line.substring(0, line.search('#')).trim();
@@ -466,7 +472,7 @@ function parseInput(input) {
                 if (left.length >= 2 && left[1] != "_") left = left[0] + "_" + left.substring(1, left.length);
                 // main equation
                 if (isIndependentVariable(left)) {
-                    mainEqus.push("(" + balanceParenthesis(left) + ")-(" + balanceParenthesis(right) + ")");
+                    mainEqusLr.push({ left: balanceParenthesis(left), right: balanceParenthesis(right) });
                 }
                 // definition
                 else {
@@ -482,7 +488,7 @@ function parseInput(input) {
                 var fun = parseFunction(left);
                 // main equation
                 if (mathFunctions[fun[0]] != undefined) {
-                    mainEqus.push(left + "-(" + balanceParenthesis(right) + ")");
+                    mainEqusLr.push({ left: left, right: balanceParenthesis(right) });
                 }
                 // function definition
                 else {
@@ -496,13 +502,13 @@ function parseInput(input) {
             }
             // main equation
             else {
-                if (Number(right) == '0') mainEqus.push(left);
-                else mainEqus.push("(" + balanceParenthesis(left) + ")-(" + balanceParenthesis(right) + ")");
+                if (Number(right) == '0') mainEqusLr.push({ left: balanceParenthesis(left), right: '0' });
+                else mainEqusLr.push({ left: balanceParenthesis(left), right: balanceParenthesis(right) });
             }
         }
         // main equation
         else {
-            mainEqus.push(line);
+            mainEqusLr.push({ left: line, right: '0' })
         }
     }
 
@@ -521,6 +527,10 @@ function parseInput(input) {
     }
     for (var funname in functions_str) {
         let fun = functions[funname];
+        for (var i = 0; i < fun.numArgs; i++) {
+            if (functions_str.hasOwnProperty(fun.args[i]))
+                throw "You can't use function name \"" + fun.args[i] + "\" as a function argument name.";
+        }
         fun.postfix = exprToPostfix(fun.definition, functions);
     }
     var variables = {};
@@ -532,8 +542,19 @@ function parseInput(input) {
             'resolving': false
         };
     }
-    for (var i = 0; i < mainEqus.length; i++)
-        mainEqus[i] = exprToPostfix(mainEqus[i], functions);
+    var mainEqus = [];
+    for (var i = 0; i < mainEqusLr.length; i++) {
+        mainEqusLr[i].left = exprToPostfix(mainEqusLr[i].left, functions);
+        mainEqusLr[i].right = exprToPostfix(mainEqusLr[i].right, functions);
+        if (mainEqusLr[i].right.length == 1 && Number(mainEqusLr[i].right[0].str) == 0) {
+            mainEqus.push(mainEqusLr[i].left);
+        }
+        else {
+            var left = mainEqusLr[i].left;
+            var right = mainEqusLr[i].right;
+            mainEqus.push(left.concat(right).concat([new Token('operator', '-')]));
+        }
+    }
 
     // resolve dependencies
     function dfs(equ, variables) {
@@ -565,6 +586,8 @@ function parseInput(input) {
                     var variables1 = {};
                     for (var varname in variables)
                         variables1[varname] = variables[varname];
+                    if (stack.length < fun.numArgs)
+                        throw "No enough arguments for function " + equ[i].str;
                     for (var j = 0; j < fun.numArgs; j++) {
                         variables1[fun.args[j]] = {
                             'postfix': stack[stack.length - fun.numArgs + j],
@@ -689,7 +712,7 @@ function divEvalObjects(a, b) {
     );
 }
 function powEvalObjects(a, b) {
-    if (a.glsl == 'e' || a.glsl == new String(Math.E)) {
+    if (a.glsl == 'e' || a.glsl == '' + Math.E) {
         return new EvalObject(
             a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             "exp(" + b.glsl + ")",
@@ -765,18 +788,20 @@ function postfixToGlsl(queue) {
         else if (token.type == "variable") {
             var s = token.str;
             var grad = "vec3(0)";
+            var isNumeric = false;
             if (isIndependentVariable(token.str)) {
                 if (token.str == 'x') grad = "vec3(1,0,0)";
                 if (token.str == 'y') grad = "vec3(0,1,0)";
                 if (token.str == 'z') grad = "vec3(0,0,1)";
             }
             else if (token.str == "e") {
-                s = new String(Math.E);
+                s = '' + Math.E;
+                isNumeric = true;
             }
             else {
                 throw "Undeclared variable " + token.str;
             }
-            stack.push(new EvalObject([token], s, grad, grad == "0", token.str == 'e', true));
+            stack.push(new EvalObject([token], s, grad, grad == "0", isNumeric, true));
         }
         // operators
         else if (token.type == "operator") {
@@ -981,7 +1006,8 @@ var builtinFunctions = [
     ["Sin Tower 2", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
     ["Atan2 Drill", "max(cos(atan(y,x)-20e^((z-1)/4)),x^2+y^2+z/2-1)"],
     ["Atan2 Flower", "a=atan2(y,x);(x^2+y^2)^2+16z^2=2(x^2+y^2)(sin(2.5a)^2+0.5sin(10a)^2)"],
-    ["Lerp Spiky", "lerp(max(|x|,|y|,|z|),sqrt(x^2+y^2+z^2),-1)-0.3"],
+    ["Lerp Example", "lerp(max(|x|,|y|,|z|),sqrt(x^2+y^2+z^2),-1)-0.3"],
+    ["If Example", "z=if(sin(2x),1/5sin(2y),1/2cos(2y))"],
     ["Eyes", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
     ["Spiral", "k=0.15&ensp;#&ensp;r=e^kt;p=3.1415926&ensp;#&ensp;pi;#&ensp;polar&ensp;coordinates;r=2sqrt(x^2+y^2);a=atan(y,x);#&ensp;index&ensp;of&ensp;spiral&ensp;layer;n=min((log(r)/k-a)/(2p),1);#&ensp;distance&ensp;to&ensp;logarithmic&ensp;spiral;d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
     ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
@@ -991,9 +1017,10 @@ var builtinFunctions = [
     ["Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);log(u6(x-1/2,sqrt(y^2+z^2))^2+v6(x-1/2,sqrt(y^2+z^2))^2)=0"],
     ["Burning Ship", "u(x,y)=x^2-y^2;v(x,y)=2abs(xy);u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);z=(u6((x-1)/1.5,(y-1/2)/1.5)^2+v6((x-1)/1.5,(y-1/2)/1.5)^2)^-0.1-1"],
     ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);log(u2(x/2,y/2,z/2)^2+v2(x/2,y/2,z/2)^2+w2(x/2,y/2,z/2)^2)=0"],
+    ["Conch (slow)", "#&ensp;Explore&ensp;the&ensp;limit&ensp;of&ensp;this&ensp;grapher;p=3.1415926&ensp;#&ensp;pi;a_o=0.16*p&ensp;#&ensp;half&ensp;of&ensp;opening&ensp;angle;b=0.6&ensp;#&ensp;r=e^bt;s_min(a,b,k)=-1/k*ln(e^-ka+e^-kb)&ensp;#&ensp;smoothed&ensp;minimum;;#&ensp;Cross&ensp;section;C_m(u,v)=1-(1-0.01e^sin(12p(u+2v)))e^-(5v)^2&ensp;&ensp;#&ensp;mid&ensp;rod;C_s(u,v)=(sqrt((u-e^-16v)^2+(v(1-0.2exp(-4sqrt(u^2+0.1^2)))-0.5+0.5e^(-v)sin(4u)+0.2cos(2u)e^-v)^2)-0.55)tanh(5sqrt(2u^2+(v-1.2)^2))+0.01sin(40u)sin(40v)exp(-(u^2+v^2));C0(u,v)=abs(C_s(u,v))C_m(u,v)&ensp;#&ensp;single&ensp;layer;n1(u,v)=log(sqrt(u^2+v^2))/b+2&ensp;#&ensp;index&ensp;of&ensp;layer;a1(u,v)=atan(v,u)/a_o&ensp;#&ensp;opening&ensp;angle,&ensp;0-1;d1(u,v,s_d)=0.5sqrt(u^2+v^2)*C0(if(n1(u,v),n1(u,v)-s_d,fract(n1(u,v))-s_d),a1(u,v));C(u,v)=min(d1(u,v,0.5),d1(u,v,1.5))&ensp;#&ensp;cross&ensp;section;;#&ensp;Spiral;l_p(x,y)=exp(b*atan(y,x)/(2p))&ensp;#&ensp;a&ensp;multiplying&ensp;factor;U(x,y,z)=exp(log(-z)+b*atan(y,x)/(2p))&ensp;#&ensp;xyz&ensp;to&ensp;cross&ensp;section&ensp;u;V(x,y,z)=sqrt(x^2+y^2)*l_p(x,y)&ensp;#&ensp;xyz&ensp;to&ensp;cross&ensp;section&ensp;v;S_s(x,y,z)=C(U(x,y,z),V(x,y,z))/l_p(x,y)&ensp;#&ensp;body;S_o(x,y,z)=sqrt((C(exp(log(-z)-b/2),-x*exp(-b/2))*exp(b/2))^2+y^2)&ensp;#&ensp;opening;S_t(x,y,z)=d1(-z,sqrt(x^2+y^2),0.5)&ensp;#&ensp;tip;S_a(x,y,z)=if(-z,min(S_s(x,y,z),S_o(x,y,z)),S_t(x,y,z))&ensp;#&ensp;body+tip;S0(x,y,z)=S_a(x,y,z)-0.01-0.01(x^2+y^2+z^2)^0.4-0.02sqrt(x^2+y^2)exp(cos(8atan(y,x)))&ensp;#&ensp;subtract&ensp;thickness;S(x,y,z)=-s_min(-S0(x,y,z),z+1.7,10)&ensp;#&ensp;clip&ensp;bottom;S(0.4x,0.4y,0.4z-0.5)=0"]
 ];
 if (0) builtinFunctions = [ // debug
-    ['test', "(x-e^-(10y)^2)^2"],
+    ['debug', "z=-e^-(x^2+y^2"],
     // ['bridge', "x^2+y^2z+z^2=0.01"],
     // ["A6 Heart", "(x^2+9/4*y^2+z^2-1)^3=(x^2+9/80*y^2)*z^3"],
     // ["test", "g(x,y)=tanh(x)*tanh(y);g(x+y,x-y)-z"],
@@ -1012,6 +1039,7 @@ if (typeof (window) === "undefined") {  // debug in node.js
         let expr = builtinFunctions[i][1];
         var tt0 = performance.now();
         let parsed = parseInput(expr);
+        // console.log(parsed.postfix);
         let glsl = postfixToGlsl(parsed.postfix[0]);
         // console.log(glsl);
         console.log(parsed.latex);

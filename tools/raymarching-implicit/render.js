@@ -126,7 +126,10 @@ function calcScreenCom() {
     for (var i = 0; i < equations.length; i++)
         subtractBox(equations[i], 0.8);
     var com = [totCom[0] / totArea, 1.0 - totCom[1] / totArea];
-    return [2.0 * (com[0] - 0.5), 2.0 * (com[1] - 0.5)];
+    com = [2.0 * (com[0] - 0.5), 2.0 * (com[1] - 0.5)];
+    com[0] = Math.max(-0.6, Math.min(0.6, com[0]));
+    com[1] = Math.max(-0.6, Math.min(0.6, com[1]));
+    return com;
 }
 
 function calcTransformMatrix(state) {
@@ -452,7 +455,7 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
-    screenCom: [0.5, 0.5],
+    screenCom: [0.0, 0.0],
     defaultScreenCom: true,
     rz: -0.9 * Math.PI,
     rx: -0.4 * Math.PI,
@@ -598,8 +601,8 @@ function initRenderer() {
             var dx = event.movementX, dy = event.movementY;
             if (event.shiftKey) { // center
                 state.defaultScreenCom = false;
-                state.screenCom[0] += dx / state.width;
-                state.screenCom[1] -= dy / state.height;
+                state.screenCom[0] += 1.5 * dx / state.width;
+                state.screenCom[1] -= 1.5 * dy / state.height;
             }
             else {  // rotate
                 var k = fingerDist > 0. ? 0.001 : 0.01;
