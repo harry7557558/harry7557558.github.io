@@ -22,7 +22,8 @@ var state = {
     rz: -0.9 * Math.PI,
     rx: 0.1 * Math.PI,
     dist: 5.0,
-    renderNeeded: true
+    renderNeeded: true,
+    iFrame: 0
 };
 
 // request shader sources
@@ -63,16 +64,16 @@ function createSampleTexture(width, height) {
     const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
     const level = 0;
-    const internalFormat = gl.RGBA8;
+    const internalFormat = gl.RGBA32F;
     const border = 0;
     const format = gl.RGBA;
-    const type = gl.UNSIGNED_BYTE;
+    const type = gl.FLOAT;
     const data = null;
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
         width, height, border,
         format, type, data);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     return tex;
@@ -83,9 +84,11 @@ function createRenderTarget(width, height) {
     const framebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    const sampler = createSampleTexture(gl, width, height);
     return {
         texture: tex,
-        framebuffer: framebuffer
+        framebuffer: framebuffer,
+        sampler: sampler
     };
 }
 function destroyRenderTarget(target) {
@@ -141,14 +144,18 @@ function initWebGL() {
     // get context
     renderer.canvas = document.getElementById("canvas");
     renderer.gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2");
-    if (renderer.gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
+    if (renderer.gl == null)
+        throw new Error("Error: Your browser may not support WebGL 2.");
+    if (renderer.gl.getExtension("EXT_color_buffer_float") == null)
+        throw new Error("Error: Your device does not support the `EXT_color_buffer_float` extension.");
 
     // load GLSL source
     console.time("load glsl code");
     renderer.vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 fragUv;" +
         "void main(){fragUv=vertexPosition.xy;gl_Position=vertexPosition;}";
-    renderer.renderSource = loadShaderSource("render.glsl");
-    renderer.displaySource = loadShaderSource("render.glsl");
+    renderer.renderSource = loadShaderSource("render-pt.glsl");
+    renderer.displaySource = "#version 300 es\nprecision highp float;uniform sampler2D sImage;out vec4 fragColor;" +
+        "void main(){fragColor=vec4(texelFetch(sImage,ivec2(gl_FragCoord.xy),0).xyz,1.0);}";
     console.timeEnd("load glsl code");
 
     // position buffer
@@ -172,13 +179,26 @@ function initWebGL() {
 
     // textures
     renderer.texFloor = loadTexture("tex-floor.jpg");
+
+    // render targets
+    function reloadRenderTargets() {
+        state.width = canvas.width = canvas.style.width = window.innerWidth;
+        state.height = canvas.height = canvas.style.height = window.innerHeight;
+        if (renderer.renderTarget != undefined) {
+            renderer.gl.deleteFramebuffer(renderer.renderTarget.framebuffer);
+            renderer.gl.deleteTexture(renderer.renderTarget.texture);
+        }
+        renderer.renderTarget = createRenderTarget(state.width, state.height);
+        state.renderNeeded = true;
+    }
+    reloadRenderTargets();
+    window.addEventListener("resize", reloadRenderTargets);
 }
 
 
 // call this function to re-render
 async function drawScene() {
     let gl = renderer.gl;
-    let antiAliaser = renderer.antiAliaser;
 
     // set position buffer for vertex shader
     function setPositionBuffer(program) {
@@ -201,17 +221,35 @@ async function drawScene() {
     // render image
     gl.viewport(0, 0, state.width, state.height);
     gl.useProgram(renderer.renderProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, renderer.renderTarget.framebuffer);
     setPositionBuffer(renderer.renderProgram);
+    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "ZERO"), 0);
+    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "iFrame"), state.iFrame);
     gl.uniform2f(gl.getUniformLocation(renderer.renderProgram, "uResolution"),
         state.width, state.height);
-    gl.uniform2f(gl.getUniformLocation(renderer.renderProgram, "uRotate"), state.rx, state.rz);
-    gl.uniform1f(gl.getUniformLocation(renderer.renderProgram, "uDist"), state.dist);
+    gl.uniform2f(gl.getUniformLocation(renderer.renderProgram, "uRotate"),
+        state.rx, state.rz);
+    gl.uniform1f(gl.getUniformLocation(renderer.renderProgram, "uDist"),
+        state.dist = Math.min(Math.max(state.dist, 2.5), 200));
     gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.sampler);
+    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "sSelf"), 0);
+    gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, renderer.texFloor);
-    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "texFloor"), 0);
+    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "texFloor"), 1);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.sampler);
+    gl.copyTexImage2D(gl.TEXTURE_2D,
+        0, gl.RGBA32F, 0, 0, state.width, state.height, 0);
 
+    gl.viewport(0, 0, state.width, state.height);
+    gl.useProgram(renderer.displayProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    setPositionBuffer(renderer.displayProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.texture);
+    gl.uniform1i(gl.getUniformLocation(renderer.displayProgram, "sImage"), 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
 // load renderer/interaction
@@ -221,12 +259,15 @@ function initRenderer() {
 
     // rendering
     function render() {
-        if (state.renderNeeded) {
+        if (state.renderNeeded) state.iFrame = 0;
+        if (state.iFrame < 256) {
+            // console.log("iFrame", state.iFrame);
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
             drawScene();
-            state.renderNeeded = false;
+            state.iFrame += 1;
         }
+        state.renderNeeded = false;
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
