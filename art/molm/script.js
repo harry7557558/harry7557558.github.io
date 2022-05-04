@@ -19,7 +19,7 @@ var renderer = {
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
-    rz: -0.9 * Math.PI,
+    rz: -0.1 * Math.PI,
     rx: 0.1 * Math.PI,
     dist: 5.0,
     renderNeeded: true,
@@ -154,6 +154,7 @@ function initWebGL() {
     renderer.vsSource = "#version 300 es\nin vec4 vertexPosition;out vec2 fragUv;" +
         "void main(){fragUv=vertexPosition.xy;gl_Position=vertexPosition;}";
     renderer.renderSource = loadShaderSource("render-pt.glsl");
+    // renderer.renderSource = loadShaderSource("model-sdf.glsl");
     renderer.displaySource = "#version 300 es\nprecision highp float;uniform sampler2D sImage;out vec4 fragColor;" +
         "void main(){fragColor=vec4(texelFetch(sImage,ivec2(gl_FragCoord.xy),0).xyz,1.0);}";
     console.timeEnd("load glsl code");
@@ -171,9 +172,9 @@ function initWebGL() {
         renderer.displayProgram = createShaderProgram(renderer.vsSource, renderer.displaySource);
     }
     catch (e) {
-        console.error(e);
         renderer.renderProgram = null;
         renderer.displayProgram = null;
+        throw e;
     }
     console.timeEnd("compile shader");
 
@@ -260,7 +261,7 @@ function initRenderer() {
     // rendering
     function render() {
         if (state.renderNeeded) state.iFrame = 0;
-        if (state.iFrame < 256) {
+        if (state.iFrame < 1000) {
             // console.log("iFrame", state.iFrame);
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
@@ -298,7 +299,7 @@ function initRenderer() {
             var k = fingerDist > 0. ? 0.0005 : 0.005;
             state.rx += k * dy;
             state.rz += k * dx;
-            state.rx = Math.min(Math.max(state.rx, 0.0), Math.PI);
+            // state.rx = Math.min(Math.max(state.rx, 0.0), Math.PI);
             state.renderNeeded = true;
         }
     });
@@ -313,8 +314,6 @@ function initRenderer() {
         fingerDist = -1.0;
     }, { passive: true });
     canvas.addEventListener("touchmove", function (event) {
-        if (renderer.raymarchProgram == null)
-            return;
         if (event.touches.length == 2) {
             var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
             var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
