@@ -14,8 +14,8 @@ uniform sampler2D sSelf;
 
 #define PI 3.1415926
 
-// external textures
-uniform sampler2D texFloor;
+// external texture(s)
+uniform sampler2D texPortrait;
 
 
 // Modeling primitives
@@ -52,6 +52,11 @@ float sdEllipsoid(vec3 p, vec3 r) {
 float sdBox(vec3 p, vec3 b) {
     vec3 q = abs(p) - b;
     return length(max(q,vec3(0))) + min(max(q.x,max(q.y,q.z)),0.0);
+}
+float sdLnNormEllipsoid(vec3 p, vec3 r, vec3 n) {
+    float d = pow(dot(pow(abs(p)/r,n),vec3(1)),1.0/max(max(n.x,n.y),n.z))-1.0;
+    float m = min(min(r.x,r.y),r.z);
+    return d * m;
 }
 
 vec3 hash33(vec3 p3) {
@@ -151,6 +156,20 @@ vec3 gradToken(in vec3 p) {
 	return (.25/h)*vec3(a+b-c-d,a-b+c-d,a-b-c+d);
 }
 
+const vec3 boxRadiusCrystal = 0.75*vec3(0.2,0.8,1.0)+0.01;
+float mapCrystal(vec3 p) {
+    return sdLnNormEllipsoid(p, (boxRadiusCrystal-0.01)*vec3(vec2(0.9-0.1*sin(p.z)),1), vec3(4.0));
+}
+vec3 gradCrystal(in vec3 p) {
+    const float h = 0.01;
+	float a = mapCrystal(p+vec3( h, h, h));
+	float b = mapCrystal(p+vec3( h,-h,-h));
+	float c = mapCrystal(p+vec3(-h, h,-h));
+	float d = mapCrystal(p+vec3(-h,-h, h));
+	return (.25/h)*vec3(a+b-c-d,a-b+c-d,a-b-c+d);
+}
+
+
 
 // Primitive intersection functions
 
@@ -181,10 +200,8 @@ bool intersectBox(vec3 boxRadius, vec3 ro, vec3 rd, out float tn, out float tf) 
 
 // Raymarching intersection functions
 
-#define MIN_STEP 0.005
-#define MAX_STEP 0.1
-
 bool intersectHelmet(vec3 ro, vec3 rd, inout float t) {
+    const float MIN_STEP = 0.005, MAX_STEP = 0.1;
     // intersect bounding box
     float t0, t1;
     if (!intersectBox(boxRadiusHelmet, ro, rd, t0, t1)) return false;
@@ -196,9 +213,9 @@ bool intersectHelmet(vec3 ro, vec3 rd, inout float t) {
     float dt = clamp(abs(v_old), MIN_STEP, MAX_STEP);
     for (int i=ZERO; i<128; i++) {
         t += dt;
-        if (t > t1) return false;
         v = mapHelmet(ro+rd*t, false).w;
         if (v*v_old<0.) break;
+        if (t > t1) return false;
         dt = clamp(abs(v), MIN_STEP, MAX_STEP);
         v_old = v;
     }
@@ -218,6 +235,7 @@ bool intersectHelmet(vec3 ro, vec3 rd, inout float t) {
 }
 
 bool intersectToken(vec3 ro, vec3 rd, inout float t) {
+    const float MIN_STEP = 0.005, MAX_STEP = 0.1;
     // intersect bounding box
     float t0, t1;
     if (!intersectBox(boxRadiusToken, ro, rd, t0, t1)) return false;
@@ -229,9 +247,9 @@ bool intersectToken(vec3 ro, vec3 rd, inout float t) {
     float dt = clamp(abs(v_old), MIN_STEP, MAX_STEP);
     for (int i=ZERO; i<128; i++) {
         t += dt;
-        if (t > t1) return false;
         v = mapToken(ro+rd*t, false).w;
         if (v*v_old<0.) break;
+        if (t > t1) return false;
         dt = clamp(abs(v), MIN_STEP, MAX_STEP);
         v_old = v;
     }
@@ -250,6 +268,39 @@ bool intersectToken(vec3 ro, vec3 rd, inout float t) {
     return false;
 }
 
+bool intersectCrystal(vec3 ro, vec3 rd, inout float t) {
+    const float MIN_STEP = 0.01, MAX_STEP = 0.2;
+    // intersect bounding box
+    float t0, t1;
+    if (!intersectBox(boxRadiusCrystal, ro, rd, t0, t1)) return false;
+    if (t1 < 0. || t0 > t) return false;
+    t0 = max(t0, 0.0), t1 = min(t1, t);
+    // raymarching
+    t = t0;
+    float v_old = mapCrystal(ro+rd*t), v;
+    float dt = clamp(abs(v_old), MIN_STEP, MAX_STEP);
+    for (int i=ZERO; i<128; i++) {
+        t += dt;
+        v = mapCrystal(ro+rd*t);
+        if (v*v_old<0.) break;
+        if (t > t1) return false;
+        dt = clamp(dt*abs(v/(v-v_old)), MIN_STEP, MAX_STEP);
+        v_old = v;
+    }
+    if (v*v_old<0.) {
+        float t0 = t-dt, v0 = v_old;
+        float t1 = t, v1 = v;
+        for (int s = ZERO; s < 6; s += 1) {
+            t = 0.5*(t0+t1);
+            v = mapCrystal(ro+rd*t);
+            if (v*v0<0.) t1=t, v1=v;
+            else t0=t, v0=v;
+        }
+        t = t0 + (t1-t0) * clamp(v0/(v0-v1), 0., 1.);
+        return true;
+    }
+    return false;
+}
 
 // Random number generator
 uint rand_seed = 0u, rand_base = 0u;
@@ -360,6 +411,22 @@ vec3 sampleBrdf(
     return wo.x * u + wo.y * v + wo.z * n;
 }
 
+// refraction
+vec3 sampleFresnelRefraction(vec3 rd, vec3 n, float n1, float n2) {
+    float eta = n1 / n2;
+    float ci = -dot(n, rd);
+    if (ci < 0.0) ci = -ci, n = -n;
+    float ct = 1.0 - eta * eta * (1.0 - ci * ci);
+    if (ct < 0.0) return rd + 2.0*ci*n;
+    ct = sqrt(ct);
+    float Rs = (n1 * ci - n2 * ct) / (n1 * ci + n2 * ct);
+    float Rp = (n1 * ct - n2 * ci) / (n1 * ct + n2 * ci);
+    float R = 0.5 * (Rs * Rs + Rp * Rp);
+    return randf() > R ?
+        rd * eta + n * (eta * ci - ct)  // refraction
+        : rd + 2.0*ci*n;  // reflection
+}
+
 
 // Scene
 
@@ -369,6 +436,7 @@ vec3 sampleBrdf(
 #define ID_SPHERE 3  /*for testing materials*/
 #define ID_HELMET 4
 #define ID_TOKEN 5
+#define ID_CRYSTAL 6
 
 #define EPSILON 1e-3
 #define UPSILON 1e3
@@ -379,41 +447,37 @@ vec3 sampleBrdf(
 
 #define posHelmet vec3(0,0,0.54)
 #define rotHelmet rotx(0.04*PI)
-
 #define posToken vec3(0.5,1.0,0.05)
-#define rotToken (1.0*rotz(0.4*PI))
+#define rotToken rotz(0.4*PI)
+#define posCrystal vec3(1.0,-1.5,boxRadiusCrystal.z)
+#define rotCrystal rotz(0.15*PI)
 
-void intersectScene(vec3 ro, vec3 rd,
+void intersectScene(vec3 ro, vec3 rd, bool inside_crystal,
     inout int intersect_id, inout float min_t, inout vec3 min_n) {
     ro += (min_n==vec3(0) ? 1.0 : sign(dot(min_n, rd))) * EPSILON * rd;
     float t;
     vec3 n;
-    // intersect light
-    {
+    // intersect crystal
+    if (!false) {
         t = min_t;
-        if (intersectSphere(LIGHT_RAD, ro-LIGHT_POS, rd, t, n) && t < min_t) {
-            intersect_id = ID_LIGHT;
-            min_t = t, min_n = n;
-        }
-    }
-    // intersect plane
-    {
-        t = -ro.z/rd.z;
-        if (t > 0.0 && t < min_t) {
-            intersect_id = ID_PLANE;
-            min_t = t, min_n = vec3(0,0,1);
+        vec3 p = inverse(rotCrystal)*(ro-posCrystal);
+        if (intersectCrystal(p, inverse(rotCrystal)*rd, t) && t < min_t) {
+            intersect_id = ID_CRYSTAL;
+            min_t = t;
+            // if (inside_crystal) return;
         }
     }
     // intersect sphere
     if (false) {
         t = min_t;
-        if (intersectSphere(1.0, ro-vec3(0,0,1), rd, t, n) && t < min_t) {
+        if (intersectSphere(1.0, ro-vec3(0,0,1.01), rd, t, n) && t < min_t) {
             intersect_id = ID_SPHERE;
             min_t = t, min_n = n;
         }
     }
+#if 1
     // intersect helmet
-    {
+    if (!false) {
         t = min_t;
         vec3 p = inverse(rotHelmet)*(ro-posHelmet);
         if (intersectHelmet(p, inverse(rotHelmet)*rd, t) && t < min_t) {
@@ -422,7 +486,7 @@ void intersectScene(vec3 ro, vec3 rd,
         }
     }
     // intersect token
-    {
+    if (!false) {
         t = min_t;
         vec3 p = inverse(rotToken)*(ro-posToken);
         if (intersectToken(p, inverse(rotToken)*rd, t) && t < min_t) {
@@ -430,47 +494,88 @@ void intersectScene(vec3 ro, vec3 rd,
             min_t = t;
         }
     }
+#endif
+    // intersect plane
+    {
+        t = -ro.z/rd.z;
+        if (t > 0.0 && t < min_t) {
+            intersect_id = ID_PLANE;
+            min_t = t, min_n = vec3(0,0,1);
+        }
+    }
+    // intersect light
+    {
+        t = min_t;
+        if (intersectSphere(LIGHT_RAD, ro-LIGHT_POS, rd, t, n) && t < min_t) {
+            intersect_id = ID_LIGHT;
+            min_t = t, min_n = n;
+        }
+    }
     if (intersect_id != ID_BACKGROUND) min_t += EPSILON;
+}
+
+vec3 getPortraitGlow(vec3 ro, vec3 rd, float t1) {
+    ro = inverse(rotCrystal)*(ro-posCrystal);
+    rd = inverse(rotCrystal)*rd;
+    float t = -ro.x/rd.x;
+    if (t < 0. || t > t1) return vec3(0);
+    vec3 p = ro + rd * t;
+    vec2 uv = 2.0*(p.yz-vec2(0,0.05))*vec2(1,-0.7)/0.75;
+    if (max(abs(uv.x),abs(uv.y))>=1.) return vec3(0);
+    vec3 col = 1.0-texture(texPortrait, 0.5+0.5*uv).xyz;
+    col = mix(col, vec3(1.0)*col.y, 1.0);
+    return col;
 }
 
 vec3 traceRay(vec3 ro, vec3 rd) {
     vec3 tcol = vec3(0.0), fcol = vec3(1.0);
+    bool is_inside = false;
     for (int i = ZERO; i < 20; i++) {
         int intersect_id = ID_BACKGROUND;
         float t = UPSILON;
         vec3 n = vec3(0.0);
-        intersectScene(ro, rd=normalize(rd), intersect_id, t, n);
+        intersectScene(ro, rd=normalize(rd), is_inside, intersect_id, t, n);
         n = normalize(n);
         if (dot(rd, n) > 0.) n = -n;
 
+        if (is_inside) tcol += getPortraitGlow(ro, rd, t);
+
         if (intersect_id == ID_BACKGROUND) {
+            // tcol += fcol * vec3(1.0) * max(rd.z,0.0);
             return tcol;
         }
 
         vec3 p = ro+rd*t;
-        vec3 dls_rd = LIGHT_POS-p;
+        // fcol *= pow(vec3(0.99,0.5,0.1), 0.01*vec3(t));
 
         // light
         if (intersect_id == ID_LIGHT) {
-            vec3 col = LIGHT_COL;
-            tcol += fcol * col;
+            tcol += fcol * LIGHT_COL;
             return tcol;
         }
 
         // plane
         if (intersect_id == ID_PLANE) {
-            vec3 albedo = 0.4*texture(texFloor, 0.04*mat2(1,-1,1,1)*p.xy).xyz
-                        + 0.4*texture(texFloor, 0.15*p.xy).xyz
-                        + 0.3*texture(texFloor, 0.4*p.yx).xyz;
+            float tex = 0.0;
+            for (float k=0.; k<4.; k++) {
+                vec2 q = 0.3*(mat2(4.,-exp(k),exp(k),4.)*p.xy-vec2(exp2(k)));
+                tex += 0.5 * pow(1.5,-k) * cos(q.x)*cos(q.y);
+            }
+            vec3 albedo = mix(vec3(0.6,0.6,0.7), vec3(0.7,0.55,0.45), clamp(0.3+0.3*tex,0.,1.));
+            float mc = SimplexNoise3D(vec3(3.0*p.xy,0.0)) + 2.8/(1.0+0.1*dot(p.xy,p.xy)) - 1.0;
+            albedo *= tanh(max(mc, 0.25));
             rd = sampleBrdf(-rd, n, 0.5, 0.4, albedo, fcol);
         }
 
         // sphere
         else if (intersect_id == ID_SPHERE) {
-            vec3 albedo = vec3(0.9,0.5,0.0);
-            rd = sampleBrdf(-rd, n, 0.2, 0.9, albedo, fcol);
+            vec2 eta = is_inside ? vec2(1.8, 1.0) : vec2(1.0, 1.8);
+            rd = sampleFresnelRefraction(rd, n, eta.x, eta.y);
+            // if (is_inside) tcol += fcol * t * vec3(1.0,0.5,0.0);
+            // if (is_inside) fcol *= pow(vec3(0.99,0.5,0.1), vec3(t));
         }
 
+#if 1
         // helmet
         else if (intersect_id == ID_HELMET) {
             vec3 q = inverse(rotHelmet)*(p-posHelmet);
@@ -485,8 +590,18 @@ vec3 traceRay(vec3 ro, vec3 rd) {
             n = normalize(rotToken*gradToken(q));
             rd = sampleBrdf(-rd, n, 0.8, 0.3, albedo, fcol);
         }
+#endif
+        // token
+        else if (intersect_id == ID_CRYSTAL) {
+            vec3 q = inverse(rotCrystal)*(p-posCrystal);
+            n = (is_inside?-1.0:1.0)*normalize(rotCrystal*gradCrystal(q));
+            vec2 eta = is_inside ? vec2(1.8, 1.0) : vec2(1.0, 1.8);
+            rd = sampleFresnelRefraction(rd, n, eta.x, eta.y);
+            // rd = sampleBrdf(-rd, n, 0.2, 0.3, vec3(1,0.5,0.5), fcol);
+        }
 
         ro = p;
+        if (dot(rd, n) < 0.0) is_inside = !is_inside;
     }
     return tcol;
 }

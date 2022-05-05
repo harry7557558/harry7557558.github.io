@@ -12,16 +12,16 @@ var renderer = {
     renderTarget: null,
     displaySource: "",
     displayProgram: null,
-    texFloor: null,
+    texPortrait: null
 };
 
 // viewport
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
-    rz: -0.1 * Math.PI,
-    rx: 0.1 * Math.PI,
-    dist: 5.0,
+    rz: -0.0 * Math.PI,
+    rx: 0.05 * Math.PI,
+    dist: 4.0,
     renderNeeded: true,
     iFrame: 0
 };
@@ -179,7 +179,7 @@ function initWebGL() {
     console.timeEnd("compile shader");
 
     // textures
-    renderer.texFloor = loadTexture("tex-floor.jpg");
+    renderer.texPortrait = loadTexture("tex-portrait.png");
 
     // render targets
     function reloadRenderTargets() {
@@ -236,8 +236,8 @@ async function drawScene() {
     gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.sampler);
     gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "sSelf"), 0);
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, renderer.texFloor);
-    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "texFloor"), 1);
+    gl.bindTexture(gl.TEXTURE_2D, renderer.texPortrait);
+    gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "texPortrait"), 1);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.sampler);
     gl.copyTexImage2D(gl.TEXTURE_2D,
@@ -256,7 +256,10 @@ async function drawScene() {
 // load renderer/interaction
 function initRenderer() {
     let canvas = renderer.canvas;
-    let gl = renderer.gl;
+    canvas.addEventListener("webglcontextlost", function (event) {
+        event.preventDefault();
+        document.body.innerHTML = "<h1 style='color:red;'>Error: WebGL context lost.</h1>";
+    }, false);
 
     // rendering
     function render() {
