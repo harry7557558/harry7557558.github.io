@@ -155,8 +155,7 @@ function initWebGL() {
         "void main(){fragUv=vertexPosition.xy;gl_Position=vertexPosition;}";
     renderer.renderSource = loadShaderSource("render-pt.glsl");
     // renderer.renderSource = loadShaderSource("model-sdf.glsl");
-    renderer.displaySource = "#version 300 es\nprecision highp float;uniform sampler2D sImage;out vec4 fragColor;" +
-        "void main(){fragColor=vec4(texelFetch(sImage,ivec2(gl_FragCoord.xy),0).xyz,1.0);}";
+    renderer.displaySource = loadShaderSource("display.glsl");
     console.timeEnd("load glsl code");
 
     // position buffer
@@ -231,7 +230,7 @@ async function drawScene() {
     gl.uniform2f(gl.getUniformLocation(renderer.renderProgram, "uRotate"),
         state.rx, state.rz);
     gl.uniform1f(gl.getUniformLocation(renderer.renderProgram, "uDist"),
-        state.dist = Math.min(Math.max(state.dist, 2.5), 200));
+        state.dist = Math.min(Math.max(state.dist, 2.5), 6.0));
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.sampler);
     gl.uniform1i(gl.getUniformLocation(renderer.renderProgram, "sSelf"), 0);
@@ -250,6 +249,7 @@ async function drawScene() {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, renderer.renderTarget.texture);
     gl.uniform1i(gl.getUniformLocation(renderer.displayProgram, "sImage"), 0);
+    gl.uniform1i(gl.getUniformLocation(renderer.displayProgram, "iFrame"), state.iFrame);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
@@ -264,7 +264,7 @@ function initRenderer() {
     // rendering
     function render() {
         if (state.renderNeeded) state.iFrame = 0;
-        if (state.iFrame < 1000) {
+        if (state.iFrame < 9 * 4096) {
             // console.log("iFrame", state.iFrame);
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
@@ -302,7 +302,7 @@ function initRenderer() {
             var k = fingerDist > 0. ? 0.0005 : 0.005;
             state.rx += k * dy;
             state.rz += k * dx;
-            // state.rx = Math.min(Math.max(state.rx, 0.0), Math.PI);
+            state.rx = Math.min(Math.max(state.rx, -0.05 * Math.PI), Math.PI);
             state.renderNeeded = true;
         }
     });

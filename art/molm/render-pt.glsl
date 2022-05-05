@@ -156,9 +156,9 @@ vec3 gradToken(in vec3 p) {
 	return (.25/h)*vec3(a+b-c-d,a-b+c-d,a-b-c+d);
 }
 
-const vec3 boxRadiusCrystal = 0.75*vec3(0.2,0.8,1.0)+0.01;
+const vec3 boxRadiusCrystal = 0.75*vec3(0.2,0.8,1.0)+0.005;
 float mapCrystal(vec3 p) {
-    return sdLnNormEllipsoid(p, (boxRadiusCrystal-0.01)*vec3(vec2(0.9-0.1*sin(p.z)),1), vec3(4.0));
+    return sdLnNormEllipsoid(p, (boxRadiusCrystal-0.005)*vec3(vec2(0.9-0.1*sin(p.z)),1), vec3(4.0));
 }
 vec3 gradCrystal(in vec3 p) {
     const float h = 0.01;
@@ -553,7 +553,6 @@ vec3 traceRay(vec3 ro, vec3 rd) {
             tcol += fcol * LIGHT_COL;
             return tcol;
         }
-
         // plane
         if (intersect_id == ID_PLANE) {
             float tex = 0.0;
@@ -566,7 +565,6 @@ vec3 traceRay(vec3 ro, vec3 rd) {
             albedo *= tanh(max(mc, 0.25));
             rd = sampleBrdf(-rd, n, 0.5, 0.4, albedo, fcol);
         }
-
         // sphere
         else if (intersect_id == ID_SPHERE) {
             vec2 eta = is_inside ? vec2(1.8, 1.0) : vec2(1.0, 1.8);
@@ -574,7 +572,6 @@ vec3 traceRay(vec3 ro, vec3 rd) {
             // if (is_inside) tcol += fcol * t * vec3(1.0,0.5,0.0);
             // if (is_inside) fcol *= pow(vec3(0.99,0.5,0.1), vec3(t));
         }
-
 #if 1
         // helmet
         else if (intersect_id == ID_HELMET) {
@@ -587,6 +584,7 @@ vec3 traceRay(vec3 ro, vec3 rd) {
         else if (intersect_id == ID_TOKEN) {
             vec3 q = inverse(rotToken)*(p-posToken);
             vec3 albedo = mapToken(q, true).xyz;
+            // albedo = pow(albedo+vec3(0.05,0.0,0.1), vec3(0.8));
             n = normalize(rotToken*gradToken(q));
             rd = sampleBrdf(-rd, n, 0.8, 0.3, albedo, fcol);
         }
@@ -608,8 +606,22 @@ vec3 traceRay(vec3 ro, vec3 rd) {
 
 
 void main(void) {
+    // more frames, higher fps
+    const int discard_size = 4;
+    int pid = iFrame % (discard_size*discard_size);
+    ivec2 cid = ivec2(pid/discard_size, pid%discard_size);
+    ivec2 cact = ivec2(gl_FragCoord.xy) % discard_size;
+    if (cid != cact) {
+        if (iFrame == 0) {
+            fragColor = vec4(0.0);
+            return;
+        }
+        discard;
+    }
+
     // random seed
-    vec3 p3 = fract(vec3(fragUv.xy, sin(float(iFrame)))*.1031);
+    vec3 p3 = fract(fragUv.xyx*1.1031);
+    // if (fragUv.x<0.) p3 = fract(vec3(fragUv.xy, sin(float(iFrame)))*.1031);
     p3 += dot(p3, p3.zxy + 31.32);
     float h = fract((p3.x + p3.y) * p3.z);
     uint seed0 = uint(1048576.*h);
@@ -636,14 +648,15 @@ void main(void) {
     vec3 col = vec3(0.0);
     int nsample = 1;
     for (int i=ZERO; i<nsample; i++) {
-        rand_seed = seed0 + uint(iFrame*nsample + i), rand_base = 0u;
+        rand_seed = seed0 + uint(iFrame*nsample/(discard_size*discard_size) + i);
+        rand_base = 0u;
         vec2 duv = (-1.0+2.0*vec2(randf(),randf()))/uResolution;
         vec3 rd = normalize(mat3(u,v,-w)*vec3(uv+duv, 2.0));
-        col += traceRay(cam, rd)/float(nsample);
+        col += traceRay(cam, rd);
     }
 
     // output
     vec4 rgbn = texelFetch(sSelf, ivec2(gl_FragCoord.xy), 0);
     if (iFrame == 0) rgbn.w = 0.0;
-    fragColor = vec4((rgbn.xyz*rgbn.w + col)/(rgbn.w+1.0), rgbn.w+1.0);
+    fragColor = vec4((rgbn.xyz*rgbn.w + col)/(rgbn.w+float(nsample)), rgbn.w+float(nsample));
 }
