@@ -5,17 +5,16 @@
 // 3. Copy ID list from F12 console
 
 (function() {
-    var graphs_container = document.getElementsByClassName('dcg-saved-graphs-list')[0];
-    var graphs = graphs_container.getElementsByClassName('graph-link');
-    var ids = [];
-    for (var i = 0; i < graphs.length; i++) {
-        var s = graphs[i].getElementsByClassName('dcg-thumb')[0].style.backgroundImage;
-        var thumbnail = s.replace("url(\"", "").replace("\")", "");
-        var title = graphs[i].getElementsByClassName('dcg-title')[0].textContent;
-        // this is the only thing one needs
-        var id = s.split('/')[s.split('/').length - 1].split('.')[0];
-        ids.push(id);
+    var req = new XMLHttpRequest();
+    req.open("GET", "/api/v1/calculator/my_graphs");
+    req.onload = function() {
+        var graphs = JSON.parse(req.response).myGraphs;
+        var ids = [];
+        for (var i = 0; i < graphs.length; i++) {
+            ids.push(graphs[i].hash);
+        }
+        console.log(JSON.stringify(ids));
     }
-    console.log(JSON.stringify(ids));
+    req.send();
 }
 )()

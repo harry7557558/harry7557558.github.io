@@ -69,7 +69,7 @@ function animateQuotes() {
 
         function renderQuote() {
             var time_elapsed = Date.now() - time_start;
-            var quote_elapsed = time_elapsed / 4000;
+            var quote_elapsed = time_elapsed / 5000;
             var qi = Math.floor(quote_elapsed);
             var qf = quote_elapsed - qi;
             qi += Math.floor(time_start / 400);
