@@ -2,77 +2,110 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>List of my public Shadertoy shaders</title>
+    <title>List of my published Shadertoy shaders</title>
     <link rel="icon" href="https://harry7557558.github.io/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="description" content="List of my public Shadertoy shaders" />
+    <meta name="description" content="List of my published Shadertoy shaders" />
     <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL" />
     <meta name="robots" content="index, follow" />
 
     <style>
-        .shader{display:block;margin:0.5em;padding:0.5em;border-bottom:1px solid gray}
+        body{margin:0;padding:0}
+        #container{display:inline;margin:0;padding:0}
+        .shader{display:block;margin:0.5em;padding:0.5em 0;border-bottom:1px solid gray}
         .preview{width:24em;display:inline-block;margin:0 2em 0 0}
         .title a{color:black;text-decoration:none}
         .title a:hover{text-decoration:underline}
-        .info{display:inline-block;margin:0;min-width:20em}
-        .description{white-space:pre-wrap}
+        hr{margin-block:0.5em 0.5em}
+        .info{display:inline-block;margin:0;min-width:20em;word-break:break-word}
         h1{margin:1em 0 0.8em;font-size:2em}
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
         .summary{margin:0;font-size:1em;color:#222}
         a{font-size:1em;padding:0 0.1em;text-decoration:none}
         a:hover{text-decoration:underline}
-        hr{margin-block:0.5em 0.5em}
+        input,select,button{display:inline-block;vertical-align:middle}
+        .unlisted{display:none}
+        .unlisted h2{font-style:italic}
     </style>
+    <script src="script.js"></script>
 </head>
 <body>
     <div style="margin:1.2em 1.2em 0em;white-space:nowrap">
-        <h1>List of my public Shadertoy shaders</h1>
-        <p class="summary">Harry Chen (harry7557558) - Updated 2022/05/23</p>
-        <div><br/></div>
+        <h1>List of my published Shadertoy shaders</h1>
+        <p class="summary">Harry Chen (<a href='https://www.shadertoy.com/user/harry7557558'>harry7557558</a>) - Updated 2022/05/23</p>
+        <p>
+            Sort by <select id="sort-select"></select> ｜
+            <input type="checkbox" id="unlisted-checkbox" /> show unlisted shaders
+        </p>
         <hr/>
-    </div><div class="shader"><table><tr>
+    </div>
+    <div id="container"><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/ssKGWR"><img class="preview" src="https://www.shadertoy.com/media/shaders/ssKGWR.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/ssKGWR">3D SDF Visualizer</a></h2>
             <p class="summary">
                 volume, sdf, debug, discontinuity •
-                2021/09/11
+                <span class="published">2021/09/11</span>
+                
                 <br/>
-                Image • 3447 chars<br/>
+                Image • <span class="chars">3447</span> chars
+                <br/>
                 <span class="likes">12</span> likes •
-                <span class="views">135</span> views •
-                <span class="ratio">8.89</span>% like
+                <span class="views">136</span> views •
+                <span class="ratio">8.82</span>% like
             </p>
             <br/>
             Debugging an SDF, try to use a previous volume rendering shader to visualize its discontinuity.<br /><br />mouse-able
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wsfBRX"><img class="preview" src="https://www.shadertoy.com/media/shaders/wsfBRX.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wsfBRX">ASM2O CPT</a></h2>
+            <p class="summary">
+                ring, loop, hand, archer •
+                <span class="published">2020/05/07</span>
+                • unlisted
+                <br/>
+                Common • Image｜6817 + 2127 = <span class="chars">8944</span> chars
+                <br/>
+                <span class="likes">2</span> likes •
+                <span class="views">37</span> views •
+                <span class="ratio">5.41</span>% like
+            </p>
+            <br/>
+            School project appropriating The Archer by Henry Moore. The animation is not as good as expected.<br />A realtime software renderer written in C++ uses bounding boxes to accelerate raymarching, but this one doesn&#39;t.
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wljSDt"><img class="preview" src="https://www.shadertoy.com/media/shaders/wljSDt.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wljSDt">Burning-Ship ++</a></h2>
             <p class="summary">
                 fractal, complex, iteration •
-                2019/09/03
+                <span class="published">2019/09/03</span>
+                
                 <br/>
-                Image • 1016 chars<br/>
+                Image • <span class="chars">1016</span> chars
+                <br/>
                 <span class="likes">4</span> likes •
-                <span class="views">138</span> views •
-                <span class="ratio">2.90</span>% like
+                <span class="views">139</span> views •
+                <span class="ratio">2.88</span>% like
             </p>
             <br/>
             a zoom in to the Burning Ship Fractal
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/ws2yz1"><img class="preview" src="https://www.shadertoy.com/media/shaders/ws2yz1.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/ws2yz1">COVID, Stop!</a></h2>
             <p class="summary">
                 virus, coronavirus, covid19, covid •
-                2020/04/05
+                <span class="published">2020/04/05</span>
+                
                 <br/>
-                Image • 1895 chars<br/>
+                Image • <span class="chars">1895</span> chars
+                <br/>
                 <span class="likes">2</span> likes •
                 <span class="views">86</span> views •
                 <span class="ratio">2.33</span>% like
@@ -80,15 +113,17 @@
             <br/>
             Today&#39;s Google Doodle: Stay Home. Save Lives: Help Stop Coronavirus.<br /><br />(of course, you don&#39;t your home to have virus.)<br />
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/sddXWj"><img class="preview" src="https://www.shadertoy.com/media/shaders/sddXWj.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/sddXWj">Cook-Torrance IS Attempt</a></h2>
             <p class="summary">
                 sampling, sample, pbr, cooktorrance, importance •
-                2021/10/11
+                <span class="published">2021/10/11</span>
+                
                 <br/>
-                Buffer A • Image｜4996 + 73 = 5069 chars<br/>
+                Buffer A • Image｜4996 + 73 = <span class="chars">5069</span> chars
+                <br/>
                 <span class="likes">16</span> likes •
                 <span class="views">303</span> views •
                 <span class="ratio">5.28</span>% like
@@ -96,15 +131,17 @@
             <br/>
             Attempt to implement importance sampling for Cook-Torrance BRDF, somehow cannot get it right.<br />Left/Right: without/with importance sampling, look slightly different.<br />If someone could point out the problem or give a fix I&#39;d appreciate :)
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/tl2SDt"><img class="preview" src="https://www.shadertoy.com/media/shaders/tl2SDt.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/tl2SDt">Crown-Fractal++</a></h2>
             <p class="summary">
                 fractal, complex, iteration •
-                2019/09/03
+                <span class="published">2019/09/03</span>
+                
                 <br/>
-                Image • 1052 chars<br/>
+                Image • <span class="chars">1052</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
                 <span class="views">101</span> views •
                 <span class="ratio">4.95</span>% like
@@ -112,15 +149,17 @@
             <br/>
             a zoom in to fractal defined by iteration z↦Re(z³)-|Im(z³)|i+c
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wtfyWj"><img class="preview" src="https://www.shadertoy.com/media/shaders/wtfyWj.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wtfyWj">Ellipse Distance Comparison</a></h2>
             <p class="summary">
                 sdf, ellipse, compare •
-                2020/06/24
+                <span class="published">2020/06/24</span>
+                
                 <br/>
-                Common • Image｜805 + 936 = 1741 chars<br/>
+                Common • Image｜805 + 936 = <span class="chars">1741</span> chars
+                <br/>
                 <span class="likes">4</span> likes •
                 <span class="views">113</span> views •
                 <span class="ratio">3.54</span>% like
@@ -128,47 +167,53 @@
             <br/>
             Comparing two ellipse distance methods found on the internet.<br /><br />mouseable
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wsfyzB"><img class="preview" src="https://www.shadertoy.com/media/shaders/wsfyzB.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wsfyzB">Exponential Regression</a></h2>
             <p class="summary">
                 leastsquare, coronavirus, covid •
-                2020/03/25
+                <span class="published">2020/03/25</span>
+                
                 <br/>
-                Image • 4402 chars<br/>
+                Image • <span class="chars">4402</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
-                <span class="views">164</span> views •
-                <span class="ratio">3.05</span>% like
+                <span class="views">165</span> views •
+                <span class="ratio">3.03</span>% like
             </p>
             <br/>
             Fitting the number of COVID-19 daily reported cases in four countries using regression. Click and drag to read the value.<br /><br />Any idea about how can I make the compilation faster?
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wly3WG"><img class="preview" src="https://www.shadertoy.com/media/shaders/wly3WG.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wly3WG">Fitting Arc using Bézier</a></h2>
             <p class="summary">
                 bezier, circle, approximation, arc, fitting, leastsquare, 2021 •
-                2020/01/22
+                <span class="published">2020/01/22</span>
+                
                 <br/>
-                Image • 2021 chars<br/>
-                <span class="likes">14</span> likes •
-                <span class="views">258</span> views •
-                <span class="ratio">5.43</span>% like
+                Image • <span class="chars">2021</span> chars
+                <br/>
+                <span class="likes">15</span> likes •
+                <span class="views">260</span> views •
+                <span class="ratio">5.77</span>% like
             </p>
             <br/>
             Least square fitting an unit arc using cubic bezier curve. <br />Ellipse fitting can be done by simply applying a linear transform. 
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/tttSRH"><img class="preview" src="https://www.shadertoy.com/media/shaders/tttSRH.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/tttSRH">Fitting Arc using Bézier 2</a></h2>
             <p class="summary">
                 bezier, circle, arc, fitting, leastsquare •
-                2020/01/30
+                <span class="published">2020/01/30</span>
+                
                 <br/>
-                Image • 2459 chars<br/>
+                Image • <span class="chars">2459</span> chars
+                <br/>
                 <span class="likes">3</span> likes •
                 <span class="views">94</span> views •
                 <span class="ratio">3.19</span>% like
@@ -176,15 +221,17 @@
             <br/>
             Cubic version see there: <a rel="nofollow" href="https://www.shadertoy.com/view/wly3WG">https://www.shadertoy.com/view/wly3WG</a><br />These fitting functions are used to convert ellipse arcs in an SVG path into uniform bezier curve, because I don&#39;t want to write hundreds of lines of code specifically for ellipses.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/WsySWt"><img class="preview" src="https://www.shadertoy.com/media/shaders/WsySWt.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/WsySWt">Float Limit Exceed</a></h2>
             <p class="summary">
                 graph, function •
-                2019/12/01
+                <span class="published">2019/12/01</span>
+                
                 <br/>
-                Image • 602 chars<br/>
+                Image • <span class="chars">602</span> chars
+                <br/>
                 <span class="likes">7</span> likes •
                 <span class="views">150</span> views •
                 <span class="ratio">4.67</span>% like
@@ -192,47 +239,89 @@
             <br/>
             sawtooth effect produced by exceeding of float point accuracy limit
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wlySDy"><img class="preview" src="https://www.shadertoy.com/media/shaders/wlySDy.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wlySDy">Float Limit Exceed +=−=</a></h2>
+            <p class="summary">
+                bug, floatpoint •
+                <span class="published">2020/03/06</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">264</span> chars
+                <br/>
+                <span class="likes">2</span> likes •
+                <span class="views">51</span> views •
+                <span class="ratio">3.92</span>% like
+            </p>
+            <br/>
+            On my machine (test on both CPU and GPU):<br />iTime &lt; 30: procedural fBM effect<br />iTime &gt; 30: wider and wider stripes<br />
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/3tK3z3"><img class="preview" src="https://www.shadertoy.com/media/shaders/3tK3z3.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/3tK3z3">Float Limit Exceed 95 chars</a></h2>
+            <p class="summary">
+                heart, pink, short, cyan •
+                <span class="published">2020/01/20</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">96</span> chars
+                <br/>
+                <span class="likes">3</span> likes •
+                <span class="views">116</span> views •
+                <span class="ratio">2.59</span>% like
+            </p>
+            <br/>
+            mirroring an oblique ellipse x² + y² - |x|·y = r²<br />result may be different on different hardware
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/tt2SDt"><img class="preview" src="https://www.shadertoy.com/media/shaders/tt2SDt.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/tt2SDt">Forest-Fractal++</a></h2>
             <p class="summary">
                 fractal, complex, iteration •
-                2019/09/03
+                <span class="published">2019/09/03</span>
+                
                 <br/>
-                Image • 1036 chars<br/>
+                Image • <span class="chars">1036</span> chars
+                <br/>
                 <span class="likes">4</span> likes •
-                <span class="views">102</span> views •
-                <span class="ratio">3.92</span>% like
+                <span class="views">103</span> views •
+                <span class="ratio">3.88</span>% like
             </p>
             <br/>
             a zoom in to fractal defined by iteration z↦|Re(z²)|-|Im(z²)|i+c
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/WdKXDt"><img class="preview" src="https://www.shadertoy.com/media/shaders/WdKXDt.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/WdKXDt">Frozen Fractals</a></h2>
             <p class="summary">
                 fractal, iteration, snowflake •
-                2019/12/02
+                <span class="published">2019/12/02</span>
+                
                 <br/>
-                Image • 1140 chars<br/>
-                <span class="likes">9</span> likes •
-                <span class="views">289</span> views •
-                <span class="ratio">3.11</span>% like
+                Image • <span class="chars">1140</span> chars
+                <br/>
+                <span class="likes">10</span> likes •
+                <span class="views">291</span> views •
+                <span class="ratio">3.44</span>% like
             </p>
             <br/>
             And one thought crystallizes like an icy blast&#8230;<br /><br />Fake snowflakes generated by mirroring complex fractals. <br />
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/sljSzD"><img class="preview" src="https://www.shadertoy.com/media/shaders/sljSzD.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/sljSzD">Gamma (complex function grapher)</a></h2>
             <p class="summary">
                 domain, complex, gamma •
-                2021/07/25
+                <span class="published">2021/07/25</span>
+                
                 <br/>
-                Common • Image｜2977 + 2409 = 5386 chars<br/>
+                Common • Image｜2977 + 2409 = <span class="chars">5386</span> chars
+                <br/>
                 <span class="likes">13</span> likes •
                 <span class="views">92</span> views •
                 <span class="ratio">14.13</span>% like
@@ -240,47 +329,53 @@
             <br/>
             Manipulated from <a rel="nofollow" href="https://harry7557558.github.io/tools/complex_webgl.html">https://harry7557558.github.io/tools/complex_webgl.html</a>, but for 3D.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/tlc3Dj"><img class="preview" src="https://www.shadertoy.com/media/shaders/tlc3Dj.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/tlc3Dj">Heat Conduction</a></h2>
             <p class="summary">
                 heatequation •
-                2019/12/28
+                <span class="published">2019/12/28</span>
+                
                 <br/>
-                Buffer A • Image｜558 + 271 = 829 chars<br/>
+                Buffer A • Image｜558 + 271 = <span class="chars">829</span> chars
+                <br/>
                 <span class="likes">3</span> likes •
-                <span class="views">188</span> views •
-                <span class="ratio">1.60</span>% like
+                <span class="views">190</span> views •
+                <span class="ratio">1.58</span>% like
             </p>
             <br/>
             Solving heat equation numerically
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/tltSWr"><img class="preview" src="https://www.shadertoy.com/media/shaders/tltSWr.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/tltSWr">I heart Fourier</a></h2>
             <p class="summary">
                 heart, fourier, love •
-                2020/02/05
+                <span class="published">2020/02/05</span>
+                
                 <br/>
-                Image • 1880 chars<br/>
-                <span class="likes">39</span> likes •
-                <span class="views">344</span> views •
-                <span class="ratio">11.34</span>% like
+                Image • <span class="chars">1880</span> chars
+                <br/>
+                <span class="likes">40</span> likes •
+                <span class="views">345</span> views •
+                <span class="ratio">11.59</span>% like
             </p>
             <br/>
             As a beginner to Fourier series, inspired by a picture on my religion teacher&#39;s slide. 
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/slfXR7"><img class="preview" src="https://www.shadertoy.com/media/shaders/slfXR7.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/slfXR7">IdentiEgg</a></h2>
             <p class="summary">
                 color, random, egg, pysanky, pysanka •
-                2021/07/03
+                <span class="published">2021/07/03</span>
+                
                 <br/>
-                Common • Image｜5924 + 4068 = 9992 chars<br/>
+                Common • Image｜5924 + 4068 = <span class="chars">9992</span> chars
+                <br/>
                 <span class="likes">15</span> likes •
                 <span class="views">111</span> views •
                 <span class="ratio">13.51</span>% like
@@ -288,31 +383,35 @@
             <br/>
             Random dyed egg generator inspired by WordPress/Gravatar identicon.<br />
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/WtjSD3"><img class="preview" src="https://www.shadertoy.com/media/shaders/WtjSD3.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/WtjSD3">Implicit Heart</a></h2>
             <p class="summary">
                 heart, implicit, love •
-                2019/08/31
+                <span class="published">2019/08/31</span>
+                
                 <br/>
-                Image • 1926 chars<br/>
-                <span class="likes">5</span> likes •
-                <span class="views">194</span> views •
-                <span class="ratio">2.58</span>% like
+                Image • <span class="chars">1926</span> chars
+                <br/>
+                <span class="likes">6</span> likes •
+                <span class="views">195</span> views •
+                <span class="ratio">3.08</span>% like
             </p>
             <br/>
             defined by implicit equation (x² + 9/4 y² + z²)³ - x² z³ - 9/80 y² z³ = 0
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/3dXfDr"><img class="preview" src="https://www.shadertoy.com/media/shaders/3dXfDr.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/3dXfDr">Implicit Star</a></h2>
             <p class="summary">
                 star, implicit •
-                2020/04/27
+                <span class="published">2020/04/27</span>
+                
                 <br/>
-                Image • 1466 chars<br/>
+                Image • <span class="chars">1466</span> chars
+                <br/>
                 <span class="likes">8</span> likes •
                 <span class="views">128</span> views •
                 <span class="ratio">6.25</span>% like
@@ -320,15 +419,17 @@
             <br/>
             A modification of my first shader <a rel="nofollow" href="https://www.shadertoy.com/view/WtjSD3">https://www.shadertoy.com/view/WtjSD3</a>. Make the code faster and look less naive.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/7dBcDR"><img class="preview" src="https://www.shadertoy.com/media/shaders/7dBcDR.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/7dBcDR">L^n-norm ellipsoid SDF+AABB</a></h2>
             <p class="summary">
                 volume, sdf, visualizer, ellipsoid, aabb, norm, lagrangemultiplier •
-                2022/01/27
+                <span class="published">2022/01/27</span>
+                
                 <br/>
-                Image • 3823 chars<br/>
+                Image • <span class="chars">3823</span> chars
+                <br/>
                 <span class="likes">7</span> likes •
                 <span class="views">68</span> views •
                 <span class="ratio">10.29</span>% like
@@ -336,15 +437,17 @@
             <br/>
             SDF approximation (inspired by iq) derived for a high school art project.<br />Exact AABB derived using Lagrange multiplier for fun.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/sllczM"><img class="preview" src="https://www.shadertoy.com/media/shaders/sllczM.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/sllczM">Linear Regression AA</a></h2>
             <p class="summary">
                 antialiasing, aa, leastsquare, linearregression •
-                2022/04/01
+                <span class="published">2022/04/01</span>
+                
                 <br/>
-                Buffer A • Buffer B • Image｜929 + 358 + 1262 = 2549 chars<br/>
+                Buffer A • Buffer B • Image｜929 + 358 + 1262 = <span class="chars">2549</span> chars
+                <br/>
                 <span class="likes">4</span> likes •
                 <span class="views">47</span> views •
                 <span class="ratio">8.51</span>% like
@@ -352,15 +455,35 @@
             <br/>
             Showcase an anti-aliasing technique I developed for a raymarching demo.<br />Read the comments for details. Mouse click to show image without AA.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wl2SWt"><img class="preview" src="https://www.shadertoy.com/media/shaders/wl2SWt.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wl2SWt">Mandelbrot++</a></h2>
+            <p class="summary">
+                mandelbrot, complex, iteration •
+                <span class="published">2019/09/03</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">1089</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">77</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            zoom in to the Mandelbrot Set
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wscGz8"><img class="preview" src="https://www.shadertoy.com/media/shaders/wscGz8.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wscGz8">Mandelbrot−Julia Relationship</a></h2>
             <p class="summary">
                 fractal, complex, iteration •
-                2019/09/06
+                <span class="published">2019/09/06</span>
+                
                 <br/>
-                Image • 1063 chars<br/>
+                Image • <span class="chars">1063</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
                 <span class="views">75</span> views •
                 <span class="ratio">6.67</span>% like
@@ -368,79 +491,89 @@
             <br/>
             Relationship between Mandelbrot and Julia set: the red dot in the Mandelbrot set represents c, where Julia set is defined by z↦z²+c. 
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public-api"><table><tr>
         <td><a href="https://www.shadertoy.com/view/NsSSRK"><img class="preview" src="https://www.shadertoy.com/media/shaders/NsSSRK.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/NsSSRK">Mathematica Color Schemes</a></h2>
             <p class="summary">
                 color, palette, cosine, polynomial, leastsquare •
-                2021/05/08
-                • public+api<br/>
-                Image • 39878 chars<br/>
+                <span class="published">2021/05/08</span>
+                • public+api
+                <br/>
+                Image • <span class="chars">39878</span> chars
+                <br/>
                 <span class="likes">18</span> likes •
-                <span class="views">201</span> views •
-                <span class="ratio">8.96</span>% like
+                <span class="views">202</span> views •
+                <span class="ratio">8.91</span>% like
             </p>
             <br/>
             Apply least square fitting to Wolfram language color schemes.<br /><a rel="nofollow" href="https://harry7557558.github.io/Graphics/UI/color_functions/">https://harry7557558.github.io/Graphics/UI/color_functions/</a>
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public-api"><table><tr>
         <td><a href="https://www.shadertoy.com/view/Nd33zB"><img class="preview" src="https://www.shadertoy.com/media/shaders/Nd33zB.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/Nd33zB">Natural RYB Color Wheel</a></h2>
             <p class="summary">
                 color, space, rgb, wheel, ryb •
-                2021/08/26
-                • public+api<br/>
-                Image • 2559 chars<br/>
+                <span class="published">2021/08/26</span>
+                • public+api
+                <br/>
+                Image • <span class="chars">2559</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
-                <span class="views">208</span> views •
-                <span class="ratio">2.40</span>% like
+                <span class="views">209</span> views •
+                <span class="ratio">2.39</span>% like
             </p>
             <br/>
             The idea comes from a picture on my art teacher&#39;s color theory intro slide.<br />Ignore my terrible tracing skill.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public-api"><table><tr>
         <td><a href="https://www.shadertoy.com/view/sdVGWh"><img class="preview" src="https://www.shadertoy.com/media/shaders/sdVGWh.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/sdVGWh">Nautilus Shell</a></h2>
             <p class="summary">
                 spiral, logarithmic, interior, beach, nautilus, seashell, conch •
-                2021/09/12
-                • public+api<br/>
-                Image • 4409 chars<br/>
-                <span class="likes">47</span> likes •
-                <span class="views">387</span> views •
-                <span class="ratio">12.14</span>% like
+                <span class="published">2021/09/12</span>
+                • public+api
+                <br/>
+                Image • <span class="chars">4409</span> chars
+                <br/>
+                <span class="likes">48</span> likes •
+                <span class="views">388</span> views •
+                <span class="ratio">12.37</span>% like
             </p>
             <br/>
             My first attempt to model a sea snail with a spiral. (should note that a nautilus is not a gastropod snail)<br /><br />Thanks this visualizer for helping me debugging the SDF: <a rel="nofollow" href="https://www.shadertoy.com/view/ssKGWR">https://www.shadertoy.com/view/ssKGWR</a>
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/ssccz7"><img class="preview" src="https://www.shadertoy.com/media/shaders/ssccz7.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/ssccz7">Neural Tooth 2</a></h2>
             <p class="summary">
                 volume, tooth, neural, network, siren •
-                2022/05/21
+                <span class="published">2022/05/21</span>
+                
                 <br/>
-                Image • 4230 chars<br/>
-                <span class="likes">20</span> likes •
-                <span class="views">88</span> views •
-                <span class="ratio">22.73</span>% like
+                Image • <span class="chars">4230</span> chars
+                <br/>
+                <span class="likes">25</span> likes •
+                <span class="views">112</span> views •
+                <span class="ratio">22.32</span>% like
             </p>
             <br/>
             Similar to my <a rel="nofollow" href="https://www.shadertoy.com/view/sdc3R2">previous tooth shader</a> that uses a neural network to represent a volume.<br />Uses a different model that has a fewer number weights and a higher accuracy.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/3lfyDl"><img class="preview" src="https://www.shadertoy.com/media/shaders/3lfyDl.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/3lfyDl">Numerical Gradient Comparison</a></h2>
             <p class="summary">
                 gradient, compare, differen •
-                2020/06/28
+                <span class="published">2020/06/28</span>
+                
                 <br/>
-                Image • 2129 chars<br/>
+                Image • <span class="chars">2129</span> chars
+                <br/>
                 <span class="likes">6</span> likes •
                 <span class="views">281</span> views •
                 <span class="ratio">2.14</span>% like
@@ -448,15 +581,17 @@
             <br/>
             Comparing 3d numerical differentiation methods.<br /><br />Seems like the tetrahedron method doesn&#39;t work much better than the naive method ~.~
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/fsGGzh"><img class="preview" src="https://www.shadertoy.com/media/shaders/fsGGzh.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/fsGGzh">Piecewise Linear Simplex Terrain</a></h2>
             <p class="summary">
                 noise, terrain, simplex •
-                2021/09/07
+                <span class="published">2021/09/07</span>
+                
                 <br/>
-                Common • Image｜2924 + 2156 = 5080 chars<br/>
+                Common • Image｜2924 + 2156 = <span class="chars">5080</span> chars
+                <br/>
                 <span class="likes">13</span> likes •
                 <span class="views">112</span> views •
                 <span class="ratio">11.61</span>% like
@@ -464,15 +599,53 @@
             <br/>
             Demonstrate a noise generated by interpolating hash values on a simplex grid.<br />See Common tab for 2D and 3D noise functions and their analytical gradient.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/7st3Rr"><img class="preview" src="https://www.shadertoy.com/media/shaders/7st3Rr.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/7st3Rr">Scratch Pipes</a></h2>
+            <p class="summary">
+                discard, pipe •
+                <span class="published">2021/08/15</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">934</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">2</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            Replicate an old effect made in visual programming tool Scratch when I just started to learn to code. I have lost the original file but I still feel the old one looks nicer.
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/ttSSDc"><img class="preview" src="https://www.shadertoy.com/media/shaders/ttSSDc.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/ttSSDc">Self-Adaptive Super Sampling</a></h2>
+            <p class="summary">
+                raymarching, supersampling, cup •
+                <span class="published">2020/01/27</span>
+                • unlisted
+                <br/>
+                Common • Buffer A • Image｜3107 + 169 + 1403 = <span class="chars">4679</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">24</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            Much faster than brute force super sampling. <br />Note that the sawteeth at the side of the cup are not recognized. <br />I think this can be improved by using a depth buffer. 
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/fdBcRd"><img class="preview" src="https://www.shadertoy.com/media/shaders/fdBcRd.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/fdBcRd">ShallowWaterEqu_3b1d</a></h2>
             <p class="summary">
                 ripples, wave, simulation, water, equation, shallow •
-                2022/02/03
+                <span class="published">2022/02/03</span>
+                
                 <br/>
-                Common • Buffer A • Buffer B • Buffer C • Buffer D • Image｜1890 + 210 + 210 + 210 + 210 + 1510 = 4240 chars<br/>
+                Common • Buffer A • Buffer B • Buffer C • Buffer D • Image｜1890 + 210 + 210 + 210 + 210 + 1510 = <span class="chars">4240</span> chars
+                <br/>
                 <span class="likes">14</span> likes •
                 <span class="views">109</span> views •
                 <span class="ratio">12.84</span>% like
@@ -480,31 +653,71 @@
             <br/>
             My second attempt in buffer simulation. Try to simulate water ripples by solving the shallow water equation, which produces more details than the wave equation. However, it requires a much smaller time step to be stably integrated by the forward Euler.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wttGDB"><img class="preview" src="https://www.shadertoy.com/media/shaders/wttGDB.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wttGDB">Sound Test 0x00000001</a></h2>
+            <p class="summary">
+                temp •
+                <span class="published">2019/12/31</span>
+                • unlisted
+                <br/>
+                Common • Image • Sound｜2430 + 227 + 63 = <span class="chars">2720</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">25</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            temp
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wdGcDV"><img class="preview" src="https://www.shadertoy.com/media/shaders/wdGcDV.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wdGcDV">Sound Test 0x00000006</a></h2>
+            <p class="summary">
+                demo •
+                <span class="published">2020/10/26</span>
+                • unlisted
+                <br/>
+                Common • Image • Sound｜147 + 216 + 69 = <span class="chars">432</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">6</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            physics isu
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/sdc3R2"><img class="preview" src="https://www.shadertoy.com/media/shaders/sdc3R2.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/sdc3R2">Tooth (neural volume)</a></h2>
             <p class="summary">
                 volume, tooth, neural, network, siren •
-                2021/08/28
+                <span class="published">2021/08/28</span>
+                
                 <br/>
-                Image • 7988 chars<br/>
+                Image • <span class="chars">7988</span> chars
+                <br/>
                 <span class="likes">18</span> likes •
-                <span class="views">172</span> views •
-                <span class="ratio">10.47</span>% like
+                <span class="views">175</span> views •
+                <span class="ratio">10.29</span>% like
             </p>
             <br/>
             I just see a lot of siren shaders and want to have a try.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/WtcSR2"><img class="preview" src="https://www.shadertoy.com/media/shaders/WtcSR2.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/WtcSR2">Triangled</a></h2>
             <p class="summary">
                 tunnel, sound, sdf, triangle, hexagon, square •
-                2020/04/09
+                <span class="published">2020/04/09</span>
+                
                 <br/>
-                Image • Sound｜2872 + 188 = 3060 chars<br/>
+                Image • Sound｜2872 + 188 = <span class="chars">3060</span> chars
+                <br/>
                 <span class="likes">7</span> likes •
                 <span class="views">215</span> views •
                 <span class="ratio">3.26</span>% like
@@ -512,15 +725,17 @@
             <br/>
             Tangled + Triangulated. Diving down to Hell.<br /><br />(stay 1min and watch it change)
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/7lGXWK"><img class="preview" src="https://www.shadertoy.com/media/shaders/7lGXWK.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/7lGXWK">Uniform Random Showcase 2D</a></h2>
             <p class="summary">
                 2d, spiral, intersection, dof, bokeh, random, star, heart, polygon, cardioid, rose, shape, union, uniform, subtraction, vesica •
-                2022/01/04
+                <span class="published">2022/01/04</span>
+                
                 <br/>
-                Buffer A • Image｜6809 + 157 = 6966 chars<br/>
+                Buffer A • Image｜6809 + 157 = <span class="chars">6966</span> chars
+                <br/>
                 <span class="likes">11</span> likes •
                 <span class="views">131</span> views •
                 <span class="ratio">8.40</span>% like
@@ -528,15 +743,71 @@
             <br/>
             An idea to showcase generating uniformly random points inside 2D shapes.<br />Let me know about any idea to showcase 3D random functions.
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/tlcXDM"><img class="preview" src="https://www.shadertoy.com/media/shaders/tlcXDM.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/tlcXDM">Unnecessary Calculation</a></h2>
+            <p class="summary">
+                sdf, bezier, root •
+                <span class="published">2020/02/07</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">1484</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">42</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            A new discovery made after a curious attempt - every time we calculate the distance to a quadratic bezier curve by solving a cubic equation, we made an unnecessary calculation.
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/3l2XWc"><img class="preview" src="https://www.shadertoy.com/media/shaders/3l2XWc.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/3l2XWc">Untitled 0x00000001</a></h2>
+            <p class="summary">
+                temp •
+                <span class="published">2019/10/05</span>
+                • unlisted
+                <br/>
+                Common • Image｜6907 + 2053 = <span class="chars">8960</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">8</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            temp
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/wstGRH"><img class="preview" src="https://www.shadertoy.com/media/shaders/wstGRH.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/wstGRH">Untitled 0x00000004</a></h2>
+            <p class="summary">
+                temp •
+                <span class="published">2019/09/22</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">2460</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">3</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            Sketchbook No.1
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/wdc3RB"><img class="preview" src="https://www.shadertoy.com/media/shaders/wdc3RB.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/wdc3RB">Untitled 0x00000007</a></h2>
             <p class="summary">
                 raytracing •
-                2019/09/22
+                <span class="published">2019/09/22</span>
+                
                 <br/>
-                Image • 1959 chars<br/>
+                Image • <span class="chars">1959</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
                 <span class="views">171</span> views •
                 <span class="ratio">2.92</span>% like
@@ -544,15 +815,17 @@
             <br/>
             simple test of non-recursive ray tracing
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/3dcGRf"><img class="preview" src="https://www.shadertoy.com/media/shaders/3dcGRf.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/3dcGRf">Untitled 0x00000008</a></h2>
             <p class="summary">
                 temp •
-                2020/01/06
+                <span class="published">2020/01/06</span>
+                
                 <br/>
-                Image • 2981 chars<br/>
+                Image • <span class="chars">2981</span> chars
+                <br/>
                 <span class="likes">5</span> likes •
                 <span class="views">134</span> views •
                 <span class="ratio">3.73</span>% like
@@ -560,47 +833,125 @@
             <br/>
             test 100% reflective surface
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/WtK3Ry"><img class="preview" src="https://www.shadertoy.com/media/shaders/WtK3Ry.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/WtK3Ry">Untitled 0x0000000D</a></h2>
             <p class="summary">
                 light2d •
-                2020/01/20
+                <span class="published">2020/01/20</span>
+                
                 <br/>
-                Buffer A • Image｜1882 + 92 = 1974 chars<br/>
-                <span class="likes">10</span> likes •
-                <span class="views">254</span> views •
-                <span class="ratio">3.94</span>% like
+                Buffer A • Image｜1882 + 92 = <span class="chars">1974</span> chars
+                <br/>
+                <span class="likes">11</span> likes •
+                <span class="views">256</span> views •
+                <span class="ratio">4.30</span>% like
             </p>
             <br/>
             basically a copy of my c++ code <a rel="nofollow" href="https://github.com/Harry7557558/Graphics/blob/light2d/light2d%20(no%20recursion).cpp">https://github.com/Harry7557558/Graphics/blob/light2d/light2d%20(no%20recursion).cpp</a> (not gl)
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/Wdsfzj"><img class="preview" src="https://www.shadertoy.com/media/shaders/Wdsfzj.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/Wdsfzj">Untitled 0x00000017</a></h2>
+            <p class="summary">
+                archer •
+                <span class="published">2020/05/07</span>
+                • unlisted
+                <br/>
+                Common • Image｜2542 + 1274 = <span class="chars">3816</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">6</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            school project
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/sdBczG"><img class="preview" src="https://www.shadertoy.com/media/shaders/sdBczG.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/sdBczG">WaveEquation_9ec8</a></h2>
+            <p class="summary">
+                ripples, wave, simulation, water, equation •
+                <span class="published">2022/02/03</span>
+                • unlisted
+                <br/>
+                Common • Buffer A • Buffer B • Image｜1104 + 261 + 261 + 1509 = <span class="chars">3135</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">13</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            I see people made cool simulations with buffers, so I decided to give it a try.<br />One of the most basic things I can do with buffers is solve the wave equation. All parameters are in SI units. Mouseable.
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/ttcSWM"><img class="preview" src="https://www.shadertoy.com/media/shaders/ttcSWM.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/ttcSWM">Web Camera</a></h2>
+            <p class="summary">
+                temp •
+                <span class="published">2020/02/06</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">76</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">12</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            something I made for myself, since the camera app doesn&#39;t work properly.
+        </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/slSXz1"><img class="preview" src="https://www.shadertoy.com/media/shaders/slSXz1.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/slSXz1">dmojistan logo</a></h2>
+            <p class="summary">
+                render, main •
+                <span class="published">2021/07/23</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">634</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">54</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            hehe
+        </td>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/NscXRj"><img class="preview" src="https://www.shadertoy.com/media/shaders/NscXRj.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/NscXRj">isp-glassball-11-mix</a></h2>
             <p class="summary">
                 scattering, emission, henyeygreenstein, glassball •
-                2021/10/05
+                <span class="published">2021/10/05</span>
+                
                 <br/>
-                Buffer A • Image｜5275 + 73 = 5348 chars<br/>
-                <span class="likes">16</span> likes •
-                <span class="views">234</span> views •
-                <span class="ratio">6.84</span>% like
+                Buffer A • Image｜5275 + 73 = <span class="chars">5348</span> chars
+                <br/>
+                <span class="likes">17</span> likes •
+                <span class="views">235</span> views •
+                <span class="ratio">7.23</span>% like
             </p>
             <br/>
             Experimental.<br /><a rel="nofollow" href="https://github.com/harry7557558/Shadertoy/tree/master/isp-glass">https://github.com/harry7557558/Shadertoy/tree/master/isp-glass</a>
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/fd3Szj"><img class="preview" src="https://www.shadertoy.com/media/shaders/fd3Szj.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/fd3Szj">isp-glassball-12-mix</a></h2>
             <p class="summary">
                 scattering, emission, henyeygreenstein, glassball •
-                2021/10/05
+                <span class="published">2021/10/05</span>
+                
                 <br/>
-                Buffer A • Image｜5327 + 73 = 5400 chars<br/>
+                Buffer A • Image｜5327 + 73 = <span class="chars">5400</span> chars
+                <br/>
                 <span class="likes">9</span> likes •
                 <span class="views">153</span> views •
                 <span class="ratio">5.88</span>% like
@@ -608,15 +959,17 @@
             <br/>
             Experimental.<br /><a rel="nofollow" href="https://github.com/harry7557558/Shadertoy/tree/master/isp-glass">https://github.com/harry7557558/Shadertoy/tree/master/isp-glass</a>
         </td>
-    </tr></table></div><div class="shader"><table><tr>
+    </tr></table></div><div class="shader public"><table><tr>
         <td><a href="https://www.shadertoy.com/view/3dBcR3"><img class="preview" src="https://www.shadertoy.com/media/shaders/3dBcR3.jpg" /></a></td>
         <td class="info">
             <h2 class="title"><a href="https://www.shadertoy.com/view/3dBcR3">sdLine Continuity</a></h2>
             <p class="summary">
                 sdf, smooth, g2 •
-                2020/04/16
+                <span class="published">2020/04/16</span>
+                
                 <br/>
-                Image • 1401 chars<br/>
+                Image • <span class="chars">1401</span> chars
+                <br/>
                 <span class="likes">4</span> likes •
                 <span class="views">80</span> views •
                 <span class="ratio">5.00</span>% like
@@ -624,7 +977,26 @@
             <br/>
             Use a power higher than 2 to increase the continuity of line segment primitive for modeling
         </td>
+    </tr></table></div><div class="shader unlisted"><table><tr>
+        <td><a href="https://www.shadertoy.com/view/ws2yzG"><img class="preview" src="https://www.shadertoy.com/media/shaders/ws2yzG.jpg" /></a></td>
+        <td class="info">
+            <h2 class="title"><a href="https://www.shadertoy.com/view/ws2yzG">﻿Cross-Platform Test</a></h2>
+            <p class="summary">
+                nan •
+                <span class="published">2020/04/14</span>
+                • unlisted
+                <br/>
+                Image • <span class="chars">96</span> chars
+                <br/>
+                <span class="likes">0</span> likes •
+                <span class="views">2</span> views •
+                <span class="ratio">0.00</span>% like
+            </p>
+            <br/>
+            This shader is used to test shaders on different hardware and operating system.
+        </td>
     </tr></table></div>
+</div>
 <div style="margin:0.6em"><br/>
     <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise specified, all shaders are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
 <br/><br/><br/></div>

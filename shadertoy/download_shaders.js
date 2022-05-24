@@ -1,11 +1,11 @@
-// Get a list of public shaders on Shadertoy
+// Get a list of published shaders on Shadertoy
 
 // 1. Log in and go to https://www.shadertoy.com/profile?show=shaders
 // 2. Run this script
 // 3. Copy JSON from F12 console and paste into `shaders.json`
 
 (function() {
-    // get list of public shaders
+    // get list of published shaders
     var table = document.getElementById("shadersTable");
     var columns = table.tHead.getElementsByTagName("td");
     var coli = 0;
@@ -19,8 +19,7 @@
         var path = rows[i].getElementsByTagName("a")[0].href;
         var id = path.split('/')[path.split('/').length - 1];
         var status = rows[i].getElementsByTagName("td")[coli];
-        // if (/public/.test(status.textContent))
-        if (["rgb(0, 160, 0)", "rgb(0, 128, 160)"].indexOf(status.style.color) >= 0)
+        if (["rgb(0, 160, 0)", "rgb(0, 128, 160)", "rgb(160, 128, 0)"].indexOf(status.style.color) >= 0)
             shaderIds.push(id);
     }
     console.log(shaderIds);
