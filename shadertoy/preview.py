@@ -3,6 +3,7 @@
 import json
 import datetime
 import bbcode
+import os
 
 
 # https://github.com/harry7557558/bot7557558/blob/master/shadertoy.py
@@ -164,14 +165,13 @@ def get_shader_summary(shader) -> str:
         })
     if len(passes) == 1:
         passes_str = passes[0]['name'] + " • " + \
-            '<span class="chars">' + str(passes[0]['chars']) + "</span> chars"
+            f'<span class="chars">{passes[0]["chars"]}</span> chars'
     else:
         passes = sorted(passes, key=lambda rp: orders.index(rp['name']))
         passes_name_str = " • ".join([ps['name'] for ps in passes])
         passes_chars = [ps['chars'] for ps in passes]
         passes_chars_str = " + ".join(map(str, passes_chars)) + \
-            ' = <span class="chars">' + \
-            str(sum(passes_chars)) + "</span> chars"
+            f' = <span class="chars">{sum(passes_chars)}</span> chars'
         passes_str = passes_name_str + "｜" + passes_chars_str
 
     return {
@@ -196,7 +196,7 @@ with open("shadertoy/shaders.json", "r") as fp:
 
 # Header of index.html
 index = """<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>List of my published Shadertoy shaders</title>
@@ -208,30 +208,41 @@ index = """<!DOCTYPE html>
     <meta name="robots" content="index, follow" />
 
     <style>
-        body{margin:0;padding:0}
+        body{margin:0 0.5em;padding:0}
         #container{display:inline;margin:0;padding:0}
         .shader{display:block;margin:0.5em;padding:0.5em 0;border-bottom:1px solid gray}
-        .preview{width:24em;display:inline-block;margin:0 2em 0 0}
+        .preview{width:24em;height:13.5em;display:block;margin:0 2em 0 0;position:absolute;left:0;top:0}
+        .image-hover-hide{opacity:1.0}
+        .image-hover-hide:hover{opacity:0.0}
         .title a{color:black;text-decoration:none}
         .title a:hover{text-decoration:underline}
-        hr{margin-block:0.5em 0.5em}
+        #chartjs-canvas{width:40em;height:20em;margin:1em 0;border:2px solid #bbb}
+        hr{margin-block:1.0em}
         .info{display:inline-block;margin:0;min-width:20em;word-break:break-word}
         h1{margin:1em 0 0.8em;font-size:2em}
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
-        .summary{margin:0;font-size:1em;color:#222}
+        .summary{margin:0;font-size:1em;color:#555}
         a{font-size:1em;padding:0 0.1em;text-decoration:none}
         a:hover{text-decoration:underline}
         input,select,button{display:inline-block;vertical-align:middle}
         .unlisted{display:none}
         .unlisted h2{font-style:italic}
+        .vsc-controller{display:none}
     </style>
-    <script src="script.js"></script>
 </head>
 <body>
-    <div style="margin:1.2em 1.2em 0em;white-space:nowrap">
+    <div style="margin:1.2em 0.8em 0;white-space:nowrap">
         <h1>List of my published Shadertoy shaders</h1>
         <p class="summary">Harry Chen (<a href='https://www.shadertoy.com/user/harry7557558'>harry7557558</a>) - Updated {%CURRENT_DATE%}</p>
+        <hr/>
+        <span>
+            Horizontal axis: <select id="chart-x-select"></select> ｜
+            Vertical axis: <select id="chart-y-select"></select>
+        </span>
+        <br/>
+        <canvas id="chartjs-canvas"></canvas>
+        <br/>
         <p>
             Sort by <select id="sort-select"></select> ｜
             <input type="checkbox" id="unlisted-checkbox" /> show unlisted shaders
@@ -240,44 +251,57 @@ index = """<!DOCTYPE html>
     </div>
     <div id="container">""".replace('{%CURRENT_DATE%}', datetime.datetime.now().strftime("%Y/%m/%d"))
 
-
 # Go through the list of shaders
 for shader in shaders:
 
     summary = get_shader_summary(shader)
 
-    display_status = "• " + summary['status']
+    display_status = '• <span class="status">' + \
+        summary['status'] + "</span>"
     if summary['status'] == 'public':
-        display_status = ""
+        display_status = '<span class="status" style="display:none">public</span>'
+
+    if os.path.isfile(f"shadertoy/videos/{summary['shader_id']}.mp4"):
+        image_preview = f"""<video class="preview" autoplay muted loop noplaybackrate>
+                    <source src="videos/{summary['shader_id']}.mp4" type="video/mp4">
+                </video>
+                <img class="preview image-hover-hide" src="{summary['preview_url']}" alt="{summary['title']}" />"""
+    else:
+        image_preview = f"""<img class="preview" src="{summary['preview_url']}" alt="{summary['title']}" />"""
 
     # add graph to the index
-    content = f"""<div class="shader {summary['status'].replace('+', '-')}"><table><tr>
-        <td><a href="{summary['url']}"><img class="preview" src="{summary['preview_url']}" /></a></td>
-        <td class="info">
-            <h2 class="title"><a href="{summary['url']}">{summary['title']}</a></h2>
-            <p class="summary">
-                {summary['tags']} •
-                <span class="published">{summary['published']}</span>
-                {display_status}
+    content = f"""
+        <div class="shader {summary['status'].replace('+', '-')}"><table><tr>
+            <td><a href="{summary['url']}" style="position:relative">
+                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
+                {image_preview}
+            </a></td>
+            <td class="info">
+                <h2 class="title"><a href="{summary['url']}">{summary['title']}</a></h2>
+                <p class="summary">
+                    {summary['tags']} •
+                    <span class="published">{summary['published']}</span>
+                    {display_status}
+                    <br/>
+                    {summary['renderpass']}
+                    <br/>
+                    <span class="likes">{summary['likes']}</span> likes •
+                    <span class="views">{summary['views']}</span> views •
+                    <span class="ratio">{summary['ratio']}</span>% like
+                </p>
                 <br/>
-                {summary['renderpass']}
-                <br/>
-                <span class="likes">{summary['likes']}</span> likes •
-                <span class="views">{summary['views']}</span> views •
-                <span class="ratio">{summary['ratio']}</span>% like
-            </p>
-            <br/>
-            {summary['description']}
-        </td>
-    </tr></table></div>"""
+                {summary['description']}
+            </td>
+        </tr></table></div>"""
     index += content
 
-
+# Footer of index.html
 index += """
-</div>
-<div style="margin:0.6em"><br/>
-    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise specified, all shaders are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-<br/><br/><br/></div>
+    </div>
+    <div style="margin:0.6em"><br/>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise specified, all shaders are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    <br/><br/><br/></div>
+    <script src="script.js"></script>
 </body></html>"""
 
 open('shadertoy/index.html', "wb").write(bytearray(index, 'utf-8'))
