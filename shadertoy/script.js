@@ -55,19 +55,23 @@ function initSort() {
         { name: "shortest", key: "chars", comp: 1.0 },
     ];
     let selector = document.getElementById("sort-select");
+    var selector_value = "ratio";  // less popular ones
     for (var i = 0; i < sortModes.length; i++) {
         var option = document.createElement("option");
         option.innerHTML = sortModes[i].name;
         option.value = sortModes[i].key;
+        if (document.URL.indexOf("sort=" + sortModes[i].key) != -1)
+            selector_value = sortModes[i].key;
         selector.appendChild(option);
     }
-    selector.value = "ratio";  // less popular ones
+    selector.value = selector_value;
     selector.addEventListener("input", sortShaders);
     sortShaders();
 }
 
 function initUnlistedCheckbox() {
     let checkbox = document.getElementById("unlisted-checkbox");
+    checkbox.checked = (document.URL.indexOf("unlisted=1") != -1);
     function updateCss() {
         let unlisted = document.getElementsByClassName("unlisted");
         var display = checkbox.checked ? "block" : "none";
@@ -94,11 +98,11 @@ function getShadersPoints(shaders, key1, key2) {
 
 function initChart() {
     const axesVariables = [
-        { name: "year", key: "year" },
+        { name: "date published", key: "year" },
         { name: "views", key: "views" },
         { name: "likes", key: "likes" },
         { name: "like rate (%)", key: "ratio" },
-        { name: "size (chars)", key: "chars" },
+        { name: "char count", key: "chars" },
     ];
     let selectorX = document.getElementById("chart-x-select");
     let selectorY = document.getElementById("chart-y-select");

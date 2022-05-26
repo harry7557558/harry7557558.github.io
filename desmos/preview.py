@@ -1,6 +1,7 @@
 # backup all of my saved Desmos graphs
 
-from requests_html import HTMLSession
+import requests
+import re
 import html
 import json
 import latex_parser
@@ -8,15 +9,22 @@ import datetime
 import os
 
 
-def download_graph(graph_id: str):
-    url = f'https://www.desmos.com/calculator/{graph_id}'
-    r = HTMLSession().get(url)
-    if r.status_code != 200:
-        print(r, url)
-    body = r.html.find('body', first='True')
-    data = body.attrs['data-load-data']
-    data = json.loads(data)
-    return data['graph']
+def get_graph_info(graph_id: str):
+    url = "https://www.desmos.com/calculator/" + graph_id
+    req = requests.get(url)
+    if req.status_code != 200:
+        raise ValueError(f"Request returns {req.status_code}")
+    content = req.content.decode('utf-8')
+    matches = re.findall(r'data-load-data="([^\"]+?)"', content)
+    if len(matches) == 0:
+        raise ValueError(f"Graph contains no `data-load-data`.")
+    info = html.unescape(matches[0])
+    graph = json.loads(info)['graph']
+    if "state" not in graph:
+        state_url = graph['stateUrl']
+        state_str = requests.get(state_url).content
+        graph['state'] = json.loads(state_str)
+    return graph
 
 
 def get_representative_equation(expressions: dict):
@@ -97,19 +105,32 @@ with open("desmos/graphs_id.json", "r") as fp:
 
 # contents of index.html
 index = """<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>List of my saved Desmos graphs</title>
     <link rel="icon" href="https://harry7557558.github.io/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="description" content="List of my saved Desmos graphs" />
-    <meta name="keywords" content="harry7557558, Desmos, graph" />
+    <meta name="description" content="This page lists all of my saved Desmos graphs: 3D graphing, function art, math explorations, and more." />
+    <meta name="keywords" content="harry7557558, Desmos, graph, function, art, 3D" />
     <meta name="robots" content="index, follow" />
 
-    <script id="mathjax-config-script" type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax:{inlineMath:[["$","$"]],preview:"none"},"fast-preview":{disabled:true},AssistiveMML:{disabled:true},menuSettings:{inTabOrder:false},messageStyle:"simple",positionToHash: false,"HTML-CSS":{linebreaks:{automatic:false}}});</script>
-    <script type="text/javascript" id="MathJax_src" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                packages: { '[+]': ['color'] }
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            // options: { enableMenu: false }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+        onerror="alert('Failed to load MathJax.')"></script>
+
     <style>
         .graph{display:block;margin:0.5em;padding:0.5em;border-bottom:1px solid gray}
         img{height:15em;display:inline-block;margin:0 2em 0 0}
@@ -142,9 +163,9 @@ for graph_id in graphs:
             graph = json.load(fp)
         print("loaded from file", end=' - ')
     else:
-        graph = download_graph(graph_id)
+        graph = get_graph_info(graph_id)
         with open(filename, 'w') as fp:
-            json.dump(graph, fp)
+            json.dump(graph, fp, separators=(',', ':'))
         print("downloaded", end=' - ')
 
     date = datetime.datetime.strptime(
@@ -155,6 +176,10 @@ for graph_id in graphs:
         description = description[:256] + "..."
     preview = ""
     if description != "":
+        description = html.escape(description)
+        # https://stackoverflow.com/a/6041965
+        url_regex = r"((http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))"
+        description = re.sub(url_regex, '<a href="\\1">\\1</a>', description)
         preview += f"""<p class="description">{description}</p>"""
     if len(description)+32*description.count('\n') < 128:
         equation = html.escape(get_representative_equation(graph))
@@ -162,7 +187,7 @@ for graph_id in graphs:
 
     # add graph to the index
     content = f"""<div class="graph"><table><tr>
-        <td><img src="{graph['thumbUrl']}" /></td>
+        <td><img src="{graph['thumbUrl']}" alt="{graph['title']}" /></td>
         <td class="info">
             <h2>{graph['title']}</h2>
             <p class="created">{date} • {size_summary}</p>

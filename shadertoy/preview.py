@@ -3,6 +3,7 @@
 import json
 import datetime
 import bbcode
+import re
 import os
 
 
@@ -152,17 +153,56 @@ def get_shader_summary(shader) -> str:
     orders = ["Common", "Buffer A", "Buffer B",
               "Buffer C", "Buffer D", "Cube A", "Image", "Sound"]
     passes = []
+
+    mains_count = {
+        'mainImage': 0,
+        'mainSound': 0,
+        'mainVR': 0,
+    }
+    uniforms_count = {
+        'iResolution': 0,
+        'iTime': 0,
+        'iTimeDelta': 0,
+        'iChannelTime': 0,
+        'iFrame': 0,
+        'iMouse': 0,
+        'iDate': 0,
+        'iSampleRate': 0,
+        'iChannelResolution': 0,
+    }
+    textures_count = {
+        'buffer': 0,
+        'texture': 0,
+        'cubemap': 0,
+        'video': 0,
+        'music': 0,
+        'musicstream': 0,
+        'mic': 0,
+        'webcam': 0,
+        'volume': 0,
+        'keyboard': 0,
+    }
+
     for renderpass in shader['renderpass']:
         name = renderpass['name']
         name = name.replace("Buf ", "Buffer ")
         assert name in orders
-        inputs = renderpass['inputs']
-        outputs = renderpass['outputs']
-        code = renderpass['code']
+        code = minify_code(renderpass['code'])
+        open(".temp", "w").write(minify_code(code))  # so I can check for bug
         passes.append({
             "name": name,
-            "chars": len(minify_code(code))
+            "chars": len(code)
         })
+        words = re.sub(r"[^A-Za-z0-9_]+", ' ', code).strip()
+        for word in words.split():
+            if word in mains_count:
+                mains_count[word] += 1
+            if word in uniforms_count:
+                uniforms_count[word] += 1
+        for input in renderpass['inputs']:
+            if input['type'] in textures_count:  # should be
+                textures_count[input['type']] += 1
+
     if len(passes) == 1:
         passes_str = passes[0]['name'] + " • " + \
             f'<span class="chars">{passes[0]["chars"]}</span> chars'
@@ -173,6 +213,13 @@ def get_shader_summary(shader) -> str:
         passes_chars_str = " + ".join(map(str, passes_chars)) + \
             f' = <span class="chars">{sum(passes_chars)}</span> chars'
         passes_str = passes_name_str + "｜" + passes_chars_str
+
+    mains = [item[0] for item in mains_count.items() if item[1] > 0]
+    uniforms = [item[0] for item in uniforms_count.items() if item[1] > 0]
+    textures = [item[0] for item in textures_count.items() if item[1] > 0]
+    ios = '｜'.join([' • '.join(s)
+                    for s in [mains, uniforms, textures] if s != []])
+    passes_str += '<br/>' + ios
 
     return {
         'shader_id': shader_id,
@@ -200,11 +247,10 @@ index = """<!DOCTYPE html>
 <head>
     <meta charset="utf-8" />
     <title>List of my published Shadertoy shaders</title>
-    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="description" content="List of my published Shadertoy shaders" />
-    <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL" />
+    <meta name="description" content="This page lists all of my published Shadertoy shaders, which includes my experiments in rendering, modeling, data fitting, simulation, and art." />
+    <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL, function" />
     <meta name="robots" content="index, follow" />
 
     <style>
@@ -218,7 +264,7 @@ index = """<!DOCTYPE html>
         .title a:hover{text-decoration:underline}
         #chartjs-canvas{width:40em;height:20em;margin:1em 0;border:2px solid #bbb}
         hr{margin-block:1.0em}
-        .info{display:inline-block;margin:0;min-width:20em;word-break:break-word}
+        .info{display:inline-block;margin:-0.2em 0 0.5em;min-width:20em;word-break:break-word}
         h1{margin:1em 0 0.8em;font-size:2em}
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
