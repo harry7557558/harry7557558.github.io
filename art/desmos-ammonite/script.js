@@ -1,3 +1,5 @@
+"use strict";
+
 // Shader sources
 const VS_BACKGROUND = `precision highp float;
 attribute vec4 vertexPosition;
@@ -36,10 +38,11 @@ const VS_STROKE = `precision highp float;
 uniform mat4 transformMatrix;
 uniform vec2 iResolution;
 uniform vec4 iXyminmax;
+uniform float iThickness;
 attribute vec4 aPosition;
 attribute vec4 aDirection;
 attribute vec4 aColor;
-varying vec3 vColor;
+varying vec4 vColor;
 
 void main() {
     // matrix after screen-space translation
@@ -60,20 +63,19 @@ void main() {
     vec4 q1 = mat * vec4(q01,1); q1 /= q1.w;
     vec4 pos = p1;
     vec2 dp = normalize(q1.xy - p1.xy);
-    vec2 thickness = 0.05 * sc;
     float ca = cos(aDirection.w), sa = sin(aDirection.w);
-    pos.xy += thickness*(mat2(ca,sa,-sa,ca)*dp+0.15*dp);
+    pos.xy += iThickness*sc*(mat2(ca,sa,-sa,ca)*dp+0.15*dp);
     pos.z = 0.01*pos.z + 0.5;
     gl_Position = pos;
 
     // color
-    vColor = clamp(aColor.xyz, 0.0, 1.0);
+    vColor = clamp(aColor, 0.0, 1.0);
 }
 `;
 const FS_STROKE = `precision highp float;
-varying vec3 vColor;
+varying vec4 vColor;
 void main() {
-    gl_FragColor = vec4(vColor, 0.9);
+    gl_FragColor = vColor;
 }
 `;
 
@@ -162,6 +164,7 @@ function segmentCurve(fun, t0, t1, ndif) {
     }
 }
 
+
 // Hood
 function funHood(u, v) {
     var x = pow(cos(0.5 * PI * u), 1.7) * (0.5 + 3 * v)
@@ -230,6 +233,39 @@ function generateTentacles() {
         segments: segments,
         colors: colors
     };
+}
+
+// Eyes
+function funEye(i, n) {
+    i = i - 0.5;
+    var z = 2.0 * i / n - 1.0;
+    var x = sqrt(1 - z * z) * cos(k_fibonacci * i);
+    var y = sqrt(1 - z * z) * sin(k_fibonacci * i);
+    var eyewhite = [0.7 + 0.3 * x, 1.4 + 0.1 * y, -3.4 + 0.25 * z];
+    var eyeblack = [0.7 + 0.05 * x, 1.53 + 0.05 * y, -3.4 + 0.05 * z];
+    return {
+        eyewhite1: eyewhite,
+        eyeblack1: eyeblack,
+        eyewhite2: [eyewhite[0], -eyewhite[1], eyewhite[2]],
+        eyeblack2: [eyeblack[0], -eyeblack[1], eyeblack[2]]
+    };
+}
+function generateEyes() {
+    const n_eye = 32;
+    var res = [
+        { points: new Array(n_eye), color: [120 / 255, 150 / 255, 150 / 255, 0.8] },
+        { points: new Array(n_eye), color: [0, 0, 0, 0.5] },
+        { points: new Array(n_eye), color: [70 / 255, 120 / 255, 120 / 255, 0.8] },
+        { points: new Array(n_eye), color: [0, 0, 0, 0.5] },
+    ];
+    for (var i = 0; i < n_eye; i++) {
+        var sp = funEye(i + 1, n_eye);
+        res[0].points[i] = sp.eyewhite1;
+        res[1].points[i] = sp.eyeblack1;
+        res[2].points[i] = sp.eyewhite2;
+        res[3].points[i] = sp.eyeblack2;
+    }
+    return res;
 }
 
 // Shell
@@ -313,11 +349,12 @@ function generateShell() {
         }
     }
     return {
+        points: points,
+        pcolors: colors,
         segments: uSegs.concat(vSegs),
         colors: uCols.concat(vCols)
     };
 }
-const generatedShell = generateShell();
 
 
 // Create shader program
@@ -351,8 +388,7 @@ function drawBackground(renderer) {
     gl.useProgram(program);
 
     // setup position buffer
-    var positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, renderer.buffers.positionBuffer);
     var positions = [-1, 1, 1, 1, -1, -1, 1, -1];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
     {
@@ -381,22 +417,87 @@ function drawBackground(renderer) {
         const vertexCount = 4;
         gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
     }
-    gl.deleteBuffer(positionBuffer);
 }
 
-// Draw lines
-// lines are passed as [[x1, y1, z1, x2, y2, z2], ...]
-// colors are passed as [[r, g, b], ...]
-function drawLines(renderer, lines, colors) {
+// A general VBO drawing function that uses the stroke drawing program
+// obj is returned by rasterLines() or rasterPoints()
+function drawVbo(renderer, obj) {
+    let vertexCount = obj.vertexCount,
+        verts = obj.verts,
+        dirs = obj.dirs,
+        cols = obj.cols,
+        indices = obj.indices,
+        thickness = obj.radius;
     let gl = renderer.gl;
     let program = renderer.programs.strokeRenderer;
     gl.useProgram(program);
 
+    // setup uniforms
+    gl.uniform2f(gl.getUniformLocation(program, "iResolution"),
+        renderer.viewport.iResolution[0], renderer.viewport.iResolution[1]);
+    gl.uniform4f(gl.getUniformLocation(program, "iXyminmax"),
+        renderer.viewport.xmin, renderer.viewport.ymin,
+        renderer.viewport.xmax, renderer.viewport.ymax);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "transformMatrix"),
+        false, calcMatrix(renderer.viewport));
+    gl.uniform1f(gl.getUniformLocation(program, "iThickness"), thickness);
+
     // setup buffers
+    function setVec3Buffer(attribName, numComponents) {
+        const type = gl.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        var attrib = gl.getAttribLocation(program, attribName);
+        gl.vertexAttribPointer(
+            attrib,
+            numComponents, type, normalize, stride, offset);
+        gl.enableVertexAttribArray(attrib);
+    }
+    let positionBuffer = renderer.buffers.positionBuffer;
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
+    setVec3Buffer("aPosition", 4);
+    let directionBuffer = renderer.buffers.directionBuffer;
+    gl.bindBuffer(gl.ARRAY_BUFFER, directionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(dirs), gl.STATIC_DRAW);
+    setVec3Buffer("aDirection", 4);
+    let colorBuffer = renderer.buffers.colorBuffer;
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cols), gl.STATIC_DRAW);
+    setVec3Buffer("aColor", 4);
+    let indiceBuffer = renderer.buffers.indiceBuffer;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    const type = gl.UNSIGNED_SHORT;
+    const offset = 0;
+    gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+}
+
+// Concatenate two objects passed to drawVbo
+function concatObjects(obj1, obj2) {
+    if (obj1.radius != obj2.radius)
+        throw new Error("Unable to concatenate two objects with different radius.");
+    var obj = {};
+    obj.vertexCount = obj1.vertexCount + obj2.vertexCount;
+    obj.verts = obj1.verts.concat(obj2.verts);
+    obj.dirs = obj1.dirs.concat(obj2.dirs);
+    obj.cols = obj1.cols.concat(obj2.cols);
+    obj.indices = obj1.indices.concat(obj2.indices);
+    for (var i = 0; i < obj2.indices.length; i++)
+        obj.indices[obj1.indices.length + i] += obj1.verts.length / 4;
+    obj.radius = obj1.radius;
+    return obj;
+}
+
+// Convert line segments to triangles
+// lines are passed as [[x1, y1, z1, x2, y2, z2], ...]
+// colors are passed as [[r, g, b], ...]
+function rasterLines(lines, colors) {
     let n = lines.length;
     let verts = new Array(16 * n).fill(0);
     let dirs = new Array(16 * n).fill(0);
-    let cols = new Array(16 * n).fill(1);
+    let cols = new Array(16 * n).fill(0.9);
     let indices = new Array(6 * n);
     for (var i = 0; i < n; i++) {
         var ai = 16 * i;
@@ -416,119 +517,152 @@ function drawLines(renderer, lines, colors) {
         dirs[ai + 7] = -0.5 * PI;
         dirs[ai + 11] = 0.5 * PI;
         dirs[ai + 15] = -0.5 * PI;
+        if (colors[i].length > 3) {
+            for (var j = 3; j < 16; j += 4)
+                cols[ai + j] = colors[i][3];
+        }
         // indices
         ai = 6 * i;
         var ti = 4 * i;
         indices[ai] = ti, indices[ai + 1] = ti + 1, indices[ai + 2] = ti + 2;
         indices[ai + 3] = ti, indices[ai + 4] = ti + 2, indices[ai + 5] = ti + 3;
     }
-
-    // setup uniforms
-    gl.uniform2f(gl.getUniformLocation(program, "iResolution"),
-        renderer.viewport.iResolution[0], renderer.viewport.iResolution[1]);
-    gl.uniform4f(gl.getUniformLocation(program, "iXyminmax"),
-        renderer.viewport.xmin, renderer.viewport.ymin,
-        renderer.viewport.xmax, renderer.viewport.ymax);
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "transformMatrix"),
-        false, calcMatrix(renderer.viewport));
-
-    // setup position buffer
-    function setVec3Buffer(attribName, numComponents) {
-        const type = gl.FLOAT;
-        const normalize = false;
-        const stride = 0;
-        const offset = 0;
-        var attrib = gl.getAttribLocation(program, attribName);
-        gl.vertexAttribPointer(
-            attrib,
-            numComponents, type, normalize, stride, offset);
-        gl.enableVertexAttribArray(attrib);
-    }
-    let positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
-    setVec3Buffer("aPosition", 4);
-
-    // setup direction buffer
-    let directionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, directionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(dirs), gl.STATIC_DRAW);
-    setVec3Buffer("aDirection", 4);
-
-    // setup color buffer
-    let colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cols), gl.STATIC_DRAW);
-    setVec3Buffer("aColor", 4);
-
-    // setup indice buffer + draw elements
-    let indiceBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indiceBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-    {
-        const vertexCount = indices.length;
-        const type = gl.UNSIGNED_SHORT;
-        const offset = 0;
-        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-    }
-
-    // clean up
-    gl.deleteBuffer(positionBuffer);
-    // gl.deleteBuffer(directionBuffer);
-    // gl.deleteBuffer(colorBuffer);
-    gl.deleteBuffer(indiceBuffer);
+    return {
+        vertexCount: 6 * n,
+        verts: verts,
+        dirs: dirs,
+        cols: cols,
+        indices: indices,
+        radius: 0.05
+    };
 }
 
-// Draw the scene, main rendering function
-function drawScene(renderer) {
-    let canvas = renderer.canvas;
-    let gl = renderer.gl;
+// Convert points to triangles
+// points are passed as [[x, y, z], ...]
+// colors are passed as [[r, g, b], ...]
+function rasterPoints(points, colors, radius, connectLines = true) {
 
-    // clear the canvas
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // call drawLines() to draw lines connecting the points
+    // if (connectLines) {
+    //     let lines = new Array(points.length - 1);
+    //     for (var i = 0; i + 1 < points.length; i++)
+    //         lines[i] = points[i].concat(points[i + 1]);
+    //     drawLines(renderer, lines, colors);
+    // }
 
-    // background
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.BLEND)
-    gl.colorMask(true, true, true, true);
-    drawBackground(renderer);
-
-    gl.clearDepth(-1.0);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.GEQUAL);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.colorMask(true, true, true, false);
-
-    // axes
-    if (1) {
-        let coords = [
-            [0, 0, 0, 10, 0, 0],
-            [0, 0, 0, 0, 10, 0],
-            [0, 0, 0, 0, 0, 10]];
-        let cols = [[1, 0, 0], [0, 0.5, 0], [0, 0, 1]];
-        drawLines(renderer, coords, cols);
+    // draw points
+    let n = points.length;
+    const m = 8;  // number of vertices of the polygon
+    let verts = new Array(4 * m * n).fill(0);
+    let dirs = new Array(4 * m * n).fill(0);
+    let cols = new Array(4 * m * n).fill(0.9);
+    let indices = new Array(3 * m * n);
+    for (var i = 0; i < n; i++) {
+        var ai = 4 * m * i;
+        for (var j = 0; j < m; j++) {
+            var aj = ai + 4 * j;
+            for (var k = 0; k < 3; k++) {
+                verts[aj + k] = points[i][k];
+                dirs[aj + k] = [1, 0, 0][k];
+                cols[aj + k] = colors[i][k];
+            }
+            if (colors[i].length > 3) cols[aj + 3] = colors[i][3];
+            dirs[aj + 3] = 2 * PI * j / m;
+        }
+        // indices
+        ai = 3 * m * i;
+        for (var j = 0; j < m; j++) {
+            var aj = ai + 3 * j;
+            indices[aj + 0] = m * i;
+            indices[aj + 1] = m * i + j;
+            indices[aj + 2] = m * i + (j + 1) % m;
+        }
     }
-
-    // shell
-    let shell = generatedShell;
-    drawLines(renderer, shell.segments, shell.colors);
-
-    // body parts
-    let tentacles = generateTentacles();
-    drawLines(renderer, tentacles.segments, tentacles.colors);
-    let hood = generateHood();
-    drawLines(renderer, hood.segments, hood.colors);
+    return {
+        vertexCount: 3 * m * n,
+        verts: verts,
+        dirs: dirs,
+        cols: cols,
+        indices: indices,
+        radius: radius
+    };
 }
 
+
+// Layout the scene
+function Scene() {
+    // static parts
+    let shell = generateShell();
+    this.shellPoints = rasterPoints(shell.points, shell.pcolors, 0.15);
+    this.shellLines = rasterLines(shell.segments, shell.colors);
+    let eyes = generateEyes();
+    this.eyePoints = null;
+    for (var i = 0; i < 4; i++) {
+        var colors = new Array(eyes[i].points.length).fill(eyes[i].color);
+        var obj = rasterPoints(eyes[i].points, colors, 0.2, true);
+        if (this.eyePoints == null) this.eyePoints = obj;
+        else this.eyePoints = concatObjects(this.eyePoints, obj);
+    }
+    this.axesLines = rasterLines([
+        [0, 0, 0, 10, 0, 0],
+        [0, 0, 0, 0, 10, 0],
+        [0, 0, 0, 0, 0, 10]
+    ], [[1, 0, 0], [0, 0.5, 0], [0, 0, 1]]);
+
+    // moving parts
+    this.update = function () {
+        let tentacles = generateTentacles();
+        this.tentacleLines = rasterLines(tentacles.segments, tentacles.colors);
+        let hood = generateHood();
+        this.hoodLines = rasterLines(hood.segments, hood.colors);
+    };
+    this.update();
+
+    // draw function
+    this.draw = function (renderer) {
+        let canvas = renderer.canvas;
+        let gl = renderer.gl;
+
+        // clear the canvas
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clearDepth(-1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        // background
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.BLEND);
+        gl.colorMask(true, true, true, true);
+        drawBackground(renderer);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.colorMask(true, true, true, false);
+
+        // shell
+        drawVbo(renderer, this.shellPoints);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.GEQUAL);
+        drawVbo(renderer, this.shellLines);
+
+        // body parts
+        drawVbo(renderer, this.tentacleLines);
+        drawVbo(renderer, this.hoodLines);
+        drawVbo(renderer, this.eyePoints);
+
+        // axes
+        if (0) drawVbo(renderer, this.axesLines);
+    };
+}
+
+
+// Main
 window.onload = function () {
 
     // load WebGL
     var webgl_failed = function (error) {
         console.error(error);
-        document.write("<h1 style='color:red;'>" + error + "</h1>");
+        document.write("<h1 style='color:red;'>Error: " + error + "</h1>");
     };
     const canvas = document.getElementById("canvas");
     const gl = canvas.getContext("webgl", {
@@ -563,6 +697,12 @@ window.onload = function () {
             ry: -0.27,
             d: 10.0,
         },
+        buffers: {
+            positionBuffer: gl.createBuffer(),
+            directionBuffer: gl.createBuffer(),
+            colorBuffer: gl.createBuffer(),
+            indiceBuffer: gl.createBuffer(),
+        }
     };
 
     // Compile shaders
@@ -576,9 +716,11 @@ window.onload = function () {
         return;
     }
 
+    let scene = new Scene();
     function render_main() {
         try {
-            drawScene(renderer);
+            scene.update();
+            scene.draw(renderer);
         } catch (e) {
             webgl_failed(e);
             return;
@@ -588,33 +730,90 @@ window.onload = function () {
     requestAnimationFrame(render_main);
 
     // window resize
-    function onresize() {
+    function initResize() {
         let viewport = renderer.viewport;
-        var w = window.innerWidth, h = window.innerHeight;
-        viewport.iResolution[0] = w;
-        viewport.iResolution[1] = h;
-        canvas.width = w, canvas.style.width = w + "px";
-        canvas.height = h, canvas.style.height = h + "px";
-        var canw = 8.0 * w / Math.sqrt(w * h), canh = canw * h / w;
-        viewport.xmin = -3.0 - canw, viewport.xmax = -3.0 + canw;
-        viewport.ymin = -0.0 - canh, viewport.ymax = -0.0 + canh;
+        let w = window.innerWidth, h = window.innerHeight;
+        canvas.width = viewport.iResolution[0] = w, canvas.style.width = w + "px";
+        canvas.height = viewport.iResolution[1] = h, canvas.style.height = h + "px";
+        let cx = -3.5, cy = -1.8, sc = 9.0;
+        var canw, canh;
+        if (w < 0.8 * h) canw = sc, canh = canw * h / w;
+        else canh = 0.8 * sc, canw = canh * w / h;
+        viewport.xmin = cx - canw, viewport.xmax = cx + canw;
+        viewport.ymin = cy - canh, viewport.ymax = cy + canh;
     }
-    onresize();
-    window.addEventListener("resize", onresize);
+    function onResize() {
+        let viewport = renderer.viewport;
+        let oldW = viewport.iResolution[0], oldH = viewport.iResolution[1];
+        let w = window.innerWidth, h = window.innerHeight;
+        canvas.width = viewport.iResolution[0] = w, canvas.style.width = w + "px";
+        canvas.height = viewport.iResolution[1] = h, canvas.style.height = h + "px";
+        let cx = 0.5 * (viewport.xmin + viewport.xmax),
+            cy = 0.5 * (viewport.ymin + viewport.ymax);
+        // var sc = sqrt(oldW * oldH) / sqrt(w * h);
+        var sc = min(oldW, oldH) / min(w, h);
+        var canw = 0.5 * (viewport.xmax - viewport.xmin) * sc * (w / oldW),
+            canh = 0.5 * (viewport.ymax - viewport.ymin) * sc * (h / oldH);
+        viewport.xmin = cx - canw, viewport.xmax = cx + canw;
+        viewport.ymin = cy - canh, viewport.ymax = cy + canh;
+    }
+    initResize();
+    window.addEventListener("resize", onResize);
 
     // mouse interaction
     var mouseDown = false;
+    var fingerDist = -1;
     canvas.addEventListener('pointerdown', function (event) {
+        canvas.setPointerCapture(event.pointerId);
         mouseDown = true;
     });
     window.addEventListener('pointerup', function (event) {
+        event.preventDefault();
         mouseDown = false;
     });
     canvas.addEventListener('pointermove', function (event) {
         if (mouseDown) {
-            renderer.viewport.rz -= 0.01 * event.movementX;
-            renderer.viewport.rx += 0.01 * event.movementY;
+            var k = fingerDist > 0. ? 0.0001 : 0.01;
+            renderer.viewport.rz -= k * event.movementX;
+            renderer.viewport.rx += k * event.movementY;
         }
     });
+    function zoomIn(scrX, scrY, sc) {
+        let viewport = renderer.viewport;
+        var x = viewport.xmin + (viewport.xmax - viewport.xmin) * (scrX / viewport.iResolution[0]);
+        var y = viewport.ymin + (viewport.ymax - viewport.ymin) * (1.0 - scrY / viewport.iResolution[1]);
+        viewport.xmax = x + (viewport.xmax - x) * sc;
+        viewport.ymax = y + (viewport.ymax - y) * sc;
+        viewport.xmin = x + (viewport.xmin - x) * sc;
+        viewport.ymin = y + (viewport.ymin - y) * sc;
+    }
+    canvas.addEventListener("wheel", function (event) {
+        var sc = Math.exp(-0.0005 * event.wheelDeltaY);
+        zoomIn(event.clientX, event.clientY, sc);
+    }, { passive: true });
+    canvas.addEventListener("touchstart", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            fingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+        }
+    }, { passive: true });
+    canvas.addEventListener("touchend", function (event) {
+        fingerDist = -1.0;
+    }, { passive: true });
+    canvas.addEventListener("touchmove", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            var newFingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+            if (fingerDist > 0. && newFingerDist > 0.) {
+                var sc = Math.max(Math.min(fingerDist / newFingerDist, 2.0), 0.5);
+                var scrX = 0.5 * (fingerPos0[0] + fingerPos1[0]);
+                var scrY = 0.5 * (fingerPos0[1] + fingerPos1[1]);
+                zoomIn(scrX, scrY, sc);
+            }
+            fingerDist = newFingerDist;
+        }
+    }, { passive: true });
 
 }
