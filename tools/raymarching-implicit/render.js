@@ -210,6 +210,8 @@ function loadShaderSource(path) {
 function createShaderProgram(vsSource, fsSource) {
     let gl = renderer.gl;
     function loadShader(gl, type, source) {
+        if (location.hostname == "localhost")
+            source += "\n//#define _TIMESTAMP" + Date.now();  // prevent cache to test compile time
         var shader = gl.createShader(type); // create a new shader
         gl.shaderSource(shader, source); // send the source code to the shader
         gl.compileShader(shader); // compile shader

@@ -69,8 +69,8 @@
         <span title="Display the surface as semi-transparent"><input type="checkbox"
                 id="checkbox-transparency" />transparency</span>
         <br />
-        <span title="Analytical gradient usually makes rendering faster and compilation slower"><input type="checkbox"
-                id="checkbox-analygrad" checked />analytical&nbsp;grad</span>&ensp;
+        <span title="Evaluate the exact gradient instead of a finite difference approximation"><input type="checkbox"
+                id="checkbox-analygrad" />analytical&nbsp;grad</span>&ensp;
         <span title="Red-highlight discontinuities with sign change for opaque surfaces"><input type="checkbox"
                 id="checkbox-discontinuity" />discontinuity</span>
         <br />
@@ -134,10 +134,10 @@
         <p><b>Transparency</b>: Check this if you want the surface to be semi-transparent so you can look through it to
             see if there's anything inside. (Try the "A5 Star" example.) Warn that this may decrease the
             accuracy of the image.</p>
-        <p><b>Analytical gradient</b>: This tool requires the gradient of the function to perform raymarching and
-            calculating normal. When this is checked, this tool calculates the analytical gradient of the function.
-            Otherwise, it uses the <a href="https://en.wikipedia.org/wiki/Symmetric_derivative" target="_blank">central
-                difference</a> method to approximate gradient, which is typically (but not always) slower.</p>
+        <p><b>Analytical gradient</b>: When this is checked, this tool evaluates the analytical gradient of the function
+            used in raymarching and shading. Otherwise, it approximates the line derivative from previous raymarching
+            samples, which is typically faster but less accurate. Raymarching step size is reduced to balance speed and
+            quality when this is unchecked.</p>
         <p><b>Discontinuity</b>: This tool plots points where there are sign changes, which is either a zero or a
             discontinuity. Check this to detect and red-highlight surface that is a discontinuity.
             (Try the "Sin Terrace" example.)</p>
@@ -297,9 +297,9 @@
                 select.childNodes[0].setAttribute("value", initialExpr);
                 var selectId = 0;
                 for (var i = 1; i < select.childNodes.length; i++) {
-                    if (select.childNodes[i].value == initialExpr) {
+                    var value = select.childNodes[i].value.replace(/\;/g, '\n');
+                    if (value == initialExpr.trim())
                         selectId = i;
-                    }
                 }
                 select.childNodes[selectId].selected = true;
             }
@@ -409,11 +409,12 @@
                 }
                 else if (event.keyCode == 191 && event.ctrlKey) {
                     let control = document.getElementById("control");
+                    let fps = document.getElementById("fps");
                     if (control.style.display == "none")
-                        control.style.display = "block";
-                    else control.style.display = "none";
+                        fps.style.display = control.style.display = "block";
+                    else fps.style.display = control.style.display = "none";
                 }
-            })
+            });
             input.value = select.value.replaceAll(";", "\n");
 
             // main

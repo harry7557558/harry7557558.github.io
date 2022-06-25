@@ -80,13 +80,17 @@ float sdfS(vec3 p, vec3 rd) {
 }
 
 
-#define STEP_SIZE {%STEP_SIZE%}
+#define STEP_SIZE (({%STEP_SIZE%})*(bool({%ANALYTICAL_GRADIENT%})?1.0:0.5))
 #define MAX_STEP int(10.0/(STEP_SIZE))
 
 // returns the inverval to check for intersections
+
+#if {%ANALYTICAL_GRADIENT%}
+
+// gradient-based raymarching
 vec2 premarch(in vec3 ro, in vec3 rd) {
     float t = ZERO, dt = STEP_SIZE;
-    float v_old = funS(ro), v;
+    float v0 = funS(ro), v;
     float t0 = -1.0, t1 = -1.0;
     float min_t = 0.0, min_v = 1e12;
     int i = int(ZERO);
@@ -95,19 +99,54 @@ vec2 premarch(in vec3 ro, in vec3 rd) {
         v = sdfS(p, rd);
         if (abs(v) < min_v) min_t = t, min_v = abs(v);
         float dt1 = isnan(v) ? STEP_SIZE : clamp(abs(v)-STEP_SIZE, 0.1*STEP_SIZE, STEP_SIZE);
-        if (v*v_old < 0.0) {
+        if (v*v0 < 0.0) {
             if (t0 < 0.) t0 = t - dt, t1 = t + dt1;
             else t1 = t;
         }
-        v_old = v;
+        v0 = v;
         dt = dt1;
     }
     if (t0 < 0.) t0 = t1 = min_t;
     return vec2(t0, t1);
 }
 
+#else // {%ANALYTICAL_GRADIENT%}
+
+// approximates the gradient from three previous values
+vec2 premarch(in vec3 ro, in vec3 rd) {
+    float t0 = -1.0, t1 = -1.0;
+    float min_t = 0.0, min_v = 1e12;
+    float t = ZERO, dt = STEP_SIZE;
+    float v = 0.0, v0 = v, v00 = v;
+    float dt0 = 0.0, dt00 = 0.0;
+    int i = int(ZERO);
+    for (; i < MAX_STEP && t < 1.0; t += dt, i++) {
+        v = funS(ro+rd*t);
+        if (!(dt0>0.0)) v00 = v, v0 = v, dt0 = dt00 = 0.0;
+        float g = dt0 > 0.0 ? ( // estimate gradient
+            dt00 > 0.0 ? // quadratic fit
+                v00*dt0/(dt00*(dt0+dt00))-v0*(dt0+dt00)/(dt0*dt00)+v*(2.*dt0+dt00)/(dt0*(dt0+dt00))
+                : (v-v0)/dt0  // finite difference
+        ) : 0.;
+        float dt1 = (isnan(g) || g==0.) ? STEP_SIZE :
+            clamp(abs(v/g)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
+        if (abs(v) < min_v) min_t = t, min_v = abs(v);
+        if (v*v0 < 0.0) {
+            if (t0 < 0.) t0 = t - dt, t1 = t + dt1;
+            else t1 = t;
+        }
+        dt = dt1;
+        dt00 = dt0, dt0 = dt, v00 = v0, v0 = v;
+    }
+    if (t0 < 0.) t0 = t1 = min_t;
+    return vec2(t0, t1);
+}
+
+#endif // {%ANALYTICAL_GRADIENT%}
+
 
 void main(void) {
     vec2 t = premarch(vec3(vXy-screenCom,0), vec3(0,0,1));
+    // t = vec2(0, 1);
     fragColor = vec4(t, 0.0, 1.0);
 }

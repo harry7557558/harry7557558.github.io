@@ -55,7 +55,7 @@ vec3 funGrad(vec3 p) {
 #else
 #define funGrad funGradA
 #endif  // {%Y_UP%}
-#else
+#else // {%ANALYTICAL_GRADIENT%}
 #define funGrad funGradN
 #endif
 
@@ -74,15 +74,15 @@ vec3 funGradS(vec3 x) {
 }
 float sdfS(vec3 p, vec3 rd) {
 #if {%ANALYTICAL_GRADIENT%}
-    // usually but not always faster
     return funS(p) / abs(dot(funGradS(p), rd));
 #else
-    return funS(p) / abs((funS(p+0.001*rd)-funS(p-0.001*rd))/0.002);
+    const float h = 0.001;
+    return funS(p) / abs((funS(p+h*rd)-funS(p-h*rd))/h);
 #endif
 }
 
 
-#define STEP_SIZE {%STEP_SIZE%}
+#define STEP_SIZE (({%STEP_SIZE%})*(bool({%ANALYTICAL_GRADIENT%})?1.0:0.5))
 #define MAX_STEP int(10.0/(STEP_SIZE))
 
 uniform vec3 LDIR;
@@ -120,7 +120,7 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     vec3 n = normalize(n0);
 #if {%Y_UP%}
     n0 = vec3(n0.x, n0.z, -n0.y);
-#endif
+#endif // {%Y_UP%}
     float g = bool({%GRID%}) ? grid(p, n) : 1.0;
 #if {%COLOR%} == 0
     // porcelain-like shading
@@ -130,7 +130,7 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     vec3 spc = min(1.2*pow(max(dot(reflect(rd,n),LDIR),0.0),100.0),1.) * vec3(10.);
     vec3 rfl = mix(vec3(1.), vec3(4.), clamp(5.*dot(reflect(rd,n),LDIR),0.,1.));
     vec3 col = mix(amb+dif, rfl+spc, mix(.01,.2,pow(clamp(1.+dot(rd,n),.0,.8),5.)));
-#else
+#else // {%COLOR%} == 0
 #if {%COLOR%} == 1
     // color based on normal
     vec3 albedo = mix(vec3(1.0), normalize(n0), 0.45);
@@ -141,36 +141,59 @@ vec4 calcColor(vec3 ro, vec3 rd, float t) {
     float grad = 0.5-0.5*cos(PI*log(length(n0))/log(10.));
     vec3 albedo = vec3(.372,.888,1.182) + vec3(.707,-2.123,-.943)*grad
         + vec3(.265,1.556,.195)*cos(vec3(5.2,2.48,8.03)*grad-vec3(2.52,1.96,-2.88));
-#endif
+#endif // {%COLOR%} == 1
     albedo *= g;
     // phong shading
     vec3 amb = vec3(0.2+0.0*n.y) * albedo;
     vec3 dif = 0.6*max(dot(n,LDIR),0.0) * albedo;
     vec3 spc = pow(max(dot(reflect(rd,n),LDIR),0.0),40.0) * vec3(0.1);
     vec3 col = amb + dif + spc;
-#endif
+#endif // {%COLOR%} == 0
     return vec4(col*fade(t), 1.0-pow(1.0-OPACITY,abs(1.0/dot(rd,n))));
 }
 
 // Without opacity, finds the zero using bisection search
 vec3 vSolid(in vec3 ro, in vec3 rd, float t0, float t1) {
     // raymarching
-    float t = ZERO, dt = STEP_SIZE;
-    float v_old = sdfS(ro+rd*t0, rd), v;
+#if {%ANALYTICAL_GRADIENT%}
+    float t = t0, dt = STEP_SIZE;
+    float v0 = sdfS(ro+rd*t, rd), v;
     int i = int(ZERO);
-    for (t += t0 + dt; i < MAX_STEP && t < t1; t += dt, i++) {
-        vec3 p = ro + rd * t;
-        v = sdfS(p, rd);
-        if (v*v_old < 0.0) {
-            break;
-        }
-        v_old = v;
+    for (t += dt; i < MAX_STEP && t < t1; t += dt, i++) {
+        v = sdfS(ro+rd*t, rd);
+        if (v*v0 < 0.0) break;
+        v0 = v;
         dt = isnan(v) ? STEP_SIZE : clamp(abs(v)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
     }
-    if (v*v_old >= 0.0) return vec3(0);
+#else // {%ANALYTICAL_GRADIENT%}
+    // https://www.desmos.com/calculator/mhxwoieyph
+    float t = t0, dt = STEP_SIZE;
+    float v = 0.0, v0 = v, v00 = v;
+    float dt0 = 0.0, dt00 = 0.0;
+    int i = int(ZERO);
+    for (; i < MAX_STEP && t < t1; t += dt, i++) {
+        v = funS(ro+rd*t);
+        if (v*v0 < 0.0) break;
+        if (!(dt0>0.0)) v00 = v, v0 = v, dt0 = dt00 = 0.0;
+        float g = dt0 > 0.0 ? ( // estimate gradient
+            dt00 > 0.0 ? // quadratic fit
+                v00*dt0/(dt00*(dt0+dt00))-v0*(dt0+dt00)/(dt0*dt00)+v*(2.*dt0+dt00)/(dt0*(dt0+dt00))
+                : (v-v0)/dt0  // finite difference
+        ) : 0.;
+        dt = (isnan(g) || g==0.) ? STEP_SIZE :
+            clamp(abs(v/g)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
+        dt00 = dt0, dt0 = dt, v00 = v0, v0 = v;
+    }
+#endif // {%ANALYTICAL_GRADIENT%}
+    if (v*v0 >= 0.0) return vec3(0);
     // finding root
     t0 = t-dt, t1 = t;
-    float v0 = funS(ro+rd*t0), v1 = funS(ro+rd*t1);
+#if {%ANALYTICAL_GRADIENT%} && {%DISCONTINUITY%}
+    v0 = funS(ro+rd*t0);  // use raw function value for discontinuity detection
+    float v1 = funS(ro+rd*t1);
+#else
+    float v1 = v;
+#endif
     float old_dvdt = abs((v1-v0)/(t1-t0)), dvdt;
     for (int s = int(ZERO); s < 8; s += 1) {
         // bisect
