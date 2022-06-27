@@ -6,7 +6,7 @@ out vec4 fragColor;
 
 uniform sampler2D iChannel0;
 uniform mat4 transformMatrix;
-uniform vec2 screenCom;
+uniform vec2 screenCenter;
 uniform float uScale;
 
 uniform float ZERO;  // used in loops to reduce compilation time
@@ -39,7 +39,8 @@ vec3 funGradA(vec3 p) {  // analytical gradient
     {%FUNGRAD%}
 }
 vec3 funGradN(vec3 p) {  // numerical gradient
-    float h = 0.002*max(pow(length(p),1./3.),1.);  // error term O(h²)
+    //float h = 0.002*max(pow(length(p),1./3.),1.);
+    float h = 0.002*length(p);
     return vec3(
         fun(p+vec3(h,0,0)) - fun(p-vec3(h,0,0)),
         fun(p+vec3(0,h,0)) - fun(p-vec3(0,h,0)),
@@ -174,7 +175,7 @@ vec3 vSolid(in vec3 ro, in vec3 rd, float t0, float t1) {
     for (; i < MAX_STEP && t < t1; t += dt, i++) {
         v = funS(ro+rd*t);
         if (v*v0 < 0.0) break;
-        if (!(dt0>0.0)) v00 = v, v0 = v, dt0 = dt00 = 0.0;
+        if (isnan(dt0) || dt0 <= 0.0) v00 = v, v0 = v, dt0 = dt00 = 0.0;
         float g = dt0 > 0.0 ? ( // estimate gradient
             dt00 > 0.0 ? // quadratic fit
                 v00*dt0/(dt00*(dt0+dt00))-v0*(dt0+dt00)/(dt0*dt00)+v*(2.*dt0+dt00)/(dt0*(dt0+dt00))
@@ -227,37 +228,75 @@ vec3 vSolid(in vec3 ro, in vec3 rd, float t0, float t1) {
     return calcColor(ro, rd, t).xyz;
 }
 
+
 // With opacity, approximates zeros using linear interpolation
+#if {%ANALYTICAL_GRADIENT%}
+
 vec3 vAlpha(in vec3 ro, in vec3 rd, float t0, float t1) {
     float t = ZERO, dt = STEP_SIZE;
-    float v_old = sdfS(ro+rd*t0, rd), v;
+    float v0 = sdfS(ro+rd*t0, rd), v;
     int i = int(ZERO);
     vec3 tcol = vec3(0.0);
     float mcol = 1.0;
     for (t += t0 + dt; i < MAX_STEP && t < t1; t += dt, i++) {
         vec3 p = ro + rd * t;
         v = sdfS(p, rd);
-        if (v*v_old < 0.0 && mcol > 0.01) {
-            float tm = t - dt * v / (v - v_old);
+        if (v*v0 < 0.0 && mcol > 0.01) {
+            float tm = t - dt * v / (v - v0);
             vec4 rgba = calcColor(ro, rd, tm);
             tcol += mcol * rgba.xyz * rgba.w;
             mcol *= 1.0 - rgba.w;
         }
-        v_old = v;
+        v0 = v;
         dt = isnan(v) ? STEP_SIZE : clamp(abs(v)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
     }
     return tcol;
 }
 
+#else // {%ANALYTICAL_GRADIENT%}
+
+vec3 vAlpha(in vec3 ro, in vec3 rd, float t0, float t1) {
+    float t = t0, dt = STEP_SIZE;
+    float v = 0.0, v0 = v, v00 = v, g0 = 0.0, g;
+    float dt0 = 0.0, dt00 = 0.0;
+    int i = int(ZERO);
+    vec3 tcol = vec3(0.0);
+    float mcol = 1.0;
+    for (; i < MAX_STEP && t < t1; t += dt, i++) {
+        v = funS(ro+rd*t);
+        if (v*v0 < 0.0 && mcol > 0.01) {  // intersection
+            if (isnan(g) || g <= 0.0) g = 1.0;
+            if (isnan(g0) || g0 <= 0.0) g0 = g;
+            float tm = t - dt * (v/g) / ((v/g) - (v0/g0));
+            vec4 rgba = calcColor(ro, rd, tm);
+            tcol += mcol * rgba.xyz * rgba.w;
+            mcol *= 1.0 - rgba.w;
+        }
+        if (isnan(dt0) || dt0 <= 0.0) v00 = v, v0 = v, dt0 = dt00 = 0.0;
+        g = dt0 > 0.0 ? ( // estimate gradient
+            dt00 > 0.0 ? // quadratic fit
+                v00*dt0/(dt00*(dt0+dt00))-v0*(dt0+dt00)/(dt0*dt00)+v*(2.*dt0+dt00)/(dt0*(dt0+dt00))
+                : (v-v0)/dt0  // finite difference
+        ) : 0.;
+        if (isnan(g0) || g0 <= 0.0) g0 = g;
+        dt = (isnan(g) || g==0.) ? STEP_SIZE :
+            clamp(abs(v/g)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
+        dt00 = dt0, dt0 = dt, v00 = v0, v0 = v, g0 = g;
+    }
+    return tcol;
+}
+
+#endif // {%ANALYTICAL_GRADIENT%}
+
 
 void main(void) {
-    vec3 ro = vec3(vXy-screenCom, 0);
+    vec3 ro = vec3(vXy-screenCenter, 0);
     vec3 rd = vec3(0, 0, 1);
     vec2 t01 = texture(iChannel0, 0.5+0.5*vXy).xy;
     float pad = max(STEP_SIZE, 1./255.);
-    vec3 col = {%V_RENDER%}(ro, rd, max(t01.x-pad, 0.0), min(t01.y+pad, 1.0));
+    vec3 col = {%V_RENDER%}(ro, rd, t01.x==1.?1.:max(t01.x-pad, 0.0), min(t01.y+pad, 1.0));
     col -= vec3(1.5/255.)*fract(0.13*gl_FragCoord.x*gl_FragCoord.y);  // reduce "stripes"
-    //col = vec3(callCount) / 255.0;
+    // col = vec3(callCount) / 255.0;
 #if {%GRID%}
     col = pow(col, vec3(0.85));
 #endif

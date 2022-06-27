@@ -8,14 +8,26 @@
     touch-action: none;
 }
 
-#fps {
+#legend {
     position: fixed;
-    left: 10px;
-    top: 10px;
+    left: 0;
+    top: 0;
+    padding: 10px;
+}
+
+#fps {
+    margin: 0;
     font-family: Consolas;
     font-size: 20px;
     color: white;
     user-select: none;
+}
+
+#axes {
+    display: block;
+    pointer-events: none;
+    margin-top: 5px;
+    margin-left: -2px;
 }
 
 #control {

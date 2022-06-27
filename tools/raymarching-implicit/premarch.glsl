@@ -5,7 +5,7 @@ in vec2 vXy;
 out vec4 fragColor;
 
 uniform mat4 transformMatrix;
-uniform vec2 screenCom;
+uniform vec2 screenCenter;
 
 uniform float ZERO;  // used in loops to reduce compilation time
 #define PI 3.1415926
@@ -122,7 +122,7 @@ vec2 premarch(in vec3 ro, in vec3 rd) {
     int i = int(ZERO);
     for (; i < MAX_STEP && t < 1.0; t += dt, i++) {
         v = funS(ro+rd*t);
-        if (!(dt0>0.0)) v00 = v, v0 = v, dt0 = dt00 = 0.0;
+        if (isnan(dt0) || dt0 <= 0.0) v00 = v, v0 = v, dt0 = dt00 = 0.0;
         float g = dt0 > 0.0 ? ( // estimate gradient
             dt00 > 0.0 ? // quadratic fit
                 v00*dt0/(dt00*(dt0+dt00))-v0*(dt0+dt00)/(dt0*dt00)+v*(2.*dt0+dt00)/(dt0*(dt0+dt00))
@@ -130,7 +130,7 @@ vec2 premarch(in vec3 ro, in vec3 rd) {
         ) : 0.;
         float dt1 = (isnan(g) || g==0.) ? STEP_SIZE :
             clamp(abs(v/g)-STEP_SIZE, 0.05*STEP_SIZE, STEP_SIZE);
-        if (abs(v) < min_v) min_t = t, min_v = abs(v);
+        if (abs(v/g) < min_v) min_t = t, min_v = abs(v/g);
         if (v*v0 < 0.0) {
             if (t0 < 0.) t0 = t - dt, t1 = t + dt1;
             else t1 = t;
@@ -146,7 +146,7 @@ vec2 premarch(in vec3 ro, in vec3 rd) {
 
 
 void main(void) {
-    vec2 t = premarch(vec3(vXy-screenCom,0), vec3(0,0,1));
+    vec2 t = premarch(vec3(vXy-screenCenter,0), vec3(0,0,1));
     // t = vec2(0, 1);
     fragColor = vec4(t, 0.0, 1.0);
 }

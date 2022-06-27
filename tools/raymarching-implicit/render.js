@@ -104,29 +104,15 @@ function mat4ToFloat32Array(m) {
     return new Float32Array(arr);
 }
 
-// calculate the center of mass of the screen excluding the control box
-function calcScreenCom() {
-    var totArea = 1.0;
-    var totCom = [0.5, 0.5];
-    function subtractBox(element, weight) {
-        var rect = element.getBoundingClientRect();
-        var x0 = Math.max(rect.left / state.width, 0.0);
-        var y0 = Math.max(rect.top / state.height, 0.0);
-        var x1 = Math.min(rect.right / state.width, 1.0);
-        var y1 = Math.min(rect.bottom / state.height, 1.0);
-        var dA = weight * Math.max(x1 - x0, 0) * Math.max(y1 - y0, 0);
-        var dC = [0.5 * (x0 + x1), 0.5 * (y0 + y1)];
-        totArea -= dA;
-        totCom = [totCom[0] - dA * dC[0], totCom[1] - dA * dC[1]];
-    }
-    var control = document.getElementById("control");
-    subtractBox(control, 1.1);
-    var container = document.getElementById("mathjax-preview");
-    var equations = container.children;
-    // for (var i = 0; i < equations.length; i++)
-    //     subtractBox(equations[i], 0.8);
-    var com = [totCom[0] / totArea, 1.0 - totCom[1] / totArea];
-    com = [2.0 * (com[0] - 0.5), 2.0 * (com[1] - 0.5)];
+// calculate the center of the screen excluding the control box
+function calcScreenCenter() {
+    let rect = document.getElementById("control").getBoundingClientRect();
+    var w = window.innerWidth, h = window.innerHeight;
+    var rl = rect.left, rb = h - rect.bottom;
+    var cx = 0.5 * w, cy = 0.5 * h;
+    if (rl > rb && rl > 0) cx = 0.5 * rl;
+    else if (rb > 0) cy = 0.5 * rb;
+    var com = [2.0 * (cx / w - 0.5), 2.0 * (cy / h - 0.5)];
     com[0] = Math.max(-0.6, Math.min(0.6, com[0]));
     com[1] = Math.max(-0.6, Math.min(0.6, com[1]));
     return com;
@@ -175,6 +161,26 @@ function calcLightDirection(transformMatrix, lightTheta, lightPhi) {
     return l;
 }
 
+// set legend
+function setLegendAxes(state) {
+    let axes = [
+        document.getElementById("axis-x"),
+        document.getElementById("axis-y"),
+        document.getElementById("axis-z")
+    ];
+    let yup = document.getElementById("checkbox-yup").checked;
+    var mat = mat4(1.0);
+    mat = mat4Rotate(mat, state.rx, [1, 0, 0]);
+    mat = mat4Rotate(mat, state.rz, [0, 0, 1]);
+    var ij = yup ? [0.01, 2, -1] : [0.01, 1, 2];
+    for (var i = 0; i < 3; i++) {
+        var j = Math.floor(Math.abs(ij[i]));
+        var s = 0.9 * Math.sign(ij[i]) * Math.min(2.0 * state.scale, 1.0);
+        axes[i].setAttribute("x2", s * mat[j][0]);
+        axes[i].setAttribute("y2", s * mat[j][1]);
+    }
+}
+
 // ============================ WEBGL ==============================
 
 var renderer = {
@@ -211,7 +217,7 @@ function createShaderProgram(vsSource, fsSource) {
     let gl = renderer.gl;
     function loadShader(gl, type, source) {
         if (location.hostname == "localhost")
-            source += "\n//#define _TIMESTAMP" + Date.now();  // prevent cache to test compile time
+            source += "\n#define _TIMESTAMP" + Date.now();  // prevent cache to test compile time
         var shader = gl.createShader(type); // create a new shader
         gl.shaderSource(shader, source); // send the source code to the shader
         gl.compileShader(shader); // compile shader
@@ -304,7 +310,7 @@ function destroyAntiAliaser(antiAliaser) {
 }
 
 // call this function to re-render
-async function drawScene(screenCom, transformMatrix, lightDir) {
+async function drawScene(screenCenter, transformMatrix, lightDir) {
     if (renderer.raymarchProgram == null) {
         renderer.canvas.style.cursor = "not-allowed";
         return;
@@ -363,8 +369,8 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
         gl.getUniformLocation(renderer.premarchProgram, "transformMatrix"),
         false,
         mat4ToFloat32Array(transformMatrix));
-    gl.uniform2f(gl.getUniformLocation(renderer.premarchProgram, "screenCom"),
-        screenCom[0], screenCom[1]);
+    gl.uniform2f(gl.getUniformLocation(renderer.premarchProgram, "screenCenter"),
+        screenCenter[0], screenCenter[1]);
     renderPass();
 
     // pooling
@@ -391,8 +397,8 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
         gl.getUniformLocation(renderer.raymarchProgram, "transformMatrix"),
         false,
         mat4ToFloat32Array(transformMatrix));
-    gl.uniform2f(gl.getUniformLocation(renderer.raymarchProgram, "screenCom"),
-        screenCom[0], screenCom[1]);
+    gl.uniform2f(gl.getUniformLocation(renderer.raymarchProgram, "screenCenter"),
+        screenCenter[0], screenCenter[1]);
     gl.uniform1f(gl.getUniformLocation(renderer.raymarchProgram, "uScale"), state.scale);
     gl.uniform3f(gl.getUniformLocation(renderer.raymarchProgram, "LDIR"),
         lightDir[0], lightDir[1], lightDir[2]);
@@ -457,8 +463,8 @@ async function drawScene(screenCom, transformMatrix, lightDir) {
 var state = {
     width: window.innerWidth,
     height: window.innerHeight,
-    screenCom: [0.0, 0.0],
-    defaultScreenCom: true,
+    screenCenter: [0.0, 0.0],
+    defaultScreenCenter: true,
     rz: -0.9 * Math.PI,
     rx: -0.4 * Math.PI,
     scale: 0.5,
@@ -466,24 +472,35 @@ var state = {
     lightPhi: null,
     renderNeeded: true
 };
-function resetState() {
-    state.width = window.innerWidth;
-    state.height = window.innerHeight;
-    state.screenCom = calcScreenCom();
-    state.defaultScreenCom = true;
-    state.rz = -0.9 * Math.PI;
-    state.rx = -0.4 * Math.PI;
-    state.scale = 0.5;
-    state.lightTheta = document.querySelector("#slider-theta").value * (Math.PI / 180.);
-    state.lightPhi = document.querySelector("#slider-phi").value * (Math.PI / 180.);
-    state.renderNeeded = true;
+function resetState(overwrite = true) {
+    var state1 = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        screenCenter: calcScreenCenter(),
+        defaultScreenCenter: true,
+        rz: -0.9 * Math.PI,
+        rx: -0.4 * Math.PI,
+        scale: 0.5,
+        lightTheta: document.querySelector("#slider-theta").value * (Math.PI / 180.),
+        lightPhi: document.querySelector("#slider-phi").value * (Math.PI / 180.),
+        renderNeeded: true
+    };
+    for (var key in state1) {
+        if (overwrite || state[key] == undefined)
+            state[key] = state1[key];
+    }
 }
 
 function initWebGL() {
     // get context
     renderer.canvas = document.getElementById("canvas");
     renderer.gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2");
-    if (renderer.gl == null) throw ("Error: `canvas.getContext(\"webgl2\")` returns null. Your browser may not support WebGL 2.");
+    if (renderer.gl == null)
+        throw ("Error: Your browser may not support WebGL2, which is required to run this tool.<br/>It is recommended to use a Chrome-based browser on a desktop device with an updated graphics driver.");
+    canvas.addEventListener("webglcontextlost", function (event) {
+        event.preventDefault();
+        document.body.innerHTML = "<h1 style='color:red;'>Error: WebGL context lost. Please refresh this page.</h1>";
+    });
 
     // load GLSL source
     console.time("load glsl code");
@@ -510,7 +527,10 @@ function initWebGL() {
     // state
     try {
         var initialState = localStorage.getItem("ri_State");
-        if (initialState != null) state = JSON.parse(initialState);
+        if (initialState != null) {
+            state = JSON.parse(initialState);
+            resetState(false);
+        }
     }
     catch (e) {
         try { localStorage.removeItem("ri_State"); } catch (e) { }
@@ -547,11 +567,11 @@ function initRenderer() {
     //resetState();
 
     // rendering
-    var oldScreenCom = [-1, -1];
+    var oldScreenCenter = [-1, -1];
     function render() {
-        var screenCom = state.defaultScreenCom ? calcScreenCom() : state.screenCom;
-        state.screenCom = screenCom;
-        if ((screenCom[0] != oldScreenCom[0] || screenCom[1] != oldScreenCom[1])
+        var screenCenter = state.defaultScreenCenter ? calcScreenCenter() : state.screenCenter;
+        state.screenCenter = screenCenter;
+        if ((screenCenter[0] != oldScreenCenter[0] || screenCenter[1] != oldScreenCenter[1])
             || state.renderNeeded) {
             state.width = canvas.width = canvas.style.width = window.innerWidth;
             state.height = canvas.height = canvas.style.height = window.innerHeight;
@@ -560,10 +580,11 @@ function initRenderer() {
             } catch (e) { }
             var transformMatrix = calcTransformMatrix(state);
             var lightDir = calcLightDirection(transformMatrix, state.lightTheta, state.lightPhi);
-            drawScene(screenCom, transformMatrix, lightDir);
+            drawScene(screenCenter, transformMatrix, lightDir);
+            setLegendAxes(state);
             state.renderNeeded = false;
         }
-        oldScreenCom = screenCom;
+        oldScreenCenter = screenCenter;
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
@@ -582,7 +603,7 @@ function initRenderer() {
         if (event.shiftKey) {
             console.log("Shift");
             event.preventDefault();
-            state.defaultScreenCom = true;
+            state.defaultScreenCenter = true;
             state.renderNeeded = true;
         }
     });
@@ -602,9 +623,9 @@ function initRenderer() {
         if (mouseDown) {
             var dx = event.movementX, dy = event.movementY;
             if (event.shiftKey) { // center
-                state.defaultScreenCom = false;
-                state.screenCom[0] += 1.5 * dx / state.width;
-                state.screenCom[1] -= 1.5 * dy / state.height;
+                state.defaultScreenCenter = false;
+                state.screenCenter[0] += 1.5 * dx / state.width;
+                state.screenCenter[1] -= 1.5 * dy / state.height;
             }
             else {  // rotate
                 var k = fingerDist > 0. ? 0.001 : 0.01;

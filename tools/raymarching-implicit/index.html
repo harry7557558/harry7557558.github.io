@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <title>Raymarching Implicit Surface Grapher</title>
-    <meta name="description" content="Raymarching based 3D implicit surface graphing tool." />
+    <meta name="description"
+        content="A high-quality 3D implicit surface graphing tool that supports variable/function definition and various graphing parameters." />
     <meta name="keywords"
-        content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, function, equation, 3d, webgl" />
+        content="harry7557558, raymarching, raycasting, isosurface, implicit, surface, function, equation, graph, 3d, webgl" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -35,7 +36,17 @@
 <body>
     <canvas id="canvas"></canvas>
 
-    <div id="fps"></div>
+    <div id="legend">
+        <div id="fps"></div>
+        <svg id="axes" width="80" height="80">
+            <g transform="translate(40,40) scale(40,-40)">
+                <circle cx="0" cy="0" r="1" stroke="none" fill="rgba(50,50,50,0.5)"></circle>
+                <line id="axis-x" x1="0" y1="0" x2="0" y2="0" stroke="red" stroke-width="0.06"></line>
+                <line id="axis-y" x1="0" y1="0" x2="0" y2="0" stroke="green" stroke-width="0.06"></line>
+                <line id="axis-z" x1="0" y1="0" x2="0" y2="0" stroke="blue" stroke-width="0.06"></line>
+            </g>
+        </svg>
+    </div>
 
     <div id="control">
         <select id="builtin-functions"></select>
@@ -72,7 +83,7 @@
         <span title="Evaluate the exact gradient instead of a finite difference approximation"><input type="checkbox"
                 id="checkbox-analygrad" />analytical&nbsp;grad</span>&ensp;
         <span title="Red-highlight discontinuities with sign change for opaque surfaces"><input type="checkbox"
-                id="checkbox-discontinuity" />discontinuity</span>
+                id="checkbox-discontinuity" checked />discontinuity</span>
         <br />
         <span><i>θ<sub>light</sub></i>&nbsp;<input type="range" id="slider-theta" min="-90" max="270" value="30"
                 style="width:100px" /></span>
@@ -418,9 +429,9 @@
             input.value = select.value.replaceAll(";", "\n");
 
             // main
-            initWebGL();
-            updateFunctionInput(true);
             try {
+                initWebGL();
+                updateFunctionInput(true);
                 initRenderer();
             } catch (e) {
                 console.error(e);
