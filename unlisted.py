@@ -88,11 +88,12 @@ content = """<!doctype html>
     <title>Harry Chen - unlisted</title>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
-    <!--<meta name="viewport" content="width=device-width, initial-scale=1" />-->
+    <meta name="viewport" content="width=600, initial-scale=1" />
     <link rel="icon" href="./logo.png" />
     <style>
         body{margin:0.5em}
         div>div,table{margin-left:2em}td{padding-right:1em}span{padding-left:1em}
+        .dirname{font-size:1.2em}table{font-size:1em}
         a{color:#aaa}
         .htm,.html{color:blue}
         .js{color:#ff4500}

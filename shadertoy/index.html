@@ -3,19 +3,20 @@
 <head>
     <meta charset="utf-8" />
     <title>List of my published Shadertoy shaders</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <meta name="viewport" content="width=700, initial-scale=1" />
 
     <meta name="description" content="This page lists all of my published Shadertoy shaders, which includes my experiments in rendering, modeling, data fitting, simulation, and art." />
     <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL, function" />
     <meta name="robots" content="index, follow" />
 
     <style>
-        body{margin:0 0.5em;padding:0}
+        body{margin:0 0.5em;padding:0;font-family:'Times New Roman'}
         #container{display:inline;margin:0;padding:0}
         .shader{display:block;margin:0.5em;padding:0.5em 0;border-bottom:1px solid gray}
-        .preview{width:24em;height:13.5em;display:block;margin:0 2em 0 0;position:absolute;left:0;top:0}
-        .image-hover-hide{opacity:1.0}
-        .image-hover-hide:hover{opacity:0.0}
+        .preview{width:24em;height:13.5em;display:block;margin:0;position:absolute;left:0;top:0}
+        .preview-container{margin:0 2em 0.5em 0;display:inline-block;font-size:1em;padding:0;text-decoration:none;touch-action:none}
+        .placeholder{position:relative;height:13.5em;pointer-event:none}
         .title a{color:black;text-decoration:none}
         .title a:hover{text-decoration:underline}
         #chartjs-canvas{width:40em;height:20em;margin:1em 0;border:2px solid #bbb}
@@ -25,7 +26,7 @@
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
         .summary{margin:0;font-size:1em;color:#555}
-        a{font-size:1em;padding:0 0.1em;text-decoration:none}
+        a{text-decoration:none;color:#06c}
         a:hover{text-decoration:underline}
         input,select,button{display:inline-block;vertical-align:middle}
         .unlisted{display:none}
@@ -36,11 +37,12 @@
 <body>
     <div style="margin:1.2em 0.8em 0;white-space:nowrap">
         <h1>List of my published Shadertoy shaders</h1>
-        <p class="summary">Harry Chen (<a href='https://www.shadertoy.com/user/harry7557558'>harry7557558</a>) - Updated 2022/05/25</p>
+        <p class="summary">Harry Chen (<a href='https://www.shadertoy.com/user/harry7557558'>harry7557558</a>) - Updated 2022/07/02</p>
         <hr/>
         <span>
             Horizontal axis: <select id="chart-x-select"></select> ｜
-            Vertical axis: <select id="chart-y-select"></select>
+            Vertical axis: <select id="chart-y-select"></select> ｜
+            Line fit: <select id="line-fit-select"></select>
         </span>
         <br/>
         <canvas id="chartjs-canvas"></canvas>
@@ -53,9 +55,9 @@
     </div>
     <div id="container">
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ssKGWR" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/ssKGWR.jpg" alt="3D SDF Visualizer" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ssKGWR" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/ssKGWR.jpg" alt="3D SDF Visualizer" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ssKGWR">3D SDF Visualizer</a></h2>
@@ -67,20 +69,17 @@
                     Image • <span class="chars">3447</span> chars<br/>mainImage｜iResolution • iMouse
                     <br/>
                     <span class="likes">12</span> likes •
-                    <span class="views">137</span> views •
-                    <span class="ratio">8.76</span>% like
+                    <span class="views">156</span> views •
+                    <span class="ratio">7.69</span>% like
                 </p>
                 <br/>
                 Debugging an SDF, try to use a previous volume rendering shader to visualize its discontinuity.<br /><br />mouse-able
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wsfBRX" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wsfBRX.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wsfBRX.jpg" alt="ASM2O CPT" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wsfBRX" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wsfBRX.jpg" alt="ASM2O CPT" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wsfBRX">ASM2O CPT</a></h2>
@@ -92,20 +91,17 @@
                     Common • Image｜6817 + 2127 = <span class="chars">8944</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse
                     <br/>
                     <span class="likes">2</span> likes •
-                    <span class="views">38</span> views •
-                    <span class="ratio">5.26</span>% like
+                    <span class="views">41</span> views •
+                    <span class="ratio">4.88</span>% like
                 </p>
                 <br/>
                 School project appropriating The Archer by Henry Moore. The animation is not as good as expected.<br />A realtime software renderer written in C++ uses bounding boxes to accelerate raymarching, but this one doesn&#39;t.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wljSDt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wljSDt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wljSDt.jpg" alt="Burning-Ship ++" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wljSDt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wljSDt.jpg" alt="Burning-Ship ++" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wljSDt">Burning-Ship ++</a></h2>
@@ -117,20 +113,17 @@
                     Image • <span class="chars">1016</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">4</span> likes •
-                    <span class="views">140</span> views •
-                    <span class="ratio">2.86</span>% like
+                    <span class="views">147</span> views •
+                    <span class="ratio">2.72</span>% like
                 </p>
                 <br/>
                 a zoom in to the Burning Ship Fractal
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ws2yz1" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/ws2yz1.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/ws2yz1.jpg" alt="COVID, Stop!" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ws2yz1" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/ws2yz1.jpg" alt="COVID, Stop!" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ws2yz1">COVID, Stop!</a></h2>
@@ -150,9 +143,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sddXWj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/sddXWj.jpg" alt="Cook-Torrance IS Attempt" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sddXWj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/sddXWj.jpg" alt="Cook-Torrance IS Attempt" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sddXWj">Cook-Torrance IS Attempt</a></h2>
@@ -164,20 +157,17 @@
                     Buffer A • Image｜4996 + 73 = <span class="chars">5069</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse｜buffer • cubemap
                     <br/>
                     <span class="likes">16</span> likes •
-                    <span class="views">303</span> views •
-                    <span class="ratio">5.28</span>% like
+                    <span class="views">315</span> views •
+                    <span class="ratio">5.08</span>% like
                 </p>
                 <br/>
                 Attempt to implement importance sampling for Cook-Torrance BRDF, somehow cannot get it right.<br />Left/Right: without/with importance sampling, look slightly different.<br />If someone could point out the problem or give a fix I&#39;d appreciate :)
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tl2SDt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/tl2SDt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/tl2SDt.jpg" alt="Crown-Fractal++" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tl2SDt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/tl2SDt.jpg" alt="Crown-Fractal++" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tl2SDt">Crown-Fractal++</a></h2>
@@ -189,17 +179,17 @@
                     Image • <span class="chars">1052</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">102</span> views •
-                    <span class="ratio">4.90</span>% like
+                    <span class="views">103</span> views •
+                    <span class="ratio">4.85</span>% like
                 </p>
                 <br/>
                 a zoom in to fractal defined by iteration z↦Re(z³)-|Im(z³)|i+c
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wtfyWj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/wtfyWj.jpg" alt="Ellipse Distance Comparison" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wtfyWj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/wtfyWj.jpg" alt="Ellipse Distance Comparison" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wtfyWj">Ellipse Distance Comparison</a></h2>
@@ -211,17 +201,17 @@
                     Common • Image｜805 + 936 = <span class="chars">1741</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">4</span> likes •
-                    <span class="views">113</span> views •
-                    <span class="ratio">3.54</span>% like
+                    <span class="views">116</span> views •
+                    <span class="ratio">3.45</span>% like
                 </p>
                 <br/>
                 Comparing two ellipse distance methods found on the internet.<br /><br />mouseable
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wsfyzB" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/wsfyzB.jpg" alt="Exponential Regression" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wsfyzB" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/wsfyzB.jpg" alt="Exponential Regression" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wsfyzB">Exponential Regression</a></h2>
@@ -233,20 +223,17 @@
                     Image • <span class="chars">4402</span> chars<br/>mainImage｜iResolution • iMouse｜texture
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">165</span> views •
-                    <span class="ratio">3.03</span>% like
+                    <span class="views">167</span> views •
+                    <span class="ratio">2.99</span>% like
                 </p>
                 <br/>
                 Fitting the number of COVID-19 daily reported cases in four countries using regression. Click and drag to read the value.<br /><br />Any idea about how can I make the compilation faster?
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wly3WG" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wly3WG.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wly3WG.jpg" alt="Fitting Arc using Bézier" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wly3WG" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wly3WG.jpg" alt="Fitting Arc using Bézier" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wly3WG">Fitting Arc using Bézier</a></h2>
@@ -258,20 +245,17 @@
                     Image • <span class="chars">2021</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">15</span> likes •
-                    <span class="views">261</span> views •
-                    <span class="ratio">5.75</span>% like
+                    <span class="views">268</span> views •
+                    <span class="ratio">5.60</span>% like
                 </p>
                 <br/>
                 Least square fitting an unit arc using cubic bezier curve. <br />Ellipse fitting can be done by simply applying a linear transform. 
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tttSRH" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/tttSRH.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/tttSRH.jpg" alt="Fitting Arc using Bézier 2" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tttSRH" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/tttSRH.jpg" alt="Fitting Arc using Bézier 2" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tttSRH">Fitting Arc using Bézier 2</a></h2>
@@ -283,20 +267,17 @@
                     Image • <span class="chars">2459</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">3</span> likes •
-                    <span class="views">95</span> views •
-                    <span class="ratio">3.16</span>% like
+                    <span class="views">97</span> views •
+                    <span class="ratio">3.09</span>% like
                 </p>
                 <br/>
                 Cubic version see there: <a rel="nofollow" href="https://www.shadertoy.com/view/wly3WG">https://www.shadertoy.com/view/wly3WG</a><br />These fitting functions are used to convert ellipse arcs in an SVG path into uniform bezier curve, because I don&#39;t want to write hundreds of lines of code specifically for ellipses.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/WsySWt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/WsySWt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/WsySWt.jpg" alt="Float Limit Exceed" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/WsySWt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/WsySWt.jpg" alt="Float Limit Exceed" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/WsySWt">Float Limit Exceed</a></h2>
@@ -308,17 +289,17 @@
                     Image • <span class="chars">602</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">7</span> likes •
-                    <span class="views">151</span> views •
-                    <span class="ratio">4.64</span>% like
+                    <span class="views">154</span> views •
+                    <span class="ratio">4.55</span>% like
                 </p>
                 <br/>
                 sawtooth effect produced by exceeding of float point accuracy limit
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wlySDy" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/wlySDy.jpg" alt="Float Limit Exceed +=−=" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wlySDy" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/wlySDy.jpg" alt="Float Limit Exceed +=−=" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wlySDy">Float Limit Exceed +=−=</a></h2>
@@ -338,9 +319,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3tK3z3" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/3tK3z3.jpg" alt="Float Limit Exceed 95 chars" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3tK3z3" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/3tK3z3.jpg" alt="Float Limit Exceed 95 chars" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3tK3z3">Float Limit Exceed 95 chars</a></h2>
@@ -360,12 +341,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tt2SDt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/tt2SDt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/tt2SDt.jpg" alt="Forest-Fractal++" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tt2SDt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/tt2SDt.jpg" alt="Forest-Fractal++" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tt2SDt">Forest-Fractal++</a></h2>
@@ -377,20 +355,17 @@
                     Image • <span class="chars">1036</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">4</span> likes •
-                    <span class="views">104</span> views •
-                    <span class="ratio">3.85</span>% like
+                    <span class="views">105</span> views •
+                    <span class="ratio">3.81</span>% like
                 </p>
                 <br/>
                 a zoom in to fractal defined by iteration z↦|Re(z²)|-|Im(z²)|i+c
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/WdKXDt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/WdKXDt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/WdKXDt.jpg" alt="Frozen Fractals" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/WdKXDt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/WdKXDt.jpg" alt="Frozen Fractals" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/WdKXDt">Frozen Fractals</a></h2>
@@ -402,20 +377,39 @@
                     Image • <span class="chars">1140</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">10</span> likes •
-                    <span class="views">294</span> views •
-                    <span class="ratio">3.40</span>% like
+                    <span class="views">298</span> views •
+                    <span class="ratio">3.36</span>% like
                 </p>
                 <br/>
                 And one thought crystallizes like an icy blast&#8230;<br /><br />Fake snowflakes generated by mirroring complex fractals. <br />
             </td>
         </tr></table></div>
+        <div class="shader public-api"><table><tr>
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/Nt2yW3" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/Nt2yW3.jpg" alt="Functional Conch" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
+            </a></td>
+            <td class="info">
+                <h2 class="title"><a href="https://www.shadertoy.com/view/Nt2yW3">Functional Conch</a></h2>
+                <p class="summary">
+                    water, spiral, function, logarithmic, sand, beach, seashell, moana, conch •
+                    <span class="published">2022/06/30</span>
+                    • <span class="status">public+api</span>
+                    <br/>
+                    Common • Image｜4436 + 2930 = <span class="chars">7366</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse
+                    <br/>
+                    <span class="likes">23</span> likes •
+                    <span class="views">155</span> views •
+                    <span class="ratio">14.84</span>% like
+                </p>
+                <br/>
+                My second attempt to create a conch after the <a rel="nofollow" href="https://www.shadertoy.com/view/sdVGWh">nautilus shell</a> shader.<br />The conch was modeled in a functional graphing calculator. Place it on a more decent beach.
+            </td>
+        </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sljSzD" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/sljSzD.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/sljSzD.jpg" alt="Gamma (complex function grapher)" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sljSzD" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/sljSzD.jpg" alt="Gamma (complex function grapher)" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sljSzD">Gamma (complex function grapher)</a></h2>
@@ -427,17 +421,17 @@
                     Common • Image｜2977 + 2409 = <span class="chars">5386</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">13</span> likes •
-                    <span class="views">94</span> views •
-                    <span class="ratio">13.83</span>% like
+                    <span class="views">95</span> views •
+                    <span class="ratio">13.68</span>% like
                 </p>
                 <br/>
                 Manipulated from <a rel="nofollow" href="https://harry7557558.github.io/tools/complex_webgl.html">https://harry7557558.github.io/tools/complex_webgl.html</a>, but for 3D.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tlc3Dj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/tlc3Dj.jpg" alt="Heat Conduction" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tlc3Dj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/tlc3Dj.jpg" alt="Heat Conduction" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tlc3Dj">Heat Conduction</a></h2>
@@ -448,21 +442,18 @@
                     <br/>
                     Buffer A • Image｜558 + 271 = <span class="chars">829</span> chars<br/>mainImage｜iResolution • iFrame • iMouse｜buffer
                     <br/>
-                    <span class="likes">3</span> likes •
-                    <span class="views">191</span> views •
-                    <span class="ratio">1.57</span>% like
+                    <span class="likes">4</span> likes •
+                    <span class="views">195</span> views •
+                    <span class="ratio">2.05</span>% like
                 </p>
                 <br/>
                 Solving heat equation numerically
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tltSWr" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/tltSWr.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/tltSWr.jpg" alt="I heart Fourier" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tltSWr" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/tltSWr.jpg" alt="I heart Fourier" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tltSWr">I heart Fourier</a></h2>
@@ -474,20 +465,17 @@
                     Image • <span class="chars">1880</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">40</span> likes •
-                    <span class="views">348</span> views •
-                    <span class="ratio">11.49</span>% like
+                    <span class="views">354</span> views •
+                    <span class="ratio">11.30</span>% like
                 </p>
                 <br/>
                 As a beginner to Fourier series, inspired by a picture on my religion teacher&#39;s slide. 
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/slfXR7" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/slfXR7.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/slfXR7.jpg" alt="IdentiEgg" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/slfXR7" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/slfXR7.jpg" alt="IdentiEgg" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/slfXR7">IdentiEgg</a></h2>
@@ -499,20 +487,17 @@
                     Common • Image｜5924 + 4068 = <span class="chars">9992</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">15</span> likes •
-                    <span class="views">113</span> views •
-                    <span class="ratio">13.27</span>% like
+                    <span class="views">115</span> views •
+                    <span class="ratio">13.04</span>% like
                 </p>
                 <br/>
                 Random dyed egg generator inspired by WordPress/Gravatar identicon.<br />
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/WtjSD3" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/WtjSD3.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/WtjSD3.jpg" alt="Implicit Heart" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/WtjSD3" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/WtjSD3.jpg" alt="Implicit Heart" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/WtjSD3">Implicit Heart</a></h2>
@@ -524,20 +509,17 @@
                     Image • <span class="chars">1926</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">6</span> likes •
-                    <span class="views">196</span> views •
-                    <span class="ratio">3.06</span>% like
+                    <span class="views">199</span> views •
+                    <span class="ratio">3.02</span>% like
                 </p>
                 <br/>
                 defined by implicit equation (x² + 9/4 y² + z²)³ - x² z³ - 9/80 y² z³ = 0
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3dXfDr" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/3dXfDr.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/3dXfDr.jpg" alt="Implicit Star" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3dXfDr" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/3dXfDr.jpg" alt="Implicit Star" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3dXfDr">Implicit Star</a></h2>
@@ -549,20 +531,17 @@
                     Image • <span class="chars">1466</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">8</span> likes •
-                    <span class="views">129</span> views •
-                    <span class="ratio">6.20</span>% like
+                    <span class="views">130</span> views •
+                    <span class="ratio">6.15</span>% like
                 </p>
                 <br/>
                 A modification of my first shader <a rel="nofollow" href="https://www.shadertoy.com/view/WtjSD3">https://www.shadertoy.com/view/WtjSD3</a>. Make the code faster and look less naive.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/7dBcDR" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/7dBcDR.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/7dBcDR.jpg" alt="L^n-norm ellipsoid SDF+AABB" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/7dBcDR" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/7dBcDR.jpg" alt="L^n-norm ellipsoid SDF+AABB" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/7dBcDR">L^n-norm ellipsoid SDF+AABB</a></h2>
@@ -574,17 +553,17 @@
                     Image • <span class="chars">3823</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">7</span> likes •
-                    <span class="views">72</span> views •
-                    <span class="ratio">9.72</span>% like
+                    <span class="views">77</span> views •
+                    <span class="ratio">9.09</span>% like
                 </p>
                 <br/>
                 SDF approximation (inspired by iq) derived for a high school art project.<br />Exact AABB derived using Lagrange multiplier for fun.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sllczM" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/sllczM.jpg" alt="Linear Regression AA" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sllczM" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/sllczM.jpg" alt="Linear Regression AA" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sllczM">Linear Regression AA</a></h2>
@@ -596,20 +575,17 @@
                     Buffer A • Buffer B • Image｜929 + 358 + 1262 = <span class="chars">2549</span> chars<br/>mainImage｜iResolution • iMouse｜buffer • texture
                     <br/>
                     <span class="likes">4</span> likes •
-                    <span class="views">49</span> views •
-                    <span class="ratio">8.16</span>% like
+                    <span class="views">52</span> views •
+                    <span class="ratio">7.69</span>% like
                 </p>
                 <br/>
                 Showcase an anti-aliasing technique I developed for a raymarching demo.<br />Read the comments for details. Mouse click to show image without AA.
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wl2SWt" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wl2SWt.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wl2SWt.jpg" alt="Mandelbrot++" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wl2SWt" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wl2SWt.jpg" alt="Mandelbrot++" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wl2SWt">Mandelbrot++</a></h2>
@@ -629,12 +605,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wscGz8" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wscGz8.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wscGz8.jpg" alt="Mandelbrot−Julia Relationship" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wscGz8" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wscGz8.jpg" alt="Mandelbrot−Julia Relationship" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wscGz8">Mandelbrot−Julia Relationship</a></h2>
@@ -646,17 +619,17 @@
                     Image • <span class="chars">1063</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">76</span> views •
-                    <span class="ratio">6.58</span>% like
+                    <span class="views">77</span> views •
+                    <span class="ratio">6.49</span>% like
                 </p>
                 <br/>
                 Relationship between Mandelbrot and Julia set: the red dot in the Mandelbrot set represents c, where Julia set is defined by z↦z²+c. 
             </td>
         </tr></table></div>
         <div class="shader public-api"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/NsSSRK" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/NsSSRK.jpg" alt="Mathematica Color Schemes" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/NsSSRK" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/NsSSRK.jpg" alt="Mathematica Color Schemes" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/NsSSRK">Mathematica Color Schemes</a></h2>
@@ -665,20 +638,20 @@
                     <span class="published">2021/05/08</span>
                     • <span class="status">public+api</span>
                     <br/>
-                    Image • <span class="chars">39878</span> chars<br/>mainImage｜iResolution
+                    Image • <span class="chars">26124</span> chars<br/>mainImage｜iResolution
                     <br/>
                     <span class="likes">18</span> likes •
-                    <span class="views">202</span> views •
-                    <span class="ratio">8.91</span>% like
+                    <span class="views">209</span> views •
+                    <span class="ratio">8.61</span>% like
                 </p>
                 <br/>
-                Apply least square fitting to Wolfram language color schemes.<br /><a rel="nofollow" href="https://harry7557558.github.io/Graphics/UI/color_functions/">https://harry7557558.github.io/Graphics/UI/color_functions/</a>
+                Apply least-squares fitting to Wolfram language color schemes.<br /><a rel="nofollow" href="https://harry7557558.github.io/Graphics/UI/color_functions/">https://harry7557558.github.io/Graphics/UI/color_functions/</a>
             </td>
         </tr></table></div>
         <div class="shader public-api"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/Nd33zB" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/Nd33zB.jpg" alt="Natural RYB Color Wheel" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/Nd33zB" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/Nd33zB.jpg" alt="Natural RYB Color Wheel" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/Nd33zB">Natural RYB Color Wheel</a></h2>
@@ -690,20 +663,17 @@
                     Image • <span class="chars">2559</span> chars<br/>mainImage｜iResolution
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">211</span> views •
-                    <span class="ratio">2.37</span>% like
+                    <span class="views">215</span> views •
+                    <span class="ratio">2.33</span>% like
                 </p>
                 <br/>
                 The idea comes from a picture on my art teacher&#39;s color theory intro slide.<br />Ignore my terrible tracing skill.
             </td>
         </tr></table></div>
         <div class="shader public-api"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sdVGWh" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/sdVGWh.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/sdVGWh.jpg" alt="Nautilus Shell" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sdVGWh" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/sdVGWh.jpg" alt="Nautilus Shell" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sdVGWh">Nautilus Shell</a></h2>
@@ -714,21 +684,18 @@
                     <br/>
                     Image • <span class="chars">4409</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
-                    <span class="likes">48</span> likes •
-                    <span class="views">391</span> views •
-                    <span class="ratio">12.28</span>% like
+                    <span class="likes">51</span> likes •
+                    <span class="views">425</span> views •
+                    <span class="ratio">12.00</span>% like
                 </p>
                 <br/>
-                My first attempt to model a sea snail with a spiral. (should note that a nautilus is not a gastropod snail)<br /><br />Thanks this visualizer for helping me debugging the SDF: <a rel="nofollow" href="https://www.shadertoy.com/view/ssKGWR">https://www.shadertoy.com/view/ssKGWR</a>
+                My first attempt to model a sea snail with a spiral. Should note that a nautilus is classified as a cephalopod so it&#39;s technically not a snail.<br /><br />Thanks this visualizer for helping me debug the SDF: <a rel="nofollow" href="https://www.shadertoy.com/view/ssKGWR">https://www.shadertoy.com/view/ssKGWR</a>
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ssccz7" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/ssccz7.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/ssccz7.jpg" alt="Neural Tooth 2" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ssccz7" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/ssccz7.jpg" alt="Neural Tooth 2" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ssccz7">Neural Tooth 2</a></h2>
@@ -740,17 +707,17 @@
                     Image • <span class="chars">4230</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse
                     <br/>
                     <span class="likes">28</span> likes •
-                    <span class="views">146</span> views •
-                    <span class="ratio">19.18</span>% like
+                    <span class="views">192</span> views •
+                    <span class="ratio">14.58</span>% like
                 </p>
                 <br/>
                 Similar to my <a rel="nofollow" href="https://www.shadertoy.com/view/sdc3R2">previous tooth shader</a> that uses a neural network to represent a volume.<br />Uses a different model that has a fewer number weights and a higher accuracy.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3lfyDl" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/3lfyDl.jpg" alt="Numerical Gradient Comparison" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3lfyDl" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/3lfyDl.jpg" alt="Numerical Gradient Comparison" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3lfyDl">Numerical Gradient Comparison</a></h2>
@@ -762,20 +729,17 @@
                     Image • <span class="chars">2129</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">6</span> likes •
-                    <span class="views">287</span> views •
-                    <span class="ratio">2.09</span>% like
+                    <span class="views">299</span> views •
+                    <span class="ratio">2.01</span>% like
                 </p>
                 <br/>
                 Comparing 3d numerical differentiation methods.<br /><br />Seems like the tetrahedron method doesn&#39;t work much better than the naive method ~.~
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/fsGGzh" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/fsGGzh.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/fsGGzh.jpg" alt="Piecewise Linear Simplex Terrain" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/fsGGzh" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/fsGGzh.jpg" alt="Piecewise Linear Simplex Terrain" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/fsGGzh">Piecewise Linear Simplex Terrain</a></h2>
@@ -787,17 +751,17 @@
                     Common • Image｜2924 + 2156 = <span class="chars">5080</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">13</span> likes •
-                    <span class="views">113</span> views •
-                    <span class="ratio">11.50</span>% like
+                    <span class="views">115</span> views •
+                    <span class="ratio">11.30</span>% like
                 </p>
                 <br/>
                 Demonstrate a noise generated by interpolating hash values on a simplex grid.<br />See Common tab for 2D and 3D noise functions and their analytical gradient.
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/7st3Rr" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/7st3Rr.jpg" alt="Scratch Pipes" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/7st3Rr" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/7st3Rr.jpg" alt="Scratch Pipes" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/7st3Rr">Scratch Pipes</a></h2>
@@ -809,7 +773,7 @@
                     Image • <span class="chars">934</span> chars<br/>mainImage｜iResolution • iFrame
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">4</span> views •
+                    <span class="views">5</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -817,9 +781,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ttSSDc" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/ttSSDc.jpg" alt="Self-Adaptive Super Sampling" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ttSSDc" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/ttSSDc.jpg" alt="Self-Adaptive Super Sampling" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ttSSDc">Self-Adaptive Super Sampling</a></h2>
@@ -831,7 +795,7 @@
                     Common • Buffer A • Image｜3107 + 169 + 1403 = <span class="chars">4679</span> chars<br/>mainImage｜iResolution • iTime • iMouse｜buffer • texture
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">24</span> views •
+                    <span class="views">25</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -839,9 +803,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/fdBcRd" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/fdBcRd.jpg" alt="ShallowWaterEqu_3b1d" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/fdBcRd" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/fdBcRd.jpg" alt="ShallowWaterEqu_3b1d" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/fdBcRd">ShallowWaterEqu_3b1d</a></h2>
@@ -853,17 +817,39 @@
                     Common • Buffer A • Buffer B • Buffer C • Buffer D • Image｜1890 + 210 + 210 + 210 + 210 + 1510 = <span class="chars">4240</span> chars<br/>mainImage｜iResolution • iFrame • iMouse｜buffer
                     <br/>
                     <span class="likes">14</span> likes •
-                    <span class="views">109</span> views •
-                    <span class="ratio">12.84</span>% like
+                    <span class="views">123</span> views •
+                    <span class="ratio">11.38</span>% like
                 </p>
                 <br/>
                 My second attempt in buffer simulation. Try to simulate water ripples by solving the shallow water equation, which produces more details than the wave equation. However, it requires a much smaller time step to be stably integrated by the forward Euler.
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wttGDB" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/wttGDB.jpg" alt="Sound Test 0x00000001" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sdlSDH" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/sdlSDH.jpg" alt="Snowflake-7557558" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
+            </a></td>
+            <td class="info">
+                <h2 class="title"><a href="https://www.shadertoy.com/view/sdlSDH">Snowflake-7557558</a></h2>
+                <p class="summary">
+                    snowflake •
+                    <span class="published">2022/06/23</span>
+                    • <span class="status">unlisted</span>
+                    <br/>
+                    Image • <span class="chars">3356</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse｜cubemap
+                    <br/>
+                    <span class="likes">0</span> likes •
+                    <span class="views">5</span> views •
+                    <span class="ratio">0.00</span>% like
+                </p>
+                <br/>
+                A Shadertoy version of the snowflake on my website homepage, which is also my bot&#39;s PFP.<br /><a rel="nofollow" href="https://harry7557558.github.io/">https://harry7557558.github.io/</a>
+            </td>
+        </tr></table></div>
+        <div class="shader unlisted"><table><tr>
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wttGDB" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/wttGDB.jpg" alt="Sound Test 0x00000001" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wttGDB">Sound Test 0x00000001</a></h2>
@@ -875,7 +861,7 @@
                     Common • Image • Sound｜2430 + 227 + 63 = <span class="chars">2720</span> chars<br/>mainImage • mainSound｜iResolution • iTime
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">25</span> views •
+                    <span class="views">26</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -883,9 +869,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wdGcDV" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/wdGcDV.jpg" alt="Sound Test 0x00000006" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wdGcDV" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/wdGcDV.jpg" alt="Sound Test 0x00000006" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wdGcDV">Sound Test 0x00000006</a></h2>
@@ -905,12 +891,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sdc3R2" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/sdc3R2.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/sdc3R2.jpg" alt="Tooth (neural volume)" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sdc3R2" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/sdc3R2.jpg" alt="Tooth (neural volume)" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sdc3R2">Tooth (neural volume)</a></h2>
@@ -922,20 +905,17 @@
                     Image • <span class="chars">7988</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">18</span> likes •
-                    <span class="views">181</span> views •
-                    <span class="ratio">9.94</span>% like
+                    <span class="views">190</span> views •
+                    <span class="ratio">9.47</span>% like
                 </p>
                 <br/>
                 I just see a lot of siren shaders and want to have a try.
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/WtcSR2" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/WtcSR2.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/WtcSR2.jpg" alt="Triangled" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/WtcSR2" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/WtcSR2.jpg" alt="Triangled" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/WtcSR2">Triangled</a></h2>
@@ -947,17 +927,17 @@
                     Image • Sound｜2872 + 188 = <span class="chars">3060</span> chars<br/>mainImage • mainSound｜iResolution • iTime｜texture
                     <br/>
                     <span class="likes">7</span> likes •
-                    <span class="views">216</span> views •
-                    <span class="ratio">3.24</span>% like
+                    <span class="views">221</span> views •
+                    <span class="ratio">3.17</span>% like
                 </p>
                 <br/>
                 Tangled + Triangulated. Diving down to Hell.<br /><br />(stay 1min and watch it change)
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/7lGXWK" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/7lGXWK.jpg" alt="Uniform Random Showcase 2D" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/7lGXWK" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/7lGXWK.jpg" alt="Uniform Random Showcase 2D" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/7lGXWK">Uniform Random Showcase 2D</a></h2>
@@ -969,17 +949,17 @@
                     Buffer A • Image｜6809 + 157 = <span class="chars">6966</span> chars<br/>mainImage｜iResolution • iFrame｜buffer
                     <br/>
                     <span class="likes">11</span> likes •
-                    <span class="views">132</span> views •
-                    <span class="ratio">8.33</span>% like
+                    <span class="views">143</span> views •
+                    <span class="ratio">7.69</span>% like
                 </p>
                 <br/>
                 An idea to showcase generating uniformly random points inside 2D shapes.<br />Let me know about any idea to showcase 3D random functions.
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/tlcXDM" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/tlcXDM.jpg" alt="Unnecessary Calculation" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/tlcXDM" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/tlcXDM.jpg" alt="Unnecessary Calculation" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/tlcXDM">Unnecessary Calculation</a></h2>
@@ -999,9 +979,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3l2XWc" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/3l2XWc.jpg" alt="Untitled 0x00000001" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3l2XWc" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/3l2XWc.jpg" alt="Untitled 0x00000001" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3l2XWc">Untitled 0x00000001</a></h2>
@@ -1021,12 +1001,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wstGRH" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wstGRH.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wstGRH.jpg" alt="Untitled 0x00000004" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wstGRH" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wstGRH.jpg" alt="Untitled 0x00000004" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wstGRH">Untitled 0x00000004</a></h2>
@@ -1046,12 +1023,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/wdc3RB" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/wdc3RB.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/wdc3RB.jpg" alt="Untitled 0x00000007" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/wdc3RB" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/wdc3RB.jpg" alt="Untitled 0x00000007" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/wdc3RB">Untitled 0x00000007</a></h2>
@@ -1063,20 +1037,17 @@
                     Image • <span class="chars">1959</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">172</span> views •
-                    <span class="ratio">2.91</span>% like
+                    <span class="views">175</span> views •
+                    <span class="ratio">2.86</span>% like
                 </p>
                 <br/>
                 simple test of non-recursive ray tracing
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3dcGRf" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/3dcGRf.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/3dcGRf.jpg" alt="Untitled 0x00000008" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3dcGRf" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/3dcGRf.jpg" alt="Untitled 0x00000008" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3dcGRf">Untitled 0x00000008</a></h2>
@@ -1088,17 +1059,17 @@
                     Image • <span class="chars">2981</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">5</span> likes •
-                    <span class="views">135</span> views •
-                    <span class="ratio">3.70</span>% like
+                    <span class="views">139</span> views •
+                    <span class="ratio">3.60</span>% like
                 </p>
                 <br/>
                 test 100% reflective surface
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/WtK3Ry" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/WtK3Ry.jpg" alt="Untitled 0x0000000D" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/WtK3Ry" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/WtK3Ry.jpg" alt="Untitled 0x0000000D" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/WtK3Ry">Untitled 0x0000000D</a></h2>
@@ -1110,17 +1081,17 @@
                     Buffer A • Image｜1882 + 92 = <span class="chars">1974</span> chars<br/>mainImage｜iResolution • iTime • iFrame｜buffer
                     <br/>
                     <span class="likes">11</span> likes •
-                    <span class="views">256</span> views •
-                    <span class="ratio">4.30</span>% like
+                    <span class="views">261</span> views •
+                    <span class="ratio">4.21</span>% like
                 </p>
                 <br/>
                 basically a copy of my c++ code <a rel="nofollow" href="https://github.com/Harry7557558/Graphics/blob/light2d/light2d%20(no%20recursion).cpp">https://github.com/Harry7557558/Graphics/blob/light2d/light2d%20(no%20recursion).cpp</a> (not gl)
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/Wdsfzj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/Wdsfzj.jpg" alt="Untitled 0x00000017" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/Wdsfzj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/Wdsfzj.jpg" alt="Untitled 0x00000017" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/Wdsfzj">Untitled 0x00000017</a></h2>
@@ -1140,9 +1111,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/sdBczG" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/sdBczG.jpg" alt="WaveEquation_9ec8" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/sdBczG" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/sdBczG.jpg" alt="WaveEquation_9ec8" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/sdBczG">WaveEquation_9ec8</a></h2>
@@ -1154,7 +1125,7 @@
                     Common • Buffer A • Buffer B • Image｜1104 + 261 + 261 + 1509 = <span class="chars">3135</span> chars<br/>mainImage｜iResolution • iFrame • iMouse｜buffer
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">14</span> views •
+                    <span class="views">18</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -1162,9 +1133,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ttcSWM" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/ttcSWM.jpg" alt="Web Camera" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ttcSWM" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/ttcSWM.jpg" alt="Web Camera" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ttcSWM">Web Camera</a></h2>
@@ -1176,7 +1147,7 @@
                     Image • <span class="chars">76</span> chars<br/>mainImage｜iResolution｜webcam
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">12</span> views •
+                    <span class="views">13</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -1184,12 +1155,9 @@
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/slSXz1" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/slSXz1.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/slSXz1.jpg" alt="dmojistan logo" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/slSXz1" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/slSXz1.jpg" alt="dmojistan logo" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/slSXz1">dmojistan logo</a></h2>
@@ -1201,7 +1169,7 @@
                     Image • <span class="chars">634</span> chars<br/>mainImage｜iResolution • iTime
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">56</span> views •
+                    <span class="views">61</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -1209,9 +1177,9 @@
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/NscXRj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/NscXRj.jpg" alt="isp-glassball-11-mix" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/NscXRj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/NscXRj.jpg" alt="isp-glassball-11-mix" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/NscXRj">isp-glassball-11-mix</a></h2>
@@ -1223,17 +1191,17 @@
                     Buffer A • Image｜5275 + 73 = <span class="chars">5348</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse｜buffer • cubemap
                     <br/>
                     <span class="likes">17</span> likes •
-                    <span class="views">235</span> views •
-                    <span class="ratio">7.23</span>% like
+                    <span class="views">241</span> views •
+                    <span class="ratio">7.05</span>% like
                 </p>
                 <br/>
                 Experimental.<br /><a rel="nofollow" href="https://github.com/harry7557558/Shadertoy/tree/master/isp-glass">https://github.com/harry7557558/Shadertoy/tree/master/isp-glass</a>
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/fd3Szj" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/fd3Szj.jpg" alt="isp-glassball-12-mix" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/fd3Szj" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/fd3Szj.jpg" alt="isp-glassball-12-mix" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/fd3Szj">isp-glassball-12-mix</a></h2>
@@ -1245,20 +1213,17 @@
                     Buffer A • Image｜5327 + 73 = <span class="chars">5400</span> chars<br/>mainImage｜iResolution • iTime • iFrame • iMouse｜buffer • cubemap
                     <br/>
                     <span class="likes">9</span> likes •
-                    <span class="views">153</span> views •
-                    <span class="ratio">5.88</span>% like
+                    <span class="views">158</span> views •
+                    <span class="ratio">5.70</span>% like
                 </p>
                 <br/>
                 Experimental.<br /><a rel="nofollow" href="https://github.com/harry7557558/Shadertoy/tree/master/isp-glass">https://github.com/harry7557558/Shadertoy/tree/master/isp-glass</a>
             </td>
         </tr></table></div>
         <div class="shader public"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/3dBcR3" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/3dBcR3.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="https://www.shadertoy.com/media/shaders/3dBcR3.jpg" alt="sdLine Continuity" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/3dBcR3" style="position:relative">
+                <img class="preview image-video-preview" src="https://www.shadertoy.com/media/shaders/3dBcR3.jpg" alt="sdLine Continuity" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/3dBcR3">sdLine Continuity</a></h2>
@@ -1270,17 +1235,17 @@
                     Image • <span class="chars">1401</span> chars<br/>mainImage｜iResolution • iTime • iMouse
                     <br/>
                     <span class="likes">4</span> likes •
-                    <span class="views">81</span> views •
-                    <span class="ratio">4.94</span>% like
+                    <span class="views">84</span> views •
+                    <span class="ratio">4.76</span>% like
                 </p>
                 <br/>
                 Use a power higher than 2 to increase the continuity of line segment primitive for modeling
             </td>
         </tr></table></div>
         <div class="shader unlisted"><table><tr>
-            <td><a href="https://www.shadertoy.com/view/ws2yzG" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-                <img class="preview" src="https://www.shadertoy.com/media/shaders/ws2yzG.jpg" alt="﻿Cross-Platform Test" />
+            <td><a class="preview-container" href="https://www.shadertoy.com/view/ws2yzG" style="position:relative">
+                <img class="preview" src="https://www.shadertoy.com/media/shaders/ws2yzG.jpg" alt="﻿Cross-Platform Test" loading="lazy" />
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="https://www.shadertoy.com/view/ws2yzG">﻿Cross-Platform Test</a></h2>
@@ -1292,7 +1257,7 @@
                     Buffer A • Buffer B • Image • Sound｜86 + 86 + 158 + 88 = <span class="chars">418</span> chars<br/>mainImage • mainSound｜iResolution • iTime｜buffer • texture • cubemap • video • webcam • volume
                     <br/>
                     <span class="likes">0</span> likes •
-                    <span class="views">3</span> views •
+                    <span class="views">4</span> views •
                     <span class="ratio">0.00</span>% like
                 </p>
                 <br/>
@@ -1301,7 +1266,12 @@
         </tr></table></div>
     </div>
     <div style="margin:0.6em"><br/>
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise specified, all shaders are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    <br/><br/><br/></div>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, shaders on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <br/><br/>
+        <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/shadertoy#readme">GitHub</a>.</span>
+        <br/>
+        <span>(Also check out my <a href="/desmos/index.html">Desmos list</a> :)</span>
+        <br/><br/>
+    </div>
     <script src="script.js"></script>
 </body></html>

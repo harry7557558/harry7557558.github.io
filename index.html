@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <title>Harry Chen - Homepage</title>
     <link rel="icon" href="./logo.png" />
+    <meta property="og:image" content="snowflake.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="description" content="An insane website created by an insane person." />
@@ -40,20 +41,21 @@
     <canvas id='falling-snowflake-canvas'></canvas>
 
     <script>
-        window.addEventListener("load", function (event) {
 
+        setTimeout(function () {
             animateQuotes();
             initRandomLink();
             setContactInfo();
             resetWordStyle();
             window.addEventListener("resize", resetWordStyle);
-
             try { setSofakeClick(); }
             catch (e) { console.error(e); }
+        }, 0);
 
+        setTimeout(function () {
             setupSnowflakeRenderer();
+        }, 0);
 
-        });
     </script>
 </body>
 

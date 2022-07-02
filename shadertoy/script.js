@@ -1,5 +1,9 @@
 // sorting, graph plotting, preview
 
+`Use this line to
+break outdated browsers
+`;
+
 
 function getShaders() {
     let shaders = document.getElementsByClassName("shader");
@@ -96,7 +100,64 @@ function getShadersPoints(shaders, key1, key2) {
     return points;
 }
 
+const LineFitModes = ["proportional", "linear", "median-median"];
+const LineFits = {
+    // least-squares y=mx
+    "proportional": function (p) {
+        var sxy = 0.0, sx2 = 0.0;
+        for (var i = 0; i < p.length; i++) {
+            var x = p[i][0], y = p[i][1];
+            sxy += x * y;
+            sx2 += x * x;
+        }
+        var m = sxy / sx2;
+        return function (x) {
+            return m * x;
+        };
+    },
+    // least-squares y=mx+b
+    "linear": function (p) {
+        var sx2 = 0.0, sx = 0.0, s1 = 0.0,
+            sxy = 0.0, sy = 0.0;
+        for (var i = 0; i < p.length; i++) {
+            var x = p[i][0], y = p[i][1];
+            sx2 += x * x, sx += x, s1 += 1.0;
+            sxy += x * y, sy += y;
+        }
+        var k = 1.0 / (sx2 * s1 - sx * sx);
+        var m = k * (sxy * s1 - sx * sy);
+        var b = k * (sx2 * sy - sx * sxy);
+        return function (x) {
+            return m * x + b;
+        };
+    },
+    // median-median line
+    "median-median": function (p) {
+        if (p.length < 3) return this.linear(p);
+        var n = p.length, m = Math.round(n / 3);
+        p.sort(function (a, b) { return a[0] - b[0] });
+        function med(q) {
+            var i = q.length / 2;
+            var x = q.length & 1 ? q[Math.floor(i)][0]
+                : 0.5 * (q[i][0] + q[i + 1][0]);
+            q = q.sort(function (a, b) { return a[1] - b[1]; });
+            var y = q.length & 1 ? q[Math.floor(i)][1]
+                : 0.5 * (q[i][1] + q[i + 1][1]);
+            return [x, y];
+        }
+        var m1 = med(p.slice(0, m));
+        var m2 = med(p.slice(m, n - m));
+        var m3 = med(p.slice(n - m, n));
+        var m = (m3[1] - m1[1]) / (m3[0] - m1[0]);
+        var b = m2[1] - m * m2[0];
+        return function (x) {
+            return m * x + b;
+        };
+    },
+};
+
 function initChart() {
+    // initialize selects
     const axesVariables = [
         { name: "date published", key: "year" },
         { name: "views", key: "views" },
@@ -116,32 +177,94 @@ function initChart() {
     }
     selectorX.value = "year";
     selectorY.value = "ratio";
+    let selectorFit = document.getElementById("line-fit-select");
+    for (var i = 0; i < LineFitModes.length; i++) {
+        var option = document.createElement("option");
+        option.innerHTML = LineFitModes[i];
+        selectorFit.appendChild(option);
+    }
+    selectorFit.value = "linear";
 
     let shaders = getShaders();
     var points = getShadersPoints(shaders, selectorX.value, selectorY.value);
 
+    let chart = null;
+    function setLineFit(datasets) {
+        var data = [];
+        for (var i = 0; i < 3; i++) if (!datasets[i].hidden)
+            data = data.concat(datasets[i].data);
+        var fun = LineFits[selectorFit.value](data);
+        var xmin = Infinity, xmax = -Infinity;
+        for (var i = 0; i < data.length; i++) {
+            xmin = Math.min(xmin, data[i][0]);
+            xmax = Math.max(xmax, data[i][0]);
+        }
+        var points = [];
+        var nd = 40;
+        for (var i = 0; i <= nd; i++) {
+            var x = xmin + (xmax - xmin) * (i / nd);
+            var y = Math.max(fun(x), 0.0);
+            points.push([x, y]);
+        }
+        datasets[3].data = points;
+    }
+    function updateChart() {
+        var datasets = chart.data.datasets;
+        var points = getShadersPoints(shaders, selectorX.value, selectorY.value);
+        datasets[0].titles = points.publicApi.titles;
+        datasets[0].data = points.publicApi.data;
+        datasets[1].titles = points.public.titles;
+        datasets[1].data = points.public.data;
+        datasets[2].titles = points.unlisted.titles;
+        datasets[2].data = points.unlisted.data;
+        setLineFit(datasets);
+        chart.update();
+    }
+    selectorX.addEventListener("input", updateChart);
+    selectorY.addEventListener("input", updateChart);
+    selectorFit.addEventListener("input", updateChart);
+
     let data = {
         datasets: [
             {
+                type: 'scatter',
+                hidden: false,
                 label: 'public+api',
                 titles: points.publicApi.titles,
                 data: points.publicApi.data,
                 backgroundColor: "rgb(0,128,160)"
             },
             {
+                type: 'scatter',
+                hidden: false,
                 label: 'public',
                 titles: points.public.titles,
                 data: points.public.data,
                 backgroundColor: "rgb(0,160,0)"
             },
             {
+                type: 'scatter',
+                hidden: false,
                 label: 'unlisted',
                 titles: points.unlisted.titles,
                 data: points.unlisted.data,
                 backgroundColor: "rgb(160,128,0)"
+            },
+            {
+                type: 'line',
+                hidden: false,
+                label: 'line fit',
+                data: [],
+                pointBackgroundColor: "transparent",
+                pointBorderColor: "transparent",
+                backgroundColor: "rgb(128,128,128)",
+                borderColor: "rgba(128,128,128,0.5)",
+                borderWidth: 2,
+                borderDash: [10, 10]
             }
         ]
     };
+    setLineFit(data.datasets);
 
     let options = {
         responsive: false,
@@ -165,8 +288,19 @@ function initChart() {
             legend: {
                 position: 'top',
                 align: 'center',
+                onClick: function (event, legendItem, legend) {
+                    var datasets = chart.data.datasets;
+                    for (var i = 0; i < datasets.length; i++) {
+                        if (datasets[i].label == legendItem.text)
+                            datasets[i].hidden = !datasets[i].hidden;
+                    }
+                    updateChart();
+                }
             },
             tooltip: {
+                filter: function (item) {
+                    return item.datasetIndex != 3;
+                },
                 callbacks: {
                     label: function (item) {
                         var label = item.dataset.titles[item.dataIndex];
@@ -193,7 +327,7 @@ function initChart() {
         }
     };
 
-    let chart = new Chart(
+    chart = new Chart(
         document.getElementById("chartjs-canvas"),
         {
             type: 'scatter',
@@ -202,24 +336,64 @@ function initChart() {
         }
     );
 
-    function updateChart() {
-        var datasets = chart.data.datasets;
-        var points = getShadersPoints(shaders, selectorX.value, selectorY.value);
-        datasets[0].titles = points.publicApi.titles;
-        datasets[0].data = points.publicApi.data;
-        datasets[1].titles = points.public.titles;
-        datasets[1].data = points.public.data;
-        datasets[2].titles = points.unlisted.titles;
-        datasets[2].data = points.unlisted.data;
-        chart.update();
-    }
-    selectorX.addEventListener("input", updateChart);
-    selectorY.addEventListener("input", updateChart);
 }
+
+
+function initVideoLazyLoad() {
+    function mouseEnterHandler(e) {
+        // e.preventDefault();
+        let a = e.target;
+        if (a.tagName.toLowerCase() != "a")
+            a = a.parentElement;
+        let videos = a.getElementsByTagName("video");
+        if (videos.length > 0) {
+            videos[0].style.visibility = "visible";
+            return;
+        }
+        let id = a.href.split('/')[a.href.split('/').length - 1];
+        var video = document.createElement("video");
+        video.classList = ['preview'];
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = true;
+        video.noplaybackrate = true;
+        var source = document.createElement("source");
+        source.setAttribute("src", "videos/" + id + ".mp4");
+        source.setAttribute("type", "video/mp4");
+        video.appendChild(source);
+        a.appendChild(video);
+    }
+    function mouseLeaveHandler(e) {
+        // e.preventDefault();
+        let a = e.target;
+        if (a.tagName.toLowerCase() != "a")
+            a = a.parentElement;
+        let videos = a.getElementsByTagName("video");
+        if (videos.length > 0) {
+            videos[0].style.visibility = "hidden";
+            return;
+        }
+    }
+    let imgs = document.getElementsByClassName("image-video-preview");
+    for (var i = 0; i < imgs.length; i++) {
+        let img = imgs[i];
+        let a = img.parentElement;
+        a.addEventListener("mouseenter", mouseEnterHandler);
+        a.addEventListener("mouseleave", mouseLeaveHandler);
+        //a.addEventListener("mouseover", mouseEnterHandler);
+        //a.addEventListener("mouseout", mouseLeaveHandler);
+        a.addEventListener("touchenter", mouseEnterHandler);
+        a.addEventListener("touchleave", mouseLeaveHandler);
+        a.addEventListener("touchstart", mouseEnterHandler);
+        //a.addEventListener("touchend", mouseLeaveHandler);
+    }
+}
+
 
 (function () {
     initSort();
     initUnlistedCheckbox();
+    initVideoLazyLoad();
 
     var chartjs = document.createElement("script");
     chartjs.setAttribute("src", "https://cdn.jsdelivr.net/npm/chart.js@3.7.1");

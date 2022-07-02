@@ -247,19 +247,20 @@ index = """<!DOCTYPE html>
 <head>
     <meta charset="utf-8" />
     <title>List of my published Shadertoy shaders</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <meta name="viewport" content="width=700, initial-scale=1" />
 
     <meta name="description" content="This page lists all of my published Shadertoy shaders, which includes my experiments in rendering, modeling, data fitting, simulation, and art." />
     <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL, function" />
     <meta name="robots" content="index, follow" />
 
     <style>
-        body{margin:0 0.5em;padding:0}
+        body{margin:0 0.5em;padding:0;font-family:'Times New Roman'}
         #container{display:inline;margin:0;padding:0}
         .shader{display:block;margin:0.5em;padding:0.5em 0;border-bottom:1px solid gray}
-        .preview{width:24em;height:13.5em;display:block;margin:0 2em 0 0;position:absolute;left:0;top:0}
-        .image-hover-hide{opacity:1.0}
-        .image-hover-hide:hover{opacity:0.0}
+        .preview{width:24em;height:13.5em;display:block;margin:0;position:absolute;left:0;top:0}
+        .preview-container{margin:0 2em 0.5em 0;display:inline-block;font-size:1em;padding:0;text-decoration:none;touch-action:none}
+        .placeholder{position:relative;height:13.5em;pointer-event:none}
         .title a{color:black;text-decoration:none}
         .title a:hover{text-decoration:underline}
         #chartjs-canvas{width:40em;height:20em;margin:1em 0;border:2px solid #bbb}
@@ -269,7 +270,7 @@ index = """<!DOCTYPE html>
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
         .summary{margin:0;font-size:1em;color:#555}
-        a{font-size:1em;padding:0 0.1em;text-decoration:none}
+        a{text-decoration:none;color:#06c}
         a:hover{text-decoration:underline}
         input,select,button{display:inline-block;vertical-align:middle}
         .unlisted{display:none}
@@ -284,7 +285,8 @@ index = """<!DOCTYPE html>
         <hr/>
         <span>
             Horizontal axis: <select id="chart-x-select"></select> ｜
-            Vertical axis: <select id="chart-y-select"></select>
+            Vertical axis: <select id="chart-y-select"></select> ｜
+            Line fit: <select id="line-fit-select"></select>
         </span>
         <br/>
         <canvas id="chartjs-canvas"></canvas>
@@ -307,20 +309,17 @@ for shader in shaders:
     if summary['status'] == 'public':
         display_status = '<span class="status" style="display:none">public</span>'
 
+    img_classes = ['preview']
     if os.path.isfile(f"shadertoy/videos/{summary['shader_id']}.mp4"):
-        image_preview = f"""<video class="preview" autoplay muted loop noplaybackrate>
-                    <source src="videos/{summary['shader_id']}.mp4" type="video/mp4">
-                </video>
-                <img class="preview image-hover-hide" src="{summary['preview_url']}" alt="{summary['title']}" />"""
-    else:
-        image_preview = f"""<img class="preview" src="{summary['preview_url']}" alt="{summary['title']}" />"""
+        img_classes.append("image-video-preview")
+    image_preview = f"""<img class="{' '.join(img_classes)}" src="{summary['preview_url']}" alt="{summary['title']}" loading="lazy" />"""
 
     # add graph to the index
     content = f"""
         <div class="shader {summary['status'].replace('+', '-')}"><table><tr>
-            <td><a href="{summary['url']}" style="position:relative">
-                <img class="preview" style="position:relative;height:12em;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
+            <td><a class="preview-container" href="{summary['url']}" style="position:relative">
                 {image_preview}
+                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
             </a></td>
             <td class="info">
                 <h2 class="title"><a href="{summary['url']}">{summary['title']}</a></h2>
@@ -345,8 +344,13 @@ for shader in shaders:
 index += """
     </div>
     <div style="margin:0.6em"><br/>
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise specified, all shaders are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    <br/><br/><br/></div>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, shaders on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <br/><br/>
+        <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/shadertoy#readme">GitHub</a>.</span>
+        <br/>
+        <span>(Also check out my <a href="/desmos/index.html">Desmos list</a> :)</span>
+        <br/><br/>
+    </div>
     <script src="script.js"></script>
 </body></html>"""
 

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>List of my saved Desmos graphs</title>
     <link rel="icon" href="https://harry7557558.github.io/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=600, initial-scale=1">
 
     <meta name="description" content="This page lists all of my saved Desmos graphs: 3D graphing, function art, math explorations, and more." />
     <meta name="keywords" content="harry7557558, Desmos, graph, function, art, 3D" />
@@ -22,32 +22,81 @@
             // options: { enableMenu: false }
         };
     </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
         onerror="alert('Failed to load MathJax.')"></script>
 
     <style>
+        body{font-family:'Times New Roman'}
         .graph{display:block;margin:0.5em;padding:0.5em;border-bottom:1px solid gray}
         img{height:15em;display:inline-block;margin:0 2em 0 0}
         .info{display:inline-block;margin:0;min-width:20em}
         .description{white-space:pre-wrap}
         h1{margin:1em 0;font-size:2em}
         h2{margin:0.7em 0;font-size:1.75em}
-        .created{margin:0;font-size:1em;color:#222}
+        .created{margin:0;font-size:1em;color:#555}
         .equation{margin:1.5em 0;font-size:1.25em}
-        a{font-size:1em;padding:0 0.1em;text-decoration:none}a:hover{text-decoration:underline}
+        a{font-size:1em;padding:0 0.1em;text-decoration:none;color:#06c}
+        a:hover{text-decoration:underline}
     </style>
 </head>
 <body>
     <div style="margin:1.2em;white-space:nowrap">
         <h1>List of my saved Desmos graphs</h1>
-        <p class="created">Harry Chen (harry7557558) - Updated 2022/05/25</p>
+        <p class="created">Harry Chen (harry7557558) - Updated 2022/07/02</p>
         <div><br/></div>
         <hr/>
     </div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/jveus4m8ji.png" alt="Tanh Activation Loss Function" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/mhxwoieyph.png" alt="Raymarching Gradient Estimation" loading="lazy" /></td>
+        <td class="info">
+            <h2>Raymarching Gradient Estimation</h2>
+            <p class="created">2022/06/24 • 15,046&nbsp;bytes • 62&nbsp;expressions • 3&nbsp;notes • 5&nbsp;folders</p>
+            <p class="description">Try to develop a fast-converging method for intersecting a ray with an implicit surface. The value of the scalar field along the ray can be viewed as a one-dimensional function, and the problem is to find the first zero of the function with a positive para...</p>
+            <p class="links">
+                <a href="https://www.desmos.com/calculator/mhxwoieyph">Desmos</a>
+                <a href="./graphs/mhxwoieyph.json">JSON</a>
+            </p>
+        </td>
+    </tr></table></div><div class="graph"><table><tr>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/casiwyvoa1.png" alt="Value-Gradient Projection" loading="lazy" /></td>
+        <td class="info">
+            <h2>Value-Gradient Projection</h2>
+            <p class="created">2022/06/23 • 5,459&nbsp;bytes • 31&nbsp;expressions • 1&nbsp;note • 4&nbsp;folders</p>
+            <p class="description">Given v(x) and g(x)=v&#x27;(x) at x=-h0 and x=0, project v(x) and g(x) at x=h1.
+
+Test a method that expresses the answer as the weighted sum of the givens and finds the coefficients by setting the low-order terms of the series expansion to zero.</p>
+            <p class="links">
+                <a href="https://www.desmos.com/calculator/casiwyvoa1">Desmos</a>
+                <a href="./graphs/casiwyvoa1.json">JSON</a>
+            </p>
+        </td>
+    </tr></table></div><div class="graph"><table><tr>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/3gxx2oomam.png" alt="Bouncing Rigid Body" loading="lazy" /></td>
+        <td class="info">
+            <h2>Bouncing Rigid Body</h2>
+            <p class="created">2022/06/18 • 21,384&nbsp;bytes • 81&nbsp;expressions • 23&nbsp;notes • 6&nbsp;folders • ticker</p>
+            <p class="description">Simulating a bouncing rigid body that conserves energy. It has both linear and angular positions and velocities.</p><p class="equation">$\displaystyle{d_{pCd}\left(r_{0},n\right)=-\frac{2\left(d_{ot}\left(v,n\right)+\omega d_{et}\left(p_{rd}\left(p,\alpha,r_{0}\right),n\right)\right)}{d_{ot2}\left(n\right)+\frac{1}{I}d_{et}\left(p_{rd}\left(p,\alpha,r_{0}\right),n\right)^{2}}}$</p>
+            <p class="links">
+                <a href="https://www.desmos.com/calculator/3gxx2oomam">Desmos</a>
+                <a href="./graphs/3gxx2oomam.json">JSON</a>
+            </p>
+        </td>
+    </tr></table></div><div class="graph"><table><tr>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/obsrf5bzrl.png" alt="Action Test" loading="lazy" /></td>
+        <td class="info">
+            <h2>Action Test</h2>
+            <p class="created">2022/06/14 • 9,244&nbsp;bytes • 37&nbsp;expressions • 14&nbsp;notes • 5&nbsp;folders • ticker</p>
+            <p class="description">This is my first time to play with the &quot;action&quot; feature in Desmos.
+I try to create a bouncing ball with collision response that conserves energy.</p>
+            <p class="links">
+                <a href="https://www.desmos.com/calculator/obsrf5bzrl">Desmos</a>
+                <a href="./graphs/obsrf5bzrl.json">JSON</a>
+            </p>
+        </td>
+    </tr></table></div><div class="graph"><table><tr>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/jveus4m8ji.png" alt="Tanh Activation Loss Function" loading="lazy" /></td>
         <td class="info">
             <h2>Tanh Activation Loss Function</h2>
-            <p class="created">2022/04/20 • 6,657 bytes • 26 expressions • 4 notes • 4 folders</p>
+            <p class="created">2022/04/20 • 6,657&nbsp;bytes • 26&nbsp;expressions • 4&nbsp;notes • 4&nbsp;folders</p>
             <p class="description">Trying to find a loss function for the tanh activation function on a single layer neural network
 
 Training data</p>
@@ -57,10 +106,10 @@ Training data</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/wdkyfjm2s5.png" alt="Forest Tutorial" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/wdkyfjm2s5.png" alt="Forest Tutorial" loading="lazy" /></td>
         <td class="info">
             <h2>Forest Tutorial</h2>
-            <p class="created">2022/04/19 • 9,883 bytes • 22 expressions • 19 notes • 4 folders</p>
+            <p class="created">2022/04/19 • 9,883&nbsp;bytes • 22&nbsp;expressions • 19&nbsp;notes • 4&nbsp;folders</p>
             <p class="description">Demonstrate the use of implicit shapes
 
 An overview of implicit shapes:
@@ -73,10 +122,10 @@ An overview of implicit shapes:
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/d3rp7hlvpg.png" alt="Seashells Tutorial" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/d3rp7hlvpg.png" alt="Seashells Tutorial" loading="lazy" /></td>
         <td class="info">
             <h2>Seashells Tutorial</h2>
-            <p class="created">2022/04/19 • 5,832 bytes • 24 expressions • 4 folders</p>
+            <p class="created">2022/04/19 • 5,832&nbsp;bytes • 24&nbsp;expressions • 4&nbsp;folders • slider&nbsp;animation</p>
             <p class="equation">$\displaystyle{H_{m}\left(t\right)=\min\left(\max\left(2\cos\left(t+\frac{\pi}{2}\right),0\right),1\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/d3rp7hlvpg">Desmos</a>
@@ -84,10 +133,10 @@ An overview of implicit shapes:
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/rv7pvp1fk0.png" alt="Discord Emoji Complete List" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/rv7pvp1fk0.png" alt="Discord Emoji Complete List" loading="lazy" /></td>
         <td class="info">
             <h2>Discord Emoji Complete List</h2>
-            <p class="created">2022/03/15 • 2,895,413 bytes • 7,561 expressions • 3 notes</p>
+            <p class="created">2022/03/15 • 2,895,413&nbsp;bytes • 7,561&nbsp;expressions • 3&nbsp;notes</p>
             <p class="description">Discord Emojis Complete List
 
 Original graphics by Twemoji - <a href="https://twemoji.twitter.com/">https://twemoji.twitter.com/</a>
@@ -103,10 +152,10 @@ A summary of the steps to produce this graph:
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/cs4faizltl.png" alt="Orthogonal linear regression" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/cs4faizltl.png" alt="Orthogonal linear regression" loading="lazy" /></td>
         <td class="info">
             <h2>Orthogonal linear regression</h2>
-            <p class="created">2022/02/11 • 8,768 bytes • 36 expressions • 9 notes • 6 folders</p>
+            <p class="created">2022/02/11 • 8,768&nbsp;bytes • 36&nbsp;expressions • 9&nbsp;notes • 6&nbsp;folders</p>
             <p class="description">Compare different ways to fit a straight line to a set of points.
 Drag the black point to set data
 
@@ -119,10 +168,10 @@ The two green lines are identical...</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pqgezgxk0l.png" alt="3D Parametric Surface Template 3" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pqgezgxk0l.png" alt="3D Parametric Surface Template 3" loading="lazy" /></td>
         <td class="info">
             <h2>3D Parametric Surface Template 3</h2>
-            <p class="created">2022/02/08 • 14,870 bytes • 65 expressions • 18 notes • 8 folders • 1 image</p>
+            <p class="created">2022/02/08 • 14,870&nbsp;bytes • 65&nbsp;expressions • 18&nbsp;notes • 8&nbsp;folders • 1&nbsp;image</p>
             <p class="description">3D Parametric Surface Template 3 - by harry7557558
 
 Improved from version 2 <a href="https://www.desmos.com/calculator/ftuogjzprg">https://www.desmos.com/calculator/ftuogjzprg</a> by using a more efficient way to plot faces.</p>
@@ -132,10 +181,10 @@ Improved from version 2 <a href="https://www.desmos.com/calculator/ftuogjzprg">h
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" alt="Ammonite" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" alt="Ammonite" loading="lazy" /></td>
         <td class="info">
             <h2>Ammonite</h2>
-            <p class="created">2022/01/09 • 34,882 bytes • 137 expressions • 49 notes • 13 folders • 1 image</p>
+            <p class="created">2022/01/09 • 34,882&nbsp;bytes • 137&nbsp;expressions • 49&nbsp;notes • 13&nbsp;folders • 1&nbsp;image • slider&nbsp;animation</p>
             <p class="description">&quot;Ammonite&quot; by Harry Chen (harry7557558)
 
 My artwork is a creature with a spiral shell and tentacles moving underwater. I have been fascinated by objects from the sea, especially the spiral shells of mollusks, so I choose to create an ammonite whose shell c...</p>
@@ -145,10 +194,10 @@ My artwork is a creature with a spiral shell and tentacles moving underwater. I 
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/wrxe3cbpyz.png" alt="2022 Firework Animation" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/wrxe3cbpyz.png" alt="2022 Firework Animation" loading="lazy" /></td>
         <td class="info">
             <h2>2022 Firework Animation</h2>
-            <p class="created">2022/01/01 • 6,841 bytes • 28 expressions • 4 folders</p>
+            <p class="created">2022/01/01 • 6,841&nbsp;bytes • 28&nbsp;expressions • 4&nbsp;folders • slider&nbsp;animation</p>
             <p class="equation">$\displaystyle{p_{fw3}=0.008c_{fw3}\left(2\pi\cdot\frac{1}{N_{fw3}}\cdot\left[1,2...N_{fw3}\right]\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/wrxe3cbpyz">Desmos</a>
@@ -156,10 +205,10 @@ My artwork is a creature with a spiral shell and tentacles moving underwater. I 
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/jk1okdxoks.png" alt="Random subtraction of two circles #2" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/jk1okdxoks.png" alt="Random subtraction of two circles #2" loading="lazy" /></td>
         <td class="info">
             <h2>Random subtraction of two circles #2</h2>
-            <p class="created">2021/12/28 • 3,614 bytes • 27 expressions • 3 notes</p>
+            <p class="created">2021/12/28 • 3,614&nbsp;bytes • 27&nbsp;expressions • 3&nbsp;notes</p>
             <p class="equation">$\displaystyle{X_{2}=I_{2inv}\left(I_{1}\cdot\left(2\left\{U&lt;T:\frac{0}{0},\frac{U-T}{1-T}\right\}-1\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/jk1okdxoks">Desmos</a>
@@ -167,10 +216,10 @@ My artwork is a creature with a spiral shell and tentacles moving underwater. I 
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/af8foz89fc.png" alt="Random subtraction of two circles #1" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/af8foz89fc.png" alt="Random subtraction of two circles #1" loading="lazy" /></td>
         <td class="info">
             <h2>Random subtraction of two circles #1</h2>
-            <p class="created">2021/12/28 • 5,826 bytes • 39 expressions • 2 folders</p>
+            <p class="created">2021/12/28 • 5,826&nbsp;bytes • 39&nbsp;expressions • 2&nbsp;folders</p>
             <p class="equation">$\displaystyle{I_{1}\left(x\right)=\frac{1}{2}\left(xh_{1}\left(x\right)+r^{2}\arctan\left(\frac{x}{h_{1}\left(x\right)}\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/af8foz89fc">Desmos</a>
@@ -178,10 +227,10 @@ My artwork is a creature with a spiral shell and tentacles moving underwater. I 
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ddyum0rkgw.png" alt="Random points inside union of two circles" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ddyum0rkgw.png" alt="Random points inside union of two circles" loading="lazy" /></td>
         <td class="info">
             <h2>Random points inside union of two circles</h2>
-            <p class="created">2021/12/28 • 3,427 bytes • 25 expressions • 4 notes</p>
+            <p class="created">2021/12/28 • 3,427&nbsp;bytes • 25&nbsp;expressions • 4&nbsp;notes</p>
             <p class="equation">$\displaystyle{I_{0}=-\frac{1}{2}\left(cy_{0}+r^{2}\arctan\left(\frac{c}{y_{0}}\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/ddyum0rkgw">Desmos</a>
@@ -189,10 +238,10 @@ My artwork is a creature with a spiral shell and tentacles moving underwater. I 
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ftuogjzprg.png" alt="3D Parametric Surface Template 2" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ftuogjzprg.png" alt="3D Parametric Surface Template 2" loading="lazy" /></td>
         <td class="info">
             <h2>3D Parametric Surface Template 2</h2>
-            <p class="created">2021/12/23 • 17,635 bytes • 79 expressions • 16 notes • 8 folders • 1 image</p>
+            <p class="created">2021/12/23 • 17,635&nbsp;bytes • 79&nbsp;expressions • 16&nbsp;notes • 8&nbsp;folders • 1&nbsp;image</p>
             <p class="description">3D Parametric Surface Template - by harry7557558
 
 Replace the &quot;x_obj&quot;, &quot;y_obj&quot;, &quot;z_obj&quot; functions in the &quot;Object&quot; folder to graph custom parametric equations.
@@ -204,10 +253,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/x0gicefgnp.png" alt="3D Parametric Surface Template" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/x0gicefgnp.png" alt="3D Parametric Surface Template" loading="lazy" /></td>
         <td class="info">
             <h2>3D Parametric Surface Template</h2>
-            <p class="created">2021/12/23 • 15,957 bytes • 73 expressions • 9 notes • 8 folders • 1 image</p>
+            <p class="created">2021/12/23 • 15,957&nbsp;bytes • 73&nbsp;expressions • 9&nbsp;notes • 8&nbsp;folders • 1&nbsp;image</p>
             <p class="description">3D Parametric Surface Template - by harry7557558
 
 Replace the &quot;x_obj&quot;, &quot;y_obj&quot;, &quot;z_obj&quot; functions in the &quot;Object&quot; folder to graph custom parametric equations.
@@ -219,10 +268,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zsp6rgqjev.png" alt="2017 CSMC A6" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zsp6rgqjev.png" alt="2017 CSMC A6" loading="lazy" /></td>
         <td class="info">
             <h2>2017 CSMC A6</h2>
-            <p class="created">2021/11/03 • 2,548 bytes • 16 expressions • 1 folder</p>
+            <p class="created">2021/11/03 • 2,548&nbsp;bytes • 16&nbsp;expressions • 1&nbsp;folder</p>
             <p class="equation">$\displaystyle{\left(x-3\right)^{2}+\left(y-4\right)^{2}=5^{2}\left\{\frac{x}{6}+\frac{y}{8}\ge1\right\}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/zsp6rgqjev">Desmos</a>
@@ -230,10 +279,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/j0eqqzsj7v.png" alt="Circle Equidistant Locus" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/j0eqqzsj7v.png" alt="Circle Equidistant Locus" loading="lazy" /></td>
         <td class="info">
             <h2>Circle Equidistant Locus</h2>
-            <p class="created">2021/10/17 • 5,363 bytes • 29 expressions • 1 note • 4 folders</p>
+            <p class="created">2021/10/17 • 5,363&nbsp;bytes • 29&nbsp;expressions • 1&nbsp;note • 4&nbsp;folders</p>
             <p class="description">Locus points equidistant from two circles</p><p class="equation">$\displaystyle{\frac{\left(x-x_{0}\right)^{2}}{a_{1}^{2}}+\frac{y^{2}}{a_{1}^{2}-f^{2}}=1}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/j0eqqzsj7v">Desmos</a>
@@ -241,10 +290,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zccocbuygk.png" alt="Cook-Torrance BRDF" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zccocbuygk.png" alt="Cook-Torrance BRDF" loading="lazy" /></td>
         <td class="info">
             <h2>Cook-Torrance BRDF</h2>
-            <p class="created">2021/10/11 • 12,983 bytes • 58 expressions • 6 notes • 7 folders</p>
+            <p class="created">2021/10/11 • 12,983&nbsp;bytes • 58&nbsp;expressions • 6&nbsp;notes • 7&nbsp;folders</p>
             <p class="equation">$\displaystyle{\Lambda\left(\theta\right)=\frac{\sqrt{1+\alpha^{2}\tan\left(\theta\right)^{2}}-1}{2}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/zccocbuygk">Desmos</a>
@@ -252,10 +301,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/otaly31kry.png" alt="Henyey-Greenstein importance sampling" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/otaly31kry.png" alt="Henyey-Greenstein importance sampling" loading="lazy" /></td>
         <td class="info">
             <h2>Henyey-Greenstein importance sampling</h2>
-            <p class="created">2021/10/03 • 6,787 bytes • 31 expressions • 6 notes • 3 folders</p>
+            <p class="created">2021/10/03 • 6,787&nbsp;bytes • 31&nbsp;expressions • 6&nbsp;notes • 3&nbsp;folders</p>
             <p class="equation">$\displaystyle{F_{inv}\left(x\right)=\frac{1}{2g}\left(1+g^{2}-\left(\frac{\left(1-g^{2}\right)}{2g\left(x+\frac{1-g}{2g}\right)}\right)^{2}\right)\left\{0\le x\le1\right\}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/otaly31kry">Desmos</a>
@@ -263,10 +312,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/oz6pwrslel.png" alt="Oren-Nayar BRDF" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/oz6pwrslel.png" alt="Oren-Nayar BRDF" loading="lazy" /></td>
         <td class="info">
             <h2>Oren-Nayar BRDF</h2>
-            <p class="created">2021/10/01 • 5,669 bytes • 27 expressions • 4 folders</p>
+            <p class="created">2021/10/01 • 5,669&nbsp;bytes • 27&nbsp;expressions • 4&nbsp;folders</p>
             <p class="equation">$\displaystyle{\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}}F_{r}\left(u,v\right)\cos\left(v\right)\cdot\sin\left(v\right)dvdu}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/oz6pwrslel">Desmos</a>
@@ -274,10 +323,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/sctxdxh1td.png" alt="Random points inside intersection of two circles" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/sctxdxh1td.png" alt="Random points inside intersection of two circles" loading="lazy" /></td>
         <td class="info">
             <h2>Random points inside intersection of two circles</h2>
-            <p class="created">2021/09/12 • 2,842 bytes • 19 expressions • 5 notes</p>
+            <p class="created">2021/09/12 • 2,842&nbsp;bytes • 19&nbsp;expressions • 5&nbsp;notes</p>
             <p class="description">Attempt to generate uniform random samples in the intersection of two circles</p><p class="equation">$\displaystyle{I\left(x\right)=\frac{1}{2}r^{2}\arcsin\left(\frac{x}{r}\right)+\frac{1}{2}x\sqrt{r^{2}-x^{2}}-cx}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/sctxdxh1td">Desmos</a>
@@ -285,10 +334,10 @@ Change the subscript &quot;_obj&quot; to others to display multiple parametric s
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/w4thzt4ofr.png" alt="RYB Color Wheel Girl" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/w4thzt4ofr.png" alt="RYB Color Wheel Girl" loading="lazy" /></td>
         <td class="info">
             <h2>RYB Color Wheel Girl</h2>
-            <p class="created">2021/08/27 • 10,039 bytes • 46 expressions • 5 notes • 4 folders</p>
+            <p class="created">2021/08/27 • 10,039&nbsp;bytes • 46&nbsp;expressions • 5&nbsp;notes • 4&nbsp;folders</p>
             <p class="description">WebGL version: <a href="https://www.shadertoy.com/view/Nd33zB">https://www.shadertoy.com/view/Nd33zB</a>
 
 Linear interpolation</p>
@@ -298,10 +347,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/vfizuknvjq.png" alt="2D color palette" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/vfizuknvjq.png" alt="2D color palette" loading="lazy" /></td>
         <td class="info">
             <h2>2D color palette</h2>
-            <p class="created">2021/08/14 • 1,912 bytes • 12 expressions</p>
+            <p class="created">2021/08/14 • 1,912&nbsp;bytes • 12&nbsp;expressions</p>
             <p class="equation">$\displaystyle{Y=-1+\frac{2}{N}\left(\operatorname{floor}\left(\frac{I}{N}\right)+\frac{1}{2}\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/vfizuknvjq">Desmos</a>
@@ -309,10 +358,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pav2l1kzte.png" alt="Linear color gradient grapher" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pav2l1kzte.png" alt="Linear color gradient grapher" loading="lazy" /></td>
         <td class="info">
             <h2>Linear color gradient grapher</h2>
-            <p class="created">2021/08/13 • 2,883 bytes • 13 expressions • 3 notes • 5 folders</p>
+            <p class="created">2021/08/13 • 2,883&nbsp;bytes • 13&nbsp;expressions • 3&nbsp;notes • 5&nbsp;folders</p>
             <p class="equation">$\displaystyle{g\left(t\right)=0.5+0.5\cos\left(2\pi\left(t-\frac{1}{3}\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/pav2l1kzte">Desmos</a>
@@ -320,10 +369,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pv4gxyyckx.png" alt="Titration Curve" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/pv4gxyyckx.png" alt="Titration Curve" loading="lazy" /></td>
         <td class="info">
             <h2>Titration Curve</h2>
-            <p class="created">2021/03/31 • 2,844 bytes • 14 expressions • 7 notes</p>
+            <p class="created">2021/03/31 • 2,844&nbsp;bytes • 14&nbsp;expressions • 7&nbsp;notes</p>
             <p class="description">pH and H⁺/OH⁻ amounts of the sample, assuming 1L sample</p><p class="equation">$\displaystyle{a\left(t\right)=\frac{a_{0}+a_{d}\cdot t}{1+t}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/pv4gxyyckx">Desmos</a>
@@ -331,10 +380,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hvtbjw6rue.png" alt="Quadratic Interpolation" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hvtbjw6rue.png" alt="Quadratic Interpolation" loading="lazy" /></td>
         <td class="info">
             <h2>Quadratic Interpolation</h2>
-            <p class="created">2020/12/29 • 4,083 bytes • 16 expressions</p>
+            <p class="created">2020/12/29 • 4,083&nbsp;bytes • 16&nbsp;expressions</p>
             <p class="equation">$\displaystyle{x=\frac{y_{0}\left(x_{c}^{2}-x_{1}^{2}\right)+y_{c}\left(x_{1}^{2}-x_{0}^{2}\right)+y_{1}\left(x_{0}^{2}-x_{c}^{2}\right)}{2\left(y_{0}\left(x_{c}-x_{1}\right)+y_{c}\left(x_{1}-x_{0}\right)+y_{1}\left(x_{0}-x_{c}\right)\right)}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/hvtbjw6rue">Desmos</a>
@@ -342,10 +391,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ktnucw466t.png" alt="Vectorization Test Cases" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ktnucw466t.png" alt="Vectorization Test Cases" loading="lazy" /></td>
         <td class="info">
             <h2>Vectorization Test Cases</h2>
-            <p class="created">2020/11/08 • 3,315 bytes • 12 expressions</p>
+            <p class="created">2020/11/08 • 3,315&nbsp;bytes • 12&nbsp;expressions</p>
             <p class="equation">$\displaystyle{\frac{1}{3}\left(\sin\left(N\left(S\right)t\right),\cos\left(K\left(S\right)t\right)\right)+\left(N\left(S\right),K\left(S\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/ktnucw466t">Desmos</a>
@@ -353,10 +402,10 @@ Linear interpolation</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/7lr5htcel6.png" alt="Epsilon" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/7lr5htcel6.png" alt="Epsilon" loading="lazy" /></td>
         <td class="info">
             <h2>Epsilon</h2>
-            <p class="created">2020/10/05 • 2,128 bytes • 12 expressions • 3 notes</p>
+            <p class="created">2020/10/05 • 2,128&nbsp;bytes • 12&nbsp;expressions • 3&nbsp;notes</p>
             <p class="description">Machine epsilon demonstration
 
 Result may vary by hardware and web browser</p>
@@ -366,10 +415,10 @@ Result may vary by hardware and web browser</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/vu4xm0n9ir.png" alt="Torus projection" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/vu4xm0n9ir.png" alt="Torus projection" loading="lazy" /></td>
         <td class="info">
             <h2>Torus projection</h2>
-            <p class="created">2020/09/10 • 16,048 bytes • 82 expressions • 7 notes • 6 folders</p>
+            <p class="created">2020/09/10 • 16,048&nbsp;bytes • 82&nbsp;expressions • 7&nbsp;notes • 6&nbsp;folders</p>
             <p class="equation">$\displaystyle{s_{z}\left(n\right)=z_{0}+\frac{n}{D_{z}}\left(z_{1}-z_{0}\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/vu4xm0n9ir">Desmos</a>
@@ -377,10 +426,10 @@ Result may vary by hardware and web browser</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ivasvrustk.png" alt="Ellipsoid projection" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ivasvrustk.png" alt="Ellipsoid projection" loading="lazy" /></td>
         <td class="info">
             <h2>Ellipsoid projection</h2>
-            <p class="created">2020/09/07 • 13,179 bytes • 71 expressions • 5 notes • 4 folders</p>
+            <p class="created">2020/09/07 • 13,179&nbsp;bytes • 71&nbsp;expressions • 5&nbsp;notes • 4&nbsp;folders</p>
             <p class="equation">$\displaystyle{G\left(x,y,z\right)=\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}+\frac{z^{2}}{c^{2}}-1}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/ivasvrustk">Desmos</a>
@@ -388,10 +437,10 @@ Result may vary by hardware and web browser</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/nwoctkrg80.png" alt="Ellipse principal axes" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/nwoctkrg80.png" alt="Ellipse principal axes" loading="lazy" /></td>
         <td class="info">
             <h2>Ellipse principal axes</h2>
-            <p class="created">2020/09/07 • 1,536 bytes • 11 expressions</p>
+            <p class="created">2020/09/07 • 1,536&nbsp;bytes • 11&nbsp;expressions</p>
             <p class="equation">$\displaystyle{P_{1}=\frac{v_{1}}{\operatorname{distance}\left(\left(0,0\right),v_{1}\right)}\sqrt{\frac{1}{\lambda_{1}}}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/nwoctkrg80">Desmos</a>
@@ -399,10 +448,10 @@ Result may vary by hardware and web browser</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/raeuahskxm.png" alt="Elliptical ring moment of inertia" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/raeuahskxm.png" alt="Elliptical ring moment of inertia" loading="lazy" /></td>
         <td class="info">
             <h2>Elliptical ring moment of inertia</h2>
-            <p class="created">2020/09/06 • 4,748 bytes • 20 expressions • 1 note • 4 folders</p>
+            <p class="created">2020/09/06 • 4,748&nbsp;bytes • 20&nbsp;expressions • 1&nbsp;note • 4&nbsp;folders</p>
             <p class="description">Interactive visualization of the ratio of the moment of inertia of a uniform elliptical ring to its mass</p><p class="equation">$\displaystyle{r_{e}\left(t\right)=RN\left(t-\frac{1}{N}\operatorname{floor}\left(Nt\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/raeuahskxm">Desmos</a>
@@ -410,10 +459,10 @@ Result may vary by hardware and web browser</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/4vo8ccfuvp.png" alt="Polynomial trigonometric fit" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/4vo8ccfuvp.png" alt="Polynomial trigonometric fit" loading="lazy" /></td>
         <td class="info">
             <h2>Polynomial trigonometric fit</h2>
-            <p class="created">2020/08/25 • 6,068 bytes • 32 expressions • 3 notes • 6 folders</p>
+            <p class="created">2020/08/25 • 6,068&nbsp;bytes • 32&nbsp;expressions • 3&nbsp;notes • 6&nbsp;folders</p>
             <p class="description">Multivation: find an approximation of roots of equations in the form P(x)+c1*cos(w*x)+c2*sin(w*x)=0, P(x) is a polynomial with degree no more than 4 that can be solved analytically.
 
 Perform Newton&#x27;s iteration twice on the approximation to solve the equati...</p>
@@ -423,10 +472,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hsp3ccmdhw.png" alt="damped forced vibration" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hsp3ccmdhw.png" alt="damped forced vibration" loading="lazy" /></td>
         <td class="info">
             <h2>damped forced vibration</h2>
-            <p class="created">2020/08/15 • 2,375 bytes • 14 expressions</p>
+            <p class="created">2020/08/15 • 2,375&nbsp;bytes • 14&nbsp;expressions</p>
             <p class="equation">$\displaystyle{C_{1}=\frac{Fuw}{\left(-mw^{2}+k\right)^{2}+u^{2}w^{2}}+\frac{mg}{k}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/hsp3ccmdhw">Desmos</a>
@@ -434,10 +483,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/diuy6hrgw6.png" alt="Capacitor Output Voltage" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/diuy6hrgw6.png" alt="Capacitor Output Voltage" loading="lazy" /></td>
         <td class="info">
             <h2>Capacitor Output Voltage</h2>
-            <p class="created">2020/08/13 • 2,315 bytes • 13 expressions • 1 note</p>
+            <p class="created">2020/08/13 • 2,315&nbsp;bytes • 13&nbsp;expressions • 1&nbsp;note</p>
             <p class="description">Solve <a href="http://www.thefouriertransform.com/series/circuitExample.php">http://www.thefouriertransform.com/series/circuitExample.php</a> without Fourier series</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/diuy6hrgw6">Desmos</a>
@@ -445,10 +494,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/1z17yc5djh.png" alt="random vector generator" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/1z17yc5djh.png" alt="random vector generator" loading="lazy" /></td>
         <td class="info">
             <h2>random vector generator</h2>
-            <p class="created">2020/08/03 • 7,092 bytes • 31 expressions • 7 notes • 6 folders</p>
+            <p class="created">2020/08/03 • 7,092&nbsp;bytes • 31&nbsp;expressions • 7&nbsp;notes • 6&nbsp;folders</p>
             <p class="description">Generate random vectors in R3</p><p class="equation">$\displaystyle{Z_{3}\left(t\right)=w_{3}\left(t\right)v_{3}\left(t\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/1z17yc5djh">Desmos</a>
@@ -456,10 +505,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zn9d68fqzt.png" alt="Quadratic Quotient" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zn9d68fqzt.png" alt="Quadratic Quotient" loading="lazy" /></td>
         <td class="info">
             <h2>Quadratic Quotient</h2>
-            <p class="created">2020/07/08 • 5,172 bytes • 35 expressions • 2 notes • 4 folders</p>
+            <p class="created">2020/07/08 • 5,172&nbsp;bytes • 35&nbsp;expressions • 2&nbsp;notes • 4&nbsp;folders</p>
             <p class="equation">$\displaystyle{p_{0}=\left(-\frac{1}{2D_{A}}\left(A_{11}u_{0}-A_{01}u_{1}\right),-\frac{1}{2D_{A}}\left(A_{00}u_{1}-A_{01}u_{0}\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/zn9d68fqzt">Desmos</a>
@@ -467,10 +516,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/btal70uvxv.png" alt="Numerical Differentiation Comparison" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/btal70uvxv.png" alt="Numerical Differentiation Comparison" loading="lazy" /></td>
         <td class="info">
             <h2>Numerical Differentiation Comparison</h2>
-            <p class="created">2020/06/28 • 7,293 bytes • 40 expressions • 6 folders</p>
+            <p class="created">2020/06/28 • 7,293&nbsp;bytes • 40&nbsp;expressions • 6&nbsp;folders</p>
             <p class="equation">$\displaystyle{c_{x}=\frac{1}{2h}\left(F\left(x_{0}+h,y_{0}\right)-F\left(x_{0}-h,y_{0}\right)\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/btal70uvxv">Desmos</a>
@@ -478,10 +527,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/l99tjopqcx.png" alt="Ellipse Distance Lagrangian" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/l99tjopqcx.png" alt="Ellipse Distance Lagrangian" loading="lazy" /></td>
         <td class="info">
             <h2>Ellipse Distance Lagrangian</h2>
-            <p class="created">2020/06/26 • 4,651 bytes • 19 expressions • 2 notes • 3 folders</p>
+            <p class="created">2020/06/26 • 4,651&nbsp;bytes • 19&nbsp;expressions • 2&nbsp;notes • 3&nbsp;folders</p>
             <p class="equation">$\displaystyle{f_{0}\left(k\right)=\frac{1}{a^{2}}\left(\frac{a^{2}x_{0}}{a^{2}-k}\right)^{2}+\frac{1}{b^{2}}\left(\frac{b^{2}y_{0}}{b^{2}-k}\right)^{2}-1}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/l99tjopqcx">Desmos</a>
@@ -489,10 +538,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/kmkcgt5eld.png" alt="Trigonometric Cubic Equation (sin/sinh)" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/kmkcgt5eld.png" alt="Trigonometric Cubic Equation (sin/sinh)" loading="lazy" /></td>
         <td class="info">
             <h2>Trigonometric Cubic Equation (sin/sinh)</h2>
-            <p class="created">2020/06/20 • 2,731 bytes • 20 expressions • 1 note • 2 folders</p>
+            <p class="created">2020/06/20 • 2,731&nbsp;bytes • 20&nbsp;expressions • 1&nbsp;note • 2&nbsp;folders</p>
             <p class="description">Solving general cubic equations using sin/sinh triple angle property</p><p class="equation">$\displaystyle{\left(u\cdot\sin\left(\frac{1}{3}\arcsin\left(m\cdot q\right)+\frac{2\pi}{3}\right)+f,0\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/kmkcgt5eld">Desmos</a>
@@ -500,10 +549,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zyxas5zy8w.png" alt="Trigonometric Cubic Equation" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/zyxas5zy8w.png" alt="Trigonometric Cubic Equation" loading="lazy" /></td>
         <td class="info">
             <h2>Trigonometric Cubic Equation</h2>
-            <p class="created">2020/06/19 • 2,534 bytes • 15 expressions • 3 folders</p>
+            <p class="created">2020/06/19 • 2,534&nbsp;bytes • 15&nbsp;expressions • 3&nbsp;folders</p>
             <p class="equation">$\displaystyle{\left(\sin\left(\frac{1}{3}\left(\arcsin\left(k\right)+2\pi\right)\right),0\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/zyxas5zy8w">Desmos</a>
@@ -511,10 +560,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hznnunxnx6.png" alt="4th derivative simpson error estimate" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/hznnunxnx6.png" alt="4th derivative simpson error estimate" loading="lazy" /></td>
         <td class="info">
             <h2>4th derivative simpson error estimate</h2>
-            <p class="created">2020/05/29 • 807 bytes • 4 expressions</p>
+            <p class="created">2020/05/29 • 807&nbsp;bytes • 4&nbsp;expressions</p>
             <p class="equation">$\displaystyle{f\left(x\right)=\arctan\left(\frac{x^{3}-3x^{2}+2x+1}{2x^{3}+x^{2}-x-2}\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/hznnunxnx6">Desmos</a>
@@ -522,10 +571,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ar8trp3g9s.png" alt="Hitting the Target" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ar8trp3g9s.png" alt="Hitting the Target" loading="lazy" /></td>
         <td class="info">
             <h2>Hitting the Target</h2>
-            <p class="created">2020/05/07 • 2,390 bytes • 17 expressions</p>
+            <p class="created">2020/05/07 • 2,390&nbsp;bytes • 17&nbsp;expressions</p>
             <p class="equation">$\displaystyle{c\left(h-y\cdot\frac{d}{x}-\frac{1}{2}g\cdot\frac{d^{2}}{x^{2}}\right)&lt;0\left\{x&lt;0\right\}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/ar8trp3g9s">Desmos</a>
@@ -533,10 +582,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/nn29zfpyiq.png" alt="solve a*cos(x)+b*sin(x)=c" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/nn29zfpyiq.png" alt="solve a*cos(x)+b*sin(x)=c" loading="lazy" /></td>
         <td class="info">
             <h2>solve a*cos(x)+b*sin(x)=c</h2>
-            <p class="created">2020/05/02 • 1,947 bytes • 9 expressions • 4 notes</p>
+            <p class="created">2020/05/02 • 1,947&nbsp;bytes • 9&nbsp;expressions • 4&nbsp;notes</p>
             <p class="equation">$\displaystyle{x=\arcsin\left(\frac{a\sqrt{a^{2}+b^{2}-c^{2}}+bc}{b^{2}+a^{2}}\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/nn29zfpyiq">Desmos</a>
@@ -544,10 +593,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/bq5nc43zfh.png" alt="2D Metaballs - Snowflake" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/bq5nc43zfh.png" alt="2D Metaballs - Snowflake" loading="lazy" /></td>
         <td class="info">
             <h2>2D Metaballs - Snowflake</h2>
-            <p class="created">2020/04/18 • 11,071 bytes • 43 expressions • 7 notes • 4 folders</p>
+            <p class="created">2020/04/18 • 11,071&nbsp;bytes • 43&nbsp;expressions • 7&nbsp;notes • 4&nbsp;folders</p>
             <p class="description">clamp a real number in [0,1]</p><p class="equation">$\displaystyle{a_{t2}\left(y,x\right)=\arctan\left(\frac{y}{x}\right)+\left\{x&gt;0:\ 0,\ \pi\cdot\operatorname{sign}\left(y\right)\right\}}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/bq5nc43zfh">Desmos</a>
@@ -555,10 +604,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/59x14hqpt3.png" alt="2D Metaballs - Coronavirus" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/59x14hqpt3.png" alt="2D Metaballs - Coronavirus" loading="lazy" /></td>
         <td class="info">
             <h2>2D Metaballs - Coronavirus</h2>
-            <p class="created">2020/04/06 • 11,297 bytes • 46 expressions • 8 notes • 5 folders</p>
+            <p class="created">2020/04/06 • 11,297&nbsp;bytes • 46&nbsp;expressions • 8&nbsp;notes • 5&nbsp;folders</p>
             <p class="description">Stay Home, Save Lives: Help Stop Coronavirus!
 
 (use the following slider to animate)</p>
@@ -568,10 +617,10 @@ Perform Newton&#x27;s iteration twice on the approximation to solve the equati..
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/f9vwgan2ip.png" alt="Desmos 3D (Perspective)" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/f9vwgan2ip.png" alt="Desmos 3D (Perspective)" loading="lazy" /></td>
         <td class="info">
             <h2>Desmos 3D (Perspective)</h2>
-            <p class="created">2020/04/05 • 12,560 bytes • 41 expressions • 10 notes • 5 folders</p>
+            <p class="created">2020/04/05 • 12,560&nbsp;bytes • 41&nbsp;expressions • 10&nbsp;notes • 5&nbsp;folders</p>
             <p class="description">3D modeling and animation on Desmos. I decide to keep most of my creation process.
 
 These variables control the camera, where the camera is located at d·(cos(rz)cos(rx), sin(rz)cos(rx), sin(rx)).</p>
@@ -581,10 +630,10 @@ These variables control the camera, where the camera is located at d·(cos(rz)co
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/fa7mwvpxb3.png" alt="Desmos 3D" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/fa7mwvpxb3.png" alt="Desmos 3D" loading="lazy" /></td>
         <td class="info">
             <h2>Desmos 3D</h2>
-            <p class="created">2020/04/03 • 14,943 bytes • 68 expressions • 9 notes • 7 folders</p>
+            <p class="created">2020/04/03 • 14,943&nbsp;bytes • 68&nbsp;expressions • 9&nbsp;notes • 7&nbsp;folders</p>
             <p class="description">3D graphing on Desmos!
 
 The following examples demonstrate how to project Planar Implicit Curve, Spacial Parametric Curve, Explicit Surface, Parametric Surface, and Implicit Surface onto a 2D plane.
@@ -596,10 +645,10 @@ Camera: (cos(rz)cos(rx), sin(rz)cos(rx), sin(rx)).</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/gbji3acmwp.png" alt="Love Path" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/gbji3acmwp.png" alt="Love Path" loading="lazy" /></td>
         <td class="info">
             <h2>Love Path</h2>
-            <p class="created">2020/04/01 • 1,152 bytes • 2 expressions</p>
+            <p class="created">2020/04/01 • 1,152&nbsp;bytes • 2&nbsp;expressions</p>
             <p class="equation">$\displaystyle{(0.0184-0.1311\cos(t)-0.03627\sin(t),0.01564+0.0455\cos(t)-0.153\sin(t))}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/gbji3acmwp">Desmos</a>
@@ -607,10 +656,10 @@ Camera: (cos(rz)cos(rx), sin(rz)cos(rx), sin(rx)).</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/bzecuo9xix.png" alt="Offsetting Curves" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/bzecuo9xix.png" alt="Offsetting Curves" loading="lazy" /></td>
         <td class="info">
             <h2>Offsetting Curves</h2>
-            <p class="created">2020/03/24 • 12,109 bytes • 35 expressions • 8 notes • 9 folders</p>
+            <p class="created">2020/03/24 • 12,109&nbsp;bytes • 35&nbsp;expressions • 8&nbsp;notes • 9&nbsp;folders</p>
             <p class="description">Offsetting Curves: Useful in CAD and Graphics Design. (And is quite simple)</p><p class="equation">$\displaystyle{\left(t+o\frac{e^{-t}}{\sqrt{1+e^{-2t}}},\left(e^{-t}-1\right)+o\frac{1}{\sqrt{1+e^{-2t}}}\right)}$</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/bzecuo9xix">Desmos</a>
@@ -618,10 +667,10 @@ Camera: (cos(rz)cos(rx), sin(rz)cos(rx), sin(rx)).</p>
             </p>
         </td>
     </tr></table></div><div class="graph"><table><tr>
-        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ozmnil3v00.png" alt="Fourier Series" /></td>
+        <td><img src="https://saved-work.desmos.com/calc_thumbs/production/ozmnil3v00.png" alt="Fourier Series" loading="lazy" /></td>
         <td class="info">
             <h2>Fourier Series</h2>
-            <p class="created">2019/10/24 • 9,745 bytes • 59 expressions • 2 notes • 3 folders • 1 table</p>
+            <p class="created">2019/10/24 • 9,745&nbsp;bytes • 59&nbsp;expressions • 2&nbsp;notes • 3&nbsp;folders • 1&nbsp;table</p>
             <p class="description">Drag the points, see what the graph looks like. Do you understand why most lossy image compression methods doesn&#x27;t work well for simple illustrations?</p>
             <p class="links">
                 <a href="https://www.desmos.com/calculator/ozmnil3v00">Desmos</a>
@@ -629,7 +678,12 @@ Camera: (cos(rz)cos(rx), sin(rz)cos(rx), sin(rx)).</p>
             </p>
         </td>
     </tr></table></div>
-<div style="margin:0.6em"><br/>
-    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-<br/><br/><br/></div>
+    <div style="margin:0.6em"><br/>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, graphs on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <br/><br/>
+        <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub</a>.</span>
+        <br/>
+        <span>(Also check out my <a href="/shadertoy/index.html">Shadertoy list</a> :)</span>
+        <br/><br/>
+    </div>
 </body></html>

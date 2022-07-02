@@ -51,7 +51,9 @@ def get_graph_size_summary(state) -> str:
             count_s = "," + "{:03d}".format(count % 1000) + count_s
             count //= 1000
         count_s = str(count) + count_s
-        return count_s + " " + name
+        return count_s + "&nbsp;" + name
+
+    # get size
     byte_count = len(bytearray(json.dumps(
         state, separators=(',', ':')), 'utf-8'))  # may vary
     expr_count, note_count, folder_count, table_count, img_count = [0]*5
@@ -79,6 +81,20 @@ def get_graph_size_summary(state) -> str:
         size_info.append(format_plural(table_count, "table"))
     if img_count != 0:
         size_info.append(format_plural(img_count, "image"))
+
+    # detect animation
+    for expr in state['expressions']['list']:
+        if 'type' not in expr or expr['type'] != "expression":
+            continue
+        if 'slider' in expr and 'isPlaying' in expr['slider'] \
+                and expr['slider']['isPlaying'] is True:
+            size_info.append("slider&nbsp;animation")
+            break
+    if 'ticker' in state['expressions'] and \
+        'playing' in state['expressions']['ticker'] and \
+            state['expressions']['ticker']['playing'] is True:
+        size_info.append("ticker")
+
     size_info = " • ".join(size_info)
     return size_info
 
@@ -110,7 +126,7 @@ index = """<!DOCTYPE html>
     <meta charset="utf-8" />
     <title>List of my saved Desmos graphs</title>
     <link rel="icon" href="https://harry7557558.github.io/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=600, initial-scale=1">
 
     <meta name="description" content="This page lists all of my saved Desmos graphs: 3D graphing, function art, math explorations, and more." />
     <meta name="keywords" content="harry7557558, Desmos, graph, function, art, 3D" />
@@ -128,19 +144,21 @@ index = """<!DOCTYPE html>
             // options: { enableMenu: false }
         };
     </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
         onerror="alert('Failed to load MathJax.')"></script>
 
     <style>
+        body{font-family:'Times New Roman'}
         .graph{display:block;margin:0.5em;padding:0.5em;border-bottom:1px solid gray}
         img{height:15em;display:inline-block;margin:0 2em 0 0}
         .info{display:inline-block;margin:0;min-width:20em}
         .description{white-space:pre-wrap}
         h1{margin:1em 0;font-size:2em}
         h2{margin:0.7em 0;font-size:1.75em}
-        .created{margin:0;font-size:1em;color:#222}
+        .created{margin:0;font-size:1em;color:#555}
         .equation{margin:1.5em 0;font-size:1.25em}
-        a{font-size:1em;padding:0 0.1em;text-decoration:none}a:hover{text-decoration:underline}
+        a{font-size:1em;padding:0 0.1em;text-decoration:none;color:#06c}
+        a:hover{text-decoration:underline}
     </style>
 </head>
 <body>
@@ -187,7 +205,7 @@ for graph_id in graphs:
 
     # add graph to the index
     content = f"""<div class="graph"><table><tr>
-        <td><img src="{graph['thumbUrl']}" alt="{graph['title']}" /></td>
+        <td><img src="{graph['thumbUrl']}" alt="{graph['title']}" loading="lazy" /></td>
         <td class="info">
             <h2>{graph['title']}</h2>
             <p class="created">{date} • {size_summary}</p>
@@ -204,9 +222,14 @@ for graph_id in graphs:
 
 
 index += """
-<div style="margin:0.6em"><br/>
-    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-<br/><br/><br/></div>
+    <div style="margin:0.6em"><br/>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, graphs on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <br/><br/>
+        <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub</a>.</span>
+        <br/>
+        <span>(Also check out my <a href="/shadertoy/index.html">Shadertoy list</a> :)</span>
+        <br/><br/>
+    </div>
 </body></html>"""
 
 open('desmos/index.html', "wb").write(bytearray(index, 'utf-8'))
