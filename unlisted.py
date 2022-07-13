@@ -31,6 +31,8 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
         for line in fp:
             if line.strip() == '*':
                 return ""
+    if os.path.isfile(_dir+'.siteignore'):
+        return ""
     ls = [f for f in os.listdir(_dir) if f[0] != '.']
     files = [_dir+f for f in ls if os.path.isfile(_dir+f)]
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
@@ -88,7 +90,7 @@ content = """<!doctype html>
     <title>Harry Chen - unlisted</title>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
-    <meta name="viewport" content="width=600, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./logo.png" />
     <style>
         body{margin:0.5em}

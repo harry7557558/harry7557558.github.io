@@ -1,5 +1,7 @@
 // sorting, graph plotting, preview
 
+"use strict";
+
 `Use this line to
 break outdated browsers
 `;
@@ -59,7 +61,7 @@ function initSort() {
         { name: "shortest", key: "chars", comp: 1.0 },
     ];
     let selector = document.getElementById("sort-select");
-    var selector_value = "ratio";  // less popular ones
+    var selector_value = "likes";  // less popular ones
     for (var i = 0; i < sortModes.length; i++) {
         var option = document.createElement("option");
         option.innerHTML = sortModes[i].name;
@@ -244,7 +246,7 @@ function initChart() {
             },
             {
                 type: 'scatter',
-                hidden: false,
+                hidden: true,
                 label: 'unlisted',
                 titles: points.unlisted.titles,
                 data: points.unlisted.data,
@@ -267,7 +269,8 @@ function initChart() {
     setLineFit(data.datasets);
 
     let options = {
-        responsive: false,
+        responsive: true,
+        aspectRatio: 2.0,
         layout: {
             padding: {
                 top: 15,
@@ -385,7 +388,7 @@ function initVideoLazyLoad() {
         a.addEventListener("touchenter", mouseEnterHandler);
         a.addEventListener("touchleave", mouseLeaveHandler);
         a.addEventListener("touchstart", mouseEnterHandler);
-        //a.addEventListener("touchend", mouseLeaveHandler);
+        a.addEventListener("touchend", mouseLeaveHandler);
     }
 }
 

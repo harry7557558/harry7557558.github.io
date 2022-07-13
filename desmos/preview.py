@@ -125,9 +125,11 @@ index = """<!DOCTYPE html>
 <head>
     <meta charset="utf-8" />
     <title>List of my saved Desmos graphs</title>
-    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
-    <meta name="viewport" content="width=600, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <meta property="og:image" content="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" />
+    <link rel="image_src" href="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" />
     <meta name="description" content="This page lists all of my saved Desmos graphs: 3D graphing, function art, math explorations, and more." />
     <meta name="keywords" content="harry7557558, Desmos, graph, function, art, 3D" />
     <meta name="robots" content="index, follow" />
@@ -148,21 +150,29 @@ index = """<!DOCTYPE html>
         onerror="alert('Failed to load MathJax.')"></script>
 
     <style>
+        html,body{height:100%}
         body{font-family:'Times New Roman'}
-        .graph{display:block;margin:0.5em;padding:0.5em;border-bottom:1px solid gray}
-        img{height:15em;display:inline-block;margin:0 2em 0 0}
-        .info{display:inline-block;margin:0;min-width:20em}
+        .graph{display:block;margin:0.5em;padding:1em;border-bottom:1px solid gray;}
+        .image-container{display:table-cell;vertical-align:middle;width:15em;min-width:15em;height:100%;padding:0 2em 0 0}
+        .graph-thumbnail{width:100%}
+        .info{display:table-cell;vertical-align:top;margin:0;overflow:hidden;word-break:break-word}
         .description{white-space:pre-wrap}
-        h1{margin:1em 0;font-size:2em}
+        h1{margin:0.8em 0;font-size:2em}
         h2{margin:0.7em 0;font-size:1.75em}
         .created{margin:0;font-size:1em;color:#555}
-        .equation{margin:1.5em 0;font-size:1.25em}
+        .equation{margin:1.5em 0;font-size:1.25em;overflow:hidden}
+        @media only screen and (max-width: 740px) {
+            .image-container{display:block;width:100%;margin:0.5em 0;padding:0;}
+            .graph-thumbnail{width:100%;max-width:15em;margin:0}
+            .info{display:block;width:100%}
+            .equation{overflow:scroll}
+        }
         a{font-size:1em;padding:0 0.1em;text-decoration:none;color:#06c}
         a:hover{text-decoration:underline}
     </style>
 </head>
 <body>
-    <div style="margin:1.2em;white-space:nowrap">
+    <div style="margin:1.2em 1.2em 0 1.2em">
         <h1>List of my saved Desmos graphs</h1>
         <p class="created">Harry Chen (harry7557558) - Updated {%CURRENT_DATE%}</p>
         <div><br/></div>
@@ -204,9 +214,11 @@ for graph_id in graphs:
         preview += f"""<p class="equation">$\\displaystyle{{{equation}}}$</p>"""
 
     # add graph to the index
-    content = f"""<div class="graph"><table><tr>
-        <td><img src="{graph['thumbUrl']}" alt="{graph['title']}" loading="lazy" /></td>
-        <td class="info">
+    content = f"""<div class="graph">
+        <div class="image-container">
+            <img class="graph-thumbnail" src="{graph['thumbUrl']}" alt="{graph['title']}" loading="lazy" />
+        </div>
+        <div class="info">
             <h2>{graph['title']}</h2>
             <p class="created">{date} • {size_summary}</p>
             {preview}
@@ -214,8 +226,8 @@ for graph_id in graphs:
                 <a href="https://www.desmos.com/calculator/{graph_id}">Desmos</a>
                 <a href="./graphs/{graph_id}.json">JSON</a>
             </p>
-        </td>
-    </tr></table></div>"""
+        </div>
+    </div>"""
     index += content
 
     print("complete", end='\n')

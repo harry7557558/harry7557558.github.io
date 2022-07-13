@@ -240,6 +240,7 @@ def get_shader_summary(shader) -> str:
 # Load downloaded shaders
 with open("shadertoy/shaders.json", "r") as fp:
     shaders = json.load(fp)
+    shaders.sort(key=lambda t: -t['info']['likes'])
 
 # Header of index.html
 index = """<!DOCTYPE html>
@@ -247,49 +248,61 @@ index = """<!DOCTYPE html>
 <head>
     <meta charset="utf-8" />
     <title>List of my published Shadertoy shaders</title>
-    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
-    <meta name="viewport" content="width=700, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <meta property="og:image" content="https://www.shadertoy.com/media/users/harry7557558/profile.png" />
+    <link rel="image_src" href="https://www.shadertoy.com/media/users/harry7557558/profile.png" />
     <meta name="description" content="This page lists all of my published Shadertoy shaders, which includes my experiments in rendering, modeling, data fitting, simulation, and art." />
     <meta name="keywords" content="harry7557558, Shadertoy, shader, GLSL, WebGL, function" />
     <meta name="robots" content="index, follow" />
 
     <style>
+        html,body{height:100%}
         body{margin:0 0.5em;padding:0;font-family:'Times New Roman'}
+        input,select,button{display:inline;vertical-align:middle}
+        #chartjs-canvas-container{max-width:40em}
+        #chartjs-canvas{width:100%;margin:1em 0;border:2px solid #bbb}
+        hr{margin-block:1.0em}
         #container{display:inline;margin:0;padding:0}
         .shader{display:block;margin:0.5em;padding:0.5em 0;border-bottom:1px solid gray}
-        .preview{width:24em;height:13.5em;display:block;margin:0;position:absolute;left:0;top:0}
-        .preview-container{margin:0 2em 0.5em 0;display:inline-block;font-size:1em;padding:0;text-decoration:none;touch-action:none}
-        .placeholder{position:relative;height:13.5em;pointer-event:none}
+        .image-container{display:table-cell;vertical-align:middle;width:20em;padding:0 2em 0 0}
+        .preview-container{display:inline-block;width:100%;margin:0 2em 0.5em 0;padding:0;text-decoration:none;touch-action:none}
+        .preview{width:100%;height:auto;display:block;margin:0;position:absolute;left:0;top:0}
+        .placeholder{position:relative;width:100%;z-index:-1;opacity:0.0}
+        .info{display:table-cell;vertical-align:top;margin:-0.2em 0 0.5em;overflow:hidden;word-break:break-word}
         .title a{color:black;text-decoration:none}
         .title a:hover{text-decoration:underline}
-        #chartjs-canvas{width:40em;height:20em;margin:1em 0;border:2px solid #bbb}
-        hr{margin-block:1.0em}
-        .info{display:inline-block;margin:-0.2em 0 0.5em;min-width:20em;word-break:break-word}
         h1{margin:1em 0 0.8em;font-size:2em}
         h2{margin:0.5em 0;font-size:1.75em}
         p{line-height:1.5em}
         .summary{margin:0;font-size:1em;color:#555}
+        @media only screen and (max-width: 740px) {
+            .image-container{display:block;width:100%;max-width:20em;margin:0;padding:0;}
+            .preview-container{display:block;width:100%;margin:0;padding:0}
+            .info{display:block;width:100%}
+        }
         a{text-decoration:none;color:#06c}
         a:hover{text-decoration:underline}
-        input,select,button{display:inline-block;vertical-align:middle}
         .unlisted{display:none}
         .unlisted h2{font-style:italic}
         .vsc-controller{display:none}
     </style>
 </head>
 <body>
-    <div style="margin:1.2em 0.8em 0;white-space:nowrap">
+    <div style="margin:1.2em 0.8em 0">
         <h1>List of my published Shadertoy shaders</h1>
         <p class="summary">Harry Chen (<a href='https://www.shadertoy.com/user/harry7557558'>harry7557558</a>) - Updated {%CURRENT_DATE%}</p>
         <hr/>
         <span>
-            Horizontal axis: <select id="chart-x-select"></select> ｜
-            Vertical axis: <select id="chart-y-select"></select> ｜
-            Line fit: <select id="line-fit-select"></select>
+            Horizontal&nbsp;axis:&nbsp;<select id="chart-x-select"></select> ｜
+            Vertical&nbsp;axis:&nbsp;<select id="chart-y-select"></select> ｜
+            Line&nbsp;fit:&nbsp;<select id="line-fit-select"></select>
         </span>
         <br/>
-        <canvas id="chartjs-canvas"></canvas>
+        <div id="chartjs-canvas-container">
+            <canvas id="chartjs-canvas"></canvas>
+        </div>
         <br/>
         <p>
             Sort by <select id="sort-select"></select> ｜
@@ -316,12 +329,12 @@ for shader in shaders:
 
     # add graph to the index
     content = f"""
-        <div class="shader {summary['status'].replace('+', '-')}"><table><tr>
-            <td><a class="preview-container" href="{summary['url']}" style="position:relative">
+        <div class="shader {summary['status'].replace('+', '-')}">
+            <div class="image-container"><a class="preview-container" href="{summary['url']}" style="position:relative">
                 {image_preview}
-                <img class="preview placeholder" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAAtJREFUGFdjYAACAAAFAAGq1chRAAAAAElFTkSuQmCC" alt="1x1-00000000.png" />
-            </a></td>
-            <td class="info">
+                <img class="preview placeholder" src="16x9_Transparent.png" alt="16x9_Transparent.png" />
+            </a></div>
+            <div class="info">
                 <h2 class="title"><a href="{summary['url']}">{summary['title']}</a></h2>
                 <p class="summary">
                     {summary['tags']} •
@@ -334,10 +347,9 @@ for shader in shaders:
                     <span class="views">{summary['views']}</span> views •
                     <span class="ratio">{summary['ratio']}</span>% like
                 </p>
-                <br/>
-                {summary['description']}
-            </td>
-        </tr></table></div>"""
+                <p>{summary['description']}</p>
+            </div>
+        </div>"""
     index += content
 
 # Footer of index.html
