@@ -10,38 +10,20 @@
     <meta name="author" content="Harry Chen" />
     <meta name="robots" content="index, follow" />
 
-    <script id="mathjax-config-script" type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: { inlineMath: [["$", "$"]], preview: "none" },
-            "fast-preview": { disabled: true },
-            AssistiveMML: { disabled: true },
-            menuSettings: { inTabOrder: false },
-            messageStyle: "simple",
-            positionToHash: false
-        });
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                packages: { '[+]': ['color'] }
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            // options: { enableMenu: false }
+        };
     </script>
-    <script type="text/javascript" id="MathJax_src" async=""
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <style>
-        /* #MathJax_MenuFrame {
-            opacity: 0.0;
-            visibility: hidden;
-            display: none;
-        } */
-
-        .MathJax:focus,
-        .mjx-chtml:focus,
-        .MathJax_SVG:focus {
-            outline-width: 0px;
-            outline-style: none;
-            outline-color: rgba(255, 255, 255, 0.0);
-        }
-
-        #MathJax_Message {
-            visibility: hidden;
-            display: none;
-        }
-    </style>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+        onerror="alert('Failed to load MathJax.')"></script>
 
     <style>
         body {
@@ -102,29 +84,6 @@
 </head>
 
 <body>
-    <!-- Latex macros -->
-    <div style="height:0px; visibility:hidden; display:none;">
-        $\newcommand{\d} {\mathrm{d}}$
-        $\newcommand{\e}{\operatorname{e}}$
-        $\newcommand{\erf}{\operatorname{erf}}$
-        $\newcommand{\abs}{\operatorname{abs}}$
-        $\newcommand{\sgn}{\operatorname{sgn}}$
-        $\newcommand{\mod}{\operatorname{mod}}$
-        $\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}$
-        $\newcommand{\bmat}[1]{\begin{bmatrix}#1\end{bmatrix}}$
-        $\newcommand{\vmat}[1]{\begin{vmatrix}#1\end{vmatrix}}$
-        $\newcommand{\E}{\operatorname{E}}$
-        $\newcommand{\P}{\operatorname{P}}$
-        $\newcommand{\Var}{\operatorname{Var}}$
-        $\newcommand{\F}{\mathcal{F}}$
-
-        $\newcommand{\N}{\unicode{0x2115}}$
-        $\newcommand{\Z}{\unicode{0x2124}}$
-        $\newcommand{\Q}{\unicode{0x211A}}$
-        $\newcommand{\R}{\unicode{0x211D}}$
-        $\newcommand{\C}{\unicode{0x2102}}$
-        $\newcommand{\H}{\unicode{0x210D}}$
-    </div>
 
     <!-- Editor -->
     <div id="LaTeX_Tester">
@@ -150,7 +109,6 @@
         const pref = document.getElementById("TeX_PreviewBox_Frame");
         const pre = document.getElementById("TeX_PreviewBox");
         const fom = document.getElementById("TeX_Preview");
-        var cookie_enabled = navigator.cookieEnabled;
         var input_history = [], redo_history = [];
 
         function escape(str) {
@@ -216,26 +174,16 @@
                 return this.substr(0, dir) + this.substring(dir + num, this.length);
             }
 
-            // load from cookie
+            // load from local storage
             try {
-                var getCookie = function getCookie(cname) {
-                    var name = cname + "=";
-                    var ca = document.cookie.split(';');
-                    for (var i = 0; i < ca.length; i++) {
-                        var c = ca[i].trim();
-                        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-                    }
-                    return "";
-                };
-                var checked = (getCookie("Checked") != "0");
+                var checked = (localStorage.getItem("mathjaxt_Checked") != "0");
                 document.getElementById("checkbox").checked = checked;
-                var base64 = getCookie("FinInput");
-                var s = decodeURIComponent(escape(window.atob(base64)));
+                var s = localStorage.getItem("mathjaxt_FinInput");
                 if (s != "") tex.value = s;
                 if (tex.value == "") throw (tex.value);
             }
             catch (e) {
-                tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\d{z}";
+                tex.value = "\\displaystyle f(a) = \\dfrac{1}{2\\pi i} \\oint_\\gamma \\frac{f(z)}{z-a} \\mathrm{d}{z}";
                 document.getElementById("checkbox").checked = true;
             }
             addHistory(tex.value, tex.value.length);
@@ -250,20 +198,14 @@
 
         }
 
-        function backupCookie() {
-            if (!cookie_enabled) return 0;
-            var date = new Date();
-            date.setTime(date.getTime() + (365 * 86400000));
-            var expires = " expires=" + date.toUTCString();
-
-            var base64 = window.btoa(unescape(encodeURIComponent(tex.value)));
+        function backupStorage() {
+            localStorage.setItem("mathjaxt_FinInput", tex.value);
             var checked = document.getElementById("checkbox").checked ? "1" : "0";
-            document.cookie = "FinInput=" + base64 + ";" + expires;
-            document.cookie = "Checked=" + checked + ";" + expires;
+            localStorage.setItem("mathjaxt_Checked", checked);
         }
 
         function render() {
-            if (cookie_enabled) backupCookie();
+            backupStorage();
 
             //var ht = fom.getBoundingClientRect().height;
             var ht = pre.getBoundingClientRect().height;
@@ -273,12 +215,12 @@
                 if (document.getElementById("checkbox").checked)
                     fom.innerHTML = "$" + escape(tex.value) + "$";
                 else fom.innerHTML = "<div style='text-align:left;display:inline-block;'>" + escape(tex.value).replace(/\n/g, '<br/>') + "</div>"
-                backupCookie();
+                backupStorage();
             }
             else fom.innerText = "";
 
             try {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);    // refresh MathJax
+                MathJax.typeset();
             }
             catch (e) {
                 document.getElementById("TeX_Preview").innerHTML = "<b style='color:red'>" + e + "</b>";
