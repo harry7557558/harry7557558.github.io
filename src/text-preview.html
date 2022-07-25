@@ -20,6 +20,7 @@
             var path = document.location.hash.replace('#', '');
             if (path.length == 0) return onerror("empty hash");
             if (path[0] != '/') path = '/' + path;
+            path += "?t=" + Date.now();  // no cache
 
             var req = new XMLHttpRequest();
             req.open("GET", path);
