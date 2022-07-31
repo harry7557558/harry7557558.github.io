@@ -39,7 +39,7 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/998673860847206471/craiyon_153306_nautilus__app_icon.png",
         "date": "07/18/2022",
         "text": "nautilus, app icon",
-        "comment": "I have beem fanscinated with the spiral shells of mollusks, especially symmetrical and mathematical nautilus shells. I'm quite satisfied with these results. I may consider the middle-right one as a composition for my new website logo."
+        "comment": "I have been fascinated with the spiral shells of mollusks, especially symmetrical and mathematical nautilus shells. I'm quite satisfied with these results. I may consider the middle-right one as a composition for my new website logo."
     },
     {
         "filename": "craiyon_203313_natural_scenery_from_Xinjiang__China",
@@ -60,14 +60,14 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/998763408126136390/craiyon_212734_Elsa_fighting_Te_Ka_from_Moana.png",
         "date": "07/18/2022",
         "text": "Elsa fighting Te Ka from Moana",
-        "comment": "[i]Frozen[/i] and [i]Moana[/i] are two of my favorite Disney movies. I don't see lava or Moana, but I worder whether the AI memorized all frames from the movie with faces uglified?"
+        "comment": "[i]Frozen[/i] and [i]Moana[/i] are two of my favorite Disney movies. I don't see lava or Moana, but I wonder whether the AI memorized all frames from the movie with faces uglified?"
     },
     {
         "filename": "craiyon_235312_a_still_display_of_the_skeleton_of_a_cephalopod",
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/999524570652483604/craiyon_235312_a_still_display_of_the_skeleton_of_a_cephalopod.png",
         "date": "07/20/2022",
         "text": "a still display of the skeleton of a cephalopod",
-        "comment": "The skeleton of mollusks with tentacles are scary."
+        "comment": "The skeletons of mollusks with tentacles are scary."
     },
     {
         "filename": "craiyon_160837_protests_outside_SparkNotes_office_after_Shakespeare_translation_become_paywalled",
@@ -109,14 +109,14 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1000825247957786624/craiyon_140159_a_beetle_trapped_inside_transparent_glass.png",
         "date": "07/24/2022",
         "text": "a beetle trapped inside transparent glass",
-        "comment": "Insects and plants embedded inside transparent resin is also my fanscination."
+        "comment": "Insects and plants embedded inside transparent resin is also my fascination."
     },
     {
         "filename": "craiyon_160540_icy_force__award_winning_photography",
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1000856518989729892/craiyon_160540_icy_force__award_winning_photography.png",
         "date": "07/24/2022",
         "text": "icy force, award-winning photography",
-        "comment": "I was thinking about glaciers. But these images do like award-winning photos I saw on art/photography sites. With waterprints."
+        "comment": "I was thinking about glaciers. But these images do like award-winning photos I saw on art/photography sites. With water prints."
     },
     {
         "filename": "craiyon_163432_photorealistic_rendering_of_an_underwater_palace_of_mermaids",
@@ -138,6 +138,144 @@ const OBJECTS = [
         "date": "07/24/2022",
         "text": "butterflies surround a broken glass cup with miniature blooms inside it",
         "comment": "Based on an overused idea from my junior high school art teacher."
+    },
+    {
+        "filename": "craiyon_094914_a_miniature_house_with_warm_light_coming_from_its_windows__on_the_back_of_a_snail",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1001848900233211914/craiyon_094914_a_miniature_house_with_warm_light_coming_from_its_windows__on_the_back_of_a_snail.png",
+        "date": "07/27/2022",
+        "text": "a miniature house with warm light coming from its windows, on the back of a snail",
+        "comment": "I wanted it to create a snail with a house on its back. This is what I get after rephrasing my prompt several times."
+    },
+    {
+        "filename": "craiyon_095229_a_snail_made_of_blue__curly_orchid",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1001849652716503101/craiyon_095229_a_snail_made_of_blue__curly_orchid.png",
+        "date": "07/27/2022",
+        "text": "a snail made of blue, curly orchid",
+        "comment": "I did not expect a dark background, although it doesn't look bad."
+    },
+    {
+        "filename": "craiyon_095555_an_underwater_coral_realm__in_the_style_of_Monet",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1001850555544654026/craiyon_095555_an_underwater_coral_realm__in_the_style_of_Monet.png",
+        "date": "07/27/2022",
+        "text": "an underwater coral realm, in the style of Monet",
+        "comment": "Being stylish looks nicer than being realistic."
+    },
+    {
+        "filename": "craiyon_100022_an_underwater_coral_realm__Chinese_traditional_painting",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1001851647175168000/craiyon_100022_an_underwater_coral_realm__Chinese_traditional_painting.png",
+        "date": "07/27/2022",
+        "text": "an underwater coral realm, Chinese traditional painting",
+        "comment": "I had been learning Chinese traditional painting for years in my childhood. But to be honest, I have forgotten most of it."
+    },
+    {
+        "filename": "craiyon_122937_the_call_of_the_vast__award_winning_photography",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1001889186120478821/craiyon_122937_the_call_of_the_vast__award_winning_photography.png",
+        "date": "07/27/2022",
+        "text": "the call of the vast, award-winning photography",
+        "comment": "Another award-winning photograph series."
+    },
+    {
+        "filename": "craiyon_222525_glassware_on_a_table_with_sophisticated_refractive_caustics",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002039270627872839/craiyon_222525_glassware_on_a_table_with_sophisticated_refractive_caustics.png",
+        "date": "07/27/2022",
+        "text": "glassware on a table with sophisticated refractive caustics",
+        "comment": "Refractive caustics are sophisticating yet challenging to render. But... Where are they?"
+    },
+    {
+        "filename": "craiyon_223505_a_photograph_of_an_origami_crane_floating_on_water__surrounded_by_lily_leaves",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002041927740440606/craiyon_223505_a_photograph_of_an_origami_crane_floating_on_water__surrounded_by_lily_leaves.png",
+        "date": "07/27/2022",
+        "text": "a photograph of an origami crane floating on water, surrounded by lily leaves",
+    },
+    {
+        "filename": "craiyon_121928_a_dragonfly_with_alternating_cyan__magenta__and_yellow_stripes_on_its_body",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002249042455183501/craiyon_121928_a_dragonfly_with_alternating_cyan__magenta__and_yellow_stripes_on_its_body.png",
+        "date": "07/28/2022",
+        "text": "a dragonfly with alternating cyan, magenta, and yellow stripes on its body",
+        "comment": "I discovered that vibrant CMY color scheme looks cool not so long ago, and I just found a dead dragonfly that morning. DALL-E disappoints me slightly."
+    },
+    {
+        "filename": "craiyon_223939_a_running_figure_made_of_liquid_water_with_splash_behind",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002405129095479376/craiyon_223939_a_running_figure_made_of_liquid_water_with_splash_behind.png",
+        "date": "07/28/2022",
+        "text": "a running figure made of liquid water with splash behind",
+        "comment": "I was thinking about a liquid running figure with beautiful body flow created with fluid simulation."
+    },
+    {
+        "filename": "craiyon_224321_beautiful_and_colorful_microscopic_photography_of_plant_cells",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002405995659677737/craiyon_224321_beautiful_and_colorful_microscopic_photography_of_plant_cells.png",
+        "date": "07/28/2022",
+        "text": "beautiful and colorful microscopic photography of plant cells",
+        "comment": "Reminds me of my childhood memory of placing almost everything under a microscope. I [i]did[/i] get some images that are more satisfying than these."
+    },
+    {
+        "filename": "craiyon_224713_a_tearful_burning_candle_in_front_of_a_skull_made_of_blue_ice",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002406965588262993/craiyon_224713_a_tearful_burning_candle_in_front_of_a_skull_made_of_blue_ice.png",
+        "date": "07/28/2022",
+        "text": "a tearful burning candle in front of a skull made of blue ice",
+        "comment": "When will I be able to write my own code to simulate candle tears?"
+    },
+    {
+        "filename": "craiyon_230106_a_fairy_studying_computer_graphics_in_its_miniature_fantasy_flower_garden",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002410470239653988/craiyon_230106_a_fairy_studying_computer_graphics_in_its_miniature_fantasy_flower_garden.png",
+        "date": "07/28/2022",
+        "text": "a fairy studying computer graphics in its miniature fantasy flower garden",
+        "comment": "You see vivid colors at your first glance. But once you stare at it, you encounter the faces of monsters."
+    },
+    {
+        "filename": "craiyon_132827_abstract_colored_geometry_inside_a_crystal_cube",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002657677014483034/craiyon_132827_abstract_colored_geometry_inside_a_crystal_cube.png",
+        "date": "07/29/2022",
+        "text": "abstract colored geometry inside a crystal cube"
+    },
+    {
+        "filename": "craiyon_153222_several_colored_glass_pieces__in_the_shape_of_gem_crystals",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002660013942259896/craiyon_153222_several_colored_glass_pieces__in_the_shape_of_gem_crystals.png",
+        "date": "07/29/2022",
+        "text": "several colored glass pieces, in the shape of gem crystals",
+        "comment": "I didn't expect this many pieces in a picture. I like the bottom left one most."
+    },
+    {
+        "filename": "craiyon_153945_fish_and_mollusk_artworks_made_from_colored_glass",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002661797666496602/craiyon_153945_fish_and_mollusk_artworks_made_from_colored_glass.png",
+        "date": "07/29/2022",
+        "text": "fish and mollusk artworks made from colored glass",
+        "comment": "Not what I'm looking for, but they look artistic."
+    },
+    {
+        "filename": "craiyon_154211_colored_miniature_fishes_and_mollusks__glass_blowing_artwork",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1002662405907685476/craiyon_154211_colored_miniature_fishes_and_mollusks__glass_blowing_artwork.png",
+        "date": "07/29/2022",
+        "text": "colored miniature fishes and mollusks, glass-blowing artwork",
+        "comment": "This is what was in my mind, although I think there are too many items in a picture, making them look less nice than the previous one."
+    },
+    {
+        "filename": "craiyon_190448_scientific_illustration_of_a_creature_with_fish_body_and_bird_beak",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003075821361180752/craiyon_190448_scientific_illustration_of_a_creature_with_fish_body_and_bird_beak.png",
+        "date": "07/30/2022",
+        "text": "scientific illustration of a creature with fish body and bird beak",
+        "comment": "Inspired by [url=https://www.thisiscolossal.com/2022/07/beto-val-surreal-illustrations/]this[/url]."
+    },
+    {
+        "filename": "craiyon_190837_a_boy_walking_with_his_dog__in_the_path_of_an_underwater_coral_forest",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003077379754823760/craiyon_190837_a_boy_walking_with_his_dog__in_the_path_of_an_underwater_coral_forest.png",
+        "date": "07/30/2022",
+        "text": "a boy walking with his dog, in the path of an underwater coral forest",
+        "comment": "Based on the dog my mom's friend left for me before leaving for a trip. Keeping such an active creature is uneasy."
+    },
+    {
+        "filename": "craiyon_191457_the_giant_sea_monster__indigenous_painting",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003078327092916244/craiyon_191457_the_giant_sea_monster__indigenous_painting.png",
+        "date": "07/30/2022",
+        "text": "the giant sea monster, indigenous painting",
+        "comment": "Indigenous art is cool, even for sea monsters. Not based but this reminds me of me drawing a sea monster for an assignment in grade 9 art class."
+    },
+    {
+        "filename": "craiyon_193602_the_giant_sea_monster__from_a_CGI_movie",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003083637664776242/craiyon_193602_the_giant_sea_monster__from_a_CGI_movie.png",
+        "date": "07/30/2022",
+        "text": "the giant sea monster, from a CGI movie",
+        "comment": "Try to see what photorealistic giant sea monsters look like. A bit scary, aren't they?"
     }
 ];
 
@@ -148,6 +286,9 @@ function clickPreview(event) {
         container = container.parentElement;
         if (container.tagName.toLowerCase() == "body") {
             container_full.style.display = "none";
+            document.body.style.overflow = null;
+            if (document.location.hash != "")
+                document.location.hash = null;
             return;
         }
     }
@@ -155,11 +296,14 @@ function clickPreview(event) {
     for (var i = 0; i < fulls.length; i++) {
         if (fulls[i].id == "close-button")
             continue;
-        if (fulls[i].id == container.id)
+        if (fulls[i].id == container.id.replace(/\-thumb$/, ''))
             fulls[i].style.display = null;
         else fulls[i].style.display = "none";
     }
     container_full.style.display = null;
+    document.body.style.overflow = "hidden";
+    if (document.location.hash != container.id)
+        document.location.hash = container.id.replace(/-thumb$/, '');
 }
 
 function main(objects) {
@@ -248,11 +392,12 @@ function main(objects) {
         // thumbnail
         {
             let div = document.createElement("div");
-            div.id = title;
+            div.id = title + '-thumb';
             div.className = "object-thumb";
             div.addEventListener("click", clickPreview);
             let img = document.createElement("img");
             img.className = "img-thumb";
+            img.loading = "lazy";
             img.src = thumb;
             img.alt = title;
             img.textContent = "Loading...";
@@ -269,13 +414,29 @@ function main(objects) {
     container.removeChild(document.getElementById("loading"));
 
     container_full.addEventListener("click", function (event) {
-        if (event.target == container_full || /^craiyon_/.test(event.target.id))
+        if (event.target == container_full || /^craiyon_/.test(event.target.id)) {
             container_full.style.display = "none";
+            document.body.style.overflow = null;
+            if (document.location.hash != "")
+                document.location.hash = null;
+        }
     });
     // container.children[0].click();
 
+    function updateHash(event) {
+        var url = event.newURL;
+        if (!/#/.test(url)) url += '#';
+        var hash = url.substring(url.search('#') + 1);
+        var object = document.getElementById(hash);
+        if (object == null) object = container_full;
+        clickPreview({ target: object });
+    };
+    window.onhashchange = updateHash;
+    updateHash({ newURL: document.URL });
+
     document.getElementById("close-button").addEventListener("click", clickPreview);
     document.getElementById("updated-date").textContent = "Harry Chen - Updated " + objects[objects.length - 1].date;
+
 }
 
 (function () {
