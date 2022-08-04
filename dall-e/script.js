@@ -276,6 +276,192 @@ const OBJECTS = [
         "date": "07/30/2022",
         "text": "the giant sea monster, from a CGI movie",
         "comment": "Try to see what photorealistic giant sea monsters look like. A bit scary, aren't they?"
+    },
+    {
+        "filename": "craiyon_123425_a_seashell_on_a_beach__in_the_style_of_Pixar",
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003340064945872917/craiyon_123425_a_seashell_on_a_beach__in_the_style_of_Pixar.png",
+        "date": "07/31/2022",
+        "text": "a seashell on a beach, in the style of Pixar",
+        "comment": "I can't tell whether these are bivalves or gastropods."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003342145832358009/craiyon_124143_a_specie_under_the_class_Cypraeidae_in_its_natural_habitat.png",
+        "date": "07/31/2022",
+        "text": "a specie under the class Cypraeidae in its natural habitat",
+        "comment": "I expected some variety like the images on [url=https://blueanimalbio-mirror.github.io/ruantidongwu/baobei.htm]this page[/url]. But it's nice to see that AI has knowledge of taxonomy, and it gives the correct result even though Cypraeidae is a family not a class."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003343780033867796/craiyon_124905_a_specie_under_the_family_Cypraeidae_in_a_coral_reef.png",
+        "date": "07/31/2022",
+        "text": "a specie under the family Cypraeidae in a coral reef",
+        "comment": "Rephrase my previous query. It's funny to see species made of 90% fish and 10% gastropod."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003344995257958410/craiyon_125243_beautiful_sea_slugs.png",
+        "date": "07/31/2022",
+        "text": "beautiful sea slugs",
+        "comment": "Despite the query being simple, the results are satisfying. Not as varied as [url=https://www.google.com/search?q=beautiful+sea+slugs&tbm=isch]results on Google Images[/url] but still as beautiful with a rich background."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003379661952266310/craiyon_151016_artwork_made_of_rainbow_colored_leaves.png",
+        "date": "07/31/2022",
+        "text": "artwork made of rainbow-colored leaves",
+        "comment": "Return from the sea and try some land stuff. These [i]are[/i] what I'm looking for, although the stems look a bit weird."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003381256144289833/craiyon_151808_a_flying_bird__with_its_tail_and_wings_made_of_leaves.png",
+        "date": "07/31/2022",
+        "text": "a flying bird, with its tail and wings made of leaves",
+        "comment": "I expected photorealistic ones, but the illustrations also look cool."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003384284717002783/craiyon_153029_opalized_nautilus__necklace_pendant.png",
+        "date": "07/31/2022",
+        "text": "opalized nautilus, necklace pendant",
+        "comment": "Back to the sea. This AI is more creative than Google Image!"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003385738756366387/craiyon_153628_nautilus__colored_nbsp_glass_blowing_artwork.png",
+        "date": "07/31/2022",
+        "text": "nautilus, colored glass-blowing artwork",
+        "comment": "More creative than Google Image. I like the color and the shadow/reflection on the white ground."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003692304852332594/craiyon_115421__nbsp_a_fantasy_glass_water_bottle_containing_planets_and_the_milky_way.png",
+        "date": "08/01/2022",
+        "text": "a fantasy glass water bottle containing planets and the milky way"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003693286210404352/craiyon_115831_a_sci_fi_character_unleashing_his_ice_power__freezing_the_ocean_and_the_planet.png",
+        "date": "08/01/2022",
+        "text": "a sci-fi character unleashing his ice power, freezing the ocean and the planet"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003693943902449724/craiyon_120054_University_of_Toronto_Engineering_2T6_logo.png",
+        "date": "08/01/2022",
+        "text": "University of Toronto Engineering 2T6 logo",
+        "comment": "Try this after seeing someone designing the 2T6 logo using DALL-E 2. It's nice to recognize the letter \"T\" and the purple color."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003696303412367431/craiyon_120816_a_color_wheel_inside_the_silhouette_of_a_girl_s_head.png",
+        "date": "08/01/2022",
+        "text": "a color wheel inside the silhouette of a girl's head",
+        "comment": "A bit disappointing. I expected something like [url=https://saved-work.desmos.com/calc_thumbs/production/w4thzt4ofr.png]this[/url], which was inspired by a painting of my high school art teacher."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003698233937248396/craiyon_121803_beautiful_3D_fractal_made_of_ice.png",
+        "date": "08/01/2022",
+        "text": "beautiful 3D fractal made of ice"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1003699548167868456/craiyon_122203_fruit_in_the_shape_of_an_octahedron.png",
+        "date": "08/01/2022",
+        "text": "fruit in the shape of an octahedron",
+        "comment": "Like how a vivid, detailed, seemly tasty fruit based on a simple geometric primitive."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004088698415087656/craiyon_140830_beautiful_butterflies_resting_on_a_pile_of_poop.png",
+        "date": "08/02/2022",
+        "text": "beautiful butterflies resting on a pile of poop",
+        "comment": "The contrast between beauty and feces isn't a rare sight on trails. Although the feces on trails don't have this regular shape."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004090540159139930/craiyon_141611_a_hermit_crab_inside_a_paper_boat_filled_with_sand__with_an_Nvidia_chip_in_its_claw.png",
+        "date": "08/02/2022",
+        "text": "a hermit crab inside a paper boat filled with sand, with an Nvidia chip in its claw",
+        "comment": "I was thinking about [url=https://harry7557558.github.io/AVI4M-ISP/index.html]this[/url]. These images are more visually pleasing."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004094895050469436/craiyon_143424_an_octopus_holding_a_pencil_doing_calculus_on_paper.png",
+        "date": "08/02/2022",
+        "text": "an octopus holding a pencil doing calculus on paper"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004095834763300884/craiyon_143651_a_girl_looking_into_a_mirror__seeing_a_fairy_with_wings.png",
+        "date": "08/02/2022",
+        "text": "a girl looking into a mirror, seeing a fairy with wings",
+        "comment": "Is the AI discouraging me from having all sorts of fantasy thoughts?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004097604566655126/craiyon_144345_a_small_figure_standing_on_the_graph_of_gamma_function_on_the_complex_plane.png",
+        "date": "08/02/2022",
+        "text": "a small figure standing on the graph of gamma function on the complex plane",
+        "comment": "An idea for CG. Combining human figures and iconic 3D mathematical figures."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004098751008354355/craiyon_144943_a_crescent_moon_made_of_water.png",
+        "date": "08/02/2022",
+        "text": "a crescent moon made of water"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004102005524017182/craiyon_150207_path_traced_Cornell_box_flooded_with_water__with_a_goldfish_inside_it.png",
+        "date": "08/02/2022",
+        "text": "path-traced Cornell box flooded with water, with a goldfish inside it",
+        "comment": "How did you generate so realistic results with path tracing?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004121677908688896/craiyon_162008_seashell_made_of_shiny_metal.png",
+        "date": "08/02/2022",
+        "text": "seashell made of shiny metal",
+        "comment": "I have done some renderings similar to these. I can't find them right now."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004202488007766138/craiyon_214057_three_translucent_glass_spheres__respectively_red__green__and_blue.png",
+        "date": "08/02/2022",
+        "text": "three translucent glass spheres, respectively red, green, and blue",
+        "comment": "Like the refractive appearance and the caustics cast on the floor."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004437549936283730/craiyon_131445_an_apple_melted_into_a_puddle.png",
+        "date": "08/03/2022",
+        "text": "an apple melted into a puddle",
+        "comment": "The AI doesn't seem to understand what I'm thinking about. What was in my mind is something similar to [url=https://www.thisiscolossal.com/2022/02/yosuke-amemiya-apple-sculptures/]this[/url]."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004439742047338616/craiyon_132333_a_glass_blown_electrical_plug_with_vibrant_color.png",
+        "date": "08/03/2022",
+        "text": "a glass-blown electrical plug with vibrant color",
+        "comment": "This is my attempt to enter an idea that avoids cliche after being reminded by my art teacher's slides."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004444031025160262/craiyon_133827_an_old_clock_with_numbers_arranged_in_a_Fibonacci_spiral.png",
+        "date": "08/03/2022",
+        "text": "an old clock with numbers arranged in a Fibonacci spiral",
+        "comment": "I was thinking about something like what I found on [url=https://www.google.com/search?q=infinite+time+spiral+clock&tbm=isch]Google Image[/url] but in a classic style. This is the best I got after rephrasing multiple times."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004448577612959814/craiyon_135935_a_glass_ball_with_the_reflection_of_the_Eiffel_tower_within.png",
+        "date": "08/03/2022",
+        "text": "a glass ball with the reflection of the Eiffel tower within"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004451049718947910/craiyon_140401_a_depressed_girl_sitting_against_a_closed_door_with_her_face_covered_by_hair.png",
+        "date": "08/03/2022",
+        "text": "a depressed girl sitting against a closed door with her face covered by hair",
+        "comment": "I was thinking about the movie [i]Frozen[/i], how Elsa and Anna sat against the door after their parent's funeral. In these images, I like how depression is revealed through the dark cyan color."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004570965914701884/craiyon_220435_jellyfishes_flying_over_the_clouds__hyperrealistic_photography_composition.png",
+        "date": "08/03/2022",
+        "text": "jellyfishes flying over the clouds, hyperrealistic photography composition",
+        "comment": "I just noticed that Craiyon added videos on how to generate better images. Adding \"hyperrealistic...\" makes the images much more stunning."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004574285899247778/craiyon_221744_barnacles_growing_on_a_cellphone__still_life_photography.png",
+        "date": "08/03/2022",
+        "text": "barnacles growing on a cellphone, still life photography",
+        "comment": "I could barely see cell phones, but I appreciate these realistic \"photographs\". I always thought these \"horse teeth\" are some mollusks until I saw them under crustaceans when looking at a website that introduces biodiversity."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004578785179488318/craiyon_223527_fantasy_eye__an_ocean_within__hyperrealistic_digital_art.png",
+        "date": "08/03/2022",
+        "text": "fantasy eye, an ocean within, hyperrealistic digital art",
+        "comment": "Pretty impressive clearness with 256×256. But where are the sea creatures?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004580700449685524/craiyon_224446_a_seahorse_surrounded_by_blossom__watercolor.png",
+        "date": "08/03/2022",
+        "text": "a seahorse surrounded by blossom, watercolor"
     }
 ];
 
@@ -314,9 +500,10 @@ function main(objects) {
         var object = objects[oi];
 
         let title = object.filename;
+        let original = object.original;
+        title = original.split('/')[original.split('/').length - 1].replace(/\.png$/, '');
         let thumb = "thumbs/" + title + ".jpg";
         let full = "jpg/" + title + ".jpg";
-        let original = object.original;
         let date = object.date;
         let text = object.text;
 
