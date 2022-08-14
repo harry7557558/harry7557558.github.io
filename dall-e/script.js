@@ -462,6 +462,74 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004580700449685524/craiyon_224446_a_seahorse_surrounded_by_blossom__watercolor.png",
         "date": "08/03/2022",
         "text": "a seahorse surrounded by blossom, watercolor"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004828236120854758/craiyon_150718_3D_quadratic_form__black_pencil_drawing.png",
+        "date": "08/04/2022",
+        "text": "3D quadratic form, black pencil drawing",
+        "comment": "I was thinking about stuff like a hyperbolic paraboloid with axes."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1004829500967759943/craiyon_151206_a_nautilus_made_of_ice_cream__food_photography.png",
+        "date": "08/04/2022",
+        "text": "a nautilus made of ice cream, food photography",
+        "comment": "Impressive. I would be too reluctant to eat them."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005158485488566302/craiyon_130023_nautilus__abstract_geometric_sculpture.png",
+        "date": "08/05/2022",
+        "text": "nautilus, abstract geometric sculpture"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005511955324354570/craiyon_122459_a_pile_of_rocks_arranged_in_a_sophisticated_nbsp_spiral__dark_room_photography.png",
+        "date": "08/06/2022",
+        "text": "a pile of rocks arranged in a sophisticated spiral, dark room photography",
+        "comment": "Where are the spirals?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005514585828245707/craiyon_123305_opalized_calcareous_operculum_of_a_sea_gastropod__jewelry_photography.png",
+        "date": "08/06/2022",
+        "text": "opalized calcareous operculum of a sea gastropod, jewelry photography",
+        "comment": "I have been wondering what these \"spiral rocks\" on beaches are until I saw them on the opening of turban conches in a seafood market."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005516459180564612/craiyon_124238_a_girl_wearing_a_crown_decorated_with_seashells__19th_century_oil_painting.png",
+        "date": "08/06/2022",
+        "text": "a girl wearing a crown decorated with seashells, 19th-century oil painting",
+        "comment": "I could barely recognize the details of the seashells, but they do look like paintings from the 19th century."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005519545659834429/craiyon_125516_a_huge_conch_above_the_sea_with_complex_architecture_inside_its_opening__surrealistic.png",
+        "date": "08/06/2022",
+        "text": "a huge conch above the sea with complex architecture inside its opening, surrealistic oil painting"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005519629457834034/craiyon_125548_a_huge_nautilus_shell_above_the_sea_with_complex_architecture_on_it__surrealistic_oil.png",
+        "date": "08/06/2022",
+        "text": "a huge nautilus shell above the sea with complex architecture on it, surrealistic oil painting"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1005521704598114367/craiyon_130235_a_pearl_oyster_bearing_human_embryos__surreal_oil_on_canvas.png",
+        "date": "08/06/2022",
+        "text": "a pearl oyster bearing human embryos, surreal oil on canvas",
+        "comment": "This isn't what I was thinking of, but I like how I can recognize both the luster of pearls and the outline of human embryos."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1006640991832379512/craiyon_150952_an_angular_antique_bowl_with_aqua_and_yellow_horizontal_color_blocks_and_small_black_.png",
+        "date": "08/09/2022",
+        "text": "an angular antique bowl with aqua and yellow horizontal color blocks and small black squares",
+        "comment": "Based on a dream I had last night that I rendered a path-traced bowl. These bowl pictures aren't exactly the same as what I dreamed of, very likely because of my poor verbal description."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1006998887434817606/craiyon_145345_nautilus__mascot_design.png",
+        "date": "08/10/2022",
+        "text": "nautilus, mascot design"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1008085642141507594/craiyon_145129_sea_cucumber__geometric_sculpture.png",
+        "date": "08/13/2022",
+        "text": "sea cucumber, geometric sculpture",
+        "comment": "Looking for inspiration for CG."
     }
 ];
 
