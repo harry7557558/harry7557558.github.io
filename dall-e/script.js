@@ -530,6 +530,108 @@ const OBJECTS = [
         "date": "08/13/2022",
         "text": "sea cucumber, geometric sculpture",
         "comment": "Looking for inspiration for CG."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1008504321199050802/craiyon_183508_an_orange_sea_cucumber_surrounded_by_purple_sea_urchins__underwater_photography.png",
+        "date": "08/14/2022",
+        "text": "an orange sea cucumber surrounded by purple sea urchins, underwater photography",
+        "comment": "Inspired by a random Google image after finishing my [url=https://www.shadertoy.com/view/Nldczs]sea cucumber shader[/url]. Those colorful echinoderms."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1008506524030738453/craiyon_184207_a_cluster_of_starfishes_on_a_tree_branch__photography.png",
+        "date": "08/14/2022",
+        "text": "a cluster of starfishes on a tree branch, photography",
+        "comment": "Try another echinoderm. It's interesting that the AI generates both on-land scenes and underwater scenes."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1008507706283401256/craiyon_184907_the_skeleton_of_radiolarian_made_from_chrome__jewelry_photography.png",
+        "date": "08/14/2022",
+        "text": "the skeleton of radiolarian made from chrome, jewelry photography",
+        "comment": "I saw someone else's radiolarians Shadertoy, which look cool."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009150087517184040/craiyon_132151_a_shiny_blue_steel_beetle_decorated_with_gems__jewelry_photography.png",
+        "date": "08/16/2022",
+        "text": "a shiny blue steel beetle decorated with gems, jewelry photography"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009162873785819206/craiyon_141217_a_beetle_with_zebra_patterns__close_up_photography.png",
+        "date": "08/16/2022",
+        "text": "a beetle with zebra patterns, close-up photography",
+        "comment": "I like these natural-looking beetles with flowers and leaves."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009193240139931818/craiyon_161243_a_beetle_in_the_shape_of_a_5_pointed_star__close_up_photography.png",
+        "date": "08/16/2022",
+        "text": "a beetle in the shape of a 5-pointed star, close-up photography",
+        "comment": "I don't see the star, but it's nice to see a variety of beetles and backgrounds."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009195573657743500/craiyon_162216_a_dung_beetle_rolling_a_moon_model_on_a_table__dark_room_photography.png",
+        "date": "08/16/2022",
+        "text": "a dung beetle rolling a moon model on a table, dark room photography",
+        "comment": "I expected a full moon, but crescent moons are also nice."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009198153725137037/craiyon_163142_jellyfish__Hawaiian_traditional_painting.png",
+        "date": "08/16/2022",
+        "text": "jellyfish, Hawaiian traditional painting",
+        "comment": "These pictures are more pretty than traditional paintings!"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009200564845957290/craiyon_163828_feminine_air_spirit__fantasy_digital_art.png",
+        "date": "08/16/2022",
+        "text": "feminine air spirit, fantasy digital art",
+        "comment": "I was thinking about a flying half-human-half-air spirit, possibly in a diagonal composition. Despite being attractive, I'm told that I should not be a fan of a bunch of \"sexy\" figures with very similar compositions."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009202631442444348/craiyon_164842_octopuses_being_compressed_into_cubes_by_a_machine_on_an_industrial_production_line__.png",
+        "date": "08/16/2022",
+        "text": "octopuses being compressed into cubes by a machine on an industrial production line, surreal oil painting",
+        "comment": "Not what I'm looking for but I like those creepy cephalopods."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009205392905093120/craiyon_170042_a_cartoon_like_brain_curiously_looking_at_its_surroundings_with_its_eyes.png",
+        "date": "08/16/2022",
+        "text": "a cartoon-like brain curiously looking at its surroundings with its eyes",
+        "comment": "I keep this here because I like the idea."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009207001680728064/craiyon_170802_a_colorful_nautilus_figure_on_the_stained_glass_window_of_a_church__photography.png",
+        "date": "08/16/2022",
+        "text": "a colorful nautilus figure on the stained glass window of a church, photography"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009501349160960010/craiyon_123731_the_clouds__the_waves__and_the_tempest__abstract_color_marbling.png",
+        "date": "08/17/2022",
+        "text": "the clouds, the waves, and the tempest, abstract color marbling"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009501787990008001/craiyon_123924_the_clouds__the_waves__and_the_tempest__abstract_paint_splatter.png",
+        "date": "08/17/2022",
+        "text": "the clouds, the waves, and the tempest, abstract paint splatter"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009502228391936020/craiyon_124110_the_clouds__the_waves__and_the_tempest__abstract_cubism_painting.png",
+        "date": "08/17/2022",
+        "text": "the clouds, the waves, and the tempest, abstract cubism painting",
+        "comment": "I tried to see if this AI can make abstract art. I'm quite satisfied with these ones."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009502843364970626/craiyon_124338_the_clouds__the_waves__and_the_tempest__hyperrealistic_oil_painting.png",
+        "date": "08/17/2022",
+        "text": "the clouds, the waves, and the tempest, hyperrealistic oil painting",
+        "comment": "Try to see what a realistic tempest sea looks like after going through abstract art styles. I like the style of these images equally as I like the style of the cubism one."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009621294419021945/craiyon_203402_a_walking_man_with_his_head_replaced_by_a_nautilus_shell_and_the_shell_s_empty_openin.png",
+        "date": "08/17/2022",
+        "text": "a walking man with his head replaced by a nautilus shell and the shell's empty opening as his face, surreal painting"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009622810882224128/craiyon_204017_a_car_in_the_form_of_a_nautilus_shell__surreal_3D_CAD_design.png",
+        "date": "08/17/2022",
+        "text": "a car in the form of a nautilus shell, surreal 3D CAD design"
     }
 ];
 
