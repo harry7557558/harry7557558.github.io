@@ -188,7 +188,6 @@ def get_shader_summary(shader) -> str:
         name = name.replace("Buf ", "Buffer ")
         assert name in orders
         code = minify_code(renderpass['code'])
-        open(".temp", "w").write(minify_code(code))  # so I can check for bug
         passes.append({
             "name": name,
             "chars": len(code)
