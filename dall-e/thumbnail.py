@@ -6,8 +6,15 @@ from PIL import Image
 for src_path in os.listdir("dall-e/original/"):
     if not src_path.endswith(".png"):
         continue
-    print(src_path)
+
     res_path = src_path[:src_path.rfind('.')] + ".jpg"
+    if os.path.isfile("dall-e/jpg/"+res_path):
+        if __name__ == "__main__":
+            print("skipped", "-", src_path)
+        continue
+    else:
+        print(src_path)
+
     image = Image.open("dall-e/original/"+src_path)
     image = image.convert("RGB")
 

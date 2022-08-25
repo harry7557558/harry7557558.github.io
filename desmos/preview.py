@@ -4,9 +4,13 @@ import requests
 import re
 import html
 import json
-import latex_parser
 import datetime
 import os
+
+try:
+    import latex_parser
+except:
+    import desmos.latex_parser as latex_parser
 
 
 def get_graph_info(graph_id: str):
@@ -127,7 +131,7 @@ index = """<!DOCTYPE html>
     <title>List of my saved Desmos graphs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <link rel="icon" href="/favicon.ico" />
     <meta property="og:image" content="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" />
     <link rel="image_src" href="https://saved-work.desmos.com/calc_thumbs/production/z7zooq9zsh.png" />
     <meta name="description" content="This page lists all of my saved Desmos graphs: 3D graphing, function art, math explorations, and more." />
@@ -182,19 +186,17 @@ index = """<!DOCTYPE html>
 
 # go through the list to download graphs
 for graph_id in graphs:
-    print(graph_id, end=' - ')
 
     # load graph
     filename = f"desmos/graphs/{graph_id}.json"
     if os.path.isfile(filename):
         with open(filename, 'r') as fp:
             graph = json.load(fp)
-        print("loaded from file", end=' - ')
     else:
         graph = get_graph_info(graph_id)
         with open(filename, 'w') as fp:
             json.dump(graph, fp, separators=(',', ':'))
-        print("downloaded", end=' - ')
+        print(graph_id, '-', "downloaded")
 
     date = datetime.datetime.strptime(
         graph['created'], "%a, %d %b %Y %H:%M:%S GMT").strftime("%Y/%m/%d")
@@ -229,8 +231,6 @@ for graph_id in graphs:
         </div>
     </div>"""
     index += content
-
-    print("complete", end='\n')
 
 
 index += """

@@ -1,7 +1,24 @@
-# generate unlisted.html
-
-import os
 import urllib.parse
+import subprocess
+import os
+
+# Update index files
+
+
+def run_module(name):
+    print("Running", name)
+    __import__(name)
+
+
+if 1:
+    run_module("desmos.preview")
+    run_module("shadertoy.preview")
+    run_module("dall-e.thumbnail")
+    run_module("src.tojson-quotes")
+
+
+# Generate unlisted.html
+
 
 root = os.path.dirname(__file__).replace('\\', '/')
 
@@ -20,7 +37,33 @@ def getExtension(path):
     return ext.lstrip('.').lower()
 
 
-def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
+def getGitTrackedFiles(_dir):
+    print("Tracking", _dir)
+    files = subprocess.run(
+        ['git', 'ls-tree', '--full-tree', '--name-only', '-r', 'HEAD'],
+        stdout=subprocess.PIPE,
+        cwd=_dir
+    ).stdout.decode('utf-8').strip().split('\n')
+    result = set({})
+    for file in files:
+        file = _dir + '/' + file
+        result.add(file)
+        slash_pos = -1
+        while True:
+            slash_pos = file.find('/', slash_pos+1)
+            if slash_pos == -1:
+                break
+            dirname = file[:slash_pos]
+            # if dirname not in result:
+            #     print(dirname)
+            result.add(dirname)
+    return result
+
+
+def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = None):
+    if tracked_list is None:
+        tracked_list = getGitTrackedFiles(_dir)
+        # print(tracked_list)
     if trunc == -1:
         _dir = _dir.replace('\\', '/')
         if _dir[-1] != '/':
@@ -33,11 +76,13 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
                 return ""
     if os.path.isfile(_dir+'.siteignore'):
         return ""
-    ls = [f for f in os.listdir(_dir) if f[0] != '.']
+    ls = [f for f in os.listdir(_dir) if _dir+f in tracked_list]
     files = [_dir+f for f in ls if os.path.isfile(_dir+f)]
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
     dirs_content = [indexDirectory(
-        path+'/', web_only=web_only, trunc=trunc, name=name) for path in dirs]
+        path+'/', web_only=web_only,
+        trunc=trunc, name=name, tracked_list=tracked_list
+    ) for path in dirs]
     content = ""
     for i in range(len(dirs)):
         if dirs_content[i] == '':
@@ -51,7 +96,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name=''):
         content += "    <table" + " style='margin-left:0'"*is_root + ">\n"
         for fn in files:
             ext = getExtension(fn)
-            if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'mp4']:
+            if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'pdf', 'mp4']:
                 continue
             content += "    <tr>"
             path = urllib.parse.quote(name+fn[trunc:])
@@ -91,7 +136,7 @@ content = """<!doctype html>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="./logo.png" />
+    <link rel="icon" href="./favicon.ico" />
     <meta property="og:image" content="./logo.png" />
     <link rel="image_src" href="./logo.png" />
     <style>

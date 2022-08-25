@@ -632,6 +632,39 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1009622810882224128/craiyon_204017_a_car_in_the_form_of_a_nautilus_shell__surreal_3D_CAD_design.png",
         "date": "08/17/2022",
         "text": "a car in the form of a nautilus shell, surreal 3D CAD design"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1011719904866598995/craiyon_153242_nautilus__watermelon_sculpture.png",
+        "date": "08/23/2022",
+        "text": "nautilus, watermelon sculpture"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1011728438194884729/craiyon_154405_a_nautilus_with_an_orange_peel_shell_and_watermelon_skin_tentacles__fruit_sculpture.png",
+        "date": "08/23/2022",
+        "text": "a nautilus with an orange peel shell and watermelon skin tentacles, fruit sculpture",
+        "comment": "A watermelon with orange pulp must be delicious!"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1011729592312148088/craiyon_161159_a_miniature_snowman_family_made_of_seashells.png",
+        "date": "08/23/2022",
+        "text": "a miniature snowman family made of seashells",
+        "comment": "I can't tell what they are made of. Seashells? Snow? Ceramic? Or flour?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1011731119865081856/craiyon_161503_a_miniature_fairy_house_made_from_a_chestnut__digital_painting.png",
+        "date": "08/23/2022",
+        "text": "a miniature fairy house made from a chestnut, digital painting",
+        "comment": "Inspired by the chestnut trees in my living area with a lot of raw fruits."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1012047360475537560/craiyon_131430_a_snail_trapped_inside_a_glass_dome__depressed_tone__hyperrealistic_oil_painting.png",
+        "date": "08/24/2022",
+        "text": "a snail trapped inside a glass dome, depressed tone, hyperrealistic oil painting"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1012076785430708315/craiyon_151125_3D_geometric_sculpture_of_a_nautilus_with_curved__flowy_spikes.png",
+        "date": "08/24/2022",
+        "text": "3D geometric sculpture of a nautilus with curved, flowy spikes"
     }
 ];
 

@@ -250,7 +250,7 @@ index = """<!DOCTYPE html>
     <title>List of my published Shadertoy shaders</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link rel="icon" href="https://harry7557558.github.io/logo.png" />
+    <link rel="icon" href="/favicon.ico" />
     <meta property="og:image" content="https://www.shadertoy.com/media/users/harry7557558/profile.png" />
     <link rel="image_src" href="https://www.shadertoy.com/media/users/harry7557558/profile.png" />
     <meta name="description" content="This page lists all of my published Shadertoy shaders, which includes my experiments in rendering, modeling, data fitting, simulation, and art." />

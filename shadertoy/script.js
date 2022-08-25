@@ -66,7 +66,8 @@ function initSort() {
         var option = document.createElement("option");
         option.innerHTML = sortModes[i].name;
         option.value = sortModes[i].key;
-        if (document.URL.indexOf("sort=" + sortModes[i].key) != -1)
+        if (document.URL.indexOf("sort=" + sortModes[i].key) != -1 ||
+            document.URL.indexOf("sort=" + sortModes[i].name) != -1)
             selector_value = sortModes[i].key;
         selector.appendChild(option);
     }
