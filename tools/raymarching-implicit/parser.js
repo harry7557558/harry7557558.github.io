@@ -927,8 +927,9 @@ function postfixToLatex(queue) {
                 latex = tex1 + "+" + tex2;
             }
             else if (token.str == "*") {
-                // latex = tex1 + "\\cdot " + tex2;
-                latex = "{" + tex1 + "}{" + tex2 + "}";
+                if (/^[\{\s]*[\d\.]/.test(tex2))
+                    latex = "{" + tex1 + "}\\cdot{" + tex2 + "}";
+                else latex = "{" + tex1 + "}{" + tex2 + "}";
             }
             else if (token.str == "/") {
                 latex = "\\frac{" + tex1 + "}{" + tex2 + "}";
@@ -1007,6 +1008,7 @@ var builtinFunctions = [
     ["Sin Tower 2", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
     ["Atan2 Drill", "max(cos(atan(y,x)-20e^((z-1)/4)),x^2+y^2+z/2-1)"],
     ["Atan2 Flower", "a=atan2(y,x);(x^2+y^2)^2+16z^2=2(x^2+y^2)(sin(2.5a)^2+0.5sin(10a)^2)"],
+    ["Log2 Spheres", "m=max(|x|,|y|,|z|);k=3/2-m;n=ceil(log(2,k))-2;(3*2^n-k)^2+(x^2+y^2+z^2-m^2)=4^n"],
     ["Lerp Example", "lerp(max(|x|,|y|,|z|),sqrt(x^2+y^2+z^2),-1)-0.3"],
     ["If Example", "z=if(sin(2x),1/5sin(2y),1/2cos(2y))"],
     ["Eyes", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
