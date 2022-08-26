@@ -12,9 +12,9 @@
 
     <script>
         window.MathJax = {
+            loader: { load: ['[tex]/color'] },
             tex: {
                 inlineMath: [['$', '$']],
-                packages: { '[+]': ['color'] }
             },
             svg: {
                 fontCache: 'global'
@@ -212,9 +212,15 @@
             pre.style.minHeight = ht + "px";
 
             if (tex.value != "") {
-                if (document.getElementById("checkbox").checked)
-                    fom.innerHTML = "$" + escape(tex.value) + "$";
-                else fom.innerHTML = "<div style='text-align:left;display:inline-block;'>" + escape(tex.value).replace(/\n/g, '<br/>') + "</div>"
+                if (document.getElementById("checkbox").checked) {
+                    document.getElementById("TeX_PreviewBox").style.textAlign = "center";
+                    fom.innerHTML = "$\\displaystyle{" + escape(tex.value) + "}$";
+                }
+                else {
+                    document.getElementById("TeX_PreviewBox").style.textAlign = "left";
+                    fom.innerHTML = "<div style='text-align:left;display:inline-block;'>"
+                        + escape(tex.value).replace(/\n/g, '<br/>') + "</div>";
+                }
                 backupStorage();
             }
             else fom.innerText = "";
@@ -272,9 +278,17 @@
                     }
                 }
                 // close '}'
-                else if (event.data == '}' && tex.value[pos] == '}') {
-                    if (tex.value[pos - 2] != '\\') {
+                else if (event.data == '}' && c == "}") {
+                    if (tex.value[pos] == '}' && tex.value[pos - 2] != '\\') {
                         tex.value = tex.value.erase(pos, 1);
+                        moveCursorTo(tex, pos);
+                    }
+                    // \begin{}
+                    var before = tex.value.substring(0, pos);
+                    if (/\\begin\{\w+\}$/.test(before)) {
+                        var casename = /\\begin\{(\w+)\}$/.exec(before)[1];
+                        var ins = "\\end{" + casename + "}"
+                        tex.value = tex.value.insert(pos, ins);
                         moveCursorTo(tex, pos);
                     }
                 }
@@ -326,6 +340,9 @@
             else if (event.inputType == 'historyRedo') {
                 redoHistory();
             }
+            else if (event.inputType == "deleteContentBackward");
+            else if (event.inputType == "deleteByCut");
+            else if (event.inputType == "insertFromPaste");
             else console.log(event);
 
             render();
