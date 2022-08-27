@@ -1,10 +1,10 @@
 ﻿<html>
 
 <head>
-    <title>SVG Path Tester</title>
+    <title>SVG Path Viewer</title>
     <meta charset="utf-8" />
 
-    <meta name="description" content="A simple tool for testing SVG path string." />
+    <meta name="description" content="A simple tool for viewing SVG path strings." />
     <meta name="keywords" content="harry7557558, SVG, path, visualize" />
     <meta name="author" content="Harry Chen">
     <meta name="robots" content="index, follow" />
@@ -158,6 +158,7 @@
             var p_start = [NaN, NaN], p0 = [0, 0];  // starting point, ending point
             var s_prev = [NaN, NaN], t_prev = [NaN, NaN];  // for reflection in smoothed curves
             var res = [], res_tmp = [];
+            var cont_count = 0;
 
             for (var d = 0; d < s.length;) {
                 while (d < s.length && /^[\s\,]$/.test(s[d])) d++;
@@ -191,6 +192,7 @@
 
                 if (/^[MZLHVCSQTA]$/.test(s[d].toUpperCase())) {
                     cmd = s[d], d++;
+                    cont_count = 0;
                 }
                 else if (!isFloat(s[d])) {
                     res.push(['X', p0]);
@@ -203,7 +205,8 @@
                     case 'm': {
                         var p = readPoint();
                         if (cmd == 'm') p = addPoint(p0, p);
-                        res_tmp.push(['M', p]);
+                        if (cont_count == 0) res_tmp.push(['M', p]);
+                        else res_tmp.push(['L', p0, p]);
                         p_start = p, p0 = p;
                         break;
                     }
@@ -307,6 +310,7 @@
                         return res;
                     }
                     res.push(res_tmp[i]);
+                    cont_count += 1;
                 }
                 res_tmp = [];
             }
@@ -496,9 +500,9 @@
 
         // debug
         if (0) {
-            var s = "M86.0376,21.6152 C198.177,7.90925 243.731,83.7155 215.621,162.412 C209.391,179.856 319.038,257.108 345.204,283.274 C371.37,309.44 367.632,336.851 350.188,354.295 C332.744,371.739 307.824,376.723 282.905,350.557 C258.334,324.753 178.241,219.728 165.781,220.974 C66.1017,239.664 21.246,215.99 20,87.6528 L91.0216,157.428 C124.663,149.952 150.829,127.525 157.059,93.8828 C155.813,92.6368 84.7916,21.6152 86.0376,21.6152";
+            var s = "M 100,100 200,100 200,200 100,200 M 180,60 C 30 -60 -70 200 180 300 C 430 200 330 -60 180 60 Z";
             //var s = "M300,200 h-150 a150,150 0 1,0 150,-150 z";
-            //document.getElementById("input").innerText = s;
+            document.getElementById("input").innerText = s;
             document.getElementById("transform").value = "scale(1.0)"
             document.getElementById("anchor-checkbox").checked = true;
             document.getElementById("arrow-checkbox").checked = true;
