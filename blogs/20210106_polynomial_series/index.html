@@ -106,147 +106,149 @@
         <div id="markdown">
             <h2>Sum of powers of consecutive integers</h2>
 <p>You may have heard this equation from math class:</p>
-<p>$$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{1}=1+2+3+&#92;cdots+n=&#92;frac{1}{2}n^{2}+&#92;frac{1}{2}n=&#92;frac{1}{2}n&#92;left(n+1&#92;right)}$$</p>
+<p>$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{1}=1+2+3+&#92;cdots+n=&#92;frac{1}{2}n^{2}+&#92;frac{1}{2}n=&#92;frac{1}{2}n&#92;left(n+1&#92;right)}$</p>
 <p>Some may have seen these:</p>
-<p>$$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{2}=&#92;frac{1}{6}&#92;left(2n^{3}+3n^{2}+n&#92;right)=&#92;frac{1}{6}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)}$$</p>
-<p>$$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{3}=&#92;frac{1}{4}&#92;left(n^{4}+2n^{3}+n^{2}&#92;right)=&#92;frac{1}{4}n^{2}&#92;left(n+1&#92;right)^{2}}$$</p>
+<p>$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{2}=&#92;frac{1}{6}&#92;left(2n^{3}+3n^{2}+n&#92;right)=&#92;frac{1}{6}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)}$</p>
+<p>$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{3}=&#92;frac{1}{4}&#92;left(n^{4}+2n^{3}+n^{2}&#92;right)=&#92;frac{1}{4}n^{2}&#92;left(n+1&#92;right)^{2}}$</p>
 <p>And trivially:</p>
-<p>$$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{0}=&#92;underbrace{1+1+&#92;cdots+1}&#95;{n&#92; 1s}=n}$$</p>
-<p>These equations are all in the form of the sum of the power of consecutive integers from $$1$$ to $$n$$ equals a polynomial with degree $$p+1$$, where the power $$p$$ is a non-negative integer.</p>
-<p>Proving these identities are not hard using mathematical induction. For a polynomial $$f(n)$$, if you can show $$f(0)=0$$ or $$f(1)=1$$, as well as $$f(n)=f(n-1)+n^p$$, then you can proof $$&#92;displaystyle{f(n)=&#92;sum&#95;{k=1}^{n}k^{p}}$$.</p>
-<p>But why the degree of the polynomials are always $$p+1$$? One may intuitively think that we are summing a $$p$$th-degree polynomial $$n$$ times that the terms are from $$1^p$$ to $$n^p$$, $$n$$ times $$n^p$$ should give $$n^{p+1}$$. Or replacing the sum by an integral, $$&#92;displaystyle{&#92;int&#95;0^n{k^p&#92;mathrm{d}k}=&#92;frac{1}{p+1}n^{p+1}}$$, so the highest term of $$&#92;displaystyle{&#92;sum&#95;{k=0}^n{k^p}}$$ is $$&#92;dfrac{1}{p+1}n^{p+1}$$. However, these are not formal proofs.</p>
-<p>I think of a way to show that the degree of $$f&#95;p(n)$$ is at least $$p+1$$. Let the coefficients of $$f&#95;p$$ be $$c$$. Since $$&#92;displaystyle{f(n)=&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}n^{i}=n^{p}+&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}(n-1)^{i}}$$, the highest term of $$&#92;displaystyle{&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}n^{i}}$$ is $$c&#95;{&#92;mathrm{deg}f}n^{&#92;mathrm{deg}f}$$ and the highest term of $$&#92;displaystyle{&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}(n-1)^{i}}$$ is also $$c&#95;{&#92;mathrm{deg}f}n^{&#92;mathrm{deg}f}$$ after expansion. Adding a $$n^p$$ does not change the term with the highest degree, so $$&#92;mathrm{deg}f$$ must be at least $$p+1$$. In the following experiment, you can see the degree of $$f&#95;p$$ is exactly $$p+1$$.</p>
-<h2>Finding $$f&#95;p$$</h2>
-<p>After seeing the equations with power $$p=0,1,2,3$$, one may have a question: are their equations for higher $$p$$? What do these equations look like?</p>
-<p>I thought about this problem two years ago. My approach to generate arbitrary $$f&#95;p$$ was as follows:</p>
+<p>$&#92;displaystyle{&#92;sum&#95;{k=1}^{n}k^{0}=&#92;underbrace{1+1+&#92;cdots+1}&#95;{n&#92; 1s}=n}$</p>
+<p>These equations are all in the form of the sum of the power of consecutive integers from $1$ to $n$ equals a polynomial with degree $p+1$, where the power $p$ is a non-negative integer.</p>
+<p>Proving these identities are not hard using mathematical induction. For a polynomial $f(n)$, if you can show $f(0)=0$ or $f(1)=1$, as well as $f(n)=f(n-1)+n^p$, then you can proof $&#92;displaystyle{f(n)=&#92;sum&#95;{k=1}^{n}k^{p}}$.</p>
+<p>But why the degree of the polynomials are always $p+1$? One may intuitively think that we are summing a $p$th-degree polynomial $n$ times that the terms are from $1^p$ to $n^p$, $n$ times $n^p$ should give $n^{p+1}$. Or replacing the sum by an integral, $&#92;displaystyle{&#92;int&#95;0^n{k^p&#92;mathrm{d}k}=&#92;frac{1}{p+1}n^{p+1}}$, so the highest term of $&#92;displaystyle{&#92;sum&#95;{k=0}^n{k^p}}$ is $&#92;dfrac{1}{p+1}n^{p+1}$. However, these are not formal proofs.</p>
+<p>I think of a way to show that the degree of $f&#95;p(n)$ is at least $p+1$. Let the coefficients of $f&#95;p$ be $c$. Since $&#92;displaystyle{f(n)=&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}n^{i}=n^{p}+&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}(n-1)^{i}}$, the highest term of $&#92;displaystyle{&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}n^{i}}$ is $c&#95;{&#92;mathrm{deg}f}n^{&#92;mathrm{deg}f}$ and the highest term of $&#92;displaystyle{&#92;sum&#95;{i=0}^{&#92;mathrm{deg}f}c&#95;{i}(n-1)^{i}}$ is also $c&#95;{&#92;mathrm{deg}f}n^{&#92;mathrm{deg}f}$ after expansion. Adding a $n^p$ does not change the term with the highest degree, so $&#92;mathrm{deg}f$ must be at least $p+1$. In the following experiment, you can see the degree of $f&#95;p$ is exactly $p+1$.</p>
+<h2>Finding $f&#95;p$</h2>
+<p>After seeing the equations with power $p=0,1,2,3$, one may have a question: are their equations for higher $p$? What do these equations look like?</p>
+<p>I thought about this problem two years ago. My approach to generate arbitrary $f&#95;p$ was as follows:</p>
 <ul>
-<li>Assume the degree of $$f&#95;p$$ is $$d=p+1$$</li>
-<li>Sample $$f&#95;p(0),f&#95;p(1),&#92;cdots f&#95;p(d)$$</li>
-<li>Find the coefficients of a $$d$$-th degree polynomial that goes through $$(0,f&#95;p(0)),(1,f&#95;p(1)),&#92;cdots(d,f&#95;p(d))$$</li>
+<li>Assume the degree of $f&#95;p$ is $d=p+1$</li>
+<li>Sample $f&#95;p(0),f&#95;p(1),&#92;cdots f&#95;p(d)$</li>
+<li>Find the coefficients of a $d$-th degree polynomial that goes through $(0,f&#95;p(0)),(1,f&#95;p(1)),&#92;cdots(d,f&#95;p(d))$</li>
 </ul>
-<p>When I get a list of points $$(x&#95;0,y&#95;0),(x&#95;1,y&#95;1),&#92;cdots(x&#95;d,y&#95;d)$$, to find a polynomial that goes through all of the points, I let the polynomial be $$&#92;displaystyle{P(x)=&#92;sum&#95;{i=0}^{d}c&#95;{i}x^{i}}$$. One can see:</p>
-<p>$$&#92;displaystyle{y&#95;j=&#92;sum&#95;{i=0}^{d}c&#95;{i}x&#95;j^i}=&#92;begin{bmatrix}x&#95;j^0&amp;x&#95;j^1&amp;&#92;cdots&amp;x&#95;j^d&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;d&#92;end{bmatrix}$$&emsp;&emsp;  for $$0&#92;le j&#92;le d$$</p>
+<p>When I get a list of points $(x&#95;0,y&#95;0),(x&#95;1,y&#95;1),&#92;cdots(x&#95;d,y&#95;d)$, to find a polynomial that goes through all of the points, I let the polynomial be $&#92;displaystyle{P(x)=&#92;sum&#95;{i=0}^{d}c&#95;{i}x^{i}}$. One can see:</p>
+<p>$&#92;displaystyle{y&#95;j=&#92;sum&#95;{i=0}^{d}c&#95;{i}x&#95;j^i}=&#92;begin{bmatrix}x&#95;j^0&amp;x&#95;j^1&amp;&#92;cdots&amp;x&#95;j^d&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;d&#92;end{bmatrix}$&emsp;&emsp;  for $0&#92;le j&#92;le d$</p>
 <p>Put all points together, I get the following systems of linear equations:</p>
-<p>$$&#92;begin{bmatrix}y&#95;0&#92;&#92;[3pt]y&#95;1&#92;&#92;[3pt]&#92;vdots&#92;&#92;[3pt]y&#95;d&#92;end{bmatrix}=&#92;begin{bmatrix}x&#95;0^0&amp;x&#95;0^1&amp;&#92;cdots&amp;x&#95;0^d&#92;&#92;[3pt]x&#95;1^0&amp;x&#95;1^1&amp;&#92;cdots&amp;x&#95;1^d&#92;&#92;[3pt]&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&amp;&#92;vdots&#92;&#92;[3pt]x&#95;d^0&amp;x&#95;d^1&amp;&#92;cdots&amp;x&#95;d^d&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;[3pt]c&#95;1&#92;&#92;[3pt]&#92;vdots&#92;&#92;[3pt]c&#95;d&#92;end{bmatrix}$$</p>
-<p>Note that the matrix is a Vandermonde matrix. Its determinant is non-zero since all $$x$$ values are distinct, so the linear system always have an unique solution. I wrote a Python script that solves the linear system using elimination and determines the coefficients of the polynomial, and thus finds $$f&#95;p$$.</p>
-<pre><code>def find&amp;#95;fp(p):
+<p>$&#92;begin{bmatrix}y&#95;0&#92;&#92;[3pt]y&#95;1&#92;&#92;[3pt]&#92;vdots&#92;&#92;[3pt]y&#95;d&#92;end{bmatrix}=&#92;begin{bmatrix}x&#95;0^0&amp;x&#95;0^1&amp;&#92;cdots&amp;x&#95;0^d&#92;&#92;[3pt]x&#95;1^0&amp;x&#95;1^1&amp;&#92;cdots&amp;x&#95;1^d&#92;&#92;[3pt]&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&amp;&#92;vdots&#92;&#92;[3pt]x&#95;d^0&amp;x&#95;d^1&amp;&#92;cdots&amp;x&#95;d^d&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;[3pt]c&#95;1&#92;&#92;[3pt]&#92;vdots&#92;&#92;[3pt]c&#95;d&#92;end{bmatrix}$</p>
+<p>Note that the matrix is a Vandermonde matrix. Its determinant is non-zero since all $x$ values are distinct, so the linear system always have an unique solution. I wrote a Python script that solves the linear system using elimination and determines the coefficients of the polynomial, and thus finds $f&#95;p$.</p>
+<p>```py
+def find&#95;fp(p):
     from math import gcd
-    d = p+1
+    d = p+1</p>
+<pre><code># sample points
+x = [xj for xj in range(0,d+1)]
+y = [sum([k**p for k in range(1,xj+1)]) for xj in x]
 
-    # sample points
-    x = [xj for xj in range(0,d+1)]
-    y = [sum([k**p for k in range(1,xj+1)]) for xj in x]
+# matrix and vector
+A = [[xj**i for i in range(0,d+1)] for xj in x]
+c = [yj for yj in y]
 
-    # matrix and vector
-    A = [[xj**i for i in range(0,d+1)] for xj in x]
-    c = [yj for yj in y]
+# solve the linear system using elimination
+for i in range(0,d+1):
+    for j in range(0,d+1):
+        if j!=i:
+            Aii,Aji = A[i][i],A[j][i]
+            Aii,Aji = Aii//gcd(Aii,Aji),Aji//gcd(Aii,Aji)  # prevent large numbers
+            for k in range(0,d+1):
+                A[j][k] = A[j][k]*Aii-A[i][k]*Aji
+            c[j] = c[j]*Aii-c[i]*Aji
 
-    # solve the linear system using elimination
-    for i in range(0,d+1):
-        for j in range(0,d+1):
-            if j!=i:
-                Aii,Aji = A[i][i],A[j][i]
-                Aii,Aji = Aii//gcd(Aii,Aji),Aji//gcd(Aii,Aji)  # prevent large numbers
-                for k in range(0,d+1):
-                    A[j][k] = A[j][k]*Aii-A[i][k]*Aji
-                c[j] = c[j]*Aii-c[i]*Aji
-
-    # return the coefficients of the polynomial
-    # as a list of fraction strings in increasing power
-    c = [[c[i]//gcd(A[i][i],c[i]), A[i][i]//gcd(A[i][i],c[i])] for i in range(d+1)]
-    return [str(f[0])+'/'+str(f[1]) for f in c]
+# return the coefficients of the polynomial
+# as a list of fraction strings in increasing power
+c = [[c[i]//gcd(A[i][i],c[i]), A[i][i]//gcd(A[i][i],c[i])] for i in range(d+1)]
+return [str(f[0])+'/'+str(f[1]) for f in c]
 </code></pre>
+<p>```</p>
 <p><em>&#42;Additional note: another approach to find a polynomial that goes through a list of points is <a href="https://en.wikipedia.org/wiki/Lagrange&#95;polynomial">Lagrange interpolation</a>.</em></p>
 <h2>Factored sum of powers polynomials</h2>
-<p>Using the above script, I computed the <a href="sumpow.html">coefficients of $$f&#95;p$$ from power $$0$$ to power $$99$$</a>. Below are $$f&#95;p$$ from power $$1$$ to power $$10$$ as well as their factored form:</p>
-<p>$$f&#95;1(n)={&#92;sum&#95;{k=1}^{n}k^{1}=&#92;frac{1}{2}n^{2}+&#92;frac{1}{2}n=&#92;frac{1}{2}n&#92;left(n+1&#92;right)}$$</p>
-<p>$$f&#95;2(n)={&#92;sum&#95;{k=1}^{n}k^{2}=&#92;frac{1}{3}n^{3}+&#92;frac{1}{2}n^{2}+&#92;frac{1}{6}n=&#92;frac{1}{6}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)}$$</p>
-<p>$$f&#95;3(n)={&#92;sum&#95;{k=1}^{n}k^{3}=&#92;frac{1}{4}n^{4}+&#92;frac{1}{2}n^{3}+&#92;frac{1}{4}n^{2}=&#92;frac{1}{4}n^{2}&#92;left(n+1&#92;right)^{2}}$$</p>
-<p>$$f&#95;4(n)={&#92;sum&#95;{k=1}^{n}k^{4}=&#92;frac{1}{5}n^{5}+&#92;frac{1}{2}n^{4}+&#92;frac{1}{3}n^{3}-&#92;frac{1}{30}n=&#92;frac{1}{30}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(3n^{2}+3n-1&#92;right)}$$</p>
-<p>$$f&#95;5(n)={&#92;sum&#95;{k=1}^{n}k^{5}=&#92;frac{1}{6}n^{6}+&#92;frac{1}{2}n^{5}+&#92;frac{5}{12}n^{4}-&#92;frac{1}{12}n^{2}=&#92;frac{1}{12}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(2n^{2}+2n-1&#92;right)}$$</p>
-<p>$$f&#95;6(n)={&#92;sum&#95;{k=1}^{n}k^{6}=&#92;frac{1}{7}n^{7}+&#92;frac{1}{2}n^{6}+&#92;frac{1}{2}n^{5}-&#92;frac{1}{6}n^{3}+&#92;frac{1}{42}n=&#92;frac{1}{42}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(3n^{4}+6n^{3}-3n+1&#92;right)}$$</p>
-<p>$$f&#95;7(n)={&#92;sum&#95;{k=1}^{n}k^{7}=&#92;frac{1}{8}n^{8}+&#92;frac{1}{2}n^{7}+&#92;frac{7}{12}n^{6}-&#92;frac{7}{24}n^{4}+&#92;frac{1}{12}n^{2}=&#92;frac{1}{24}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(3n^{4}+6n^{3}-n^{2}-4n+2&#92;right)}$$</p>
-<p>$$f&#95;8(n)={&#92;sum&#95;{k=1}^{n}k^{8}=&#92;frac{1}{9}n^{9}+&#92;frac{1}{2}n^{8}+&#92;frac{2}{3}n^{7}-&#92;frac{7}{15}n^{5}+&#92;frac{2}{9}n^{3}-&#92;frac{1}{30}n=&#92;frac{1}{90}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(5n^{6}+15n^{5}+5n^{4}-15n^{3}-n^{2}+9n-3&#92;right)}$$</p>
-<p>$$f&#95;9(n)={&#92;sum&#95;{k=1}^{n}k^{9}=&#92;frac{1}{10}n^{10}+&#92;frac{1}{2}n^{9}+&#92;frac{3}{4}n^{8}-&#92;frac{7}{10}n^{6}+&#92;frac{1}{2}n^{4}-&#92;frac{3}{20}n^{2}=&#92;frac{1}{20}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(n^{2}+n-1&#92;right)&#92;left(2n^{4}+4n^{3}-n^{2}-3n+3&#92;right)}$$</p>
-<p>$$f&#95;{10}(n)={&#92;sum&#95;{k=1}^{n}k^{10}=&#92;frac{1}{11}n^{11}+&#92;frac{1}{2}n^{10}+&#92;frac{5}{6}n^{9}-n^{7}+n^{5}-&#92;frac{1}{2}n^{3}+&#92;frac{5}{66}n&#92;&#92;=&#92;frac{1}{66}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(n^{2}+n-1&#92;right)&#92;left(3n^{6}+9n^{5}+2n^{4}-11n^{3}+3n^{2}+10n-5&#92;right)}$$</p>
+<p>Using the above script, I computed the <a href="sumpow.html">coefficients of $f&#95;p$ from power $0$ to power $99$</a>. Below are $f&#95;p$ from power $1$ to power $10$ as well as their factored form:</p>
+<p>$f&#95;1(n)={&#92;sum&#95;{k=1}^{n}k^{1}=&#92;frac{1}{2}n^{2}+&#92;frac{1}{2}n=&#92;frac{1}{2}n&#92;left(n+1&#92;right)}$</p>
+<p>$f&#95;2(n)={&#92;sum&#95;{k=1}^{n}k^{2}=&#92;frac{1}{3}n^{3}+&#92;frac{1}{2}n^{2}+&#92;frac{1}{6}n=&#92;frac{1}{6}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)}$</p>
+<p>$f&#95;3(n)={&#92;sum&#95;{k=1}^{n}k^{3}=&#92;frac{1}{4}n^{4}+&#92;frac{1}{2}n^{3}+&#92;frac{1}{4}n^{2}=&#92;frac{1}{4}n^{2}&#92;left(n+1&#92;right)^{2}}$</p>
+<p>$f&#95;4(n)={&#92;sum&#95;{k=1}^{n}k^{4}=&#92;frac{1}{5}n^{5}+&#92;frac{1}{2}n^{4}+&#92;frac{1}{3}n^{3}-&#92;frac{1}{30}n=&#92;frac{1}{30}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(3n^{2}+3n-1&#92;right)}$</p>
+<p>$f&#95;5(n)={&#92;sum&#95;{k=1}^{n}k^{5}=&#92;frac{1}{6}n^{6}+&#92;frac{1}{2}n^{5}+&#92;frac{5}{12}n^{4}-&#92;frac{1}{12}n^{2}=&#92;frac{1}{12}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(2n^{2}+2n-1&#92;right)}$</p>
+<p>$f&#95;6(n)={&#92;sum&#95;{k=1}^{n}k^{6}=&#92;frac{1}{7}n^{7}+&#92;frac{1}{2}n^{6}+&#92;frac{1}{2}n^{5}-&#92;frac{1}{6}n^{3}+&#92;frac{1}{42}n=&#92;frac{1}{42}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(3n^{4}+6n^{3}-3n+1&#92;right)}$</p>
+<p>$f&#95;7(n)={&#92;sum&#95;{k=1}^{n}k^{7}=&#92;frac{1}{8}n^{8}+&#92;frac{1}{2}n^{7}+&#92;frac{7}{12}n^{6}-&#92;frac{7}{24}n^{4}+&#92;frac{1}{12}n^{2}=&#92;frac{1}{24}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(3n^{4}+6n^{3}-n^{2}-4n+2&#92;right)}$</p>
+<p>$f&#95;8(n)={&#92;sum&#95;{k=1}^{n}k^{8}=&#92;frac{1}{9}n^{9}+&#92;frac{1}{2}n^{8}+&#92;frac{2}{3}n^{7}-&#92;frac{7}{15}n^{5}+&#92;frac{2}{9}n^{3}-&#92;frac{1}{30}n=&#92;frac{1}{90}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(5n^{6}+15n^{5}+5n^{4}-15n^{3}-n^{2}+9n-3&#92;right)}$</p>
+<p>$f&#95;9(n)={&#92;sum&#95;{k=1}^{n}k^{9}=&#92;frac{1}{10}n^{10}+&#92;frac{1}{2}n^{9}+&#92;frac{3}{4}n^{8}-&#92;frac{7}{10}n^{6}+&#92;frac{1}{2}n^{4}-&#92;frac{3}{20}n^{2}=&#92;frac{1}{20}n^{2}&#92;left(n+1&#92;right)^{2}&#92;left(n^{2}+n-1&#92;right)&#92;left(2n^{4}+4n^{3}-n^{2}-3n+3&#92;right)}$</p>
+<p>$f&#95;{10}(n)={&#92;sum&#95;{k=1}^{n}k^{10}=&#92;frac{1}{11}n^{11}+&#92;frac{1}{2}n^{10}+&#92;frac{5}{6}n^{9}-n^{7}+n^{5}-&#92;frac{1}{2}n^{3}+&#92;frac{5}{66}n&#92;&#92;=&#92;frac{1}{66}n&#92;left(n+1&#92;right)&#92;left(2n+1&#92;right)&#92;left(n^{2}+n-1&#92;right)&#92;left(3n^{6}+9n^{5}+2n^{4}-11n^{3}+3n^{2}+10n-5&#92;right)}$</p>
 <p>One should notice some patterns in the polynomials:</p>
 <ul>
 <li>
-<p>When terms are written in decreasing power, the polynomial $$f&#95;p$$ always begins with $$&#92;dfrac{1}{p+1}n^{p+1}+&#92;dfrac{1}{2}n^p$$;</p>
+<p>When terms are written in decreasing power, the polynomial $f&#95;p$ always begins with $&#92;dfrac{1}{p+1}n^{p+1}+&#92;dfrac{1}{2}n^p$;</p>
 </li>
 <li>
-<p>For $$p&#92;ge 2$$, $$f&#95;p$$ always contain factor $$&#92;dfrac{1}{6}n(n+1)(2n+1)$$ when $$p$$ is even and factor $$&#92;dfrac{1}{4}n^2(n+1)^2$$ when $$p$$ is odd.</p>
+<p>For $p&#92;ge 2$, $f&#95;p$ always contain factor $&#92;dfrac{1}{6}n(n+1)(2n+1)$ when $p$ is even and factor $&#92;dfrac{1}{4}n^2(n+1)^2$ when $p$ is odd.</p>
 </li>
 </ul>
 <p>Two years ago, when I first generated these equations, I could explain:</p>
 <ul>
 <li>
-<p>$$f&#95;p(n)$$ contains factor $$n$$ because $$f&#95;p(0)$$ is always $$0$$, $$n=0$$ is a root of $$f&#95;p$$, so $$f&#95;p$$ contains factor $$n-0=n$$;</p>
+<p>$f&#95;p(n)$ contains factor $n$ because $f&#95;p(0)$ is always $0$, $n=0$ is a root of $f&#95;p$, so $f&#95;p$ contains factor $n-0=n$;</p>
 </li>
 <li>
-<p>Since $$f&#95;p(n)=n^p+f&#95;p(n-1)$$, $$f&#95;p(n-1)=f&#95;p(n)-n^p$$, $$f&#95;p(-1)=f&#95;p(0)-0^p=f&#95;p(0)=0$$, $$n=-1$$ is a root of $$f&#95;p$$, so $$f&#95;p$$ also contains factor $$n+1$$;</p>
+<p>Since $f&#95;p(n)=n^p+f&#95;p(n-1)$, $f&#95;p(n-1)=f&#95;p(n)-n^p$, $f&#95;p(-1)=f&#95;p(0)-0^p=f&#95;p(0)=0$, $n=-1$ is a root of $f&#95;p$, so $f&#95;p$ also contains factor $n+1$;</p>
 </li>
 <li>
-<p>$$&#92;dfrac{1}{4}n^2(n+1)^2$$ is integer because one of $$n$$ and $$n+1$$ must be even and so $$n^2(n+1)^2$$ is divisible by 4;</p>
+<p>$&#92;dfrac{1}{4}n^2(n+1)^2$ is integer because one of $n$ and $n+1$ must be even and so $n^2(n+1)^2$ is divisible by 4;</p>
 </li>
 <li>
-<p>One of $$n$$ and $$n+1$$ must be even so $$n(n+1)(2n+1)$$ contains factor 2; When $$n&#92;equiv 1 (&#92;mod 3)$$, $$2n+1$$ is divisible by 3; when $$n&#92;equiv 2 (&#92;mod 3)$$, $$n+1$$ is divisible by 3; otherwise $$n$$ is divisible by 3, so $$n(n+1)(2n+1)$$ also contains factor 3. $$n(n+1)(2n+1)$$ is divisible by both $$2$$ and $$3$$ so $$&#92;dfrac{1}{6}n(n+1)(2n+1)$$ is integer.</p>
+<p>One of $n$ and $n+1$ must be even so $n(n+1)(2n+1)$ contains factor 2; When $n&#92;equiv 1 (&#92;mod 3)$, $2n+1$ is divisible by 3; when $n&#92;equiv 2 (&#92;mod 3)$, $n+1$ is divisible by 3; otherwise $n$ is divisible by 3, so $n(n+1)(2n+1)$ also contains factor 3. $n(n+1)(2n+1)$ is divisible by both $2$ and $3$ so $&#92;dfrac{1}{6}n(n+1)(2n+1)$ is integer.</p>
 </li>
 </ul>
-<p>I couldn't explain why $$f&#95;p$$ always begin with $$&#92;dfrac{1}{p+1}n^{p+1}+&#92;dfrac{1}{2}n^p$$ and didn't know why $$n(n+1)(2n+1)$$ and $$n^2(n+1)^2$$ appear as factors of $$f&#95;p$$.</p>
-<h2>Another approach to find $$f&#95;p$$</h2>
-<p>In the purpose of proving these identities, I discovered another approach to find the coefficients of $$f&#95;p$$.</p>
+<p>I couldn't explain why $f&#95;p$ always begin with $&#92;dfrac{1}{p+1}n^{p+1}+&#92;dfrac{1}{2}n^p$ and didn't know why $n(n+1)(2n+1)$ and $n^2(n+1)^2$ appear as factors of $f&#95;p$.</p>
+<h2>Another approach to find $f&#95;p$</h2>
+<p>In the purpose of proving these identities, I discovered another approach to find the coefficients of $f&#95;p$.</p>
 <p>From the induction formula:</p>
-<p>$$&#92;displaystyle{f&#95;p(n)=&#92;sum&#95;{k=0}^{m}c&#95;k n^k=n^p+&#92;sum&#95;{k=0}^{m}c&#95;k(n-1)^k}$$</p>
-<p>where $$m$$ is a number that is large enough and is at least the degree of $$f&#95;p$$, which I guessed its value is $$p+1$$ before.</p>
-<p>Let $$&#92;mathbf{n}=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}^T$$ and $$&#92;mathbf{c}=&#92;begin{bmatrix}c&#95;0&amp;c&#95;1&amp;&#92;cdots&amp;c&#95;m&#92;end{bmatrix}^T$$, the left part of the equation becomes:</p>
-<p>$$&#92;displaystyle&#92;sum&#95;{k=0}^{m}c&#95;k n^k=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;m&#92;end{bmatrix}=&#92;mathbf{n}^T&#92;cdot&#92;mathbf{c}$$</p>
+<p>$&#92;displaystyle{f&#95;p(n)=&#92;sum&#95;{k=0}^{m}c&#95;k n^k=n^p+&#92;sum&#95;{k=0}^{m}c&#95;k(n-1)^k}$</p>
+<p>where $m$ is a number that is large enough and is at least the degree of $f&#95;p$, which I guessed its value is $p+1$ before.</p>
+<p>Let $&#92;mathbf{n}=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}^T$ and $&#92;mathbf{c}=&#92;begin{bmatrix}c&#95;0&amp;c&#95;1&amp;&#92;cdots&amp;c&#95;m&#92;end{bmatrix}^T$, the left part of the equation becomes:</p>
+<p>$&#92;displaystyle&#92;sum&#95;{k=0}^{m}c&#95;k n^k=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;m&#92;end{bmatrix}=&#92;mathbf{n}^T&#92;cdot&#92;mathbf{c}$</p>
 <p>In the right part of the equation:</p>
-<p>$$&#92;displaystyle{&#92;sum&#95;{k=0}^{m}c&#95;k(n-1)^k=&#92;begin{bmatrix}(n-1)^0&amp;(n-1)^1&amp;&#92;cdots&amp;(n-1)^m&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;m&#92;end{bmatrix}}=&#92;mathbf{n'}^T&#92;cdot&#92;mathbf{c}$$</p>
+<p>$&#92;displaystyle{&#92;sum&#95;{k=0}^{m}c&#95;k(n-1)^k=&#92;begin{bmatrix}(n-1)^0&amp;(n-1)^1&amp;&#92;cdots&amp;(n-1)^m&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;&#92;vdots&#92;&#92;c&#95;m&#92;end{bmatrix}}=&#92;mathbf{n'}^T&#92;cdot&#92;mathbf{c}$</p>
 <p>Applying the binomial theorem:</p>
-<p>$$&#92;displaystyle{(n-1)^k=&#92;sum&#95;{i=0}^{m}&#92;binom{k}{i}n^{i}(-1)^{k-i}}=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}&#92;binom{k}{0}(-1)^k&#92;&#92;&#92;binom{k}{1}(-1)^{k-1}&#92;&#92;&#92;vdots&#92;&#92;&#92;binom{k}{m}(-1)^{k-m}&#92;end{bmatrix}$$</p>
-<p>Note that in the equation, the binomial terms are summed from $$0$$ to $$m$$. Conventionally we sum binomial terms from $$0$$ to $$k$$, but if we accept $$&#92;binom{k}{i&#92;gt k}=0$$, the upper bound of the summation can be extended to an arbitrary large number, and here is $$m$$.</p>
-<p>The left vector is $$&#92;mathbf{n}^T$$, which is independent to $$k$$. Expanding all elements, we get an expression for $$&#92;mathbf{n'}^T$$:</p>
-<p>$$&#92;mathbf{n'}^T=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}&#92;binom{0}{0}(-1)^0&amp;&#92;binom{1}{0}(-1)^1&amp;&#92;cdots&amp;&#92;binom{m}{0}(-1)^{m}&#92;&#92;&#92;binom{0}{1}(-1)^{0-1}&amp;&#92;binom{1}{1}(-1)^{1-1}&amp;&#92;cdots&amp;&#92;binom{m}{1}(-1)^{m-1}&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&amp;&#92;vdots&#92;&#92;&#92;binom{0}{m}(-1)^{0-m}&amp;&#92;binom{1}{m}(-1)^{1-m}&amp;&#92;cdots&amp;&#92;binom{m}{m}(-1)^{m-m}&#92;end{bmatrix}=&#92;mathbf{n}^T&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;1&amp;&#92;cdots&#92;&#92;0&amp;1&amp;-2&amp;3&amp;-4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;1&amp;-3&amp;6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;1&amp;-4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;1&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix}$$</p>
-<p>We can see the matrix that transforms $$&#92;mathbf{n}^T=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&#92;end{bmatrix}$$ to $$&#92;mathbf{n'}^T=&#92;begin{bmatrix}(n-1)^0&amp;(n-1)^1&amp;&#92;cdots&#92;end{bmatrix}$$ is a Pascal triangle matrix with change of signs on some elements. Let's call it $$A$$.</p>
-<p>Recall the induction formula for $$f&#95;p$$, $$&#92;mathbf{n}^T&#92;mathbf{c}=n^p+&#92;mathbf{n'}^T&#92;mathbf{c}=n^p+&#92;mathbf{n}^T&#92;mathbf{A}&#92;mathbf{c}$$. Let $$&#92;mathbf{u}$$ be a 0-indexed column vector such that its $$p$$th element is $$1$$ and all other elements are $$0$$, then $$n^p=&#92;mathbf{n}^T&#92;mathbf{u}$$. The equation becomes $$&#92;mathbf{n}^T&#92;mathbf{c}=&#92;mathbf{n}^T&#92;mathbf{u}+&#92;mathbf{n}^T&#92;mathbf{A}&#92;mathbf{c}$$. $$&#92;mathbf{n}$$ is an independent variable. Get rid of $$&#92;mathbf{n}^T$$ and rearrange, we get $$(&#92;mathbf{I}-&#92;mathbf{A})&#92;mathbf{c}=&#92;mathbf{u}$$. This is the equation we need to solve for $$&#92;mathbf{c}$$.</p>
+<p>$&#92;displaystyle{(n-1)^k=&#92;sum&#95;{i=0}^{m}&#92;binom{k}{i}n^{i}(-1)^{k-i}}=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}&#92;binom{k}{0}(-1)^k&#92;&#92;&#92;binom{k}{1}(-1)^{k-1}&#92;&#92;&#92;vdots&#92;&#92;&#92;binom{k}{m}(-1)^{k-m}&#92;end{bmatrix}$</p>
+<p>Note that in the equation, the binomial terms are summed from $0$ to $m$. Conventionally we sum binomial terms from $0$ to $k$, but if we accept $&#92;binom{k}{i&#92;gt k}=0$, the upper bound of the summation can be extended to an arbitrary large number, and here is $m$.</p>
+<p>The left vector is $&#92;mathbf{n}^T$, which is independent to $k$. Expanding all elements, we get an expression for $&#92;mathbf{n'}^T$:</p>
+<p>$&#92;mathbf{n'}^T=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&amp;n^m&#92;end{bmatrix}&#92;begin{bmatrix}&#92;binom{0}{0}(-1)^0&amp;&#92;binom{1}{0}(-1)^1&amp;&#92;cdots&amp;&#92;binom{m}{0}(-1)^{m}&#92;&#92;&#92;binom{0}{1}(-1)^{0-1}&amp;&#92;binom{1}{1}(-1)^{1-1}&amp;&#92;cdots&amp;&#92;binom{m}{1}(-1)^{m-1}&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&amp;&#92;vdots&#92;&#92;&#92;binom{0}{m}(-1)^{0-m}&amp;&#92;binom{1}{m}(-1)^{1-m}&amp;&#92;cdots&amp;&#92;binom{m}{m}(-1)^{m-m}&#92;end{bmatrix}=&#92;mathbf{n}^T&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;1&amp;&#92;cdots&#92;&#92;0&amp;1&amp;-2&amp;3&amp;-4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;1&amp;-3&amp;6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;1&amp;-4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;1&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix}$</p>
+<p>We can see the matrix that transforms $&#92;mathbf{n}^T=&#92;begin{bmatrix}n^0&amp;n^1&amp;&#92;cdots&#92;end{bmatrix}$ to $&#92;mathbf{n'}^T=&#92;begin{bmatrix}(n-1)^0&amp;(n-1)^1&amp;&#92;cdots&#92;end{bmatrix}$ is a Pascal triangle matrix with change of signs on some elements. Let's call it $A$.</p>
+<p>Recall the induction formula for $f&#95;p$, $&#92;mathbf{n}^T&#92;mathbf{c}=n^p+&#92;mathbf{n'}^T&#92;mathbf{c}=n^p+&#92;mathbf{n}^T&#92;mathbf{A}&#92;mathbf{c}$. Let $&#92;mathbf{u}$ be a 0-indexed column vector such that its $p$th element is $1$ and all other elements are $0$, then $n^p=&#92;mathbf{n}^T&#92;mathbf{u}$. The equation becomes $&#92;mathbf{n}^T&#92;mathbf{c}=&#92;mathbf{n}^T&#92;mathbf{u}+&#92;mathbf{n}^T&#92;mathbf{A}&#92;mathbf{c}$. $&#92;mathbf{n}$ is an independent variable. Get rid of $&#92;mathbf{n}^T$ and rearrange, we get $(&#92;mathbf{I}-&#92;mathbf{A})&#92;mathbf{c}=&#92;mathbf{u}$. This is the equation we need to solve for $&#92;mathbf{c}$.</p>
 <p>The linear system is in the form:</p>
-<p>$$&#92;begin{bmatrix}0&amp;1&amp;-1&amp;1&amp;-1&amp;&#92;cdots&#92;&#92;0&amp;0&amp;2&amp;-3&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;3&amp;-6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;0&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix} &#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;&#92;vdots&#92;end{bmatrix} = &#92;begin{bmatrix}0&#92;&#92;&#92;vdots&#92;&#92;0&#92;&#92;1&#92;&#92;0&#92;&#92;&#92;vdots&#92;end{bmatrix}$$</p>
-<p>Its first column of the matrix $$&#92;mathbf{I}-&#92;mathbf{A}$$ is zero, so it is not invertible. But since we know that $$c&#95;0=0$$, we can remove the leftmost column of the matrix. And the equation becomes:</p>
-<p>$$&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;&#92;cdots&#92;&#92;0&amp;2&amp;-3&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;3&amp;-6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;4&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix} &#92;begin{bmatrix}c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;&#92;vdots&#92;end{bmatrix} = &#92;begin{bmatrix}0&#92;&#92;&#92;vdots&#92;&#92;0&#92;&#92;1&#92;&#92;0&#92;&#92;&#92;vdots&#92;end{bmatrix}$$</p>
-<p>The $$1$$ in the right side corresponds the term with degree $$p+1$$, and all terms after it are zero. The matrix in the equation is upper triangular, which means we can remove rows after the $$p+1$$-th row, and the degree of the polynomial is exactly $$p+1$$. The bottom-right element of the remaining matrix is $$&#92;dbinom{p+1}{p}=p+1$$, so $$c&#95;{p+1}=&#92;dfrac{1}{p+1}$$, and so's why $$f&#95;p(n)$$ begins with $$&#92;dfrac{1}{p+1}n^{p+1}$$.</p>
-<p>Look at the second-last row of the remaining matrix. The last element is $$-&#92;dbinom{p+1}{p-1}=-&#92;dfrac{1}{2}p(p+1)$$, the second last element is $$&#92;dbinom{p}{p-1}=p$$. In the equation, $$p&#92;cdot c&#95;p-&#92;dfrac{1}{2}p(p+1)&#92;cdot c&#95;{p+1}=0$$, and one can solve $$c&#95;p=&#92;dfrac{1}{2}$$. This is why the second highest term of $$f&#95;p(n)$$ is always $$&#92;dfrac{1}{2}n^p$$.</p>
-<p>An example of the linear system use to find the coefficients of $$f&#95;4$$ is as follows:</p>
-<p>$$&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;1&#92;&#92;0&amp;2&amp;-3&amp;4&amp;-5&#92;&#92;0&amp;0&amp;3&amp;-6&amp;10&#92;&#92;0&amp;0&amp;0&amp;4&amp;-10&#92;&#92;0&amp;0&amp;0&amp;0&amp;5&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;c&#95;5&#92;end{bmatrix}=&#92;begin{bmatrix}0&#92;&#92;0&#92;&#92;0&#92;&#92;0&#92;&#92;1&#92;end{bmatrix}$$</p>
-<p>and $$c&#95;0=0$$.</p>
-<p>Below is a Python code that solves the coefficients of $$f&#95;p$$ using the new method.</p>
-<pre><code>def find&amp;#95;fp&amp;#95;pascal(p):
-    d = p + 1
+<p>$&#92;begin{bmatrix}0&amp;1&amp;-1&amp;1&amp;-1&amp;&#92;cdots&#92;&#92;0&amp;0&amp;2&amp;-3&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;3&amp;-6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;0&amp;0&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix} &#92;begin{bmatrix}c&#95;0&#92;&#92;c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;&#92;vdots&#92;end{bmatrix} = &#92;begin{bmatrix}0&#92;&#92;&#92;vdots&#92;&#92;0&#92;&#92;1&#92;&#92;0&#92;&#92;&#92;vdots&#92;end{bmatrix}$</p>
+<p>Its first column of the matrix $&#92;mathbf{I}-&#92;mathbf{A}$ is zero, so it is not invertible. But since we know that $c&#95;0=0$, we can remove the leftmost column of the matrix. And the equation becomes:</p>
+<p>$&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;&#92;cdots&#92;&#92;0&amp;2&amp;-3&amp;4&amp;&#92;cdots&#92;&#92;0&amp;0&amp;3&amp;-6&amp;&#92;cdots&#92;&#92;0&amp;0&amp;0&amp;4&amp;&#92;cdots&#92;&#92;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;vdots&amp;&#92;ddots&#92;end{bmatrix} &#92;begin{bmatrix}c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;&#92;vdots&#92;end{bmatrix} = &#92;begin{bmatrix}0&#92;&#92;&#92;vdots&#92;&#92;0&#92;&#92;1&#92;&#92;0&#92;&#92;&#92;vdots&#92;end{bmatrix}$</p>
+<p>The $1$ in the right side corresponds the term with degree $p+1$, and all terms after it are zero. The matrix in the equation is upper triangular, which means we can remove rows after the $p+1$-th row, and the degree of the polynomial is exactly $p+1$. The bottom-right element of the remaining matrix is $&#92;dbinom{p+1}{p}=p+1$, so $c&#95;{p+1}=&#92;dfrac{1}{p+1}$, and so's why $f&#95;p(n)$ begins with $&#92;dfrac{1}{p+1}n^{p+1}$.</p>
+<p>Look at the second-last row of the remaining matrix. The last element is $-&#92;dbinom{p+1}{p-1}=-&#92;dfrac{1}{2}p(p+1)$, the second last element is $&#92;dbinom{p}{p-1}=p$. In the equation, $p&#92;cdot c&#95;p-&#92;dfrac{1}{2}p(p+1)&#92;cdot c&#95;{p+1}=0$, and one can solve $c&#95;p=&#92;dfrac{1}{2}$. This is why the second highest term of $f&#95;p(n)$ is always $&#92;dfrac{1}{2}n^p$.</p>
+<p>An example of the linear system use to find the coefficients of $f&#95;4$ is as follows:</p>
+<p>$&#92;begin{bmatrix}1&amp;-1&amp;1&amp;-1&amp;1&#92;&#92;0&amp;2&amp;-3&amp;4&amp;-5&#92;&#92;0&amp;0&amp;3&amp;-6&amp;10&#92;&#92;0&amp;0&amp;0&amp;4&amp;-10&#92;&#92;0&amp;0&amp;0&amp;0&amp;5&#92;end{bmatrix}&#92;begin{bmatrix}c&#95;1&#92;&#92;c&#95;2&#92;&#92;c&#95;3&#92;&#92;c&#95;4&#92;&#92;c&#95;5&#92;end{bmatrix}=&#92;begin{bmatrix}0&#92;&#92;0&#92;&#92;0&#92;&#92;0&#92;&#92;1&#92;end{bmatrix}$</p>
+<p>and $c&#95;0=0$.</p>
+<p>Below is a Python code that solves the coefficients of $f&#95;p$ using the new method.</p>
+<p>```py
+def find&#95;fp&#95;pascal(p):
+    d = p + 1</p>
+<pre><code># construct a Pascal matrix using the recursive relationship
+A = [[0]*d for i in range(d)]
+A[0][0] = 1
+for i in range(1,d):
+    A[0][i] = (-1 if i&amp;1 else 1)
+    for j in range(1,i):
+        A[j][i] = (abs(A[j-1][i-1])+abs(A[j][i-1])) * (-1 if (i+j)&amp;1 else 1)
+    A[i][i] = i+1
 
-    # construct a Pascal matrix using the recursive relationship
-    A = [[0]*d for i in range(d)]
-    A[0][0] = 1
-    for i in range(1,d):
-        A[0][i] = (-1 if i&amp;1 else 1)
-        for j in range(1,i):
-            A[j][i] = (abs(A[j-1][i-1])+abs(A[j][i-1])) * (-1 if (i+j)&amp;1 else 1)
-        A[i][i] = i+1
+# initial vector
+c = [(1 if i+1==d else 0) for i in range(d)]
 
-    # initial vector
-    c = [(1 if i+1==d else 0) for i in range(d)]
+# solve the linear system in O(d²)
+for i in range(d-1,-1,-1):
+    for j in range(i-1,-1,-1):
+        c[j] -= c[i]*A[j][i]/A[i][i]
+        A[j][i]=0
+    c[i] = c[i]/A[i][i]
+    A[i][i] = 1
 
-    # solve the linear system in O(d²)
-    for i in range(d-1,-1,-1):
-        for j in range(i-1,-1,-1):
-            c[j] -= c[i]*A[j][i]/A[i][i]
-            A[j][i]=0
-        c[i] = c[i]/A[i][i]
-        A[i][i] = 1
-
-    # return the coefficients of f&amp;#95;p in decimals
-    c.insert(0,0)
-    return c
+# return the coefficients of f&amp;#95;p in decimals
+c.insert(0,0)
+return c
 </code></pre>
+<p>```</p>
         </div>
     </div>
 
@@ -257,7 +259,7 @@
         document.getElementById("katex-auto-render").onload = function () {
             renderMathInElement(document.body, {
                 delimiters: [
-                    { left: "$$", right: "$$", display: false }
+                    { left: "$", right: "$", display: false }
                 ]
             });
         }
