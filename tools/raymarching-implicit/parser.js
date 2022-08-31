@@ -2,6 +2,8 @@
 
 // parse math equations, generate LaTeX and GLSL code
 
+const PI = Math.PI;
+
 
 
 // ============================ DEFINITIONS ==============================
@@ -15,12 +17,31 @@ function Token(type, str) {
     this.numArgs = 0;  // number of arguments for functions
 }
 
-function EvalObject(postfix, glsl, glslgrad, isNumeric, isPositive = false, isCompatible = true) {
+function Interval(x0 = -Infinity, x1 = Infinity) {
+    this.x0 = Math.min(x0, x1);
+    this.x1 = Math.max(x0, x1);
+    if (!isFinite(this.x0)) this.x0 = -Infinity;
+    if (!isFinite(this.x1)) this.x1 = Infinity;
+    this.isPositive = function () {
+        return this.x0 >= 0.;
+    };
+    this.isNegative = function () {
+        return this.x1 <= 0.;
+    };
+    this.containsZero = function () {
+        return this.x0 <= 0. && this.x1 >= 0.;
+    };
+}
+
+function EvalObject(
+    postfix, glsl, glslgrad,
+    isNumeric, range = Interval(), isCompatible = true
+) {
     this.postfix = postfix;
     this.glsl = glsl;
     this.glslgrad = glslgrad;
     this.isNumeric = isNumeric;  // zero gradient
-    this.isPositive = isPositive;  // non-negative
+    this.range = range;  // non-negative
     this.isCompatible = isCompatible;  // has no NAN
 }
 
@@ -30,12 +51,18 @@ function EvalLatexObject(postfix, latex, precedence) {
     this.precedence = precedence;
 }
 
-function MathFunction(names, numArgs, latex, glsl, glslgrad) {
+function MathFunction(
+    names, numArgs, latex, glsl, glslgrad,  // all functions
+    domain = new Interval(), range = new Interval(), isMonotonic = false  // univariate functions only
+) {
     this.names = names;
     this.numArgs = numArgs;
     this.latex = latex;
     this.glsl = glsl;
     this.glslgrad = glslgrad;
+    this.domain = domain;
+    this.range = range;
+    this.isMonotonic = isMonotonic;
     this.subGlsl = function (args) {
         if (args.length != this.numArgs)
             throw "Incorrect number of arguments for function " + this.names[0];
@@ -52,16 +79,13 @@ function MathFunction(names, numArgs, latex, glsl, glslgrad) {
         }
         var result = new EvalObject(
             postfix.concat([new Token('function', names[0])]),
-            glsl, glslgrad, isNumeric, false, isCompatible);
-        const positiveFunctions = new Set(['fract', 'abs', 'sqrt', 'exp', 'cosh', 'acos', 'acosh']);
-        if (positiveFunctions.has(this.names[this.names.length - 1]))
-            result.isPositive = true;
-        let incompatibleFunctions = new Set(['log', 'ln', 'sqrt']);
-        if (incompatibleFunctions.has(this.names[this.names.length - 1]) && !args[0].isPositive)
-            result.isCompatible = false;
-        incompatibleFunctions = new Set(['asin', 'acos', 'acosh', 'atanh', 'acoth']);
-        if (incompatibleFunctions.has(this.names[this.names.length - 1]))
-            result.isCompatible = false;
+            glsl, glslgrad, isNumeric, new Interval(), isCompatible);
+        if (args.length == 1) {
+            const eps = 1e-8;
+            if (args[0].range.x0 < this.domain.x0 - eps || args[0].range.x1 > this.domain.x1 + eps)
+                result.isCompatible = false;
+            result.range = this.range;
+        }
         return result;
     };
     this.subLatex = function (args) {
@@ -85,42 +109,42 @@ const mathFunctions = (function () {
     const funs0 = [
         new MathFunction(['if'], 3, '\\operatorname{if}\\left\\{%1>0:%2,%3\\right\\}', '((%1)>0.?%2:%3)', '((%1)>0.?$2:$3)'),  // not efficient in GLSL because all are evaluated
         new MathFunction(['mod'], 2, '\\operatorname{mod}\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
-        new MathFunction(['fract', 'frac'], 1, '\\operatorname{frac}\\left(%1\\right)', 'fract(%1)', '$1'),
+        new MathFunction(['fract', 'frac'], 1, '\\operatorname{frac}\\left(%1\\right)', 'fract(%1)', '$1', new Interval(), new Interval(0, 1)),
         new MathFunction(['floor'], 1, '\\lfloor{%1}\\rfloor', 'floor(%1)', 'vec3(0)'),
         new MathFunction(['ceil'], 1, '\\lceil{%1}\\rceil', 'ceil(%1)', 'vec3(0)'),
         new MathFunction(['round'], 1, '\\operatorname{round}\\left(%1\\right)', 'round(%1)', 'vec3(0)'),
-        new MathFunction(['abs'], 1, '\\left|%1\\right|', 'abs(%1)', '($1*sign(%1))'),
-        new MathFunction(['sign', 'sgn'], 1, '\\operatorname{sign}\\left(%1\\right)', 'sign(%1)', 'vec3(0)'),
+        new MathFunction(['abs'], 1, '\\left|%1\\right|', 'abs(%1)', '($1*sign(%1))', new Interval(), new Interval(0, Infinity)),
+        new MathFunction(['sign', 'sgn'], 1, '\\operatorname{sign}\\left(%1\\right)', 'sign(%1)', 'vec3(0)', new Interval(), new Interval(-1, 1)),
         new MathFunction(['max'], 0, '\\max\\left(%0\\right)', 'max(%1,%2)', "(%1>%2?$1:$2)"),
         new MathFunction(['min'], 0, '\\min\\left(%0\\right)', 'min(%1,%2)', "(%1<%2?$1:$2)"),
         new MathFunction(['clamp'], 3, '\\operatorname{clamp}\\left(%1,%2,%3\\right)', 'clamp(%1,%2,%3)', '(%1>%3?$3:%1>%2?$1:$2)'),
         new MathFunction(['lerp', 'mix'], 3, '\\operatorname{lerp}\\left(%1,%2,%3\\right)', 'mix(%1,%2,%3)', '((1.-%3)*$1+(%2-%1)*$3+%3*$2)'),
-        new MathFunction(['sqrt'], 1, '\\sqrt{%1}', 'sqrt(%1)', '(.5*$1/sqrt(%1))'),
-        new MathFunction(['cbrt'], 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))', '($1/(3.*pow(abs(%1),2./3.)))'),
+        new MathFunction(['sqrt'], 1, '\\sqrt{%1}', 'sqrt(%1)', '(.5*$1/sqrt(%1))', new Interval(0, Infinity), new Interval(0, Infinity), true),
+        new MathFunction(['cbrt'], 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))', '($1/(3.*pow(abs(%1),2./3.)))', true),
         new MathFunction(['pow'], 2, '\\left(%1\\right)^{%2}', 'pow(%1,%2)', null),
-        new MathFunction(['exp'], 1, '\\exp\\left(%1\\right)', 'exp(%1)', '($1*exp(%1))'),
-        new MathFunction(['log', 'ln'], 1, '\\ln\\left(%1\\right)', 'log(%1)', '$1/%1'),
-        new MathFunction(['log', 'ln'], 2, '\\log_{%1}\\left(%2\\right)', '(log(%2)/log(%1))', '((log(%1)*$2/%2-log(%2)*$1/%1)/(log(%1)*log(%1)))'),
-        new MathFunction(['sin'], 1, '\\sin\\left(%1\\right)', 'sin(%1)', '($1*cos(%1))'),
-        new MathFunction(['cos'], 1, '\\cos\\left(%1\\right)', 'cos(%1)', '(-$1*sin(%1))'),
+        new MathFunction(['exp'], 1, '\\exp\\left(%1\\right)', 'exp(%1)', '($1*exp(%1))', new Interval(), new Interval(0, Infinity), true),
+        new MathFunction(['log', 'ln'], 1, '\\ln\\left(%1\\right)', 'log(%1)', '$1/%1', new Interval(0, Infinity), new Interval(), true),
+        new MathFunction(['log'], 2, '\\log_{%1}\\left(%2\\right)', '(log(%2)/log(%1))', '((log(%1)*$2/%2-log(%2)*$1/%1)/(log(%1)*log(%1)))'),
+        new MathFunction(['sin'], 1, '\\sin\\left(%1\\right)', 'sin(%1)', '($1*cos(%1))', new Interval(), new Interval(-1, 1)),
+        new MathFunction(['cos'], 1, '\\cos\\left(%1\\right)', 'cos(%1)', '(-$1*sin(%1))', new Interval(), new Interval(-1, 1)),
         new MathFunction(['tan'], 1, '\\tan\\left(%1\\right)', 'tan(%1)', '($1/(cos(%1)*cos(%1)))'),
         new MathFunction(['csc'], 1, '\\csc\\left(%1\\right)', '(1.0/sin(%1))', '(-$1/(sin(%1)*tan(%1)))'),
         new MathFunction(['sec'], 1, '\\sec\\left(%1\\right)', '(1.0/cos(%1))', '($1*tan(%1)/cos(%1))'),
         new MathFunction(['cot'], 1, '\\cot\\left(%1\\right)', '(1.0/tan(%1))', '(-$1/(sin(%1)*sin(%1)))'),
-        new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))'),
-        new MathFunction(['cosh'], 1, '\\cosh\\left(%1\\right)', 'cosh(%1)', '($1*sinh(%1))'),
-        new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))'),
+        new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))', new Interval(), new Interval(), true),
+        new MathFunction(['cosh'], 1, '\\cosh\\left(%1\\right)', 'cosh(%1)', '($1*sinh(%1))', new Interval(), new Interval(1, Infinity)),
+        new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))', new Interval(), new Interval(-1, 1), true),
         new MathFunction(['csch'], 1, '\\mathrm{csch}\\left(%1\\right)', '(1.0/sinh(%1))', '(-$1/(sinh(%1)*tanh(%1)))'),
-        new MathFunction(['sech'], 1, '\\mathrm{sech}\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))'),
+        new MathFunction(['sech'], 1, '\\mathrm{sech}\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))', new Interval(), new Interval(0, 1)),
         new MathFunction(['coth'], 1, '\\mathrm{coth}\\left(%1\\right)', '(1.0/tanh(%1))', '(-$1/(sinh(%1)*sinh(%1)))'),
-        new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))'),
-        new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))'),
-        new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))'),
+        new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(-0.5 * PI, 0.5 * PI), true),
+        new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(0.0, PI), true),
+        new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), true),
         new MathFunction(['atan2', 'arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
-        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\mathrm{arccot}\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))'),
-        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\mathrm{arcsinh}\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))'),
-        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\mathrm{arccosh}\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))'),
-        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\mathrm{arctanh}\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))'),
+        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\mathrm{arccot}\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), true),
+        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\mathrm{arcsinh}\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))', new Interval(), new Interval(), true),
+        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\mathrm{arccosh}\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))', new Interval(1, Infinity), new Interval(0, Infinity), true),
+        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\mathrm{arctanh}\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))', new Interval(-1, 1), new Interval(), true),
         new MathFunction(['arccoth', 'arcoth', 'acoth'], 1, '\\mathrm{arccoth}\\left(%1\\right)', 'atanh(1./(%1))', '($1/(1.-%1*%1))'),
     ];
     var funs = {};
@@ -136,6 +160,13 @@ const mathFunctions = (function () {
             throw "Incorrect number of arguments for function " + this.names[0];
         return powEvalObjects(args[0], args[1]);
     };
+    funs['log']['2'].subGlsl = function (args) {
+        if (args.length != 2)
+            throw "Incorrect number of arguments for function " + this.names[0];
+        return divEvalObjects(
+            funs['ln']['1'].subGlsl([args[1]]),
+            funs['ln']['1'].subGlsl([args[0]]));
+    }
     funs['max']['0'].subGlsl = funs['min']['0'].subGlsl = function (args) {
         if (args.length < 2)
             throw "To few argument for function " + this.names[0];
@@ -147,7 +178,13 @@ const mathFunctions = (function () {
                 args1.push(new EvalObject(
                     args[i].postfix.concat(args[i + 1].postfix).concat([new Token('function', this.names[0])]),
                     glsl, glslgrad, args[i].isNumeric && args[i + 1].isNumeric,
-                    this.names[0] == 'max' && (args[i].isPositive || args[i + 1].isPositive),
+                    this.names[0] == 'max' ? new Interval(
+                        Math.max(args[i].range.x0, args[i + 1].range.x0),
+                        Math.max(args[i].range.x1, args[i + 1].range.x1),
+                    ) : new Interval(
+                        Math.min(args[i].range.x0, args[i + 1].range.x0),
+                        Math.min(args[i].range.x1, args[i + 1].range.x1),
+                    ),
                     args[i].isCompatible && args[i + 1].isCompatible));
             }
             if (args.length % 2 == 1) args1.push(args[args.length - 1]);
@@ -678,16 +715,23 @@ function addEvalObjects(a, b) {
         "(" + a.glsl + "+" + b.glsl + ")",
         a.isNumeric ? b.glslgrad : b.isNumeric ? a.glslgrad :
             "(" + a.glslgrad + "+" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
+        a.isNumeric && b.isNumeric,
+        new Interval(a.range.x0 + b.range.x0, a.range.x1 + b.range.x1),
+        a.isCompatible && b.isCompatible
     );
 }
 function subEvalObjects(a, b) {
+    var interval = new Interval(
+        a.range.x0 - b.range.x1,
+        a.range.x1 - b.range.x0);
     return new EvalObject(
         a.postfix.concat(b.postfix.concat([new Token('operator', '-')])),
         "(" + a.glsl + "-" + b.glsl + ")",
         b.isNumeric ? a.glslgrad : a.isNumeric ? "(-" + b.glslgrad + ")" :
             "(" + a.glslgrad + "-" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric, false, a.isCompatible && b.isCompatible
+        a.isNumeric && b.isNumeric,
+        interval,
+        a.isCompatible && b.isCompatible
     );
 }
 function mulEvalObjects(a, b) {
@@ -697,10 +741,28 @@ function mulEvalObjects(a, b) {
         a.isNumeric ? "(" + a.glsl + "*" + b.glslgrad + ")" :
             b.isNumeric ? "(" + a.glslgrad + "*" + b.glsl + ")" :
                 "(" + a.glslgrad + "*" + b.glsl + "+" + a.glsl + "*" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
+        a.isNumeric && b.isNumeric,
+        new Interval(
+            Math.min(
+                a.range.x0 * b.range.x0, a.range.x0 * b.range.x1,
+                a.range.x1 * b.range.x0, a.range.x1 * b.range.x1),
+            Math.max(
+                a.range.x0 * b.range.x0, a.range.x0 * b.range.x1,
+                a.range.x1 * b.range.x0, a.range.x1 * b.range.x1)
+        ),
+        a.isCompatible && b.isCompatible
     );
 }
 function divEvalObjects(a, b) {
+    var interval = new Interval(
+        Math.min(
+            a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
+            a.range.x1 / b.range.x0, a.range.x1 / b.range.x1),
+        Math.max(
+            a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
+            a.range.x1 / b.range.x0, a.range.x1 / b.range.x1)
+    );
+    if (b.range.containsZero()) interval = new Interval();
     return new EvalObject(
         a.postfix.concat(b.postfix.concat([new Token('operator', '/')])),
         "(" + a.glsl + "/" + b.glsl + ")",
@@ -708,7 +770,9 @@ function divEvalObjects(a, b) {
             b.isNumeric ? "(" + a.glslgrad + "/" + b.glsl + ")" :
                 a.isNumeric ? "(-" + a.glsl + "*" + b.glslgrad + "/(" + b.glsl + "*" + b.glsl + "))" :
                     "((" + a.glslgrad + "*" + b.glsl + "-" + a.glsl + "*" + b.glslgrad + ")/(" + b.glsl + "*" + b.glsl + "))",
-        a.isNumeric && b.isNumeric, a.isPositive && b.isPositive, a.isCompatible && b.isCompatible
+        a.isNumeric && b.isNumeric,
+        interval,
+        a.isCompatible && b.isCompatible
     );
 }
 function powEvalObjects(a, b) {
@@ -717,11 +781,16 @@ function powEvalObjects(a, b) {
             a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             "exp(" + b.glsl + ")",
             "(" + b.glslgrad + "*exp(" + b.glsl + "))",
-            b.isNumeric, true, b.isCompatible
+            b.isNumeric,
+            new Interval(Math.exp(b.range.x0), Math.exp(b.range.x1)),
+            b.isCompatible
         )
     }
     var n = Number(b.glsl);
-    if (n == 0) return new EvalObject([new Token("number", '1.')], "1.", "vec3(0)", true, true);
+    if (n == 0) return new EvalObject(
+        [new Token("number", '1.')], "1.", "vec3(0)",
+        true, new Interval(1, 1), a.isCompatible
+    );
     if (n == 1) return a;
     if (n == 2 || n == 3 || n == 4 || n == 5 || n == 6 || n == 7 || n == 8) {
         var arr = [];
@@ -732,9 +801,19 @@ function powEvalObjects(a, b) {
         return new EvalObject(
             a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
             glsl, glslgrad,
-            a.isNumeric, n % 2 == 0, a.isCompatible
+            a.isNumeric,
+            new Interval(
+                n % 2 == 0 && a.range.containsZero() ? 0.0 :
+                    Math.min(Math.pow(a.range.x0, n), Math.pow(a.range.x1, n)),
+                Math.max(Math.pow(a.range.x0, n), Math.pow(a.range.x1, n))),
+            a.isCompatible
         )
     }
+    var interval = new Interval();
+    if (a.range.isPositive()) interval = new Interval(
+        Math.pow(a.range.x0, b.range.x0),
+        Math.pow(a.range.x1, b.range.x1)
+    );
     return new EvalObject(
         a.postfix.concat(b.postfix.concat([new Token('operator', '^')])),
         "pow(" + a.glsl + "," + b.glsl + ")",
@@ -743,7 +822,9 @@ function powEvalObjects(a, b) {
                 b.isNumeric ? "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad + ")" :
                     "(" + b.glsl + "*pow(" + a.glsl + "," + b.glsl + "-1.)*" + a.glslgrad +
                     "+pow(" + a.glsl + "," + b.glsl + ")*log(" + a.glsl + ")*" + b.glslgrad + ")",
-        a.isNumeric && b.isNumeric, a.isPositive, a.isPositive
+        a.isNumeric && b.isNumeric,
+        interval,
+        a.isCompatible && a.range.isPositive() && b.isCompatible
     )
 }
 
@@ -782,7 +863,8 @@ function postfixToGlsl(queue) {
         if (token.type == 'number') {
             var s = token.str;
             if (!/\./.test(s)) s += '.';
-            stack.push(new EvalObject([token], s, "vec3(0)", true, !/-/.test(s), true));
+            stack.push(new EvalObject([token], s, "vec3(0)",
+                true, new Interval(Number(s), Number(s)), true));
         }
         // variable
         else if (token.type == "variable") {
@@ -801,7 +883,8 @@ function postfixToGlsl(queue) {
             else {
                 throw "Undeclared variable " + token.str;
             }
-            stack.push(new EvalObject([token], s, grad, grad == "0", isNumeric, true));
+            stack.push(new EvalObject(
+                [token], s, grad, grad == "0", new Interval(), true));
         }
         // operators
         else if (token.type == "operator") {
@@ -988,7 +1071,6 @@ var builtinFunctions = [
     ["A7 Genus 2", "2y(y^2-3x^2)(1-z^2)+(x^2+y^2)^2-(9z^2-1)(1-z^2)"],
     ["A4 Goursat", "2(x^4+y^4+z^4)-3(x^2+y^2+z^2)+2"],
     ["A4 Genus 3", "(x^2-1)^2+(y^2-1)^2+(z^2-1)^2+4(x^2y^2+x^2z^2+y^2z^2)+8xyz-2(x^2+y^2+z^2)"],
-    ["A4 Crescent", "(2x^2+2y^2+4z^2+x+3)^2=32(x^2+y^2)"],
     ["A6 Spiky 1", "(x^2+y^2+z^2-2)^3+2000(x^2y^2+x^2z^2+y^2z^2)=10"],
     ["A6 Spiky 2", "z^6-5(x^2+y^2)z^4+5(x^2+y^2)^2z^2-2(x^4-10x^2y^2+5y^4)xz-1.002(x^2+y^2+z^2)^3+0.2"],
     ["A6 Barth", "4(x^2-y^2)(y^2-z^2)(z^2-x^2)-3(x^2+y^2+z^2-1)^2"],
@@ -998,25 +1080,25 @@ var builtinFunctions = [
     ["Ln Wineglass", "x^2+y^2-ln(z+1)^2-0.02"],
     ["Spheres", "(sin(2x)sin(2y)sin(2z)-0.9)e^(x+y)"],
     ["Noisy Sphere", "x^2+y^2+z^2=1+0.1sin(10x)sin(10y)sin(10z)"],
-    ["Noisy Octahedron", "abs(x)+abs(y)+abs(z)-2+cos(10x)cos(10y)cos(10z)"],
-    ["Noisy Peanut", "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1-0.01(cos(30x)+cos(30y)cos(30z))"],
+    ["Noisy Octahedron", "abs(x)+abs(y)+abs(z)-1+0.7cos(10x)cos(10y)cos(10z)"],
+    ["Noisy Peanut", "1/((x-1)^2+y^2+z^2)+1/((x+1)^2+y^2+z^2)-1.4-0.02(cos(30x)+cos(30y)cos(30z))"],
     ["Sin Terrace", "z=0.25round(4sin(x)sin(y))"],
     ["Tan Cells", "z=1/((tan(x)tan(y))^2+1)-1/2"],
     ["Tan Forest", "z=.2tan(asin(cos(5x)cos(5y)))+.5sin(10z)"],
-    ["Sin Field", "z=100sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)"],
-    ["Sin Tower 1", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.02))-sin(4z)"],
-    ["Sin Tower 2", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
+    ["Sine Field", "z=100sin(x-sqrt(x^2+y^2))^8sin(y+sqrt(x^2+y^2)-z)^8/(x^2+y^2+50)"],
+    ["Sine Tower", "4z+6=1/((sin(4x)sin(4y))^2+0.4sqrt(x^2+y^2+0.005z^2))-4sin(8z)"],
     ["Atan2 Drill", "max(cos(atan(y,x)-20e^((z-1)/4)),x^2+y^2+z/2-1)"],
-    ["Atan2 Flower", "a=atan2(y,x);(x^2+y^2)^2+16z^2=2(x^2+y^2)(sin(2.5a)^2+0.5sin(10a)^2)"],
+    ["Atan2 Donut", "(x^2+y^2+z^2+0.9)^2-4(x^2+z^2)=0.1asin(0.9sin(5atan(z,x)+40y))"],
+    ["Atan2 Flower", "a=atan2(z,x)+1.571;(x^2+z^2)^2+16y^2=2(x^2+z^2)(sin(2.5a)^2+0.5sin(10a)^2)"],
     ["Log2 Spheres", "m=max(|x|,|y|,|z|);k=3/2-m;n=ceil(log(2,k))-2;(3*2^n-k)^2+(x^2+y^2+z^2-m^2)=4^n"],
     ["Lerp Example", "lerp(max(|x|,|y|,|z|),sqrt(x^2+y^2+z^2),-1)-0.3"],
-    ["If Example", "z=if(sin(2x),1/5sin(2y),1/2cos(2y))"],
-    ["Eyes", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
+    ["If Example", "#&#32;warn&#32;that&#32;`if`&#32;can&#32;be&#32;slower&#32;than&#32;`min/max/abs`;z=if(sin(2x),1/5sin(2y),1/2cos(2y))"],
+    ["Eyes 1", "n=3ln((x^2+z^2)/(|x|+0.01));sqrt(x^2+z^2)sin(n)^2=10y^2+x^2+0.5z^2-0.3z"],
+    ["Eyes 2", "a=3(z+x+1);b=3(z-x+1);sin(min(a*sin(b),b*sin(a)))-cos(max(a*cos(b),b*cos(a)))=(3-2z)/9+((2x^2+z^2)/6)^3+100y^2"],
     ["Spiral 1", "k=0.14;r=1/k*ln(sqrt(x^2+y^2));10((k(xcos(r)+ysin(r))-0.5^2(x^2+y^2))^2+z^2)=x^2+y^2"],
-    ["Spiral 2", "k=0.15;r=1/k*ln(sqrt(x^2+y^2));n=0.5^2(x^2+y^2)-0.001sqrt(x^2+y^2)exp(sin(40atan(y,x)))/(z^2+0.01);(k*(xcos(r)+ysin(r))-n)^2+z^2=0.1(x^2+y^2)^1.4"],
-    ["Spiral 3", "k=0.3;r=1/k*ln(sqrt(x^2+y^2));(k*(xcos(r)+ysin(r)))^2+z^2=0.1tanh(x^2+y^2+0.3)-0.01(x^2+y^2)"],
-    ["Spiral 4", "k=0.14;r=sqrt(x^2+y^2+0.01^2);r1=1/k*ln(r);10((k(xcos(r1)+ysin(r1))-(0.5r)^2)^2+((z+0.5r-0.5)(r^2+0.1))^2)=r^2"],
-    ["Atan2 Spiral", "k=0.15&ensp;#&ensp;r=e^kt;p=3.1415926&ensp;#&ensp;pi;#&ensp;polar&ensp;coordinates;r=2sqrt(x^2+y^2);a=atan(y,x);#&ensp;index&ensp;of&ensp;spiral&ensp;layer;n=min((log(r)/k-a)/(2p),1);#&ensp;distance&ensp;to&ensp;logarithmic&ensp;spiral;d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
+    ["Spiral 2", "k=0.3;r=1/k*ln(sqrt(x^2+y^2));(k*(xcos(r)+ysin(r)))^2+z^2=0.1tanh(x^2+y^2+0.3)-0.01(x^2+y^2)"],
+    ["Spiral 3", "k=0.14;r=sqrt(x^2+y^2+0.01^2);r1=1/k*ln(r);10((k(xcos(r1)+ysin(r1))-(0.5r)^2)^2+((z+0.5r-0.5)(r^2+0.1))^2)=r^2"],
+    ["Atan2 Spiral", "k=0.15&#32;#&#32;r=e^kt;p=3.1415926&#32;#&#32;pi;#&#32;polar&#32;coordinates;r=2sqrt(x^2+y^2);a=atan(y,x);#&#32;index&#32;of&#32;spiral&#32;layer;n=min((log(r)/k-a)/(2p),1);#&#32;distance&#32;to&#32;logarithmic&#32;spiral;d(n)=abs(e^(k*(2pn+a))-r);d1=min(d(floor(n)),d(ceil(n)));sqrt(d1^2+4z^2)=0.4r^0.7(1+0.01sin(40a))"],
     ["Atomic Orbitals", "r2(x,y,z)=x^2+y^2+z^2;r(x,y,z)=sqrt(r2(x,y,z));x1(x,y,z)=x/r(x,y,z);y1(x,y,z)=y/r(x,y,z);z1(x,y,z)=z/r(x,y,z);d(r0,x,y,z)=r0^2-r2(x,y,z);r00(x,y,z)=d(0.28,x,y,z);r10(x,y,z)=d(-0.49y1(x,y,z),x,y,z);r11(x,y,z)=d(0.49z1(x,y,z),x,y,z);r12(x,y,z)=d(-0.49x1(x,y,z),x,y,z);r20(x,y,z)=d(1.09x1(x,y,z)y1(x,y,z),x,y,z);r21(x,y,z)=d(-1.09y1(x,y,z)z1(x,y,z),x,y,z);r22(x,y,z)=d(0.32(3z1(x,y,z)^2-1),x,y,z);r23(x,y,z)=d(-1.09x1(x,y,z)z1(x,y,z),x,y,z);r24(x,y,z)=d(0.55(x1(x,y,z)^2-y1(x,y,z)^2),x,y,z);max(r00(x,y,z-1.5),r10(x+1,y,z-0.4),r11(x,y,z-0.4),r12(x-1,y,z-0.4),r20(x+2,y,z+1),r21(x+1,y,z+1),r22(x,y,z+1),r23(x-1,y,z+1),r24(x-2,y,z+1))"],
     ["Value Noise", "h(x,y)=fract(126sin(12x+33y+98))-0.5;s(x)=3x^2-2x^3;v00=h(floor(x),floor(y));v01=h(floor(x),floor(y)+1);v10=h(floor(x)+1,floor(y));v11=h(floor(x)+1,floor(y)+1);f(x,y)=mix(mix(v00,v01,s(fract(y))),mix(v10,v11,s(fract(y))),s(fract(x)));v(x,y)=f(x,y)+f(2x,2y)/2+f(4x,4y)/4+f(8x,8y)/8+f(16x,16y)/16;z=ln(1+exp(40(v(x,y)-(0.05(x^2+y^2))^2)))/40"],
     ["Fractal Roots", "u(x,y)=x^2-y^2+z;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);log(u2(x,y)^2+v2(x,y)^2)=0"],
@@ -1024,7 +1106,8 @@ var builtinFunctions = [
     ["Mandelbrot", "u(x,y)=x^2-y^2;v(x,y)=2xy;u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);log(u6(x-1/2,sqrt(y^2+z^2))^2+v6(x-1/2,sqrt(y^2+z^2))^2)=0"],
     ["Burning Ship", "u(x,y)=x^2-y^2;v(x,y)=2abs(xy);u1(x,y)=u(u(x,y)+x,v(x,y)+y);v1(x,y)=v(u(x,y)+x,v(x,y)+y);u2(x,y)=u(u1(x,y)+x,v1(x,y)+y);v2(x,y)=v(u1(x,y)+x,v1(x,y)+y);u3(x,y)=u(u2(x,y)+x,v2(x,y)+y);v3(x,y)=v(u2(x,y)+x,v2(x,y)+y);u4(x,y)=u(u3(x,y)+x,v3(x,y)+y);v4(x,y)=v(u3(x,y)+x,v3(x,y)+y;u5(x,y)=u(u4(x,y)+x,v4(x,y)+y);v5(x,y)=v(u4(x,y)+x,v4(x,y)+y);u6(x,y)=u(u5(x,y)+x,v5(x,y)+y);v6(x,y)=v(u5(x,y)+x,v5(x,y)+y);z=(u6((x-1)/1.5,(y-1/2)/1.5)^2+v6((x-1)/1.5,(y-1/2)/1.5)^2)^-0.1-1"],
     ["Mandelbulb", "n=8;r=sqrt(x^2+y^2+z^2);a=atan(y,x);b=atan(sqrt(x^2+y^2),z);u(x,y,z)=r^n*sin(nb)cos(na);v(x,y,z)=r^n*sin(nb)sin(na);w(x,y,z)=r^n*cos(nb);u1(x,y,z)=u(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);v1(x,y,z)=v(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);w1(x,y,z)=w(u(x,y,z)+x,v(x,y,z)+y,w(x,y,z)+z);u2(x,y,z)=u(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);v2(x,y,z)=v(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);w2(x,y,z)=w(u1(x,y,z)+x,v1(x,y,z)+y,w1(x,y,z)+z);log(u2(x/2,y/2,z/2)^2+v2(x/2,y/2,z/2)^2+w2(x/2,y/2,z/2)^2)=0"],
-    ["Conch (slow)", "p=3.1415926&ensp;#&ensp;pi;a_o=0.16*p&ensp;#&ensp;half&ensp;of&ensp;opening&ensp;angle;b=0.6&ensp;#&ensp;r=e^bt;s_min(a,b,k)=-1/k*ln(e^-ka+e^-kb)&ensp;#&ensp;smoothed&ensp;minimum;;#&ensp;Cross&ensp;section;C_m(u,v)=1-(1-0.01e^sin(12p(u+2v)))e^-(5v)^2&ensp;&ensp;#&ensp;mid&ensp;rod;C_s(u,v)=(sqrt((u-e^-16v)^2+(v(1-0.2exp(-4sqrt(u^2+0.1^2)))-0.5+0.5e^(-v)sin(4u)+0.2cos(2u)e^-v)^2)-0.55)tanh(5sqrt(2u^2+(v-1.2)^2))+0.01sin(40u)sin(40v)exp(-(u^2+v^2));C0(u,v)=abs(C_s(u,v))C_m(u,v)&ensp;#&ensp;single&ensp;layer;n1(u,v)=log(sqrt(u^2+v^2))/b+2&ensp;#&ensp;index&ensp;of&ensp;layer;a1(u,v)=atan(v,u)/a_o&ensp;#&ensp;opening&ensp;angle,&ensp;0-1;d1(u,v,s_d)=0.5sqrt(u^2+v^2)*C0(if(n1(u,v),n1(u,v)-s_d,fract(n1(u,v))-s_d),a1(u,v));C(u,v)=min(d1(u,v,0.5),d1(u,v,1.5))&ensp;#&ensp;cross&ensp;section;;#&ensp;Spiral;l_p(x,y)=exp(b*atan(y,x)/(2p))&ensp;#&ensp;a&ensp;multiplying&ensp;factor;U(x,y,z)=exp(log(-z)+b*atan(y,x)/(2p))&ensp;#&ensp;xyz&ensp;to&ensp;cross&ensp;section&ensp;u;V(x,y,z)=sqrt(x^2+y^2)*l_p(x,y)&ensp;#&ensp;xyz&ensp;to&ensp;cross&ensp;section&ensp;v;S_s(x,y,z)=C(U(x,y,z),V(x,y,z))/l_p(x,y)&ensp;#&ensp;body;S_o(x,y,z)=sqrt((C(exp(log(-z)-b/2),-x*exp(-b/2))*exp(b/2))^2+y^2)&ensp;#&ensp;opening;S_t(x,y,z)=d1(-z,sqrt(x^2+y^2),0.5)&ensp;#&ensp;tip;S_a(x,y,z)=if(-z,min(S_s(x,y,z),S_o(x,y,z)),S_t(x,y,z))&ensp;#&ensp;body+tip;S0(x,y,z)=S_a(x,y,z)-0.01-0.01(x^2+y^2+z^2)^0.4-0.02sqrt(x^2+y^2)exp(cos(8atan(y,x)))-0.007*(0.5-0.5tanh(10(z+1+8sqrt(3x^2+y^2))))&ensp;#&ensp;subtract&ensp;thickness;S(x,y,z)=-s_min(-S0(x,y,z),z+1.7,10)&ensp;#&ensp;clip&ensp;bottom;r_a=-0.05sin(3z)tanh(2(x^2+y^2-z-1.5))&ensp;#&ensp;distortion;S(0.4(x-r_a*y),0.4(y+r_a*x),0.4z-0.7)=0"]
+    ["Ice Cream", "#&#32;cylindrical&#32;coordinates;r=sqrt(x^2+y^2);a=atan(y,x);#&#32;ice&#32;cream;n1=0.2r*asin(sin(5a+5z));c(x,y,z)=r^2+(z+r)^2-1.1+n1;#&#32;holder;p(z)=min(max(z,0.15z),0.1z+0.15);n2=0.01min(r^4,1)*min(sin(40a),sin(40z));h(x,y,z)=max(|max(r-1-p(z-0.8),-1-z)|-0.05,z-1.5)+n2;#&#32;union;u(x,y,z)=min(c(x,y,z-2),5h(x,y,z+0.8));1/1.5&#32;u(1.5x,1.5y,1.5z+0.3)=0"],
+    ["Conch Shell", "p=3.1415926&#32;#&#32;pi;a_o=0.16*p&#32;#&#32;half&#32;of&#32;opening&#32;angle;b=0.6&#32;#&#32;r=e^bt;s_min(a,b,k)=-1/k*ln(e^-ka+e^-kb)&#32;#&#32;smoothed&#32;minimum;;#&#32;Cross&#32;section;C_m(u,v)=1-(1-0.01e^sin(12p(u+2v)))e^-(5v)^2&#32;&#32;#&#32;mid&#32;rod;C_s(u,v)=(sqrt((u-e^-16v)^2+(v(1-0.2exp(-4sqrt(u^2+0.1^2)))-0.5+0.5e^(-v)sin(4u)+0.2cos(2u)e^-v)^2)-0.55)tanh(5sqrt(2u^2+(v-1.2)^2))+0.01sin(40u)sin(40v)exp(-(u^2+v^2));C0(u,v)=abs(C_s(u,v))C_m(u,v)&#32;#&#32;single&#32;layer;n1(u,v)=log(sqrt(u^2+v^2))/b+2&#32;#&#32;index&#32;of&#32;layer;a1(u,v)=atan(v,u)/a_o&#32;#&#32;opening&#32;angle,&#32;0-1;d1(u,v,s_d)=0.5sqrt(u^2+v^2)*C0(if(n1(u,v),n1(u,v)-s_d,fract(n1(u,v))-s_d),a1(u,v));C(u,v)=min(d1(u,v,0.5),d1(u,v,1.5))&#32;#&#32;cross&#32;section;;#&#32;Spiral;l_p(x,y)=exp(b*atan(y,x)/(2p))&#32;#&#32;a&#32;multiplying&#32;factor;U(x,y,z)=exp(log(-z)+b*atan(y,x)/(2p))&#32;#&#32;xyz&#32;to&#32;cross&#32;section&#32;u;V(x,y,z)=sqrt(x^2+y^2)*l_p(x,y)&#32;#&#32;xyz&#32;to&#32;cross&#32;section&#32;v;S_s(x,y,z)=C(U(x,y,z),V(x,y,z))/l_p(x,y)&#32;#&#32;body;S_o(x,y,z)=sqrt((C(exp(log(-z)-b/2),-x*exp(-b/2))*exp(b/2))^2+y^2)&#32;#&#32;opening;S_t(x,y,z)=d1(-z,sqrt(x^2+y^2),0.5)&#32;#&#32;tip;S_a(x,y,z)=if(-z,min(S_s(x,y,z),S_o(x,y,z)),S_t(x,y,z))&#32;#&#32;body+tip;S0(x,y,z)=S_a(x,y,z)-0.01-0.01(x^2+y^2+z^2)^0.4-0.02sqrt(x^2+y^2)exp(cos(8atan(y,x)))-0.007*(0.5-0.5tanh(10(z+1+8sqrt(3x^2+y^2))))&#32;#&#32;subtract&#32;thickness;S(x,y,z)=-s_min(-S0(x,y,z),z+1.7,10)&#32;#&#32;clip&#32;bottom;r_a=-0.05sin(3z)tanh(2(x^2+y^2-z-1.5))&#32;#&#32;distortion;S(0.4(x-r_a*y),0.4(y+r_a*x),0.4z-0.7)=0"]
 ];
 if (0) builtinFunctions = [ // debug
     ['debug', "z=-e^-(x^2+y^2"],

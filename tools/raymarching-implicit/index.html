@@ -28,8 +28,18 @@
         onerror="alert('Failed to load MathJax.')"></script>
 
     <link rel="stylesheet" href="style.css" />
-    <script src="parser.js"></script>
-    <script src="render.js"></script>
+    <script>
+        (function () {
+            // refresh cache every one hour
+            var hour = Math.floor(Date.now() / 3600000);
+            var parserjs = document.createElement("script");
+            parserjs.src = "parser.js?hour=" + hour;
+            document.head.appendChild(parserjs);
+            var renderjs = document.createElement("script");
+            renderjs.src = "render.js?hour=" + hour;
+            document.head.appendChild(renderjs);
+        })();
+    </script>
 
 </head>
 
@@ -109,7 +119,8 @@
             run this tool. An FPS counter will be available if your browser supports the
             <code>EXT_disjoint_timer_query_webgl2</code> extension. If the graph takes too long to update, uncheck the
             "auto-update" checkbox and apply your change by clicking the "update" button or pressing
-            <code>Alt+Enter</code>.</p>
+            <code>Alt+Enter</code>.
+        </p>
         <p>A preview of the equation is available via <a href="https://www.mathjax.org/" target="_blank">MathJax</a>.
             You can drag and move it, or turn it off/on by unchecking/checking the "equation preview" checkbox.</p>
         <h3>Entering equations</h3>
@@ -117,16 +128,20 @@
             Use <code>^</code> for power/exponentiation, <code>*</code> for multiplication and <code>/</code> for
             division. You can use built-in functions like <code>abs()</code>, <code>sin()</code>, and
             <code>sqrt()</code>. Note that <code>log(x)</code> calculates the natural logarithm by default. For the
-            common logarithm, type <code>log(10,x)</code> instead.</p>
+            common logarithm, type <code>log(10,x)</code> instead.
+        </p>
         <p><b>Defining variables</b>: A variable name starts with a letter, followed by an (optional) underscore and a
             string of letters or numbers. Example variable names are <code>k</code>, <code>x0</code> ($x_0$, equivalent
             to <code>x_0</code>), <code>x_t</code> ($x_t$) and <code>A_11</code> ($A_{11}$). For example, you can define
-            <code>a=x+y</code> and enter <code>z=a*sin(a)</code> as the main equation.</p>
+            <code>a=x+y</code> and enter <code>z=a*sin(a)</code> as the main equation.
+        </p>
         <p><b>Defining functions</b>: A function name is similar to a variable name. A function may be defined as
             <code>f(t)=t*sin(t)</code> and called like <code>z=f(x)*f(y)</code>, or defined as
-            <code>g(a,b)=sin(a)*cos(b)</code> and called like <code>z=g(x+y,x-y)</code>.</p>
+            <code>g(a,b)=sin(a)*cos(b)</code> and called like <code>z=g(x+y,x-y)</code>.
+        </p>
         <p><b>Comments</b>: A comment can be a single line or after a line of expression, starting with the character
-            <code>#</code>. (Check the "Atan2 Spiral" example)</p>
+            <code>#</code>. (Check the "Atan2 Spiral" example)
+        </p>
         <h3>Graphing parameters</h3>
         <p><b>Quality</b>: A higher quality means a smaller raymarching step, which is usually slower but produces a
             more accurate image.</p>
@@ -379,6 +394,7 @@
                     }
                     updateShaderFunction(glsl.glsl, glsl.glslgrad, getParams());
                 } catch (e) {
+                    console.error(e);
                     errorMessage.style.display = "inline-block";
                     errorMessage.style.color = "red";
                     errorMessage.innerHTML = e;
