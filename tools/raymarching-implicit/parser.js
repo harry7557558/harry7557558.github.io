@@ -52,8 +52,14 @@ function EvalLatexObject(postfix, latex, precedence) {
 }
 
 function MathFunction(
-    names, numArgs, latex, glsl, glslgrad,  // all functions
-    domain = new Interval(), range = new Interval(), isMonotonic = false  // univariate functions only
+    // all functions
+    names, numArgs, latex, glsl, glslgrad,
+    // univariate functions only
+    // @monotonicFun: a callable function, not null when the function is not both increasing and decreasing
+    domain = new Interval(), range = new Interval(), monotonicFun = null
+    // multivariable functions
+    // assert(this function has zero NAN area when all args have no NAN)
+    // otherwise (pow, log) rewrite the subGlsl function
 ) {
     this.names = names;
     this.numArgs = numArgs;
@@ -62,7 +68,7 @@ function MathFunction(
     this.glslgrad = glslgrad;
     this.domain = domain;
     this.range = range;
-    this.isMonotonic = isMonotonic;
+    this.monotonicFun = monotonicFun;
     this.subGlsl = function (args) {
         if (args.length != this.numArgs)
             throw "Incorrect number of arguments for function " + this.names[0];
@@ -84,7 +90,11 @@ function MathFunction(
             const eps = 1e-8;
             if (args[0].range.x0 < this.domain.x0 - eps || args[0].range.x1 > this.domain.x1 + eps)
                 result.isCompatible = false;
-            result.range = this.range;
+            if (this.monotonicFun != null &&
+                args[0].range.x0 >= this.domain.x0 && args[0].range.x1 <= this.range.x1)
+                result.range = new Interval(
+                    this.monotonicFun(args[0].range.x0), this.monotonicFun(args[0].range.x1))
+            else result.range = new Interval(this.range.x0, this.range.x1);
         }
         return result;
     };
@@ -107,23 +117,23 @@ function MathFunction(
 }
 const mathFunctions = (function () {
     const funs0 = [
-        new MathFunction(['if'], 3, '\\operatorname{if}\\left\\{%1>0:%2,%3\\right\\}', '((%1)>0.?%2:%3)', '((%1)>0.?$2:$3)'),  // not efficient in GLSL because all are evaluated
+        new MathFunction(['if'], 3, '\\operatorname{if}\\left\\{%1>0:%2,%3\\right\\}', '((%1)>0.?%2:%3)', '((%1)>0.?$2:$3)'),
         new MathFunction(['mod'], 2, '\\operatorname{mod}\\left(%1,%2\\right)', 'mod(%1,%2)', '$1'),
         new MathFunction(['fract', 'frac'], 1, '\\operatorname{frac}\\left(%1\\right)', 'fract(%1)', '$1', new Interval(), new Interval(0, 1)),
-        new MathFunction(['floor'], 1, '\\lfloor{%1}\\rfloor', 'floor(%1)', 'vec3(0)'),
-        new MathFunction(['ceil'], 1, '\\lceil{%1}\\rceil', 'ceil(%1)', 'vec3(0)'),
-        new MathFunction(['round'], 1, '\\operatorname{round}\\left(%1\\right)', 'round(%1)', 'vec3(0)'),
+        new MathFunction(['floor'], 1, '\\lfloor{%1}\\rfloor', 'floor(%1)', 'vec3(0)', new Interval(), new Interval(), Math.floor),
+        new MathFunction(['ceil'], 1, '\\lceil{%1}\\rceil', 'ceil(%1)', 'vec3(0)', new Interval(), new Interval(), Math.ceil),
+        new MathFunction(['round'], 1, '\\operatorname{round}\\left(%1\\right)', 'round(%1)', 'vec3(0)', new Interval(), new Interval(), Math.round),
         new MathFunction(['abs'], 1, '\\left|%1\\right|', 'abs(%1)', '($1*sign(%1))', new Interval(), new Interval(0, Infinity)),
-        new MathFunction(['sign', 'sgn'], 1, '\\operatorname{sign}\\left(%1\\right)', 'sign(%1)', 'vec3(0)', new Interval(), new Interval(-1, 1)),
+        new MathFunction(['sign', 'sgn'], 1, '\\operatorname{sign}\\left(%1\\right)', 'sign(%1)', 'vec3(0)', new Interval(), new Interval(-1, 1), (x) => x > 0. ? 1. : x < 0. ? -1. : 0.),
         new MathFunction(['max'], 0, '\\max\\left(%0\\right)', 'max(%1,%2)', "(%1>%2?$1:$2)"),
         new MathFunction(['min'], 0, '\\min\\left(%0\\right)', 'min(%1,%2)', "(%1<%2?$1:$2)"),
         new MathFunction(['clamp'], 3, '\\operatorname{clamp}\\left(%1,%2,%3\\right)', 'clamp(%1,%2,%3)', '(%1>%3?$3:%1>%2?$1:$2)'),
         new MathFunction(['lerp', 'mix'], 3, '\\operatorname{lerp}\\left(%1,%2,%3\\right)', 'mix(%1,%2,%3)', '((1.-%3)*$1+(%2-%1)*$3+%3*$2)'),
-        new MathFunction(['sqrt'], 1, '\\sqrt{%1}', 'sqrt(%1)', '(.5*$1/sqrt(%1))', new Interval(0, Infinity), new Interval(0, Infinity), true),
-        new MathFunction(['cbrt'], 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))', '($1/(3.*pow(abs(%1),2./3.)))', true),
+        new MathFunction(['sqrt'], 1, '\\sqrt{%1}', 'sqrt(%1)', '(.5*$1/sqrt(%1))', new Interval(0, Infinity), new Interval(0, Infinity), Math.sqrt),
+        new MathFunction(['cbrt'], 1, '\\sqrt[3]{%1}', '(sign(%1)*pow(abs(%1),1./3.))', '($1/(3.*pow(abs(%1),2./3.)))', Math.cbrt),
         new MathFunction(['pow'], 2, '\\left(%1\\right)^{%2}', 'pow(%1,%2)', null),
-        new MathFunction(['exp'], 1, '\\exp\\left(%1\\right)', 'exp(%1)', '($1*exp(%1))', new Interval(), new Interval(0, Infinity), true),
-        new MathFunction(['log', 'ln'], 1, '\\ln\\left(%1\\right)', 'log(%1)', '$1/%1', new Interval(0, Infinity), new Interval(), true),
+        new MathFunction(['exp'], 1, '\\exp\\left(%1\\right)', 'exp(%1)', '($1*exp(%1))', new Interval(), new Interval(0, Infinity), Math.exp),
+        new MathFunction(['log', 'ln'], 1, '\\ln\\left(%1\\right)', 'log(%1)', '$1/%1', new Interval(0, Infinity), new Interval(), Math.log),
         new MathFunction(['log'], 2, '\\log_{%1}\\left(%2\\right)', '(log(%2)/log(%1))', '((log(%1)*$2/%2-log(%2)*$1/%1)/(log(%1)*log(%1)))'),
         new MathFunction(['sin'], 1, '\\sin\\left(%1\\right)', 'sin(%1)', '($1*cos(%1))', new Interval(), new Interval(-1, 1)),
         new MathFunction(['cos'], 1, '\\cos\\left(%1\\right)', 'cos(%1)', '(-$1*sin(%1))', new Interval(), new Interval(-1, 1)),
@@ -131,20 +141,20 @@ const mathFunctions = (function () {
         new MathFunction(['csc'], 1, '\\csc\\left(%1\\right)', '(1.0/sin(%1))', '(-$1/(sin(%1)*tan(%1)))'),
         new MathFunction(['sec'], 1, '\\sec\\left(%1\\right)', '(1.0/cos(%1))', '($1*tan(%1)/cos(%1))'),
         new MathFunction(['cot'], 1, '\\cot\\left(%1\\right)', '(1.0/tan(%1))', '(-$1/(sin(%1)*sin(%1)))'),
-        new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))', new Interval(), new Interval(), true),
+        new MathFunction(['sinh'], 1, '\\sinh\\left(%1\\right)', 'sinh(%1)', '($1*cosh(%1))', new Interval(), new Interval(), Math.sinh),
         new MathFunction(['cosh'], 1, '\\cosh\\left(%1\\right)', 'cosh(%1)', '($1*sinh(%1))', new Interval(), new Interval(1, Infinity)),
-        new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))', new Interval(), new Interval(-1, 1), true),
+        new MathFunction(['tanh'], 1, '\\tanh\\left(%1\\right)', 'tanh(%1)', '$1/(cosh(%1)*cosh(%1))', new Interval(), new Interval(-1, 1), Math.tanh),
         new MathFunction(['csch'], 1, '\\mathrm{csch}\\left(%1\\right)', '(1.0/sinh(%1))', '(-$1/(sinh(%1)*tanh(%1)))'),
         new MathFunction(['sech'], 1, '\\mathrm{sech}\\left(%1\\right)', '(1.0/cosh(%1))', '(-$1*tanh(%1)/cosh(%1))', new Interval(), new Interval(0, 1)),
         new MathFunction(['coth'], 1, '\\mathrm{coth}\\left(%1\\right)', '(1.0/tanh(%1))', '(-$1/(sinh(%1)*sinh(%1)))'),
-        new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(-0.5 * PI, 0.5 * PI), true),
-        new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(0.0, PI), true),
-        new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), true),
+        new MathFunction(['arcsin', 'arsin', 'asin'], 1, '\\arcsin\\left(%1\\right)', 'asin(%1)', '($1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(-0.5 * PI, 0.5 * PI), Math.asin),
+        new MathFunction(['arccos', 'arcos', 'acos'], 1, '\\arccos\\left(%1\\right)', 'acos(%1)', '(-$1/sqrt(1.-%1*%1))', new Interval(-1, 1), new Interval(0.0, PI), Math.acos),
+        new MathFunction(['arctan', 'artan', 'atan'], 1, '\\arctan\\left(%1\\right)', 'atan(%1)', '($1/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), Math.atan),
         new MathFunction(['atan2', 'arctan', 'artan', 'atan'], 2, '\\operatorname{atan2}\\left(%1,%2\\right)', 'atan(%1,%2)', '((%2*$1-%1*$2)/(%1*%1+%2*%2))'),
-        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\mathrm{arccot}\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), true),
-        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\mathrm{arcsinh}\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))', new Interval(), new Interval(), true),
-        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\mathrm{arccosh}\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))', new Interval(1, Infinity), new Interval(0, Infinity), true),
-        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\mathrm{arctanh}\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))', new Interval(-1, 1), new Interval(), true),
+        new MathFunction(['arccot', 'arcot', 'acot'], 1, '\\mathrm{arccot}\\left(%1\\right)', '(0.5*PI-atan(%1))', '(-($1)/(1.+%1*%1))', new Interval(), new Interval(-0.5 * PI, 0.5 * PI), (x) => 0.5 * PI - Math.atan(x)),
+        new MathFunction(['arcsinh', 'arsinh', 'asinh'], 1, '\\mathrm{arcsinh}\\left(%1\\right)', 'asinh(%1)', '($1/sqrt(%1*%1+1.))', new Interval(), new Interval(), Math.asinh),
+        new MathFunction(['arccosh', 'arcosh', 'acosh'], 1, '\\mathrm{arccosh}\\left(%1\\right)', 'acosh(%1)', '($1/sqrt(%1*%1-1.))', new Interval(1, Infinity), new Interval(0, Infinity), Math.acosh),
+        new MathFunction(['arctanh', 'artanh', 'atanh'], 1, '\\mathrm{arctanh}\\left(%1\\right)', 'atanh(%1)', '($1/(1.-%1*%1))', new Interval(-1, 1), new Interval(), Math.atanh),
         new MathFunction(['arccoth', 'arcoth', 'acoth'], 1, '\\mathrm{arccoth}\\left(%1\\right)', 'atanh(1./(%1))', '($1/(1.-%1*%1))'),
     ];
     var funs = {};
@@ -754,15 +764,34 @@ function mulEvalObjects(a, b) {
     );
 }
 function divEvalObjects(a, b) {
-    var interval = new Interval(
-        Math.min(
-            a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
-            a.range.x1 / b.range.x0, a.range.x1 / b.range.x1),
-        Math.max(
-            a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
-            a.range.x1 / b.range.x0, a.range.x1 / b.range.x1)
-    );
-    if (b.range.containsZero()) interval = new Interval();
+    var interval = new Interval();
+    if (b.range.containsZero()) {
+        if ((a.range.isPositive() || a.range.isNegative()) && (b.range.isPositive() || b.range.isNegative()))
+            interval = new Interval(0,
+                a.range.isPositive() == b.range.isPositive() ? Infinity : -Infinity);
+    }
+    else if (!isFinite(a.range.x0) && isFinite(a.range.x1)) {
+        if (b.range.isPositive()) interval = new Interval(
+            -Infinity, Math.max(a.range.x1 / b.range.x0, a.range.x1 / b.range.x1));
+        if (b.range.isNegative()) interval = new Interval(
+            Math.min(a.range.x1 / b.range.x0, a.range.x1 / b.range.x1), Infinity);
+    }
+    else if (!isFinite(a.range.x1) && isFinite(a.range.x0)) {
+        if (b.range.isPositive()) interval = new Interval(
+            Math.min(a.range.x0 / b.range.x0, a.range.x0 / b.range.x1), Infinity);
+        if (b.range.isNegative()) interval = new Interval(
+            -Infinity, Math.max(a.range.x0 / b.range.x0, a.range.x0 / b.range.x1));
+    }
+    else if (isFinite(a.range.x0) && isFinite(a.range.x1)) {
+        interval = new Interval(
+            Math.min(
+                a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
+                a.range.x1 / b.range.x0, a.range.x1 / b.range.x1),
+            Math.max(
+                a.range.x0 / b.range.x0, a.range.x0 / b.range.x1,
+                a.range.x1 / b.range.x0, a.range.x1 / b.range.x1)
+        );
+    }
     return new EvalObject(
         a.postfix.concat(b.postfix.concat([new Token('operator', '/')])),
         "(" + a.glsl + "/" + b.glsl + ")",
