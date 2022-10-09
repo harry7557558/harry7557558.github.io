@@ -155,7 +155,7 @@ index = """<!DOCTYPE html>
 
     <style>
         html,body{height:100%}
-        body{font-family:'Times New Roman'}
+        body{font-family:'Times New Roman',serif}
         .graph{display:block;margin:0.5em;padding:1em;border-bottom:1px solid gray;}
         .image-container{display:table-cell;vertical-align:middle;width:15em;min-width:15em;height:100%;padding:0 2em 0 0}
         .graph-thumbnail{width:100%}

@@ -42,7 +42,7 @@ body {
 #left,
 #right,
 #bottom {
-    font-family: Calibri;
+    font-family: Calibri, Arial, Helvetica, sans-serif;
     font-weight: 800;
     color: white;
 }

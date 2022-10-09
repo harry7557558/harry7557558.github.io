@@ -76,7 +76,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
                 return ""
     if os.path.isfile(_dir+'.siteignore'):
         return ""
-    ls = [f for f in os.listdir(_dir) if
+    ls = [f for f in sorted(os.listdir(_dir)) if
           _dir+f in tracked_list and not f.startswith('.')]
     files = [_dir+f for f in ls if os.path.isfile(_dir+f)]
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
@@ -117,6 +117,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
 
 additional_repos = [
     ['Graphics', '../Graphics'],
+    ['spirula', '../spirula'],
     ['miscellaneous', '../miscellaneous'],
     ['AVI3M-CPT', '../AVI3M-CPT'],
     ['AVI4M-ISP', '../AVI4M-ISP'],

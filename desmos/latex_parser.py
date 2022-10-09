@@ -1,7 +1,7 @@
 import json
 
 
-def split_latex(latex: str) -> list[str]:
+def split_latex(latex: str) -> 'list[str]':
     """Split a LaTeX string to a list of segments
         latex must start and end with '$'
     """
@@ -58,7 +58,7 @@ def split_latex(latex: str) -> list[str]:
     return result
 
 
-def latex_splitted_to_tree(segments: list[str]) -> dict:
+def latex_splitted_to_tree(segments: 'list[str]') -> dict:
     """Construct a tree from the result of split_latex(), O(N^2) worst case"""
 
     # find and remove brackets
@@ -117,7 +117,7 @@ def latex_splitted_to_tree(segments: list[str]) -> dict:
     }
 
 
-def tree_to_html(tree: dict, scale: float) -> tuple[str, float, float]:
+def tree_to_html(tree: dict, scale: float) -> 'tuple[str, float, float]':
     """Return the HTML string, approximate width and height"""
 
     def span(cx: float, cy: float, rx: float, ry: float, html: str) -> str:
@@ -253,7 +253,7 @@ def tree_to_html(tree: dict, scale: float) -> tuple[str, float, float]:
     return (full_html, width, height)
 
 
-def get_latex_size(latex: str) -> tuple[float, float]:
+def get_latex_size(latex: str) -> 'tuple[float, float]':
     """Get the approximate width and height of a LaTeX expressions when rendered"""
     tree = latex_splitted_to_tree(split_latex(latex))
     html, w, h = tree_to_html(tree, 1.0)
@@ -266,7 +266,7 @@ def rank_latex(latex: str) -> float:
     return min(40.0*(h/w**0.5), 5.0*w**0.5)
 
 
-def get_all_latex(expressions: dict) -> list[str]:
+def get_all_latex(expressions: dict) -> 'list[str]':
     """Get a list of LaTeX expressions in a Desmos expressions list
         Does not include bounds and steps of parametric curves and sliders
     """

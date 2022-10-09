@@ -258,7 +258,7 @@ index = """<!DOCTYPE html>
 
     <style>
         html,body{height:100%}
-        body{margin:0 0.5em;padding:0;font-family:'Times New Roman'}
+        body{margin:0 0.5em;padding:0;font-family:'Times New Roman',serif}
         input,select,button{display:inline;vertical-align:middle}
         #chartjs-canvas-container{max-width:40em}
         #chartjs-canvas{width:100%;margin:1em 0;border:2px solid #bbb}
