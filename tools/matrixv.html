@@ -11,42 +11,13 @@
     <meta name="author" content="Harry Chen">
     <meta name="robots" content="index, follow" />
 
-    <!-- vector, matrix, math functions -->
-    <script>
-        var canvas, PreviousWindowSize, Unit;
-        function $(s) { return document.getElementById(s); }
-        function init() {
-            canvas = $("canvas");
-            var w = window.innerWidth, h = window.innerHeight;
-            PreviousWindowSize = [w, h, 0];
-            Unit = 0.08 * Math.min(w, h);
-            window.onresize = function () {
-                resizeCanvas();
-            }
-            initmat();
-            initCanvasAttitudes();
-            $("footer").style.display = 'block';
-            resizeCanvas();
-        }
-        function resizeCanvas() {
-            var w = Math.floor(window.innerWidth), h = Math.floor(window.innerHeight);
-            var prevw = PreviousWindowSize[0], prevh = PreviousWindowSize[1];
-            //Unit *= Math.sqrt((w * h) / (prevw * prevh));
-            //Unit *= Math.min(w, h) / Math.min(prevw, prevh);
-            Unit *= 0.5 * (Math.sqrt((w * h) / (prevw * prevh)) + Math.min(w, h) / Math.min(prevw, prevh));
-            PreviousWindowSize = [w, h];
-            if ((canvas.width !== w) || (canvas.height !== h)) {
-                canvas.width = w, canvas.height = h;
-                canvas.style.width = w + "px", canvas.style.height = h + "px";
-            }
-            redraw();
-        }
+    <!-- Linear algebra -->
+    <script src="matrixv-linalg.js"></script>
 
-        function sin(x) { return Math.sin(x); }
-        function cos(x) { return Math.cos(x); }
-        function atan(x) { return Math.atan(x); }
-        function sqrt(x) { return Math.sqrt(x); }
-        function pow(a, b) { return Math.pow(a, b); }
+    <!-- Linear algebra for rendering -->
+    <script>
+        const sin = Math.sin, cos = Math.cos, atan = Math.atan,
+            sqrt = Math.sqrt, pow = Math.pow;
         function dot(u, v) { return u[0] * v[0] + u[1] * v[1] + u[2] * v[2]; }
         function cross(u, v) { return [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]; }
         function length(v) { return sqrt(dot(v, v)); }
@@ -82,70 +53,54 @@
             return [(M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2] + M[0][3]) / m,
             (M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2] + M[1][3]) / m, (M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2] + M[2][3]) / m];
         }
-        function cadd(x, y) { return [x[0] + y[0], x[1] + y[1]]; }
-        function cmin(x, y) { return [x[0] - y[0], x[1] - y[1]]; }
-        function cmul(x, y) { return [x[0] * y[0] - x[1] * y[1], x[1] * y[0] + x[0] * y[1]]; }
-        function cdiv(x, y) { var m = 1.0 / (y[0] * y[0] + y[1] * y[1]); return [m * (x[0] * y[0] + x[1] * y[1]), m * (x[1] * y[0] - x[0] * y[1])]; }
+    </script>
 
-        // solve ax^3+bx^2+cx+d=0
-        function isZero(x) { return x * x < 1e-12; }
-        function solveCubic(a, b, c, d) {
-            b /= a, c /= a, d /= a;
-            var p = c - b * b / 3, q = (b * b / 13.5 - c / 3) * b + d;
-            b /= 3, p /= 3, q /= -2; a = q * q + p * p * p;
-            var r, u, v;
-            if (a >= 0) {  // one real root r and two complex roots u+vi, u-vi;
-                a = sqrt(a);
-                //u = cbrt(q + a), v = cbrt(q - a);
-                u = q + a; u = u > 0.0 ? pow(u, 1. / 3) : -pow(-u, 1. / 3);
-                v = q - a; v = v > 0.0 ? pow(v, 1. / 3) : -pow(-v, 1. / 3);
-                r = u + v;
-                v = sqrt(0.75) * (u - v);
-                u = -0.5 * r - b, r -= b;
-                return [1, r, u, v];
+    <!-- Formatting -->
+    <script>
+        var canvas, PreviousWindowSize, Unit;
+        function $(s) { return document.getElementById(s); }
+        function init() {
+            canvas = $("canvas");
+            var w = window.innerWidth, h = window.innerHeight;
+            PreviousWindowSize = [w, h, 0];
+            Unit = 0.08 * Math.min(w, h);
+            window.onresize = function () {
+                resizeCanvas();
             }
-            else { // two or three real roots, r, u, v;
-                c = pow(q * q - a, 1.0 / 6);
-                u = atan(sqrt(-a) / q) / 3; if (q < 0) u += Math.PI / 3;
-                d = c * sin(u), c *= cos(u);
-                r = 2 * c - b;
-                c = -c, d *= sqrt(3);
-                u = c - d - b, v = u + 2 * d;
-                return [3, r, u, v];
-            }
+            initmat();
+            initCanvasAttitudes();
+            $("footer").style.display = 'block';
+            resizeCanvas();
         }
-        function solveCubic_refine(a, b, c, d, x) {
-            // reduce error - sometimes may not work
-            if (typeof (x) == "number") {  // real number
-                for (var i = 0; i < 3; i++) {
-                    var y = d + x * (c + x * (b + x * a));
-                    var dy = c + x * (2 * b + x * 3 * a);
-                    if (dy * dy < 1e-8) break;
-                    x -= y / dy;
-                }
-                return x;
+        function resizeCanvas() {
+            var w = Math.floor(window.innerWidth), h = Math.floor(window.innerHeight);
+            var prevw = PreviousWindowSize[0], prevh = PreviousWindowSize[1];
+            //Unit *= Math.sqrt((w * h) / (prevw * prevh));
+            //Unit *= Math.min(w, h) / Math.min(prevw, prevh);
+            Unit *= 0.5 * (Math.sqrt((w * h) / (prevw * prevh)) + Math.min(w, h) / Math.min(prevw, prevh));
+            PreviousWindowSize = [w, h];
+            if ((canvas.width !== w) || (canvas.height !== h)) {
+                canvas.width = w, canvas.height = h;
+                canvas.style.width = w + "px", canvas.style.height = h + "px";
             }
-            else {  // complex
-                var b2 = [2 * b, 0], a3 = [3 * a, 0];
-                a = [a, 0], b = [b, 0], c = [c, 0], d = [d, 0];
-                for (var i = 0; i < 3; i++) {
-                    var y = cadd(d, cmul(x, cadd(c, cmul(x, cadd(b, cmul(x, a))))));
-                    var dy = cadd(c, cmul(x, cadd(b2, cmul(x, a3))));
-                    if (dy[0] * dy[0] + dy[1] * dy[1] < 1e-8) break;
-                    x = cmin(x, cdiv(y, dy));
-                }
-                return x;
-            }
-        };
+            redraw();
+        }
 
         const Neg = "−";
         function num2str(n, d) {
-            if (typeof (n) != "number") {
-                // complex number
-                var r = num2str(n[0], d);
-                var i = num2str(n[1], d);
-                if (i.match(Neg)) return r + " " + Neg + i.replace(Neg, " ") + "i";
-                else return r + " + " + i + "i";
+            if (n instanceof Complex) {
+                var r = num2str(n.re, d);
+                var i = num2str(n.im, d);
+                if (i == "0") return r;
+                if (r == "0") return i + "i";
+                if (i.match(Neg)) return r + Neg + i.replace(Neg, "") + "i";
+                else return r + "+" + i + "i";
+            }
+            if (typeof n == "object") {
+                var v = [];
+                for (var i = 0; i < n.length; i++)
+                    v.push(num2str(n[i], d));
+                return "(" + v.join(", ") + ")";
             }
             if (isNaN(0 * n)) return "<span style='color:gray'>#</span>";
             var s = "";
@@ -171,11 +126,6 @@
             }
             while (s[s.length - 1] == '0') s = s.substr(0, s.length - 1);
             if (s[s.length - 1] == '.') s = s.substr(0, s.length - 1);
-            return s;
-        }
-        function vec2str(v, d) {
-            var s = "(" + num2str(v[0], d) + ", " + num2str(v[1], d) + ", " + num2str(v[2], d) + ")";
-            if (s.match("#")) return "<span style='color:gray'>" + s + "</span>";
             return s;
         }
     </script>
@@ -242,7 +192,7 @@
     <!-- matrix inputs and calculations -->
     <style>
         body {
-            font-family: Calibri, Arial, Helvetica, sans-serif;
+            font-family: monospace;
         }
 
         #control {
@@ -250,22 +200,37 @@
             left: 20px;
             top: 20px;
             background-color: rgba(92, 92, 92, 0.6);
-            width: 200px;
+            width: 220px;
             padding: 20px;
         }
 
-        #control>#title {
+        #title {
             margin: -5px 10px 0px 0px;
             padding: 0px 3px;
-            font-family: Consolas, 'Courier New', monospace;
             font-style: italic;
             font-weight: 800;
             font-size: 20px;
             color: Orange;
             text-shadow: 1.5px 1.5px 1px Maroon;
+            float: left;
         }
 
-        #control>#matrix-input {
+        #info {
+            display: inline;
+            float: right;
+        }
+
+        #info a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        #info a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        #matrix-input {
             text-align: left;
             margin: 0px -10px;
             padding: 10px;
@@ -273,7 +238,7 @@
             white-space: nowrap;
         }
 
-        #control>#matrix-input>.ele {
+        #matrix-input .ele {
             margin: 0.5px;
             width: 45px;
             height: 16px;
@@ -293,198 +258,83 @@
         }
 
         .eigenvecs {
-            margin-top: -5px;
+            margin-top: 0;
             margin-bottom: 5px;
-        }
-
-        #det2,
-        #det3 {
-            display: inline;
-            font-weight: 400;
+            white-space: normal;
+            text-indent: -1em;
+            padding-left: 1em;
+            line-height: 1em;
         }
     </style>
     <div id="control">
         <div id="title">Matrix:</div>
+        <div id="info" title="info"><a
+                href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv-readme.md"
+                target="_blank">ⓘ</a></div>
         <div id="matrix-input"></div>
         <hr />
         <div id="determinant" title="Matrix determinants">
-            <div class="dets">det<sub>2×2</sub> = <span id="det2"></span></div>
-            <div class="dets">det<sub>3×3</sub> = <span id="det3"></span></div>
+            <div class="dets" id="det2"></div>
+            <div class="dets" id="det3"></div>
+            <div class="dets" id="det4"></div>
         </div>
         <hr />
-        <div id="eigens" title="Eigens of 3×3 matrix">
-            <div class="eigenvals">λ<sub>1</sub> = <span class="eival"></span></div>
-            <div class="eigenvecs">ξ<sub>1</sub> = <span class="eivec"></span></div>
-            <div class="eigenvals">λ<sub>2</sub> = <span class="eival"></span></div>
-            <div class="eigenvecs">ξ<sub>2</sub> = <span class="eivec"></span></div>
-            <div class="eigenvals">λ<sub>3</sub> = <span class="eival"></span></div>
-            <div class="eigenvecs">ξ<sub>3</sub> = <span class="eivec"></span></div>
-        </div>
+        <div id="eigens" title=""></div>
     </div>
     <script>
         var Mat = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
-        var Det2 = 1, Det3 = 1;
-        var EigenValues = [1, 1, 1], EigenVectors = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
-        const C3 = 1; var C2 = -3, C1 = 3, C0 = -1;  // characteristic polynomial coefficients
+        var Det2 = 1, Det3 = 1, Det4 = 1;
+        var Eig3 = [
+            [1, [1, 0, 0]],
+            [1, [0, 1, 0]],
+            [1, [0, 0, 1]]
+        ];
+        var Eig4 = [
+            [1, [1, 0, 0, 0]],
+            [1, [0, 1, 0, 0]],
+            [1, [0, 0, 1, 0]],
+            [1, [0, 0, 0, 1]]
+        ];
+
+        function is3x3() {
+            for (var i = 0; i < 3; i++)
+                if (Mat[3][i] != 0 || Mat[i][3] != 0)
+                    return false;
+            if (Mat[3][3] != 1)
+                return false;
+            return true;
+        }
 
         // calculating determinants
         function calcDet() {
-            Det2 = Mat[0][0] * Mat[1][1] - Mat[0][1] * Mat[1][0];
-            $("det2").innerText = num2str(Det2, 7);
-            Det3 = Mat[0][0] * (Mat[1][1] * Mat[2][2] - Mat[1][2] * Mat[2][1]) - Mat[0][1] * (Mat[1][0] * Mat[2][2] - Mat[1][2] * Mat[2][0]) + Mat[0][2] * (Mat[1][0] * Mat[2][1] - Mat[1][1] * Mat[2][0]);
-            $("det3").innerText = num2str(Det3, 7);
-        }
-
-        // calculating eigenvalues and eigenvectors
-        function calcEigen() {
-            C2 = -(Mat[0][0] + Mat[1][1] + Mat[2][2]);
-            C1 = (Mat[0][0] * Mat[1][1] + Mat[0][0] * Mat[2][2] + Mat[1][1] * Mat[2][2]) - (Mat[1][2] * Mat[2][1] + Mat[0][2] * Mat[2][0] + Mat[0][1] * Mat[1][0]);
-            C0 = -Det3;
-
-            // eigenvalues
-            var roots = solveCubic(1, C2, C1, C0);
-            roots[1] = solveCubic_refine(1, C2, C1, C0, roots[1]);
-            if (roots[0] == 3) {
-                roots[2] = solveCubic_refine(1, C2, C1, C0, roots[2]);
-                roots[3] = solveCubic_refine(1, C2, C1, C0, roots[3]);
-            }
+            var MS = new MatrixS(4);
+            MS.v = Mat;
+            Det2 = MS.resize(2).determinant();
+            $("det2").innerHTML = "det<sub>2×2</sub> = " + num2str(Det2, 8);
+            Det3 = MS.resize(3).determinant();
+            $("det3").innerHTML = "det<sub>3×3</sub> = " + num2str(Det3, 8);
+            Det4 = MS.determinant();
+            if (is3x3()) $("det4").style.display = "";
             else {
-                var x = solveCubic_refine(1, C2, C1, C0, [roots[2], roots[3]]);
-                roots[2] = x[0], roots[3] = x[1];
+                $("det4").style.display = null;
+                $("det4").innerHTML = "det<sub>4×4</sub> = " + num2str(Det4, 8);
             }
-            if (roots[0] == 1) {
-                if (isZero(roots[3])) {
-                    roots[0] = 3; roots[3] = roots[2];
-                }
-                else {
-                    EigenValues[0] = roots[1];
-                    EigenValues[1] = [roots[2], roots[3]];
-                    EigenValues[2] = [roots[2], -roots[3]];
-                }
+        }
+        function calcEigen() {
+            var MS = new MatrixS(4);
+            MS.v = Mat;
+            Eig3 = MS.resize(3).eigs();
+            Eig4 = MS.eigs();
+            if (is3x3()) $("eigens").title = "Eigensystem of the 3×3 matrix";
+            else $("eigens").title = "Eigensystem of the 4×4 matrix";
+            $("eigens").innerHTML = "";
+            var eig = is3x3() ? Eig3 : Eig4;
+            for (var i = 0; i < eig.length; i++) {
+                var val = num2str(eig[i][0], 6);
+                var vec = num2str(eig[i][1], 3);
+                $("eigens").innerHTML += "<div class='eigenvals'>λ<sub>" + (i + 1) + "</sub> = " + val + "</div>";
+                $("eigens").innerHTML += "<div class='eigenvecs'>ξ<sub>" + (i + 1) + "</sub> = " + vec + "</div>";
             }
-            if (roots[0] == 3) {
-                // sort in increasing order
-                if (roots[1] > roots[2]) { var t = roots[1]; roots[1] = roots[2]; roots[2] = t; }
-                if (roots[2] > roots[3]) { var t = roots[2]; roots[2] = roots[3]; roots[3] = t; }
-                if (roots[1] > roots[2]) { var t = roots[1]; roots[1] = roots[2]; roots[2] = t; }
-                EigenValues[0] = roots[1];
-                EigenValues[1] = roots[2];
-                EigenValues[2] = roots[3];
-            }
-
-            // eigenvectors
-            function cloneMatrix(M) { return [M[0].slice(0, 3), M[1].slice(0, 3), M[2].slice(0, 3)] };
-            function getEigenVector(M, a) {
-                // calculate linear-independent eigenvectors with a given eigenvalue
-                for (var i = 0; i < 3; i++) {
-                    for (var j = 0; j < 3; j++) M[i][j] *= -1;
-                    M[i][i] += a;
-                }
-                //console.log(cloneMatrix(M));
-
-                // elimination
-                var E = [];
-                var i, j, k, d = 0;
-                for (i = 0, d = 0; d < 3; i++, d++) {
-                    if (isZero(M[i][d])) {
-                        for (j = i + 1; j < 3; j++) if (!isZero(M[j][d])) {
-                            for (k = d; k < 3; k++) {
-                                var t = M[i][k]; M[i][k] = M[j][k]; M[j][k] = t;
-                            }
-                            break;
-                        }
-                    }
-                    if (isZero(M[i][d])) {
-                        E.push(d);
-                        i--; continue;
-                    }
-                    for (j = 0; j < 3; j++) if (j != i) {
-                        var m = M[j][d] / M[i][d];
-                        for (k = d; k < 3; k++) {
-                            M[j][k] -= m * M[i][k];
-                        }
-                    }
-                    m = 1.0 / M[i][d];
-                    for (k = d; k < 3; k++) M[i][k] *= m;
-                }
-                //console.log(i, E, M);
-
-                // find eigenvectors using cases
-                if (i == 3) {
-                    alert("Error: Full-rank matrix / NAN");
-                    console.log(cloneMatrix(M));
-                }
-                if (i == 2) {
-                    if (E[0] == 0) return [[1, 0, 0]];
-                    if (E[0] == 1) return [[-M[0][1], 1, 0]];
-                    if (E[0] == 2) return [[-M[0][2], -M[1][2], 1]];
-                }
-                if (i == 1) {
-                    if (E[0] == 0 && E[1] == 1) return [[1, 0, 0], [0, 1, 0]];
-                    if (E[0] == 0 && E[1] == 2) return [[1, 0, 0], [0, -M[0][2], 1]];
-                    if (E[0] == 1 && E[1] == 2) return [[-M[0][1], 1, 0], [-M[0][2], 0, 1]];
-                }
-                if (i == 0) {
-                    return [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
-                }
-                alert("Error: Casing failed");
-                console.log(cloneMatrix(M));
-                return [[0, 0, 0]];
-            };
-
-            // find eigenvectors using cases
-            if (roots[0] == 1) {
-                EigenVectors[0] = getEigenVector(cloneMatrix(Mat), EigenValues[0])[0];
-                EigenVectors[1] = EigenVectors[2] = [NaN, NaN, NaN];
-            }
-            if (roots[0] == 3) {
-                if (isZero(EigenValues[1] - EigenValues[0])) {
-                    if (isZero(EigenValues[2] - EigenValues[0])) {
-                        EigenVectors = getEigenVector(cloneMatrix(Mat), EigenValues[0]);
-                        while (EigenVectors.length < 3) EigenVectors.push([NaN, NaN, NaN]);
-                    }
-                    else {
-                        var s = getEigenVector(cloneMatrix(Mat), EigenValues[0]);
-                        while (s.length < 2) s.push([NaN, NaN, NaN]);
-                        EigenVectors[0] = s[0], EigenVectors[1] = s[1];
-                        EigenVectors[2] = getEigenVector(cloneMatrix(Mat), EigenValues[2])[0];
-                    }
-                }
-                else {
-                    EigenVectors[0] = getEigenVector(cloneMatrix(Mat), EigenValues[0])[0];
-                    if (isZero(EigenValues[2] - EigenValues[1])) {
-                        var s = getEigenVector(cloneMatrix(Mat), EigenValues[1]);
-                        while (s.length < 2) s.push([NaN, NaN, NaN]);
-                        EigenVectors[1] = s[0], EigenVectors[2] = s[1];
-                    }
-                    else {
-                        EigenVectors[1] = getEigenVector(cloneMatrix(Mat), EigenValues[1])[0];
-                        EigenVectors[2] = getEigenVector(cloneMatrix(Mat), EigenValues[2])[0];
-                    }
-                }
-            }
-
-            // output
-            var eivals = document.getElementsByClassName("eival");
-            var eivecs = document.getElementsByClassName("eivec");
-            for (var i = 0; i < 3; i++) {
-                eivals[i].innerHTML = num2str(EigenValues[i], 6);
-                eivecs[i].innerHTML = vec2str(EigenVectors[i], 4);
-            }
-
-            // check the correctness
-            for (var i = 0; i < 3; i++) {
-                if (0 * EigenVectors[i][0] == 0) {
-                    var A = matvecmul(Mat, EigenVectors[i]);
-                    var a = vecmul(EigenVectors[i], EigenValues[i]);
-                    var d = length(vecmin(A, a));
-                    if (!isZero(d)) {
-                        eivecs[i].innerHTML = "<span style='color:red'>" + eivecs[i].innerHTML + "</span>";
-                        console.log(cloneMatrix(Mat), i, d);
-                    }
-                }
-            }
-
         }
 
         // initialize matrix
@@ -497,19 +347,8 @@
                 }
                 mi.innerHTML += "<br/>";
             }
-            //$("_11").value = "0", $("_00").value = $("_22").value = "-1";
             getMat();
         }
-        // random matrix for debug
-        function randmat() {
-            for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) {
-                //var x = Math.floor(Math.random() * 5) - 2;
-                var x = Math.random() * 5 - 2.5;
-                $("_" + i + j).value = num2str(x, 4).replace(Neg, "-");
-            }
-            getMat();
-        }
-        //for (var i = 0; i < 1000; i++) randmat();
 
         // get matrix input
         function getMat() {
@@ -539,10 +378,6 @@
                 }
             }
             if (!R) return;
-            var NoPerspective = Mat[3][0] == 0 && Mat[3][1] == 0 && Mat[3][2] == 0 && Mat[3][3] == 1;
-            var No3DTransform = Mat[2][0] == 0 && Mat[2][1] == 0 && /*Mat[2][2] == 1 && */Mat[1][2] == 0 && Mat[0][2] == 0;
-            $("determinant").style.color = $("eigens").style.color = NoPerspective ? "#FFF" : "#BBB";
-            document.getElementsByClassName("dets")[0].style.color = NoPerspective && No3DTransform ? "#FFF" : "#BBB";
             calcDet();
             calcEigen();
             redraw();
@@ -614,9 +449,6 @@
                 ctx.stroke();
             }
 
-            var drawEigen = length(Mat[3]) == 0 && Mat[3][3] == 1 && length([Mat[0][3], Mat[1][3], Mat[2][3]]) == 0;
-
-
             const N = 2;  // radius of the cube
 
             function drawView(cx, cy, cz, cc, s) {
@@ -644,29 +476,18 @@
                 }
             };
 
-            // characteristic polynomial
-            if (drawEigen) {
-                var dx = 0.01, rg = 3 * N;
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = "rgb(255,255,255)";
-                // for (var x = -rg; x < rg; x += dx) {
-                //     var y = ((C3 * x + C2) * x + C1) * x + C0;
-                //     var y1 = ((C3 * (x + dx) + C2) * (x + dx) + C1) * (x + dx) + C0;
-                //     if ((y > -rg && y < rg) || (y1 > -rg && y1 < rg)) drawline([x, y, 0], [x + dx, y1, 0]);
-                // }
-            }
-
             // reference cube
             ctx.lineWidth = 1;
             drawView("rgb(192,128,128)", "rgb(64,96,64)", "rgb(128,128,232)", "rgb(128,128,128)", 3);
             //return;
 
             // draw zero eigenvalues there
-            if (drawEigen) {
-                for (var i = 0; i < 3; i++) if (isZero(EigenValues[i])) {
+            if (is3x3()) {
+                for (var i = 0; i < Eig3.length; i++) {
+                    if (!Eig3[i][0].isZero()) continue;
                     ctx.lineWidth = 5;
                     ctx.strokeStyle = "rgba(128,192,128,0.8)";
-                    drawVector(vecmul(normalize(EigenVectors[i]), 1));
+                    drawVector(vecmul(normalize(toReal(Eig3[i][1])), 1));
                 }
             }
 
@@ -675,16 +496,17 @@
 
             // transformed cube
             ctx.lineWidth = 1;
-            drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)", "rgb(255,255,128)", 2.5);
+            drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)", "rgb(255,255,128)", 3);
 
             // eigenvectors - note that now the matrix is transformed
-            if (drawEigen) {
-                for (var i = 0; i < 3; i++) {
+            if (is3x3()) {
+                for (var i = 0; i < Eig3.length; i++) {
+                    if (!isReal(Eig3[i][0])) continue;
                     ctx.lineWidth = 5;
-                    var l = N * EigenValues[i];
+                    var l = N * toReal(Eig3[i][0]);
                     ctx.strokeStyle = l > 0 ? "rgba(255,0,255,0.8)" : "rgba(0,192,255,0.8)";
                     if (isZero(l)) l = 1, ctx.strokeStyle = "rgba(128,192,128,0.8)";
-                    drawVector(vecmul(normalize(EigenVectors[i]), N));
+                    drawVector(vecmul(normalize(toReal(Eig3[i][1])), N));
                 }
             }
 
