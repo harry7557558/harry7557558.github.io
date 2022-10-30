@@ -100,7 +100,7 @@ h1 {
     min-width: 100px;
     min-height: 100px;
     max-height: 100%;
-    image-rendering: pixelated;
+    /* image-rendering: pixelated; */
     color: white;
 }
 

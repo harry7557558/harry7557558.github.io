@@ -56,7 +56,7 @@ for line in lines:
         weight = match.group(2)
         result[key]["objects"].append({
             "text": quote,
-            "weight": int(weight)
+            "weight": float(weight)
         })
         continue
 
@@ -97,7 +97,7 @@ for line in lines:
         result[key]["objects"].append({
             "text": link,
             "alt": alt,
-            "weight": int(weight)
+            "weight": float(weight)
         })
         continue
 
