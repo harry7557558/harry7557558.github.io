@@ -5,13 +5,14 @@
     <title>Simple 3D Matrix Visualizer</title>
     <meta charset="utf-8" />
 
-    <meta name="description" content="Visualizing 2D/3D/4D transformation matrices with determinant and eigensystem." />
+    <meta name="description"
+        content="Visualizing 2D/3D/4D transformation matrices with determinants and eigen pairs." />
     <meta name="keywords"
         content="harry7557558, matrix, transform, determinant, eigen, eigenvalue, eigenvector, affine, perspective" />
-    <meta name="author" content="Harry Chen">
+    <meta name="author" content="Harry Chen" />
     <meta name="robots" content="index, follow" />
 
-    <!-- Linear algebra -->
+    <!-- Linear algebra, for det/eigen calculation -->
     <script src="matrixv-linalg.js"></script>
 
     <!-- Linear algebra for rendering -->
@@ -86,14 +87,15 @@
             redraw();
         }
 
-        const Neg = "−";
+        const S_NEG = "−";
         function num2str(n, d) {
             if (n instanceof Complex) {
                 var r = num2str(n.re, d);
                 var i = num2str(n.im, d);
                 if (i == "0") return r;
                 if (r == "0") return i + "i";
-                if (i.match(Neg)) return r + Neg + i.replace(Neg, "") + "i";
+                if (i.match(S_NEG))
+                    return r + S_NEG + i.replace(S_NEG, "") + "i";
                 else return r + "+" + i + "i";
             }
             if (typeof n == "object") {
@@ -106,7 +108,7 @@
             var s = "";
             var e = Math.pow(.1, d);
             if (n * n < .25 * e * e) return "0";
-            if (n < 0) s = Neg, n = -n;
+            if (n < 0) s = S_NEG, n = -n;
             n += .5 * e;
             var k = [], m = Math.floor(n);
             while (m * m > e * e) {
@@ -269,7 +271,7 @@
     <div id="control">
         <div id="title">Matrix:</div>
         <div id="info" title="info"><a
-                href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv-readme.md"
+                href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv-readme.md#simple-3d-matrix-visualizer"
                 target="_blank">ⓘ</a></div>
         <div id="matrix-input"></div>
         <hr />
@@ -309,11 +311,11 @@
         function calcDet() {
             var MS = new MatrixS(4);
             MS.v = Mat;
-            Det2 = MS.resize(2).determinant();
+            Det2 = MS.resize(2).determinant().re;
             $("det2").innerHTML = "det<sub>2×2</sub> = " + num2str(Det2, 8);
-            Det3 = MS.resize(3).determinant();
+            Det3 = MS.resize(3).determinant().re;
             $("det3").innerHTML = "det<sub>3×3</sub> = " + num2str(Det3, 8);
-            Det4 = MS.determinant();
+            Det4 = MS.determinant().re;
             if (is3x3()) $("det4").style.display = "";
             else {
                 $("det4").style.display = null;
@@ -323,10 +325,17 @@
         function calcEigen() {
             var MS = new MatrixS(4);
             MS.v = Mat;
-            Eig3 = MS.resize(3).eigs();
-            Eig4 = MS.eigs();
-            if (is3x3()) $("eigens").title = "Eigensystem of the 3×3 matrix";
-            else $("eigens").title = "Eigensystem of the 4×4 matrix";
+            try {
+                Eig3 = MS.resize(3).eigs();
+                Eig4 = MS.eigs();
+            } catch (e) {
+                console.error(e);
+                $("eigens").title = e;
+                $("eigens").innerHTML = "<div class='eigenvals' style='color:orange'>failed to compute eigenpairs</span></div>";
+                return;
+            }
+            if (is3x3()) $("eigens").title = "Eigenpairs of the 3×3 matrix";
+            else $("eigens").title = "Eigenpairs of the 4×4 matrix";
             $("eigens").innerHTML = "";
             var eig = is3x3() ? Eig3 : Eig4;
             for (var i = 0; i < eig.length; i++) {
@@ -340,9 +349,13 @@
         // initialize matrix
         function initmat() {
             var mi = $("matrix-input");
+            var mat = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+            // mat = [[0, -1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+            // mat = [[-2, 0, -1, 2], [1, -2, 0, 1], [0, 0, -4, 0], [0, 0, 0, -2]];
+            // mat = [[0, -2, 0, 0], [3, 0, -1, 0], [0, -1, 0, 0], [0, 0, 0, 1]];
             for (var i = 0; i < 4; i++) {
                 for (var j = 0; j < 4; j++) {
-                    mi.innerHTML += "<input class='ele' id='_" + i + j + "' value='" + (i == j ? "1" : "0") + "' style='background-color:" +
+                    mi.innerHTML += "<input class='ele' id='_" + i + j + "' value='" + mat[i][j] + "' style='background-color:" +
                         (i == 3 ? (j == 3 ? "PaleGoldenRod" : "LightSalmon") : (j == 3 ? "PaleGreen" : "SkyBlue")) + ";' spellcheck='false' autocomplete='off' autocorrect='off' oninput='getMat()'/>";
                 }
                 mi.innerHTML += "<br/>";
@@ -484,7 +497,7 @@
             // draw zero eigenvalues there
             if (is3x3()) {
                 for (var i = 0; i < Eig3.length; i++) {
-                    if (!Eig3[i][0].isZero()) continue;
+                    if (Eig3[i][0].abs() > 1e-6) continue;
                     ctx.lineWidth = 5;
                     ctx.strokeStyle = "rgba(128,192,128,0.8)";
                     drawVector(vecmul(normalize(toReal(Eig3[i][1])), 1));
@@ -501,11 +514,11 @@
             // eigenvectors - note that now the matrix is transformed
             if (is3x3()) {
                 for (var i = 0; i < Eig3.length; i++) {
-                    if (!isReal(Eig3[i][0])) continue;
+                    if (Math.abs(Eig3[i][0].im) > 1e-6) continue;
                     ctx.lineWidth = 5;
                     var l = N * toReal(Eig3[i][0]);
                     ctx.strokeStyle = l > 0 ? "rgba(255,0,255,0.8)" : "rgba(0,192,255,0.8)";
-                    if (isZero(l)) l = 1, ctx.strokeStyle = "rgba(128,192,128,0.8)";
+                    if (Math.abs(l) < 1e-6) l = 1, ctx.strokeStyle = "rgba(128,192,128,0.8)";
                     drawVector(vecmul(normalize(toReal(Eig3[i][1])), N));
                 }
             }
