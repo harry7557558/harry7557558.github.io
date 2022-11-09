@@ -4,6 +4,7 @@
 <head>
     <title>Simple 3D Matrix Visualizer</title>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="description"
         content="Visualizing 2D/3D/4D transformation matrices with determinants and eigen pairs." />
@@ -13,7 +14,7 @@
     <meta name="robots" content="index, follow" />
 
     <!-- Linear algebra, for det/eigen calculation -->
-    <script src="matrixv-linalg.js"></script>
+    <script src="matrixv/linalg.js"></script>
 
     <!-- Linear algebra for rendering -->
     <script>
@@ -51,8 +52,10 @@
         }
         function affinevecmul(M, v) {
             var m = M[3][0] * v[0] + M[3][1] * v[1] + M[3][2] * v[2] + M[3][3];
-            return [(M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2] + M[0][3]) / m,
-            (M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2] + M[1][3]) / m, (M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2] + M[2][3]) / m];
+            v = [(M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2] + M[0][3]) / m,
+            (M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2] + M[1][3]) / m,
+            (M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2] + M[2][3]) / m];
+            return v;
         }
     </script>
 
@@ -271,7 +274,7 @@
     <div id="control">
         <div id="title">Matrix:</div>
         <div id="info" title="info"><a
-                href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv-readme.md#simple-3d-matrix-visualizer"
+                href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv/README.md#simple-3d-matrix-visualizer"
                 target="_blank">ⓘ</a></div>
         <div id="matrix-input"></div>
         <hr />
@@ -316,11 +319,8 @@
             Det3 = MS.resize(3).determinant().re;
             $("det3").innerHTML = "det<sub>3×3</sub> = " + num2str(Det3, 8);
             Det4 = MS.determinant().re;
-            if (is3x3()) $("det4").style.display = "";
-            else {
-                $("det4").style.display = null;
-                $("det4").innerHTML = "det<sub>4×4</sub> = " + num2str(Det4, 8);
-            }
+            $("det4").innerHTML = "det<sub>4×4</sub> = " + num2str(Det4, 8);
+            $("det4").style.display = is3x3() ? "none" : "block";
         }
         function calcEigen() {
             var MS = new MatrixS(4);
@@ -353,6 +353,7 @@
             // mat = [[0, -1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
             // mat = [[-2, 0, -1, 2], [1, -2, 0, 1], [0, 0, -4, 0], [0, 0, 0, -2]];
             // mat = [[0, -2, 0, 0], [3, 0, -1, 0], [0, -1, 0, 0], [0, 0, 0, 1]];
+            // mat[3] = [0, 1, 0, 1];
             for (var i = 0; i < 4; i++) {
                 for (var j = 0; j < 4; j++) {
                     mi.innerHTML += "<input class='ele' id='_" + i + j + "' value='" + mat[i][j] + "' style='background-color:" +
@@ -398,6 +399,50 @@
         }
     </script>
 
+    <!-- models -->
+    <script>
+        function decodeMatrix(s, isNumeric = true) {
+            var rows = s.split(';');
+            for (var i = 0; i < rows.length; i++) {
+                rows[i] = rows[i].replaceAll(',', ' ').split(' ');
+                if (isNumeric) rows[i] = rows[i].map(x => Number(x));
+            }
+            return rows;
+        }
+
+        var MODELS = {
+            "list": [],
+            "frame": {
+                "vertices": decodeMatrix("-1,-1,-1;-1,1,-1;1,1,-1;1,-1,-1;-1,-1,1;-1,1,1;1,1,1;1,-1,1"),
+                "edges": decodeMatrix("0,1;1,2;0,3;2,3;0,4;1,5;2,6;3,7;4,5;5,6;4,7;6,7")
+            }
+        };
+        (function (path) {
+            var req = new XMLHttpRequest();
+            req.open("GET", path);
+            req.onload = function () {
+                if (this.status != 200) {
+                    alert("Failed to load models.");
+                    return;
+                }
+                var content = JSON.parse(req.response);
+                for (var i = 0; i < content.length; i++) {
+                    var model = content[i];
+                    MODELS.list.push(model.name);
+                    MODELS[model.name] = {};
+                    MODELS[model.name].vertices = decodeMatrix(model.vertices);
+                    MODELS[model.name].edges = decodeMatrix(model.edges);
+                }
+                redraw();
+            };
+            req.onerror = function () {
+                alert("Failed to load models.");
+            };
+            req.send();
+        })("matrixv/models.json");
+
+    </script>
+
     <!-- rendering -->
     <script>
         function redraw() {
@@ -426,9 +471,27 @@
             Center[0] *= A, Center[1] *= A; Center[1] = Center[1];
             M = affinemul([[1, 0, 0, Center[0]], [0, -1, 0, Center[1]], [0, 0, 1, 0], [0, 0, 0, 1]], M);
 
-            function drawline(p1, p2) {
-                p1 = affinevecmul(M, p1);
-                p2 = affinevecmul(M, p2);
+            function drawline(p1_, p2_, rec_remain = 12) {
+                if (rec_remain < 0) return;
+                var p1 = affinevecmul(M, p1_);
+                var p2 = affinevecmul(M, p2_);
+                // check break due to perspective
+                var pm_ = vecadd(vecmul(p1_, 0.5), vecmul(p2_, 0.5));
+                var pm = affinevecmul(M, pm_);
+                p1 = [p1[0], p1[1]], p2 = [p2[0], p2[1]], pm = [pm[0], pm[1]];
+                var isOnScreen = (p) =>
+                    p[0] >= 0 && p[0] <= canvas.width &&
+                    p[1] >= 0 && p[1] <= canvas.height;
+                if (!isOnScreen(p1) && !isOnScreen(p2) && !isOnScreen(pm))
+                    return;
+                var vecdiff = (u, v) =>
+                    Math.hypot(u[0] - v[0], u[1] - v[1]);
+                if (!(vecdiff(p1, pm) < 10 && vecdiff(pm, p2) < 10)) {
+                    drawline(p1_, pm_, rec_remain - 1);
+                    drawline(pm_, p2_, rec_remain - 1);
+                    return;
+                }
+                // draw
                 ctx.beginPath();
                 ctx.moveTo(p1[0], p1[1]);
                 ctx.lineTo(p2[0], p2[1]);
@@ -449,9 +512,10 @@
             function drawVector(d) {
                 var p0 = affinevecmul(M, [0, 0, 0]);
                 var p1 = affinevecmul(M, d);
-                p0[1] = p0[1], p1[1] = p1[1];
                 var dp = vecmin(p1, p0), pm = sqrt(dp[0] * dp[0] + dp[1] * dp[1]);
-                var ang = Math.atan2(dp[1], dp[0]), da = 0.3, h = 10 * Math.min(Math.abs(pm / dp[2]), 1);
+                if (!(pm >= 1.0)) return;
+                var ang = Math.atan2(dp[1], dp[0]), da = 0.3;
+                var h = 10 * Math.min(Math.abs(pm / dp[2]), 1);
                 ctx.beginPath();
                 ctx.moveTo(p0[0], p0[1]);
                 ctx.lineTo(p1[0], p1[1]);
@@ -462,64 +526,90 @@
                 ctx.stroke();
             }
 
-            const N = 2;  // radius of the cube
+            const SC = 2;  // scaling factor
 
-            function drawView(cx, cy, cz, cc, s) {
+            function drawView(cx, cy, cz, cf, cc) {
                 // Axis with an arrow
                 ctx.strokeStyle = cx;
-                drawline([-s * N, 0, 0], [s * N, 0, 0]);
-                drawTriangle([s * N + 0.2, 0, 0], [s * N, 0.1, 0], [s * N, -0.1, 0]);
+                var s = 3.0 * SC;
+                var al = 1.08 * s, aw = 0.03 * s;
+                drawline([-s, 0, 0], [s, 0, 0]);
+                drawTriangle([al, 0, 0], [s, aw, 0], [s, -aw, 0]);
                 ctx.strokeStyle = cy;
-                drawline([0, -s * N, 0], [0, s * N, 0]);
-                drawTriangle([0, s * N + 0.2, 0], [0.1, s * N, 0], [-0.1, s * N, 0]);
+                drawline([0, -s, 0], [0, s, 0]);
+                drawTriangle([0, al, 0], [aw, s, 0], [-aw, s, 0]);
                 ctx.strokeStyle = cz;
-                drawline([0, 0, -s * N], [0, 0, s * N]);
-                drawTriangle([0, 0, s * N + 0.2], [0.1, 0, s * N], [-0.1, 0, s * N]);
+                drawline([0, 0, -s], [0, 0, s]);
+                drawTriangle([0, 0, al], [aw, 0, s], [-aw, 0, s]);
 
-                // Cube
-                ctx.strokeStyle = cc;
-                for (var i = -N; i <= N; i++) {
-                    for (var j = -N; j <= N; j++) {
-                        for (var k = -N; k < N; k++) {
-                            drawline([k, i, j], [k + 1, i, j]);
-                            drawline([i, k, j], [i, k + 1, j]);
-                            drawline([i, j, k], [i, j, k + 1]);
-                        }
+                var lines = [];
+
+                function addModel(model, color) {
+                    var vertices = model.vertices;
+                    var edges = model.edges;
+                    for (var i = 0; i < edges.length; i++) {
+                        lines.push([
+                            vecmul(vertices[edges[i][0]], SC),
+                            vecmul(vertices[edges[i][1]], SC),
+                            color]);
                     }
+                }
+
+                // object
+                if (MODELS.hasOwnProperty("cube")) {
+                    addModel(MODELS['cube'], cc);
+                }
+
+                // Frame
+                // addModel(MODELS.frame, cf);
+
+                // draw lines
+                for (var i = 0; i < lines.length; i++) {
+                    var c = vecadd(vecmul(lines[i][0], 0.5), vecmul(lines[i][1], 0.5));
+                    var z = affinevecmul(M, c)[2];
+                    lines[i].push(z);
+                }
+                lines.sort((a, b) => a[3] - b[3]);
+                for (var i = 0; i < lines.length; i++) {
+                    ctx.strokeStyle = lines[i][2];
+                    drawline(lines[i][0], lines[i][1]);
                 }
             };
 
             // reference cube
             ctx.lineWidth = 1;
-            drawView("rgb(192,128,128)", "rgb(64,96,64)", "rgb(128,128,232)", "rgb(128,128,128)", 3);
+            drawView("rgb(192,128,128)", "rgb(64,96,64)", "rgb(128,128,232)",
+                "rgb(255,192,128)", "rgb(128,128,128)");
             //return;
 
-            // draw zero eigenvalues there
-            if (is3x3()) {
-                for (var i = 0; i < Eig3.length; i++) {
-                    if (Eig3[i][0].abs() > 1e-6) continue;
-                    ctx.lineWidth = 5;
-                    ctx.strokeStyle = "rgba(128,192,128,0.8)";
-                    drawVector(vecmul(normalize(toReal(Eig3[i][1])), 1));
-                }
-            }
-
-            // combine both matrices
-            M = affinemul(M, Mat);
-
             // transformed cube
+            var M_old = M;
+            M = affinemul(M, Mat);
             ctx.lineWidth = 1;
-            drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)", "rgb(255,255,128)", 3);
+            drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)",
+                "rgb(255,160,0)", "rgb(255,255,128)");
+            M = M_old;
 
             // eigenvectors - note that now the matrix is transformed
             if (is3x3()) {
+                var cZero = 'rgba(128,192,128,0.8)',
+                    cPositive = 'rgba(255,0,255,0.8)',
+                    cNegative = 'rgba(0,192,255,0.7)';
+                var vectors = [];
                 for (var i = 0; i < Eig3.length; i++) {
                     if (Math.abs(Eig3[i][0].im) > 1e-6) continue;
+                    var l = SC * toReal(Eig3[i][0]);
+                    var color = l > 0 ? cPositive : cNegative;
+                    if (Math.abs(l) < 1e-6) l = 1.0, color = cZero;
+                    var v = vecmul(normalize(toReal(Eig3[i][1])), l);
+                    var order = affinevecmul(M, v)[2];
+                    vectors.push([v, color, order]);
+                }
+                vectors.sort((a, b) => a[2] - b[2]);
+                for (var i = 0; i < vectors.length; i++) {
                     ctx.lineWidth = 5;
-                    var l = N * toReal(Eig3[i][0]);
-                    ctx.strokeStyle = l > 0 ? "rgba(255,0,255,0.8)" : "rgba(0,192,255,0.8)";
-                    if (Math.abs(l) < 1e-6) l = 1, ctx.strokeStyle = "rgba(128,192,128,0.8)";
-                    drawVector(vecmul(normalize(toReal(Eig3[i][1])), N));
+                    ctx.strokeStyle = vectors[i][1];
+                    drawVector(vectors[i][0]);
                 }
             }
 

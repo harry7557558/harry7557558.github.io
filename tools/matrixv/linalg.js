@@ -105,7 +105,12 @@ function normalizeComplexVector(v) {
             maxv = v[i];
     }
     if (maxv.abs() != 0.0) {
+        // make the imaginary part of the largest component zero
         var m = new Complex(maxv.abs()).div(sumsqr.sqrt().mul(maxv));
+        for (var i = 0; i < v.length; i++)
+            v[i] = v[i].mul(m);
+        // make the real part of the last element positive (positive z for 3d)
+        m = new Complex(v[v.length - 1].re >= 0.0 ? 1.0 : -1.0);
         for (var i = 0; i < v.length; i++)
             v[i] = v[i].mul(m);
     }
@@ -515,7 +520,7 @@ MatrixS.prototype.eigs = function () {  // real -> complex
         // transform back
         eigvec = U.cvecmul(eigvec);
         eigvec = normalizeComplexVector(eigvec);
-        eigs.push([eigval, eigvec]);
+        eigs.unshift([eigval, eigvec]);
     }
 
     // iteration with deflation
