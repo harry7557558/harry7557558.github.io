@@ -89,7 +89,7 @@ function num2str(n, d) {
 }
 
 // shareable link via URL hash
-function getHash() {
+function getUrlHash() {
     try {
         var hash = document.location.hash.replace('#', '');
         return hash.split('&').reduce(function (res, s) {
@@ -102,7 +102,7 @@ function getHash() {
         return {};
     }
 }
-function exportHash() {
+function exportShareableHash() {
     var res = {};
     var mat = "";
     var n = is3x3() ? 3 : 4;
@@ -115,6 +115,8 @@ function exportHash() {
         if (i != n - 1) mat += ";";
     }
     res['m'] = mat;
+    res['g'] = $("model").value;
+    res['s'] = $("scale").value;
     var s = [];
     for (var key in res)
         s.push(key + "=" + res[key]);
@@ -157,13 +159,13 @@ function copyShareableLink() {
     var link = window.location.href;
     if (link.search('#', 0) != -1)
         link = link.substring(0, link.search('#', 0));
-    link = link + exportHash();
+    link = link + exportShareableHash();
     copyTextToClipboard(link);
 }
 
-// attempt to parse a matrix represented as a string
-// component will be strings, not numbers
-function parseMatrix(s) {
+// attempt to parse a user-input 4x4 matrix
+// components will be strings, not numbers
+function parseUserInputMatrix(s) {
     var m = [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -181,10 +183,11 @@ function parseMatrix(s) {
     return m;
 }
 
+var UrlHash = {};
 function updateParametersFromHash() {
-    var hash = getHash();
-    if (hash.hasOwnProperty('m')) {
-        var mat = parseMatrix(hash['m']);
+    UrlHash = getUrlHash();
+    if (UrlHash.hasOwnProperty('m')) {
+        var mat = parseUserInputMatrix(UrlHash['m']);
         for (var i = 0; i < 4; i++)
             for (var j = 0; j < 4; j++)
                 $('_' + i + j).value = mat[i][j];
@@ -309,7 +312,7 @@ function getMat() {
 
 /**************** Models ****************/
 
-function decodeMatrix(s, isNumeric = true) {
+function decodeModelMatrix(s, isNumeric = true) {
     var rows = s.split(';');
     for (var i = 0; i < rows.length; i++) {
         rows[i] = rows[i].replaceAll(',', ' ').split(' ');
@@ -318,16 +321,18 @@ function decodeMatrix(s, isNumeric = true) {
     return rows;
 }
 
+// models for previewing transform
 var MODELS = {
     "list": [],
     "frame": {
-        "vertices": decodeMatrix("-1,-1,-1;-1,1,-1;1,1,-1;1,-1,-1;-1,-1,1;-1,1,1;1,1,1;1,-1,1"),
-        "edges": decodeMatrix("0,1;1,2;0,3;2,3;0,4;1,5;2,6;3,7;4,5;5,6;4,7;6,7")
+        "vertices": decodeModelMatrix("-1,-1,-1;-1,1,-1;1,1,-1;1,-1,-1;-1,-1,1;-1,1,1;1,1,1;1,-1,1"),
+        "edges": decodeModelMatrix("0,1;1,2;0,3;2,3;0,4;1,5;2,6;3,7;4,5;5,6;4,7;6,7")
     }
 };
-(function (path) {
+function initModels() {
     var req = new XMLHttpRequest();
-    req.open("GET", path);
+    var nocache = new String(Math.floor(Date.now() / 3600000));
+    req.open("GET", "matrixv/models.json?nocache=" + nocache);
     req.onload = function () {
         if (this.status != 200) {
             alert("Failed to load models.");
@@ -335,11 +340,19 @@ var MODELS = {
         }
         var content = JSON.parse(req.response);
         for (var i = 0; i < content.length; i++) {
+            // add model to list
             var model = content[i];
             MODELS.list.push(model.name);
             MODELS[model.name] = {};
-            MODELS[model.name].vertices = decodeMatrix(model.vertices);
-            MODELS[model.name].edges = decodeMatrix(model.edges);
+            MODELS[model.name].vertices = decodeModelMatrix(model.vertices);
+            MODELS[model.name].edges = decodeModelMatrix(model.edges);
+            // add model to selector
+            var option = document.createElement("option");
+            option.value = model.name;
+            option.innerHTML = model.name;
+            if (model.name == UrlHash['g'])
+                option.selected = true;
+            $("model").appendChild(option);
         }
         redraw();
     };
@@ -347,7 +360,25 @@ var MODELS = {
         alert("Failed to load models.");
     };
     req.send();
-})("matrixv/models.json");
+}
+
+// scaling of the models
+function initModelScale() {
+    var defaultScale = 2.0;
+    let scales = [0.1, 0.2, 0.5, 1, 2, 2.5, 3, 4, 5, 8, 10];
+    for (var i = 0; i < scales.length; i++) {
+        var option = document.createElement("option");
+        option.value = scales[i];
+        option.innerHTML = scales[i] + "×";
+        if (scales[i] == defaultScale)
+            option.selected = true;
+        $("scale").appendChild(option);
+    }
+    if (UrlHash.hasOwnProperty('s')) {
+        $("scale").value = UrlHash['s'];
+        Scale /= Number(UrlHash['s'] / defaultScale);
+    }
+}
 
 
 /**************** Rendering ****************/
@@ -379,8 +410,8 @@ function redraw() {
     Center[0] *= A, Center[1] *= A; Center[1] = Center[1];
     M = affinemul([[1, 0, 0, Center[0]], [0, -1, 0, Center[1]], [0, 0, 1, 0], [0, 0, 0, 1]], M);
 
-    function drawLine(p1_, p2_, rec_remain = 12) {
-        if (rec_remain < 0) return;
+    function drawLine(p1_, p2_, recurseRemain = 12) {
+        var isInitialCall = (recurseRemain == 12);
         var p1 = affinevecmul(M, p1_);
         var p2 = affinevecmul(M, p2_);
         // check break due to perspective
@@ -390,21 +421,36 @@ function redraw() {
         var isOnScreen = (p) =>
             p[0] >= 0 && p[0] <= canvas.width &&
             p[1] >= 0 && p[1] <= canvas.height;
-        if (!isOnScreen(p1) && !isOnScreen(p2) && !isOnScreen(pm))
-            return;
+        isOnScreen = isOnScreen(p1)  || isOnScreen(p2) || isOnScreen(pm);
+        // start line
+        if (isInitialCall) {
+            if (!isOnScreen) return;
+            ctx.beginPath();
+            ctx.moveTo(p1[0], p1[1]);
+        }
         var vecdiff = (u, v) =>
             Math.hypot(u[0] - v[0], u[1] - v[1]);
-        if (!(vecdiff(p1, pm) < 10 && vecdiff(pm, p2) < 10)) {
-            drawLine(p1_, pm_, rec_remain - 1);
-            drawLine(pm_, p2_, rec_remain - 1);
-            return;
+        var shortEnough1 = (vecdiff(p1, pm) < 10);
+        var shortEnough2 = (vecdiff(pm, p2) < 10);
+        if (recurseRemain == 0 && !(shortEnough1 && shortEnough2) || !isOnScreen) {
+            // break line
+            ctx.lineTo(p1[0], p1[1]);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(p2[0], p2[1]);
+            if (!isOnScreen) return;
         }
-        // draw
-        ctx.beginPath();
-        ctx.moveTo(p1[0], p1[1]);
-        ctx.lineTo(p2[0], p2[1]);
-        ctx.closePath();
-        ctx.stroke();
+        else {
+            // recursively divide line
+            if (!shortEnough1) drawLine(p1_, pm_, recurseRemain - 1);
+            if (!shortEnough2) drawLine(pm_, p2_, recurseRemain - 1);
+        }
+        // end line
+        if (isInitialCall) {
+            ctx.lineTo(p2[0], p2[1]);
+            ctx.closePath();
+            ctx.stroke();
+        }
     }
     function drawTriangle(p1, p2, p3) {
         p1 = affinevecmul(M, p1);
@@ -434,12 +480,12 @@ function redraw() {
         ctx.stroke();
     }
 
-    const SC = 2;  // scaling factor
+    var scale = Number($("scale").value);
 
     function drawView(cx, cy, cz, cf, cc) {
         // Axis with an arrow
         ctx.strokeStyle = cx;
-        var s = 3.0 * SC;
+        var s = 3.0 * scale;
         var al = 1.08 * s, aw = 0.03 * s;
         drawLine([-s, 0, 0], [s, 0, 0]);
         drawTriangle([al, 0, 0], [s, aw, 0], [s, -aw, 0]);
@@ -457,19 +503,20 @@ function redraw() {
             var edges = model.edges;
             for (var i = 0; i < edges.length; i++) {
                 lines.push([
-                    vecmul(vertices[edges[i][0]], SC),
-                    vecmul(vertices[edges[i][1]], SC),
+                    vecmul(vertices[edges[i][0]], scale),
+                    vecmul(vertices[edges[i][1]], scale),
                     color]);
             }
         }
 
         // object
-        if (MODELS.hasOwnProperty("cube")) {
-            addModel(MODELS['cube'], cc);
+        var obj = $("model").value;
+        if (MODELS.hasOwnProperty(obj)) {
+            addModel(MODELS[obj], cc);
         }
 
-        // Frame
-        // addModel(MODELS.frame, cf);
+        // frame
+        addModel(MODELS.frame, cf);
 
         // draw lines
         for (var i = 0; i < lines.length; i++) {
@@ -478,10 +525,13 @@ function redraw() {
             lines[i].push(z);
         }
         lines.sort((a, b) => a[3] - b[3]);
+        var t0 = performance.now();
         for (var i = 0; i < lines.length; i++) {
             ctx.strokeStyle = lines[i][2];
             drawLine(lines[i][0], lines[i][1]);
         }
+        var t1 = performance.now();
+        // console.log(t1 - t0);
     };
 
     // reference cube
@@ -506,9 +556,9 @@ function redraw() {
         var vectors = [];
         for (var i = 0; i < Eig3.length; i++) {
             if (Math.abs(Eig3[i][0].im) > 1e-6) continue;
-            var l = SC * toReal(Eig3[i][0]);
+            var l = scale * toReal(Eig3[i][0]);
             var color = l > 0 ? cPositive : cNegative;
-            if (Math.abs(l) < 1e-6) l = 1.0, color = cZero;
+            if (Math.abs(l) < 1e-6) l = 0.5 * scale, color = cZero;
             var v = vecmul(normalize(toReal(Eig3[i][1])), l);
             var order = affinevecmul(M, v)[2];
             vectors.push([v, color, order]);
@@ -586,10 +636,12 @@ window.addEventListener("load", function () {
     initMat();
     updateParametersFromHash();
     getMat();
+    initModels();
 
     var w = window.innerWidth, h = window.innerHeight;
     PreviousWindowSize = [w, h, 0];
     Scale = 0.08 * Math.min(w, h);
+    initModelScale();
     initCanvasAttitudes();
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();

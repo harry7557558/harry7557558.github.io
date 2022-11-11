@@ -1,5 +1,7 @@
 # Simple 3D Matrix Visualizer
 
+**Note: This tool is recently under active construction. Its actual functionality may not be reflected here. This README will be updated when the construction is done.**
+
 By Harry Chen - I created this tool in 2019 when I just started learning computer graphics. It seems to have become the main source of my site's traffic so I write this readme to answer some questions that users might have.
 
 This tool visualizes a $4\times4$ [affine matrix](https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations) applied to R3. The gray cube and dimed axes are the untransformed and the yellow cube and axes with a higher contrast are with the matrix applied. The untransformed cube has a side length of $4$ units (with vertex coordinate components $-2$ and $2$) and each axis arrow has a half-length of $6$ units.

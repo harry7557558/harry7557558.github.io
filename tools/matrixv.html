@@ -31,11 +31,11 @@
             mathjs.src = "https://unpkg.com/mathjs@5.7.0/dist/math.min.js";
             mathjs.onload = function () {
                 MATHJS_LOADED = true;
-                $("footer").innerHTML = "Symbolic expressions available";
+                $("footer").innerHTML = "Symbolic expression available";
             };
             mathjs.onerror = function () {
                 MATHJS_LOADED = false;
-                $("footer").innerHTML = "Symbolic expressions unavailable";
+                $("footer").innerHTML = "Symbolic expression unavailable";
             }
             document.head.appendChild(mathjs);
         })();
@@ -147,6 +147,10 @@
         </div>
         <div id="title">Matrix:</div>
         <div id="matrix-input"></div>
+        <div style="white-space:nowrap">
+            <select id="model" oninput="redraw()" title="Select model to preview transform"></select>
+            <select id="scale" oninput="redraw()" title="Select scaling for the model"></select>
+        </div>
         <hr />
         <div id="determinant" title="Matrix determinants">
             <div class="dets" id="det2"></div>
