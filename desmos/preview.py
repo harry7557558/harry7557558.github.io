@@ -244,4 +244,9 @@ index += """
     </div>
 </body></html>"""
 
-open('desmos/index.html', "wb").write(bytearray(index, 'utf-8'))
+
+filename = 'desmos/index.html'
+original = open(filename, 'rb').read().decode('utf-8')
+r_date = r'\d{4}/\d{2}/\d{2}'
+if re.sub(r_date, '', original) != re.sub(r_date, '', index):
+    open(filename, "wb").write(bytearray(index, 'utf-8'))

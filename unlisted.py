@@ -97,7 +97,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
         content += "    <table" + " style='margin-left:0'"*is_root + ">\n"
         for fn in files:
             ext = getExtension(fn)
-            if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'pdf', 'mp4']:
+            if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'pdf']:
                 continue
             content += "    <tr>"
             path = urllib.parse.quote(name+fn[trunc:])
@@ -121,6 +121,7 @@ additional_repos = [
     ['miscellaneous', '../miscellaneous'],
     ['AVI3M-CPT', '../AVI3M-CPT'],
     ['AVI4M-ISP', '../AVI4M-ISP'],
+    ['engsci-2t6', '../engsci-2t6'],
 ]
 
 site_content = indexDirectory(root)

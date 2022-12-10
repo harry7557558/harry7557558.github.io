@@ -63,7 +63,7 @@ for line in lines:
     raise ValueError("Unknown line: " + line)
 
 with open("src/quotes.json", "w") as fp:
-    json.dump(result, fp)
+    json.dump(result, fp, separators=(',', ':'))
 
 
 # links
@@ -104,4 +104,4 @@ for line in lines:
     raise ValueError("Unknown line: " + line)
 
 with open("src/links.json", "w") as fp:
-    json.dump(result, fp)
+    json.dump(result, fp, separators=(',', ':'))
