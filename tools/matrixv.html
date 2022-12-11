@@ -38,6 +38,11 @@
                 $("footer").innerHTML = "Symbolic expression unavailable";
             }
             document.head.appendChild(mathjs);
+            // font awesome
+            var fontawesome = document.createElement("script");
+            fontawesome.src = "https://kit.fontawesome.com/86d67ca9e9.js";
+            fontawesome.crossOrigin = "anonymous";
+            document.head.appendChild(fontawesome);
         })();
     </script>
 
@@ -61,8 +66,8 @@
             font-style: italic;
             font-weight: 800;
             font-size: 20px;
-            color: Orange;
-            text-shadow: 1.5px 1.5px 1px Maroon;
+            color: #eee;
+            text-shadow: 1.5px 1.5px 1px #555;
             float: left;
         }
 
@@ -104,6 +109,23 @@
             outline: none;
         }
 
+        .toggle {
+            font-size: 14px;
+            color: gray;
+        }
+
+        .toggle:hover {
+            color: lightgray;
+        }
+
+        .toggled {
+            color: orange;
+        }
+
+        .toggled:hover {
+            color: yellow;
+        }
+
         #determinant,
         #eigens {
             display: inline;
@@ -142,14 +164,18 @@
     <div id="control">
         <div id="info">
             <a href="https://github.com/harry7557558/harry7557558.github.io/blob/master/tools/matrixv/README.md#simple-3d-matrix-visualizer"
-                title="README on GitHub" target="_blank">ⓘ&#xfe0e;</a>
-            <a href="javascript:copyShareableLink()" title="Copy shareable link">☍&#xfe0e;</a>
+                title="README on GitHub" target="_blank"><i class="fa-regular fa-circle-question"></i></a>
+            <a href="javascript:copyShareableLink()" title="Copy shareable link"><i class="fa-solid fa-link"></i></a>
         </div>
         <div id="title">Matrix:</div>
         <div id="matrix-input"></div>
         <div style="white-space:nowrap">
             <select id="model" oninput="redraw()" title="Select model to preview transform"></select>
             <select id="scale" oninput="redraw()" title="Select scaling for the model"></select>
+            <i id="toggle-eigens" title="show eigenvectors" class="toggle toggled fa-solid fa-location-arrow"></i>
+            <i id="toggle-frame" title="show bounding cube" class="toggle toggled fa-solid fa-cube"></i>
+            <i id="toggle-breakline" title="cull “infinity” lines due to perspective"
+                class="toggle toggled fa-solid fa-scissors"></i>
         </div>
         <hr />
         <div id="determinant" title="Matrix determinants">

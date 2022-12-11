@@ -1,6 +1,6 @@
 # Simple 3D Matrix Visualizer
 
-**Note: This tool is recently under active construction. Its actual functionality may not be reflected here. This README will be updated when the construction is done.**
+**Note: This tool is recently under active development. Its actual functionality may not be reflected here. This README will be updated when the development is done.**
 
 By Harry Chen - I created this tool in 2019 when I just started learning computer graphics. It seems to have become the main source of my site's traffic so I write this readme to answer some questions that users might have.
 

@@ -3,11 +3,11 @@ const sin = Math.sin, cos = Math.cos, atan = Math.atan,
     sqrt = Math.sqrt, pow = Math.pow;
 function dot(u, v) { return u[0] * v[0] + u[1] * v[1] + u[2] * v[2]; }
 function cross(u, v) { return [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]; }
-function length(v) { return sqrt(dot(v, v)); }
+function veclength(v) { return sqrt(dot(v, v)); }
 function vecadd(u, v) { return [u[0] + v[0], u[1] + v[1], u[2] + v[2]]; }
-function vecmin(u, v) { return [u[0] - v[0], u[1] - v[1], u[2] - v[2]]; }
+function vecsub(u, v) { return [u[0] - v[0], u[1] - v[1], u[2] - v[2]]; }
 function vecmul(v, a) { return [v[0] * a, v[1] * a, v[2] * a]; }
-function normalize(v) { return vecmul(v, 1.0 / length(v)); }
+function normalize(v) { return vecmul(v, 1.0 / veclength(v)); }
 function matvecmul(m, v) {
     return [m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
     m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
@@ -89,21 +89,9 @@ function num2str(n, d) {
 }
 
 // shareable link via URL hash
-function getUrlHash() {
-    try {
-        var hash = document.location.hash.replace('#', '');
-        return hash.split('&').reduce(function (res, s) {
-            s = s.split('=');
-            res[s[0]] = decodeURIComponent(s[1]);
-            return res;
-        }, {});
-    } catch (e) {
-        console.error(e);
-        return {};
-    }
-}
 function exportShareableHash() {
     var res = {};
+    // matrix
     var mat = "";
     var n = is3x3() ? 3 : 4;
     for (var i = 0; i < n; i++) {
@@ -115,8 +103,18 @@ function exportShareableHash() {
         if (i != n - 1) mat += ";";
     }
     res['m'] = mat;
+    // model
     res['g'] = $("model").value;
     res['s'] = $("scale").value;
+    // visualization toggles
+    var toggles = document.getElementsByClassName('toggle');
+    for (var i = 0; i < toggles.length; i++) {
+        var id = toggles[i].id.split('-');
+        id = id[0][0] + id[1][0];
+        if (!toggles[i].classList.contains("toggled"))
+            res[id] = '0';
+    }
+    // put them together
     var s = [];
     for (var key in res)
         s.push(key + "=" + res[key]);
@@ -185,14 +183,38 @@ function parseUserInputMatrix(s) {
 
 var UrlHash = {};
 function updateParametersFromHash() {
-    UrlHash = getUrlHash();
+    // get hash
+    try {
+        UrlHash = document.location.hash.replace('#', '');
+        UrlHash = UrlHash.split('&').reduce(function (res, s) {
+            s = s.split('=');
+            res[s[0]] = decodeURIComponent(s[1]);
+            return res;
+        }, {});
+    } catch (e) {
+        console.error(e);
+    }
+    document.location.hash = '';
+    // matrix
     if (UrlHash.hasOwnProperty('m')) {
         var mat = parseUserInputMatrix(UrlHash['m']);
         for (var i = 0; i < 4; i++)
             for (var j = 0; j < 4; j++)
                 $('_' + i + j).value = mat[i][j];
     }
-    document.location.hash = '';
+    // model
+    if (UrlHash.hasOwnProperty('g'))
+        $("model").value = UrlHash['g'];
+    if (UrlHash.hasOwnProperty('s'))
+        $("scale").value = UrlHash['s'];
+    // visualization toggles
+    var toggles = document.getElementsByClassName('toggle');
+    for (var i = 0; i < toggles.length; i++) {
+        var id = toggles[i].id.split('-');
+        id = id[0][0] + id[1][0];
+        if (UrlHash.hasOwnProperty(id) && UrlHash[id] === '0')
+            toggles[i].classList.remove('toggled');
+    }
 }
 
 
@@ -201,9 +223,9 @@ function updateParametersFromHash() {
 var Mat = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
 var Det2 = 1, Det3 = 1, Det4 = 1;
 var Eig3 = [
-    [1, [1, 0, 0]],
-    [1, [0, 1, 0]],
-    [1, [0, 0, 1]]
+    [1, [1, 0, 0], true],
+    [1, [0, 1, 0], true],
+    [1, [0, 0, 1], true]
 ];
 var Eig4 = [
     [1, [1, 0, 0, 0]],
@@ -250,10 +272,14 @@ function calcEigen() {
     $("eigens").innerHTML = "";
     var eig = is3x3() ? Eig3 : Eig4;
     for (var i = 0; i < eig.length; i++) {
+        var showEig = Math.abs(eig[i][0].im) < 1e-6 &&
+            (is3x3() || eig[i][1][3].abs() < 1e-6) && is3x3();
+        eig[i].push(showEig);
+        var opacity = " style='opacity:" + (showEig ? 1.0 : 0.7) + "'";
         var val = num2str(eig[i][0], 6);
         var vec = num2str(eig[i][1], 3);
-        $("eigens").innerHTML += "<div class='eigenvals'>λ<sub>" + (i + 1) + "</sub> = " + val + "</div>";
-        $("eigens").innerHTML += "<div class='eigenvecs'>ξ<sub>" + (i + 1) + "</sub> = " + vec + "</div>";
+        $("eigens").innerHTML += "<div class='eigenvals'" + opacity + ">λ<sub>" + (i + 1) + "</sub> = " + val + "</div>";
+        $("eigens").innerHTML += "<div class='eigenvecs'" + opacity + ">ξ<sub>" + (i + 1) + "</sub> = " + vec + "</div>";
     }
 }
 
@@ -383,6 +409,10 @@ function initModelScale() {
 
 /**************** Rendering ****************/
 
+function isToggled(id) {
+    return $("toggle-" + id).classList.contains("toggled");
+}
+
 function redraw() {
     let canvas = $("canvas");
     var ctx = canvas.getContext("2d");
@@ -421,7 +451,7 @@ function redraw() {
         var isOnScreen = (p) =>
             p[0] >= 0 && p[0] <= canvas.width &&
             p[1] >= 0 && p[1] <= canvas.height;
-        isOnScreen = isOnScreen(p1)  || isOnScreen(p2) || isOnScreen(pm);
+        isOnScreen = isOnScreen(p1) || isOnScreen(p2) || isOnScreen(pm);
         // start line
         if (isInitialCall) {
             if (!isOnScreen) return;
@@ -466,7 +496,7 @@ function redraw() {
     function drawVector(d) {
         var p0 = affinevecmul(M, [0, 0, 0]);
         var p1 = affinevecmul(M, d);
-        var dp = vecmin(p1, p0), pm = sqrt(dp[0] * dp[0] + dp[1] * dp[1]);
+        var dp = vecsub(p1, p0), pm = sqrt(dp[0] * dp[0] + dp[1] * dp[1]);
         if (!(pm >= 1.0)) return;
         var ang = Math.atan2(dp[1], dp[0]), da = 0.3;
         var h = 10 * Math.min(Math.abs(pm / dp[2]), 1);
@@ -480,10 +510,59 @@ function redraw() {
         ctx.stroke();
     }
 
+    // perspective clipping
     var scale = Number($("scale").value);
+    var nCut = Mat[3].slice(0, 3), dCut = Mat[3][3];
+    function isClipped(p1, p2) {
+        var d1 = dot(nCut, p1) * scale + dCut;
+        var d2 = dot(nCut, p2) * scale + dCut;
+        return d1 * d2 <= 1e-12;
+    }
+    function clipSegment(p1, p2) {
+        p1 = vecmul(p1, scale), p2 = vecmul(p2, scale);
+        var pd = vecsub(p2, p1);
+        // p(t) = p1 + pd t
+        // dot(n, p1) + dot(n, pd) t + d = 0
+        // t = (-d - dot(n, p1)) / dot(n, pd)
+        var t = (-dCut - dot(nCut, p1)) / dot(nCut, pd);
+        return vecadd(p1, vecmul(pd, t));
+    }
+    function clipCube() {
+        // get points
+        var vertices = MODELS.frame.vertices;
+        var edges = MODELS.frame.edges;
+        var points = [];
+        for (var i = 0; i < edges.length; i++) {
+            var p1 = vertices[edges[i][0]];
+            var p2 = vertices[edges[i][1]];
+            if (!isClipped(p1, p2)) continue;
+            var p = clipSegment(p1, p2);
+            var already = false;
+            for (var k = 0; k < points.length; k++)
+                if (veclength(vecsub(p, points[k])) < 1e-6) {
+                    already = true; break;
+                }
+            if (!already) points.push(p);
+        }
+        // get the convex hull
+        var segments = [];
+        for (var i = 0; i < points.length; i++)
+            for (var j = 0; j < i; j++) {
+                var p1 = points[i], p2 = points[j];
+                var n = cross(vecsub(p2, p1), normalize(nCut));
+                var mind = 0.0, maxd = 0.0;
+                for (var k = 0; k < points.length; k++) {
+                    var d = dot(points[k], n) - dot(p1, n);
+                    mind = Math.min(mind, d), maxd = Math.max(maxd, d);
+                }
+                if (mind * maxd > -1e-10)
+                    segments.push([p1, p2]);
+            }
+        return segments;
+    }
 
-    function drawView(cx, cy, cz, cf, cc) {
-        // Axis with an arrow
+    function drawView(cx, cy, cz, cf, cc_good, cc_cut) {
+        // Axes with arrows
         ctx.strokeStyle = cx;
         var s = 3.0 * scale;
         var al = 1.08 * s, aw = 0.03 * s;
@@ -502,25 +581,38 @@ function redraw() {
             var vertices = model.vertices;
             var edges = model.edges;
             for (var i = 0; i < edges.length; i++) {
-                lines.push([
-                    vecmul(vertices[edges[i][0]], scale),
-                    vecmul(vertices[edges[i][1]], scale),
-                    color]);
+                var p1 = vecmul(vertices[edges[i][0]], scale);
+                var p2 = vecmul(vertices[edges[i][1]], scale);
+                lines.push([p1, p2, color]);
             }
         }
 
         // object
         var obj = $("model").value;
         if (MODELS.hasOwnProperty(obj)) {
-            addModel(MODELS[obj], cc);
+            var model = MODELS[obj];
+            var edges_good = [], edges_cut = [];
+            if (isToggled("breakline")) {
+                for (var i = 0; i < model.edges.length; i++) {
+                    var p1 = model.vertices[model.edges[i][0]];
+                    var p2 = model.vertices[model.edges[i][1]];
+                    if (isClipped(p1, p2)) edges_cut.push(model.edges[i]);
+                    else edges_good.push(model.edges[i]);
+                }
+                addModel({ vertices: model.vertices, edges: edges_good }, cc_good);
+                if (cc_good != cc_cut)
+                    addModel({ vertices: model.vertices, edges: edges_cut }, cc_cut);
+            }
+            else addModel(model, cc_good);
         }
 
         // frame
-        addModel(MODELS.frame, cf);
+        if (isToggled("frame"))
+            addModel(MODELS.frame, cf);
 
         // draw lines
         for (var i = 0; i < lines.length; i++) {
-            var c = vecadd(vecmul(lines[i][0], 0.5), vecmul(lines[i][1], 0.5));
+            var c = vecmul(vecadd(lines[i][0], lines[i][1]), 0.5);
             var z = affinevecmul(M, c)[2];
             lines[i].push(z);
         }
@@ -534,32 +626,42 @@ function redraw() {
         // console.log(t1 - t0);
     };
 
-    // reference cube
+    // reference object
     ctx.lineWidth = 1;
     drawView("rgb(192,128,128)", "rgb(64,96,64)", "rgb(128,128,232)",
-        "rgb(255,192,128)", "rgb(128,128,128)");
-    //return;
+        "rgb(255,192,128)", "rgb(128,128,128)", "rgb(64,180,100)");
 
-    // transformed cube
+    // cut
+    if (isToggled("breakline")) {
+        var segs = clipCube();
+        ctx.strokeStyle = "#5ac";
+        for (var i = 0; i < segs.length; i++)
+            drawLine(segs[i][0], segs[i][1]);
+    }
+
+    // transformed object
     var M_old = M;
     M = affinemul(M, Mat);
     ctx.lineWidth = 1;
     drawView("rgb(255,0,0)", "rgb(0,160,0)", "rgb(0,64,255)",
-        "rgb(255,160,0)", "rgb(255,255,128)");
+        "rgb(255,160,0)", "rgb(255,255,128)", "rgb(255,255,128)"
+        //"rgb(160,255,160)"
+    );
     M = M_old;
 
     // eigenvectors - note that now the matrix is transformed
-    if (is3x3()) {
+    if (isToggled('eigens')) {
         var cZero = 'rgba(128,192,128,0.8)',
             cPositive = 'rgba(255,0,255,0.8)',
             cNegative = 'rgba(0,192,255,0.7)';
         var vectors = [];
-        for (var i = 0; i < Eig3.length; i++) {
-            if (Math.abs(Eig3[i][0].im) > 1e-6) continue;
-            var l = scale * toReal(Eig3[i][0]);
+        var eig = is3x3() ? Eig3 : Eig4;
+        for (var i = 0; i < eig.length; i++) {
+            if (!eig[i][2]) continue;
+            var l = scale * toReal(eig[i][0]) / Mat[3][3];
             var color = l > 0 ? cPositive : cNegative;
             if (Math.abs(l) < 1e-6) l = 0.5 * scale, color = cZero;
-            var v = vecmul(normalize(toReal(Eig3[i][1])), l);
+            var v = vecmul(normalize(toReal(eig[i][1].slice(0, 3))), l);
             var order = affinevecmul(M, v)[2];
             vectors.push([v, color, order]);
         }
@@ -633,8 +735,17 @@ function resizeCanvas() {
     redraw();
 }
 window.addEventListener("load", function () {
+    // init geometry
     initMat();
     updateParametersFromHash();
+    window.addEventListener("hashchange", function (event) {
+        var oldHash = event.oldURL.slice((event.oldURL + '#').search('#'));
+        var newHash = event.newURL.slice((event.newURL + '#').search('#'));
+        if (oldHash != newHash && newHash != '#') {
+            updateParametersFromHash();
+            getMat(); redraw();
+        }
+    });
     getMat();
     initModels();
 
@@ -646,6 +757,19 @@ window.addEventListener("load", function () {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    // init toggles
+    var toggles = document.getElementsByClassName("toggle");
+    for (var i = 0; i < toggles.length; i++)
+        (function (ele) {
+            ele.addEventListener("click", function () {
+                if (ele.classList.contains("toggled"))
+                    ele.classList.remove("toggled");
+                else ele.classList.add("toggled");
+                redraw();
+            });
+        })(toggles[i]);
+
+    // init footer
     $("footer").style.display = 'block';
     setTimeout(function () {
         $("footer").innerHTML = Is2D ? "2D view" : "3D view";

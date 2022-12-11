@@ -95,6 +95,13 @@ Complex.prototype.toFixed = function (n) {
 }
 
 
+function normComplexVector(v) {
+    var sumsqr = 0.0;
+    for (var i = 0; i < v.length; i++) {
+        sumsqr += v[i].mag2();
+    }
+    return Math.sqrt(sumsqr);
+}
 function normalizeComplexVector(v) {
     var sumsqr = new Complex(0);
     var maxv = new Complex(0);
