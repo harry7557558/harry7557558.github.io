@@ -87,7 +87,7 @@ const OBJECTS = [
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1000820863857344592/craiyon_134418_A_flame_ball_in_the_shape_of_the_Stanford_Bunny.png",
         "date": "07/24/2022",
         "text": "A flame ball in the shape of the Stanford Bunny",
-        "comment": "This deviates from what was in my mind, but it's cool to have fire and ice next to each other."
+        "comment": "This deviates from what was in my mind, but it's cool to see fire and bunny together on a stadium."
     },
     {
         "original": "https://cdn.discordapp.com/attachments/989936230470934558/1000825247957786624/craiyon_140159_a_beetle_trapped_inside_transparent_glass.png",
@@ -671,6 +671,54 @@ const OBJECTS = [
         "date": "10/29/2022",
         "text": "emojis blew from colored glass displayed on a table",
         "comment": "I like the depth of field and how they are arranged in a regular pattern. What was in my mind had more variety, they include nature and item emojis and not only the yellow circular faces."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058286734091227247/craiyon_023211_bolts_and_nuts_arranged_into_sophisticated_geometry__photography.png",
+        "date": "12/30/2022",
+        "text": "bolts and nuts arranged into sophisticated geometry, photography",
+        "comment": "First in two months."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058288323849891880/craiyon_023846_finite_element_stress_analysis_of_a_spirula_shell_subject_to_water_pressure__3D_techn.png",
+        "date": "12/30/2022",
+        "text": "finite element stress analysis of a spirula shell subject to water pressure, 3D technical rendering",
+        "comment": "I'm writing FEM analysis code in C++ from scratch during my winter break. Might be nice to see some cool visuals beforehand?"
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058290653446017034/craiyon_024647_a_bolt_made_of_half_steel_and_half_jade_inverted_on_a_marble_table__still_life_photog.png",
+        "date": "12/30/2022",
+        "text": "a bolt made of half steel and half jade inverted on a marble table, still-life photography",
+        "comment": "I was thinking about a bolt with the cap facing down and the steel and jade split in a diagonal. DALL-E captures the background and lighting in my imagination, but not the object."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058294594040758342/craiyon_030333_icon_of_a_mobile_app_that_renders_3D_mathematical_functions_and_surfaces.png",
+        "date": "12/30/2022",
+        "text": "icon of a mobile app that renders 3D mathematical functions and surfaces",
+        "comment": "Inspired by my [url=https://harry7557558.github.io/spirula/]3D implicit surface grapher[/url]. It's interesting to see 3D shapes pop out of screens."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058295830286708787/craiyon_030630_________.png",
+        "date": "12/30/2022",
+        "text": "🐚🔮🌊💻",
+        "comment": "It's impressive to see that DALL-E can generate meaningful images from emojis. I wonder if AIs understand emojis better than text since there are different ways to state something in the text but an emoji (especially an object one) only means something specific."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058297507676958750/craiyon_031508________.png",
+        "date": "12/30/2022",
+        "text": "🌊🍃🍇⌛",
+        "comment": "Trying to randomly put some emojis. It's impressive that the AI generates images that I couldn't imagine."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058298863263424613/craiyon_031916__________.png",
+        "date": "12/30/2022",
+        "text": "❄️👁️🐚🔥",
+        "comment": "This is probably the most satisfying set of images that DALL-E ever generated for me. I was impressed by how DALL-E generates images with spiral and polar symmetry and seamlessly combines fire and ice in an unexpected way."
+    },
+    {
+        "original": "https://cdn.discordapp.com/attachments/989936230470934558/1058301150677446716/craiyon_032842_________.png",
+        "date": "12/30/2022",
+        "text": "🍒🐠🌉🔮",
+        "comment": "I was intentionally imagining something this time. I thought about a suspension bridge inside a crystal ball with fish surrounding it. DALL-E was thinking about something else, but the result is still not disappointing."
     }
 ];
 
