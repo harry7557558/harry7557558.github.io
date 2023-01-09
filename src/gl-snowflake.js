@@ -200,5 +200,5 @@ function setupSnowflakeRenderer() {
 
     // set emoji
     let container = document.getElementById("snowflake-emoji");
-    container.innerHTML = container.innerHTML.replaceAll('❄️', '<img src="https://twemoji.maxcdn.com/v/13.1.0/svg/2744.svg" alt="❄️" style="height:1.2em;padding-top:0.15em"/>&nbsp;')
+    container.innerHTML = container.innerHTML.replaceAll('❄️', '<img src="src/twemoji-2744.svg" alt="❄️" style="height:1.2em;padding-top:0.15em"/>&nbsp;')
 }

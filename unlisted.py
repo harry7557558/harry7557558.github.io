@@ -124,7 +124,7 @@ additional_repos = [
     ['engsci-2t6', '../engsci-2t6'],
 ]
 
-site_content = indexDirectory(root)
+site_content = indexDirectory(root, web_only=True)
 additional_contents = ["<div class='dirname'><i>/"+s[0]+"</i></div>"
                        + "<div class='dir'>" +
                        indexDirectory(s[1], web_only=True,

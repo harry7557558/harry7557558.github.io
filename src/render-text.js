@@ -1,12 +1,35 @@
 /* load and animate random quotes and links */
 
+// https://stackoverflow.com/a/12646864/16318343
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
 // convert QUOTES/LINKS to a list of text/probability/psa
 function flattenItemList(objects) {
     if (typeof (objects) == "string")
         objects = JSON.parse(objects);
-    var items = [];
+    // shuffle category to make LDS random unpredictable
+    var groups = [];
     for (let group_key in objects) {
         var group = objects[group_key].objects;
+        shuffleArray(group);
+        groups.push({
+            probability: objects[group_key].probability,
+            objects: group
+        });
+    }
+    shuffleArray(groups);
+    // flatten object list
+    var items = [];
+    for (var gi = 0; gi < groups.length; gi++) {
+        var probability = groups[gi].probability;
+        var group = groups[gi].objects;
         var sub_items = [];
         for (var i = 0; i < group.length; i++) {
             sub_items.push({
@@ -24,11 +47,12 @@ function flattenItemList(objects) {
             items.push({
                 text: sub_items[i].text,
                 alt: sub_items[i].alt,
-                probability: sub_items[i].weight * objects[group_key].probability,
+                probability: sub_items[i].weight * probability,
                 psa: -1.0
             });
         }
     }
+    // calculate probability prefixed sum
     var psa = 0.0;
     for (var i = 0; i < items.length; i++) {
         psa += items[i].probability;
