@@ -329,8 +329,6 @@ function getMat() {
         }
     }
     if (!R) return;
-    calcDet();
-    calcEigen();
     redraw();
     return R;
 }
@@ -413,7 +411,7 @@ function isToggled(id) {
     return $("toggle-" + id).classList.contains("toggled");
 }
 
-function redraw() {
+function redrawGraphics() {
     let canvas = $("canvas");
     var ctx = canvas.getContext("2d");
 
@@ -676,25 +674,46 @@ function redraw() {
     return;
 }
 
+function redraw() {
+    // render text
+    var display = "none";
+    if (isToggled('eigens')) {
+        calcDet();
+        calcEigen();
+        display = "block";
+    }
+    $("determinant").style.display = display;
+    $("eigens").style.display = display;
+    var hrs = $("control").getElementsByTagName("hr");
+    for (var i = 0; i < hrs.length; i++)
+        hrs[i].style.display = display;
+    // render graphics
+    setTimeout(redrawGraphics, 0);
+}
+
 
 /**************** Interaction ****************/
 
-var MouseDown = false;
+var MouseDown = false, FingerDist = -1.0;
 var Is2D = false;  // if is in 2d view
 var Cursor = [NaN, NaN], PrevCursor = [NaN, NaN];
 var Rx = -1.3, Rz = -0.55;
 function initCanvasAttitudes() {
     let canvas = $("canvas");
-    canvas.onmousedown = function (event) {
+    canvas.style.touchAction = "none";
+    canvas.addEventListener('pointerdown', function (event) {
+        canvas.setPointerCapture(event.pointerId);
         MouseDown = true;
         PrevCursor = [event.clientX, canvas.height - event.clientY];
-    };
-    canvas.oncontextmenu = function (event) {
+    });
+    window.addEventListener('pointerup', function (event) {
         event.preventDefault();
-        if (Is2D) Is2D = false, $("footer").innerHTML = "3D view", Rx = Rz = 0;
-        redraw();
-    };
-    document.onmousemove = function (event) {
+        MouseDown = false;
+        PrevCursor = [NaN, NaN];
+    });
+    canvas.addEventListener('pointermove', function (event) {
+        event.preventDefault();
+        if (FingerDist >= 0.0) return;
         Cursor = [event.clientX, canvas.height - event.clientY];
         if (MouseDown && !Is2D) {	// click and drag to rotate the view
             var dx = Cursor[0] - PrevCursor[0], dy = PrevCursor[1] - Cursor[1];
@@ -703,20 +722,40 @@ function initCanvasAttitudes() {
             redraw();
             PrevCursor = Cursor;
         }
-    };
-    document.onmouseup = function (event) {
-        MouseDown = false;
-        PrevCursor = [NaN, NaN];
-    };
-    canvas.addEventListener("wheel", function (event) {
-        event.preventDefault();
-        const MAX = 500, MIN = 0.5;
-        var d = Math.exp(-0.0005 * event.deltaY);
-        //if (Scale * d > MAX) d = MAX / Scale;
-        //else if (Scale * d < MIN) d = MIN / Scale;
-        Scale *= d;
-        redraw();
     });
+    function zoomIn(d) {
+        const MAX = 500000, MIN = 0.01;
+        if (Scale * d > MAX) d = MAX / Scale;
+        else if (Scale * d < MIN) d = MIN / Scale;
+        Scale *= d;
+    }
+    canvas.addEventListener("wheel", function (event) {
+        zoomIn(Math.exp(-0.0005 * event.deltaY));
+        redraw();
+    }, { passive: true });
+    canvas.addEventListener("touchstart", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            FingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+        }
+    }, { passive: true });
+    canvas.addEventListener("touchend", function (event) {
+        FingerDist = -1.0;
+    }, { passive: true });
+    canvas.addEventListener("touchmove", function (event) {
+        if (event.touches.length == 2) {
+            var fingerPos0 = [event.touches[0].pageX, event.touches[0].pageY];
+            var fingerPos1 = [event.touches[1].pageX, event.touches[1].pageY];
+            var newFingerDist = Math.hypot(fingerPos1[0] - fingerPos0[0], fingerPos1[1] - fingerPos0[1]);
+            if (FingerDist > 0. && newFingerDist > 0.) {
+                var sc = Math.max(Math.min(FingerDist / newFingerDist, 2.0), 0.5);
+                zoomIn(1.0 / sc);
+                redraw();
+            }
+            FingerDist = newFingerDist;
+        }
+    }, { passive: true });
 }
 
 var PreviousWindowSize, Scale;
