@@ -164,22 +164,142 @@ function copyShareableLink() {
 // attempt to parse a user-input 4x4 matrix
 // components will be strings, not numbers
 function parseUserInputMatrix(s) {
+    function testWithBracket(s, c) {
+        var depth = 0;
+        for (var i = 0; i < s.length; i++) {
+            if (s[i] == '(') depth += 1;
+            if (s[i] == ')') depth -= 1;
+            if (s[i] == c && depth == 0) return true;
+        }
+        return false;
+    }
+    function splitWithBracket(s, c) {
+        var res = [];
+        var depth = 0;
+        var t = "";
+        for (var i = 0; i < s.length; i++) {
+            if (s[i] == '(') depth += 1;
+            if (s[i] == ')') depth -= 1;
+            if (s[i] == c && depth == 0) {
+                if (c != ' ' || t.length > 0)
+                    res.push(t);
+                t = "";
+            }
+            else t += s[i];
+        }
+        if (t != "") res.push(t);
+        return res;
+    }
+    function bracketNestDepth(s, c1, c2) {
+        var depth = 0, maxDepth = 0;
+        for (var i = 0; i < s.length; i++) {
+            if (s[i] == c1) depth++;
+            if (s[i] == c2) depth--;
+            maxDepth = Math.max(depth, maxDepth);
+        }
+        return maxDepth;
+    }
     var m = [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1]
     ];
+    if (/[\{\}]/.test(s)) {  // Wolfram format
+        s = s.replaceAll('[', '(').replaceAll(']', ')');
+        s = s.replaceAll('{', '[').replaceAll('}', ']');
+    }
+    if (/[\[\]]/.test(s)) {  // Python format
+        if (bracketNestDepth(s, '[', ']') == 1)
+            s = '[' + s + ']';
+        var s1 = "";
+        var depth = 0, bdepth = 0;
+        var t = "";
+        for (var i = 0; i < s.length; i++) {
+            if (s[i] == '[') {
+                if (t != '' && depth == 1)
+                    s1 += t.trim() + ';';
+                depth += 1;
+                t = "", bdepth = 0;
+            }
+            else if (s[i] == ']') {
+                if (t != '' && depth >= 1)
+                    s1 += t.trim() + ';';
+                depth -= 1;
+                t = "", bdepth = 0;
+            }
+            else if (/[,;]/.test(s[i]) && bdepth == 0) {
+                s1 += t.trim() + (depth == 1 ? ';' : ',');
+                t = "";
+            }
+            else {
+                t += s[i];
+                if (s[i] == '(') bdepth++;
+                if (s[i] == ')') bdepth--;
+            }
+        }
+        s = s1.replace(/\;+\,?/g, ';');
+        // console.log(s);
+    }
+    // Matlab/Octave format
+    var separator = testWithBracket(s, ',') ? ',' : ' ';
     s = s.replace(/^[\;\,\s]+/, '');
     s = s.replace(/[\;\,\s]+$/, '');
-    s = s.split(';');
+    s = splitWithBracket(s, ';');
+    for (var i = 0; i < s.length; i++)
+        s[i] = splitWithBracket(s[i], separator);
+    // reshape one column matrix
+    var isOneColumn = false;
+    for (var i = 0; i < s.length; i++)
+        isOneColumn &= (s[i].length == 1);
+    if (isOneColumn) {
+        for (var i = 1; i < s.length; i++)
+            s[0] = s[0].concat(s[i]);
+        s = [s[0]];
+    }
+    // reshape one line matrix
+    if (s.length == 1) {
+        var k = Math.floor(Math.sqrt(s[0].length));
+        while (k > 1 && s[0].length % k != 0) k--;
+        var l = s[0].length / k;
+        if (k > 1 && l <= 4) {
+            var s1 = [];
+            for (var i = 0; i < k; i++) {
+                var row = [];
+                for (var j = 0; j < l; j++)
+                    row.push(s[0][i * l + j]);
+                s1.push(row);
+            }
+            s = s1;
+        }
+    }
+    // apply
     for (var i = 0; i < s.length && i < 4; i++) {
-        var r = s[i].split(',');
-        for (var j = 0; j < r.length && j < 4; j++)
-            m[i][j] = r[j];
+        for (var j = 0; j < s[i].length && j < 4; j++)
+            m[i][j] = s[i][j].trim();
     }
     return m;
 }
+function testParseUserInputMatrix() {
+    function test(s) {
+        console.log(s);
+        console.log(JSON.stringify(parseUserInputMatrix(s)));
+    }
+    test("1,0,0;0,10;0,0,atan2(2,1)");
+    test("[[1,0,0],[0,1,0],[0,0,atan2(2,1)]]");
+    test("[[1, 2+3], pi, [0, 0, atan2(2,1)]]");
+    test("{ {1, 2}, {3, 4} }");
+    test("1,2,3, 4,5,6");
+    test("{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}");
+    test("{{1,2,3},{4,5,6,7},{9,10,11},{13,14,15,16}");
+    test("hypot(2x+1,3y-2), cos(2theta); 4sin(2x+1); e^-x;");
+    test("1 2 3;  4 5 6; 7  8 hypot(9, 5)");
+    test("[[1 3 5], [2 4 6], [3 6 9]]");
+    test("[1 3 5], [2 4 6], [3 6 9]");
+    test("[1, 3, 5], [2, 4 6], [3 6 9]");
+}
+testParseUserInputMatrix();
+
 
 var UrlHash = {};
 function updateParametersFromHash() {
@@ -294,11 +414,25 @@ function initMat() {
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
             mi.innerHTML += "<input class='ele' id='_" + i + j + "' value='" + mat[i][j] + "' style='background-color:" +
-                (i == 3 ? (j == 3 ? "PaleGoldenRod" : "LightSalmon") : (j == 3 ? "PaleGreen" : "SkyBlue")) + ";' spellcheck='false' autocomplete='off' autocorrect='off' oninput='getMat()'/>";
+                (i == 3 ? (j == 3 ? "PaleGoldenRod" : "LightSalmon") : (j == 3 ? "PaleGreen" : "SkyBlue")) +
+                ";' spellcheck='false' autocomplete='off' autocorrect='off' autocapitalize='off' oninput='getMat()'/>";
         }
         mi.innerHTML += "<br/>";
     }
     getMat();
+
+    // input matrix shortcut
+    document.addEventListener("keydown", function (event) {
+        if (!(event.code == 'F2' || (event.code == 'KeyM' && event.ctrlKey)))
+            return;
+        event.preventDefault();
+        var s = prompt("Import matrix\nPaste matrix (Python, MATLAB, and Wolfram formats are supported):");
+        if (s == null || s == "") return;
+        var mat = parseUserInputMatrix(s);
+        for (var i = 0; i < 4; i++)
+            for (var j = 0; j < 4; j++)
+                $('_' + i + j).value = mat[i][j];
+    });
 }
 
 // get matrix input
@@ -312,11 +446,13 @@ function getMat() {
             if (MATHJS_LOADED) {
                 // support expressions like "sqrt(3)/2"
                 try {
-                    var t = math.eval(tm.value);
+                    var v = tm.value.toLowerCase();
+                    v = v.replaceAll('[', '(').replaceAll(']', ')');
+                    var t = math.eval(v);
                     if (isNaN(0 * t)) throw (t);
                     Mat[i][j] = t;
                     tm.style.borderColor = "White";
-                } catch (d) {
+                } catch (e) {
                     tm.style.borderColor = "Red";
                     R = false;
                 }
@@ -807,6 +943,7 @@ window.addEventListener("load", function () {
                 redraw();
             });
         })(toggles[i]);
+    if (w < 500) $("toggle-eigens").classList.remove("toggled");
 
     // init footer
     $("footer").style.display = 'block';
