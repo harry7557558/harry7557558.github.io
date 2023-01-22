@@ -13,7 +13,6 @@ def run_module(name):
 if 1:
     run_module("desmos.preview")
     run_module("shadertoy.preview")
-    run_module("dall-e.thumbnail")
     run_module("src.tojson-quotes")
 
 
@@ -40,10 +39,12 @@ def getExtension(path):
 def getGitTrackedFiles(_dir):
     print("Tracking", _dir)
     files = subprocess.run(
-        ['git', 'ls-tree', '--full-tree', '--name-only', '-r', 'HEAD'],
+        #['git', 'ls-tree', '--full-tree', '--name-only', '-r', 'HEAD', '-z'],
+        ['git', 'ls-files', '-z'],
         stdout=subprocess.PIPE,
         cwd=_dir
-    ).stdout.decode('utf-8').strip().split('\n')
+    ).stdout.split(b'\0')
+    files = [file.decode('utf-8') for file in files]
     result = set({})
     for file in files:
         file = _dir + '/' + file
@@ -116,9 +117,10 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
 
 
 additional_repos = [
+    ['harry7557558', '../harry7557558'],
     ['Graphics', '../Graphics'],
-    ['spirula', '../spirula'],
     ['miscellaneous', '../miscellaneous'],
+    ['spirula', '../spirula'],
     ['AVI3M-CPT', '../AVI3M-CPT'],
     ['AVI4M-ISP', '../AVI4M-ISP'],
     ['engsci-2t6', '../engsci-2t6'],
