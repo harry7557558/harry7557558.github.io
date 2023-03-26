@@ -117,7 +117,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
 
 
 additional_repos = [
-    ['harry7557558', '../harry7557558'],
+    # ['harry7557558', '../harry7557558'],
     ['Graphics', '../Graphics'],
     ['miscellaneous', '../miscellaneous'],
     ['spirula', '../spirula'],
