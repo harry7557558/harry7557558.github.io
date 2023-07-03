@@ -120,7 +120,7 @@ additional_repos = [
     # ['harry7557558', '../harry7557558'],
     ['Graphics', '../Graphics'],
     ['miscellaneous', '../miscellaneous'],
-    ['spirula', '../spirula'],
+    ['spirulae', '../spirulae'],
     ['AVI3M-CPT', '../AVI3M-CPT'],
     ['AVI4M-ISP', '../AVI4M-ISP'],
     ['engsci-2t6', '../engsci-2t6'],
