@@ -142,8 +142,6 @@ content = """<!doctype html>
     <meta name="robots" content="index, follow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./favicon.ico" />
-    <meta property="og:image" content="./logo.png" />
-    <link rel="image_src" href="./logo.png" />
     <style>
         body{margin:0.5em}
         div>div,table{margin-left:2em}td{padding-right:1em}span{padding-left:1em}
