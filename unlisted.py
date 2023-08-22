@@ -98,7 +98,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
         content += "    <table" + " style='margin-left:0'"*is_root + ">\n"
         for fn in files:
             ext = getExtension(fn)
-            if web_only and ext not in ['htm', 'html', 'js', 'css', 'svg', 'pdf']:
+            if web_only and ext not in ['htm', 'html', 'pdf']:
                 continue
             content += "    <tr>"
             path = urllib.parse.quote(name+fn[trunc:])
@@ -137,7 +137,7 @@ content = """<!doctype html>
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Harry Chen - unlisted</title>
+    <title>Harry C. - unlisted</title>
     <meta name="description" content="This is the index of an insane website created by an insane person." />
     <meta name="robots" content="index, follow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -170,10 +170,10 @@ function initRandomLink() {
 function setContactInfo() {
     const element = document.getElementById("contact-info");
     const infos = [
-        "<span title='Preferred name'>Harry Chen<span>",
-        "<span title='Email'>harry7557558@gmail.com<span>",
-        "<span title='Instagram'>@harry7557558</span>",
-        "<span title='Discord'>harry7557558#2125</span>"
+        "<span>Harry (J.X.) C.<span>",
+        "<span>[a-z\\d]+@gmail.com<span>",
+        "<span>@harry7557558</span>",
+        "<span>spirulae#0000</span>"
     ];
     var infoIndex = 0;
     element.innerHTML = infos[infoIndex];
