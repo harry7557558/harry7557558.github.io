@@ -138,7 +138,7 @@ content = """<!doctype html>
 <head>
     <meta charset="utf-8" />
     <title>Harry C. - unlisted</title>
-    <meta name="description" content="This is the index of an insane website created by an insane person." />
+    <meta name="description" content="This is the index of a 🐌 website created by a 🐌 person." />
     <meta name="robots" content="index, follow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="./favicon.ico" />

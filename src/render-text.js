@@ -196,12 +196,13 @@ function resetWordStyle() {
     var pad = Math.max(0.025 * w, 20);
     left.style.left = pad.toFixed(1) + "px";
     right.style.right = pad.toFixed(1) + "px";
-    var bottom_w = Math.min(0.6 * Math.max(w, h), 0.8 * w);
+    var bottom_w = Math.min(1.2 * Math.min(w, h), 0.8 * w);
     bottom.style.width = bottom_w.toFixed(1) + "px";
     bottom.style.marginLeft = (-0.5 * bottom_w).toFixed(1) + "px";
 
     // set font size
-    var font_size = Math.max(0.014 * Math.max(w, h), 16);
+    var sc = Math.max(Math.min(w, h), 0.5*Math.max(w, h));
+    var font_size = Math.max(0.028 * sc, Math.min(20, 0.04*w));
     left.style.fontSize = right.style.fontSize = (1.0 * font_size).toFixed(1) + "px";
     bottom.style.fontSize = (1.4 * font_size).toFixed(1) + "px";
 };
