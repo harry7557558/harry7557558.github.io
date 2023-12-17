@@ -61,7 +61,11 @@ def getGitTrackedFiles(_dir):
     return result
 
 
-def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = None):
+def indexDirectory(
+        _dir, web_only=False, trunc=-1,
+        name='', root='',
+        tracked_list: set = None):
+
     if tracked_list is None:
         tracked_list = getGitTrackedFiles(_dir)
         # print(tracked_list)
@@ -83,7 +87,7 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
     dirs = [_dir+f for f in ls if os.path.isdir(_dir+f)]
     dirs_content = [indexDirectory(
         path+'/', web_only=web_only,
-        trunc=trunc, name=name, tracked_list=tracked_list
+        trunc=trunc, name=name, root=root, tracked_list=tracked_list
     ) for path in dirs]
     content = ""
     for i in range(len(dirs)):
@@ -101,11 +105,15 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
             if web_only and ext not in ['htm', 'html', 'pdf']:
                 continue
             content += "    <tr>"
-            path = urllib.parse.quote(name+fn[trunc:])
+            path = urllib.parse.quote((name if root=='' else root)+fn[trunc:])
+            path = path.replace("%3A//", "://")
             displaypath = f"/<i>{name}</i>"*(name != "") + f"{fn[trunc:]}"
             if ext in ['py', 'cpp', 'h', 'hpp', 'glsl', 'md', 'yml']:
                 path = "src/text-preview.html#" + path
             path = path.lstrip('/')
+            if path.endswith("/index.html"):
+                path = path.rstrip("index.html")
+            # print(path)
             content += f"<td class='file'><a href='{path}' class='{ext}'>{displaypath}</a></td>"
             content += f"<td>{getFileSize(fn)}</td>"
             content += f"<td>{ext}</td>"
@@ -118,19 +126,21 @@ def indexDirectory(_dir, web_only=False, trunc=-1, name='', tracked_list: set = 
 
 additional_repos = [
     # ['harry7557558', '../harry7557558'],
-    ['Graphics', '../Graphics'],
-    ['miscellaneous', '../miscellaneous'],
-    ['spirulae', '../spirulae'],
-    ['AVI3M-CPT', '../AVI3M-CPT'],
-    ['AVI4M-ISP', '../AVI4M-ISP'],
-    ['engsci-2t6', '../engsci-2t6'],
+    ['Graphics', '../Graphics', ''],
+    ['miscellaneous', '../miscellaneous', ''],
+    ['spirulae', '../spirulae', ''],
+    ['AVI3M-CPT', '../AVI3M-CPT', ''],
+    ['AVI4M-ISP', '../AVI4M-ISP', ''],
+    # ['engsci-2t6', '../engsci-2t6', ''],
+    ['img23d', '../img23d', ''],
+    ['spirulae-gallery', '../spirulae-gallery', 'https://spirulae.github.io/gallery'],
 ]
 
 site_content = indexDirectory(root, web_only=True)
 additional_contents = ["<div class='dirname'><i>/"+s[0]+"</i></div>"
                        + "<div class='dir'>" +
                        indexDirectory(s[1], web_only=True,
-                                      name=s[0])+"</div>"
+                                      name=s[0], root=s[2])+"</div>"
                        for s in additional_repos]
 
 content = """<!doctype html>
