@@ -355,11 +355,11 @@ for shader in shaders:
 index += """
     </div>
     <div style="margin:0.6em"><br/>
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, shaders on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, shaders on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
         <br/><br/>
         <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/shadertoy#readme">GitHub</a>.</span>
         <br/>
-        <span>(Also check out my <a href="/desmos/index.html">Desmos list</a> :)</span>
+        <span>(Also check out my <a href="/desmos/">Desmos list</a> :)</span>
         <br/><br/>
     </div>
     <script src="script.js"></script>

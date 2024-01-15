@@ -1,6 +1,6 @@
-## A list/backup of my saved Desmos graphs
+## A list of my saved Desmos graphs
 
-Check it out here: https://harry7557558.github.io/desmos/index.html
+Check it out here: https://harry7557558.github.io/desmos/
 
 **To generate a page like this:**
 

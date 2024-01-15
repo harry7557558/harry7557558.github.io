@@ -14,7 +14,7 @@ except:
 
 
 def get_graph_info(graph_id: str):
-    url = "https://www.desmos.com/calculator/" + graph_id
+    url = "https://www.desmos.com/" + graph_id
     req = requests.get(url)
     if req.status_code != 200:
         raise ValueError(f"Request returns {req.status_code}")
@@ -178,13 +178,14 @@ index = """<!DOCTYPE html>
 <body>
     <div style="margin:1.2em 1.2em 0 1.2em">
         <h1>List of my saved Desmos graphs</h1>
-        <p class="created">Harry Chen (harry7557558) - Updated {%CURRENT_DATE%}</p>
+        <p class="created">Harry Chen (<a href="https://github.com/harry7557558">harry7557558</a>) - Updated {%CURRENT_DATE%}</p>
         <div><br/></div>
         <hr/>
     </div>""".replace('{%CURRENT_DATE%}', datetime.datetime.now().strftime("%Y/%m/%d"))
 
 
 # go through the list to download graphs
+graph_blocks = []
 for graph_id in graphs:
 
     # load graph
@@ -225,21 +226,27 @@ for graph_id in graphs:
             <p class="created">{date} • {size_summary}</p>
             {preview}
             <p class="links">
-                <a href="https://www.desmos.com/calculator/{graph_id}">Desmos</a>
+                <a href="https://www.desmos.com/{graph_id}">Desmos</a>
                 <a href="./graphs/{graph_id}.json">JSON</a>
             </p>
         </div>
     </div>"""
-    index += content
+    graph_blocks.append({
+        'date': date,
+        'content': content
+    })
+
+for block in sorted(graph_blocks, key=lambda _: _['date'], reverse=True):
+    index += block['content']
 
 
 index += """
     <div style="margin:0.6em"><br/>
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;height:inherit" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Unless otherwise stated, graphs on this page are licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+        Unless otherwise stated, you are free to share and adapt graphs listed on this page, as long as appropriate attribution is given.
         <br/><br/>
         <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub</a>.</span>
         <br/>
-        <span>(Also check out my <a href="/shadertoy/index.html">Shadertoy list</a> :)</span>
+        <span>(Also check out my <a href="/shadertoy/">Shadertoy list</a> and <a href="https://spirulae.github.io/">function grapher</a> :)</span>
         <br/><br/>
     </div>
 </body></html>"""
