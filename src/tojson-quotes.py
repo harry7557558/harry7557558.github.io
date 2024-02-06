@@ -53,10 +53,12 @@ for line in lines:
     match = regex.match(line)
     if match:
         quote = match.group(1)
-        weight = match.group(2)
+        weight = float(match.group(2))
+        if not (weight > 0.0):
+            continue
         result[key]["objects"].append({
             "text": quote,
-            "weight": float(weight)
+            "weight": weight
         })
         continue
 
@@ -93,11 +95,13 @@ for line in lines:
     if match:
         link = match.group(1)
         alt = match.group(2)
-        weight = match.group(3)
+        weight = float(match.group(3))
+        if not (weight > 0.0):
+            continue
         result[key]["objects"].append({
             "text": link,
             "alt": alt,
-            "weight": float(weight)
+            "weight": weight
         })
         continue
 
