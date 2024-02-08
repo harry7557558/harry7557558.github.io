@@ -171,7 +171,7 @@ index = """<!DOCTYPE html>
             .info{display:block;width:100%}
             .equation{overflow:scroll}
         }
-        a{font-size:1em;padding:0 0.1em;text-decoration:none;color:#06c}
+        .links a{font-size:1em;padding:0 0.1em;text-decoration:none;color:#06c}
         a:hover{text-decoration:underline}
     </style>
 </head>
@@ -219,7 +219,8 @@ for graph_id in graphs:
     # add graph to the index
     content = f"""<div class="graph">
         <div class="image-container">
-            <img class="graph-thumbnail" src="{graph['thumbUrl']}" alt="{graph['title']}" loading="lazy" />
+            <a href="https://www.desmos.com/{graph_id}"><img class="graph-thumbnail"
+                src="{graph['thumbUrl']}" alt="{graph['title']}" loading="lazy" /></a>
         </div>
         <div class="info">
             <h2>{graph['title']}</h2>
@@ -244,7 +245,7 @@ index += """
     <div style="margin:0.6em"><br/>
         Unless otherwise stated, you are free to share and adapt graphs listed on this page, as long as appropriate attribution is given.
         <br/><br/>
-        <span>For information on how to generate a page like this, check out <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub</a>.</span>
+        <span>For information on how to generate a page like this, check out this <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub README</a>.</span>
         <br/>
         <span>(Also check out my <a href="/shadertoy/">Shadertoy list</a> and <a href="https://spirulae.github.io/">function grapher</a> :)</span>
         <br/><br/>
