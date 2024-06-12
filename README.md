@@ -24,9 +24,10 @@
  - [Math note (2020)](https://harry7557558.github.io/notes/substitution.html)
  - [Math note (before 2020)](https://harry7557558.github.io/notes/equations.html)
 
-## Not in this repository
-
- - [2D to 3D](https://harry7557558.github.io/img23d)
+## Outside this repository
+ - [Image to 3D Model](https://harry7557558.github.io/img23d)
+ - [Desmos to 3D Model](https://github.com/harry7557558/desmos-to-3d-model)
+ - [SVG to Desmos](https://github.com/harry7557558/svg-to-desmos)
 
 ## Spirulae
  - [3D implicit surface grapher](https://spirulae.github.io/implicit3/)
@@ -38,10 +39,6 @@
  - [3D mesh generation](https://spirulae.github.io/meshgen3/)
  - [Homepage](https://spirulae.github.io/)
  - [Gallery](https://spirulae.github.io/gallery)
-
-## GitHub
- - [SVG to Desmos](https://github.com/harry7557558/svg-to-desmos)
- - [Undocumented 2D to 3D CLI version](https://github.com/harry7557558/Graphics/blob/master/modeling/img23d/main_cli.cpp)
 
 ## More Art
  - [Grade 12 art (2022)](https://harry7557558.github.io/AVI4M-ISP/) ([Process (PDF)](https://harry7557558.github.io/AVI4M-ISP/process.pdf))

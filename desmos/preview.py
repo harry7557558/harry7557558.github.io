@@ -5,6 +5,7 @@ import re
 import html
 import json
 import datetime
+import dateutil.parser
 import os
 
 try:
@@ -199,8 +200,12 @@ for graph_id in graphs:
             json.dump(graph, fp, separators=(',', ':'))
         print(graph_id, '-', "downloaded")
 
-    date = datetime.datetime.strptime(
-        graph['created'], "%a, %d %b %Y %H:%M:%S GMT").strftime("%Y/%m/%d")
+    try:
+        date = datetime.datetime.strptime(
+            graph['created'], "%a, %d %b %Y %H:%M:%S GMT")
+    except:
+        date = dateutil.parser.isoparse(graph['created'])
+    date = date.strftime("%Y/%m/%d")
     size_summary = get_graph_size_summary(graph['state'])
     description = get_graph_description(graph['state'])
     if len(description) > 256:
@@ -247,7 +252,11 @@ index += """
         <br/><br/>
         <span>For information on how to generate a page like this, check out this <a href="https://github.com/harry7557558/harry7557558.github.io/tree/master/desmos#readme">GitHub README</a>.</span>
         <br/>
-        <span>(Also check out my <a href="/shadertoy/">Shadertoy list</a> and <a href="https://spirulae.github.io/">function grapher</a> :)</span>
+        <span>(Also check out my
+        <a href="https://github.com/harry7557558/desmos-to-3d-model">Desmos to 3D model tool</a>,
+        <a href="https://spirulae.github.io/">function grapher</a>, and
+        <a href="/shadertoy/">Shadertoy list</a>
+        :)</span>
         <br/><br/>
     </div>
 </body></html>"""
