@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>IMU Test</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .plot {
+            width: 100%;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <a id="start_demo" href="#" role="button">Start the demo</a>
+</div>
+
+<div id="orientation" class="plot"></div>
+<div id="acceleration" class="plot"></div>
+<div id="accelerationWithGravity" class="plot"></div>
+<div id="gyroscope" class="plot"></div>
+
+<script>
+const maxDataPoints = 100;
+const layouts = {
+    orientation: { title: 'Orientation [°]' },
+    acceleration: { title: 'Acceleration [m/s²]' },
+    accelerationWithGravity: { title: 'Acceleration with Gravity [m/s²]' },
+    gyroscope: { title: 'Gyroscope [rad/s]' }
+};
+for (var key in layouts) {
+    layouts[key].height = 150;
+    layouts[key].margin = { l: 30, r: 0, b: 20, t: 40, pad: 4 };
+    layouts[key].xaxis = { fixedrange: true };
+    layouts[key].yaxis = { autorange: true, fixedrange: true };
+}
+
+const traces = {
+    orientation: [
+        {x: [], y: [], s: [], name: 'X', line: {color: 'red'}},
+        {x: [], y: [], s: [], name: 'Y', line: {color: 'green'}},
+        {x: [], y: [], s: [], name: 'Z', line: {color: 'blue'}}
+    ],
+    acceleration: [
+        {x: [], y: [], s: [], name: 'X', line: {color: 'red'}},
+        {x: [], y: [], s: [], name: 'Y', line: {color: 'green'}},
+        {x: [], y: [], s: [], name: 'Z', line: {color: 'blue'}}
+    ],
+    accelerationWithGravity: [
+        {x: [], y: [], s: [], name: 'X', line: {color: 'red'}},
+        {x: [], y: [], s: [], name: 'Y', line: {color: 'green'}},
+        {x: [], y: [], s: [], name: 'Z', line: {color: 'blue'}}
+    ],
+    gyroscope: [
+        {x: [], y: [], s: [], name: 'X', line: {color: 'red'}},
+        {x: [], y: [], s: [], name: 'Y', line: {color: 'green'}},
+        {x: [], y: [], s: [], name: 'Z', line: {color: 'blue'}}
+    ]
+};
+
+Object.keys(traces).forEach(key => {
+    Plotly.newPlot(key, traces[key], layouts[key]);
+});
+
+function updatePlot(plotName, x=NaN, y=NaN, z=NaN) {
+    const time = new Date();
+
+    if (isFinite(x+y+z)) {
+        const update = {
+            x: [[time], [time], [time]],
+            y: [[x], [y], [z]]
+        };
+        traces[plotName].forEach((trace, i) => {
+            var n = trace.x.length;
+            if (n == 0) {
+                trace.x.push(time);
+                trace.y.push(update.y[i][0]);
+                trace.s.push(true);
+                return;
+            }
+            var n1 = n;
+            while (n > 0 && trace.s[n-1] === false) {
+                trace.y.pop();
+                trace.s.pop();
+                n -= 1;
+            }
+            var t0 = n == 0 ? time.getTime()-1 : trace.x[n-1].getTime();
+            var y0 = n == 0 ? update.y[i][0] : trace.y[n-1];
+            for (; n < n1; n++) {
+                var u = (trace.x[n].getTime() - t0) / (time.getTime() - t0);
+                u = Math.max(Math.min(u, 1.0), 0.0);
+                var y = y0 + (update.y[i][0]-y0) * u;
+                trace.y.push(y);
+                trace.s.push(true);
+            }
+            trace.x.push(time);
+            trace.y.push(update.y[i][0]);
+            trace.s.push(true);
+        });
+    }
+    else {
+        traces[plotName].forEach((trace, i) => {
+            var n = trace.x.length;
+            trace.x.push(time);
+            trace.y.push(n > 0 ? trace.y[n-1] : 0.0);
+            trace.s.push(false)
+        });
+    }
+
+    traces[plotName].forEach((trace, i) => {
+        if (trace.x.length > maxDataPoints) {
+            trace.x.shift();
+            trace.y.shift();
+            trace.s.shift();
+        }
+    });
+    Plotly.update(plotName, traces[plotName], layouts[plotName]);
+}
+
+function handleOrientation(event) {
+    updatePlot('orientation',
+        (event.alpha + 180) % 360 - 180,
+        event.beta,
+        event.gamma
+    );
+    updatePlot('accelerationWithGravity');
+    updatePlot('acceleration');
+    updatePlot('gyroscope');
+}
+
+function handleMotion(event) {
+    updatePlot('orientation');
+    updatePlot('accelerationWithGravity', 
+        event.accelerationIncludingGravity.x,
+        event.accelerationIncludingGravity.y,
+        event.accelerationIncludingGravity.z
+    );
+    updatePlot('acceleration',
+        event.acceleration.x,
+        event.acceleration.y,
+        event.acceleration.z
+    );
+    updatePlot('gyroscope',
+        Math.PI/180 * event.rotationRate.beta,
+        Math.PI/180 * event.rotationRate.gamma,
+        Math.PI/180 * event.rotationRate.alpha
+    );
+}
+
+let is_running = false;
+let demo_button = document.getElementById("start_demo");
+demo_button.onclick = function(e) {
+    e.preventDefault();
+
+    if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+        DeviceMotionEvent.requestPermission();
+    }
+
+    if (is_running) {
+        window.removeEventListener("devicemotion", handleMotion);
+        window.removeEventListener("deviceorientation", handleOrientation);
+        demo_button.innerHTML = "Start demo";
+        is_running = false;
+    } else {
+        window.addEventListener("devicemotion", handleMotion);
+        window.addEventListener("deviceorientation", handleOrientation);
+        demo_button.innerHTML = "Stop demo";
+        is_running = true;
+    }
+};
+</script>
+
+</body>
+</html>
