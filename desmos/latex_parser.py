@@ -70,6 +70,8 @@ def latex_splitted_to_tree(segments: 'list[str]') -> dict:
         ('\\left(', '\\right)'),
         ('\\left|', '\\right|'),
         ('\\left<', '\\right>'),
+        ('(', ')'),
+        ('[', ']'),
         ('{', '}'),
     ]
     if len(segments) < 2:
