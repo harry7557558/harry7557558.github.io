@@ -8,7 +8,7 @@ import json
 req = requests.get(
     "https://docs.google.com/document/d/1B7MUQFnMzgEBi-z0o2QsG-hHXcAOOsIbx4dPGrtVTNM/mobilebasic")
 print(req.status_code)
-soup = BeautifulSoup(req.content, 'html.parser')
+soup = BeautifulSoup(req.content.decode('utf-8','ignore'), 'html.parser')
 doc = soup.find('div', {'class': "doc"}).find('div')
 
 lines = []
